@@ -1,0 +1,183 @@
+{
+  "logs-network_traffic.tls-1.34.2": {
+    "description": "Pipeline for processing tls traffic",
+    "processors": [
+      {
+        "set": {
+          "field": "ecs.version",
+          "value": "8.17.0"
+        }
+      },
+      {
+        "pipeline": {
+          "if": "ctx._conf?.map_to_ecs != null && ctx._conf.map_to_ecs",
+          "name": "logs-network_traffic.tls-1.34.2-compatibility",
+          "tag": "compatibility_pipeline_processor"
+        }
+      },
+      {
+        "gsub": {
+          "field": "host.mac",
+          "pattern": "[-:.]",
+          "replacement": "",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac"
+        }
+      },
+      {
+        "gsub": {
+          "field": "host.mac",
+          "pattern": "(..)(?!$)",
+          "replacement": "$1-",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac"
+        }
+      },
+      {
+        "uppercase": {
+          "field": "host.mac",
+          "ignore_missing": true
+        }
+      },
+      {
+        "append": {
+          "field": "related.hosts",
+          "value": "{{{observer.hostname}}}",
+          "if": "ctx.observer?.hostname != null && ctx.observer?.hostname != ''",
+          "allow_duplicates": false
+        }
+      },
+      {
+        "foreach": {
+          "if": "ctx.observer?.ip != null && ctx.observer.ip instanceof List",
+          "field": "observer.ip",
+          "tag": "foreach_observer_ip",
+          "processor": {
+            "append": {
+              "field": "related.ip",
+              "value": "{{{_ingest._value}}}",
+              "allow_duplicates": false
+            }
+          }
+        }
+      },
+      {
+        "remove": {
+          "if": "ctx.host != null && ctx.tags != null && ctx.tags.contains('forwarded')",
+          "field": "host"
+        }
+      },
+      {
+        "pipeline": {
+          "if": "ctx._conf?.geoip_enrich != null && ctx._conf.geoip_enrich",
+          "name": "logs-network_traffic.tls-1.34.2-geoip",
+          "tag": "pipeline_processor"
+        }
+      },
+      {
+        "remove": {
+          "field": "_conf",
+          "ignore_missing": true
+        }
+      },
+      {
+        "convert": {
+          "field": "tls.client.x509.version_number",
+          "type": "string",
+          "ignore_missing": true,
+          "tag": "convert_tls_client_x509_version_number"
+        }
+      },
+      {
+        "convert": {
+          "field": "tls.server.x509.version_number",
+          "type": "string",
+          "ignore_missing": true,
+          "tag": "convert_tls_server_x509_version_number"
+        }
+      },
+      {
+        "remove": {
+          "description": "Remove legacy fields from Packetbeat 7.17 that are duplicated.",
+          "field": [
+            "tls.client.x509.issuer.province",
+            "tls.client.x509.subject.province",
+            "tls.client.x509.version",
+            "tls.detailed.client_certificate",
+            "tls.detailed.server_certificate",
+            "tls.server.x509.issuer.province",
+            "tls.server.x509.subject.province",
+            "tls.server.x509.version"
+          ],
+          "ignore_missing": true
+        }
+      },
+      {
+        "append": {
+          "field": "related.hash",
+          "value": "{{{tls.server.ja3s}}}",
+          "if": "ctx?.tls?.server?.ja3s != null"
+        }
+      },
+      {
+        "append": {
+          "field": "related.hash",
+          "value": "{{{tls.client.ja3}}}",
+          "if": "ctx?.tls?.client?.ja3 != null",
+          "allow_duplicates": false
+        }
+      },
+      {
+        "pipeline": {
+          "name": "global@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Global pipeline for all data streams"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs`"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.integration@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `network_traffic` integration"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.tls@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for the `network_traffic.tls` dataset"
+        }
+      }
+    ],
+    "on_failure": [
+      {
+        "append": {
+          "field": "error.message",
+          "value": "Processor \"{{{ _ingest.on_failure_processor_type }}}\" with tag \"{{{ _ingest.on_failure_processor_tag }}}\" in pipeline \"{{{ _ingest.on_failure_pipeline }}}\" failed with message \"{{{ _ingest.on_failure_message }}}\""
+        }
+      },
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      }
+    ],
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true,
+      "package": {
+        "name": "network_traffic"
+      }
+    },
+    "created_date_millis": 1780935980817,
+    "modified_date_millis": 1780935980817
+  }
+}

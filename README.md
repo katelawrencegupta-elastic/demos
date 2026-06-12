@@ -306,7 +306,11 @@ docker compose up -d --build
 ```
 demos/
 ├── docs/
-│   └── INGEST_PIPELINES_AND_ML.md   # Ingest pipelines, field mappings, ML transforms
+│   ├── INGEST_PIPELINES_AND_ML.md   # Ingest pipelines, field mappings, ML transforms
+│   └── (see artifacts/ for JSON exports)
+├── artifacts/                # Downloadable ingest pipeline, transform, ML job JSON
+│   ├── elastic-demo-artifacts.zip
+│   └── manifest.json
 ├── logstash/                 # Logstash image, pipelines, compose
 ├── netflow/                  # NetFlow v9 generator
 ├── packetbeat/               # Packetbeat + traffic generator (network_traffic)
@@ -319,3 +323,5 @@ demos/
 ```
 
 See **[docs/INGEST_PIPELINES_AND_ML.md](docs/INGEST_PIPELINES_AND_ML.md)** for full ingest pipeline IDs, ECS field mappings, ML transform details, and detection-rule query indices.
+
+**Downloadable JSON artifacts:** [artifacts/elastic-demo-artifacts.zip](artifacts/elastic-demo-artifacts.zip) (ingest pipelines, transforms, ML jobs). Regenerate with `python3 scripts/export-elastic-artifacts.py`.

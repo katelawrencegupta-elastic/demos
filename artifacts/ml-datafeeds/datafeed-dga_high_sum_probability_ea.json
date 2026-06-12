@@ -1,0 +1,66 @@
+{
+  "count": 1,
+  "datafeeds": [
+    {
+      "datafeed_id": "datafeed-dga_high_sum_probability_ea",
+      "job_id": "dga_high_sum_probability_ea",
+      "authorization": {
+        "api_key": {
+          "id": "wQfEqJ4B705u7NeocFhH",
+          "name": "logstash"
+        }
+      },
+      "query_delay": "60s",
+      "chunking_config": {
+        "mode": "auto"
+      },
+      "indices_options": {
+        "ignore_unavailable": true,
+        "expand_wildcards": [
+          "open"
+        ],
+        "allow_no_indices": true,
+        "ignore_throttled": true
+      },
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "exists": {
+                "field": "ml_is_dga.malicious_probability"
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "terms": {
+                "process.name": [
+                  "elastic-agent.exe",
+                  "elastic-agent",
+                  "elastic-endpoint.exe",
+                  "elastic-endpoint",
+                  "metricbeat.exe",
+                  "metricbeat",
+                  "filebeat.exe",
+                  "filebeat",
+                  "packetbeat.exe",
+                  "packetbeat",
+                  "winlogbeat.exe",
+                  "winlogbeat"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "indices": [
+        "logs-network_traffic.*",
+        "logs-dga.dns-*"
+      ],
+      "scroll_size": 1000,
+      "delayed_data_check_config": {
+        "enabled": true
+      }
+    }
+  ]
+}

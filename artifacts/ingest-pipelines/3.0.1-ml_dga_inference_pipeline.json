@@ -1,0 +1,68 @@
+{
+  "3.0.1-ml_dga_inference_pipeline": {
+    "processors": [
+      {
+        "script": {
+          "description": "Add ngram features for ML DGA model",
+          "lang": "painless",
+          "source": "String nGramAtPosition(String text, int fieldcount, int n){\n  if (fieldcount+n>text.length()){\n    return null;\n  } else {\n    return text.substring(fieldcount, fieldcount+n);\n  }\n}\n\nString[] secondLevelDomain(Map dynamic_domains, String domain, String subdomain, String registered_domain, String top_level_domain){\n  if (registered_domain == null || registered_domain == '.') {\n    return new String[] {domain, ''};\n  }\n\n  if (dynamic_domains.containsKey(registered_domain) == true) {\n    if (subdomain != null) {\n      return new String[] {subdomain, registered_domain};\n    }\n  }\n\n  return new String[] {registered_domain.substring(0, registered_domain.length()-top_level_domain.length()-1), top_level_domain};\n  }\n\nString domain = ctx['dns']['question']['name'];\nString subdomain = ctx['dns']['question']['subdomain'];\nString registered_domain = ctx['dns']['question']['registered_domain'];\nString top_level_domain = ctx['dns']['question']['top_level_domain'];\n\nString[] ret = secondLevelDomain(params.dynamic_domains, domain, subdomain, registered_domain, top_level_domain);\n\nString sld = ret[0];\nString tld = ret[1];\n\nctx['f'] = new HashMap();\nctx['f']['tld'] = tld;\n\nfor (int i=0;i<sld.length();i++){\n  String field = nGramAtPosition(sld, i, 1);\n  if (field == null) {\n    break;\n  }\n  ctx['f']['u'+ Integer.toString(i)] = field;\n}\n\nfor (int i=0;i<sld.length();i++){\n  String field = nGramAtPosition(sld, i, 2);\n  if (field == null) {\n    break;\n  }\n  ctx['f']['b'+ Integer.toString(i)] = field;\n  }\n\nfor (int i=0;i<sld.length();i++){\n  String field = nGramAtPosition(sld, i, 3);\n  if (field == null) {\n    break;\n  }\n  ctx['f']['t'+ Integer.toString(i)] = field;\n}\n",
+          "params": {
+            "dynamic_domains": {
+              "avsvmcloud.com": 0,
+              "co.cc": 0,
+              "cz.cc": 0,
+              "ddns.net": 0,
+              "dyndns.org": 0,
+              "dynserv.com": 0,
+              "github.io": 0,
+              "mooo.com": 0,
+              "mynumber.org": 0,
+              "yi.org": 0
+            }
+          }
+        }
+      },
+      {
+        "inference": {
+          "field_map": {},
+          "inference_config": {
+            "classification": {
+              "num_top_classes": 1
+            }
+          },
+          "model_id": "dga_1611725_2.0",
+          "target_field": "ml_is_dga"
+        }
+      },
+      {
+        "script": {
+          "lang": "painless",
+          "source": "def top_classes = ctx['ml_is_dga']['top_classes'];\ndef malicious_probability = 0.0;\ndef malicious_prediction = ctx['ml_is_dga']['malicious_prediction'];\n\nfor (def class: top_classes) {\n  if (class['class_name'] == 1) {\n    malicious_probability = class['class_probability'];\n  }\n}\n\nctx.remove('ml_is_dga');\nctx.remove('f');\nctx['ml_is_dga'] = new HashMap();\nctx['ml_is_dga']['malicious_prediction'] = malicious_prediction;\nctx['ml_is_dga']['malicious_probability'] = malicious_probability;\n"
+        }
+      }
+    ],
+    "on_failure": [
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      },
+      {
+        "append": {
+          "field": "error.message",
+          "value": "{{{ _ingest.on_failure_message }}}"
+        }
+      }
+    ],
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true,
+      "package": {
+        "name": "dga"
+      }
+    },
+    "created_date_millis": 1781021807587,
+    "modified_date_millis": 1781021807587
+  }
+}

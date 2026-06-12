@@ -1,0 +1,69 @@
+{
+  "count": 1,
+  "datafeeds": [
+    {
+      "datafeed_id": "datafeed-high_count_network_denies",
+      "job_id": "high_count_network_denies",
+      "authorization": {
+        "roles": [
+          "superuser"
+        ]
+      },
+      "query_delay": "93751ms",
+      "chunking_config": {
+        "mode": "auto"
+      },
+      "indices_options": {
+        "ignore_unavailable": false,
+        "expand_wildcards": [
+          "open"
+        ],
+        "allow_no_indices": true,
+        "ignore_throttled": true
+      },
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "term": {
+                "event.category": "network"
+              }
+            }
+          ],
+          "must": [
+            {
+              "bool": {
+                "should": [
+                  {
+                    "match": {
+                      "event.outcome": {
+                        "query": "deny",
+                        "operator": "OR"
+                      }
+                    }
+                  },
+                  {
+                    "match": {
+                      "event.type": {
+                        "query": "denied",
+                        "operator": "OR"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "indices": [
+        "*snort*"
+      ],
+      "scroll_size": 1000,
+      "delayed_data_check_config": {
+        "enabled": true
+      },
+      "max_empty_searches": 10
+    }
+  ]
+}

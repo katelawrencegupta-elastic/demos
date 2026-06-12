@@ -1,0 +1,120 @@
+{
+  "count": 1,
+  "jobs": [
+    {
+      "job_id": "dga_high_sum_probability_ea",
+      "job_type": "anomaly_detector",
+      "job_version": "12.0.0",
+      "create_time": 1781023223228,
+      "model_snapshot_id": "1781286360",
+      "custom_settings": {
+        "created_by": "ml-module-dga",
+        "threat_tactics": [
+          "TA0011"
+        ],
+        "threat_techniques": [
+          "T1071",
+          "T1071.004",
+          "T1568",
+          "T1568.002"
+        ]
+      },
+      "datafeed_config": {
+        "datafeed_id": "datafeed-dga_high_sum_probability_ea",
+        "job_id": "dga_high_sum_probability_ea",
+        "authorization": {
+          "api_key": {
+            "id": "wQfEqJ4B705u7NeocFhH",
+            "name": "logstash"
+          }
+        },
+        "query_delay": "60s",
+        "chunking_config": {
+          "mode": "auto"
+        },
+        "indices_options": {
+          "ignore_unavailable": true,
+          "expand_wildcards": [
+            "open"
+          ],
+          "allow_no_indices": true,
+          "ignore_throttled": true
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "exists": {
+                  "field": "ml_is_dga.malicious_probability"
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "terms": {
+                  "process.name": [
+                    "elastic-agent.exe",
+                    "elastic-agent",
+                    "elastic-endpoint.exe",
+                    "elastic-endpoint",
+                    "metricbeat.exe",
+                    "metricbeat",
+                    "filebeat.exe",
+                    "filebeat",
+                    "packetbeat.exe",
+                    "packetbeat",
+                    "winlogbeat.exe",
+                    "winlogbeat"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "indices": [
+          "logs-network_traffic.*",
+          "logs-dga.dns-*"
+        ],
+        "scroll_size": 1000,
+        "delayed_data_check_config": {
+          "enabled": true
+        }
+      },
+      "groups": [
+        "security",
+        "dga"
+      ],
+      "description": "Detects potential DGA (domain generation algorithm) activity that is often used by malware command and control (C2) channels. Looks for a source IP address making DNS requests that have an aggregate high probability of being DGA activity.",
+      "analysis_config": {
+        "bucket_span": "15m",
+        "detectors": [
+          {
+            "detector_description": "high probability of DGA activity",
+            "function": "high_sum",
+            "field_name": "ml_is_dga.malicious_probability",
+            "over_field_name": "source.ip",
+            "detector_index": 0
+          }
+        ],
+        "influencers": [
+          "source.ip",
+          "host.name",
+          "host.id"
+        ],
+        "model_prune_window": "30d"
+      },
+      "analysis_limits": {
+        "model_memory_limit": "11mb",
+        "categorization_examples_limit": 4
+      },
+      "data_description": {
+        "time_field": "@timestamp",
+        "time_format": "epoch_ms"
+      },
+      "model_snapshot_retention_days": 10,
+      "daily_model_snapshot_retention_after_days": 1,
+      "results_index_name": "shared",
+      "allow_lazy_open": false
+    }
+  ]
+}

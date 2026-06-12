@@ -1,0 +1,184 @@
+{
+  "logs-network_traffic.flow-1.34.2": {
+    "description": "Pipeline for processing traffic flows",
+    "processors": [
+      {
+        "set": {
+          "field": "ecs.version",
+          "value": "8.17.0"
+        }
+      },
+      {
+        "pipeline": {
+          "if": "ctx._conf?.map_to_ecs != null && ctx._conf.map_to_ecs",
+          "name": "logs-network_traffic.flow-1.34.2-compatibility",
+          "tag": "compatibility_pipeline_processor"
+        }
+      },
+      {
+        "gsub": {
+          "field": "host.mac",
+          "pattern": "[-:.]",
+          "replacement": "",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac"
+        }
+      },
+      {
+        "gsub": {
+          "field": "host.mac",
+          "pattern": "(..)(?!$)",
+          "replacement": "$1-",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac"
+        }
+      },
+      {
+        "uppercase": {
+          "field": "host.mac",
+          "ignore_missing": true
+        }
+      },
+      {
+        "append": {
+          "field": "related.hosts",
+          "value": "{{{observer.hostname}}}",
+          "if": "ctx.observer?.hostname != null && ctx.observer?.hostname != ''",
+          "allow_duplicates": false
+        }
+      },
+      {
+        "foreach": {
+          "if": "ctx.observer?.ip != null && ctx.observer.ip instanceof List",
+          "tag": "foreach_observer_ip",
+          "field": "observer.ip",
+          "processor": {
+            "append": {
+              "field": "related.ip",
+              "value": "{{{_ingest._value}}}",
+              "allow_duplicates": false
+            }
+          }
+        }
+      },
+      {
+        "remove": {
+          "if": "ctx.host != null && ctx.tags != null && ctx.tags.contains('forwarded')",
+          "field": "host"
+        }
+      },
+      {
+        "gsub": {
+          "field": "source.mac",
+          "pattern": "[-:.]",
+          "replacement": "",
+          "ignore_missing": true,
+          "tag": "gsub_source_mac"
+        }
+      },
+      {
+        "gsub": {
+          "field": "source.mac",
+          "pattern": "(..)(?!$)",
+          "replacement": "$1-",
+          "ignore_missing": true,
+          "tag": "gsub_source_mac"
+        }
+      },
+      {
+        "uppercase": {
+          "field": "source.mac",
+          "ignore_missing": true
+        }
+      },
+      {
+        "gsub": {
+          "field": "destination.mac",
+          "pattern": "[-:.]",
+          "replacement": "",
+          "ignore_missing": true,
+          "tag": "gsub_destination_mac"
+        }
+      },
+      {
+        "gsub": {
+          "field": "destination.mac",
+          "pattern": "(..)(?!$)",
+          "replacement": "$1-",
+          "ignore_missing": true,
+          "tag": "gsub_destination_mac"
+        }
+      },
+      {
+        "uppercase": {
+          "field": "destination.mac",
+          "ignore_missing": true
+        }
+      },
+      {
+        "pipeline": {
+          "if": "ctx._conf?.geoip_enrich != null && ctx._conf.geoip_enrich",
+          "name": "logs-network_traffic.flow-1.34.2-geoip",
+          "tag": "pipeline_processor"
+        }
+      },
+      {
+        "remove": {
+          "field": "_conf",
+          "ignore_missing": true
+        }
+      },
+      {
+        "pipeline": {
+          "name": "global@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Global pipeline for all data streams"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs`"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.integration@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `network_traffic` integration"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.flow@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for the `network_traffic.flow` dataset"
+        }
+      }
+    ],
+    "on_failure": [
+      {
+        "append": {
+          "field": "error.message",
+          "value": "Processor \"{{{ _ingest.on_failure_processor_type }}}\" with tag \"{{{ _ingest.on_failure_processor_tag }}}\" in pipeline \"{{{ _ingest.on_failure_pipeline }}}\" failed with message \"{{{ _ingest.on_failure_message }}}\""
+        }
+      },
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      }
+    ],
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true,
+      "package": {
+        "name": "network_traffic"
+      }
+    },
+    "created_date_millis": 1780935980816,
+    "modified_date_millis": 1780935980816
+  }
+}

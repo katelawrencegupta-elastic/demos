@@ -536,6 +536,9 @@ Tag filter: **Use Case: Domain Generation Algorithm Detection**
 | `logstash/pipeline/syslog-ingest.conf` | Syslog input |
 | `security_use_cases/beacon/trigger-beacon-transform.py` | ML transform control |
 | `security_use_cases/*/enable-*-rules.py` | Detection rule installation |
+| `scripts/export-elastic-artifacts.py` | Export ingest pipelines, transforms, ML jobs to JSON |
+| `artifacts/elastic-demo-artifacts.zip` | Downloadable bundle of all exported artifacts |
+| `artifacts/README.md` | Artifact index and import examples |
 
 ---
 

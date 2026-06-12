@@ -1,0 +1,435 @@
+{
+  "logs-netflow.log-2.25.1-klg": {
+    "description": "Pipeline for NetFlow",
+    "on_failure": [
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      },
+      {
+        "append": {
+          "field": "error.message",
+          "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+        }
+      },
+      {
+        "append": {
+          "field": "tags",
+          "allow_duplicates": false,
+          "value": "preserve_original_event"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "set": {
+          "tag": "set_ecs_version_f5923549",
+          "field": "ecs.version",
+          "value": "8.17.0"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_ingress_interface_from_input_snmp",
+          "field": "netflow.ingress_interface",
+          "copy_from": "netflow.input_snmp",
+          "if": "ctx.netflow?.input_snmp != null && ctx.netflow?.ingress_interface == null"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_egress_interface_from_output_snmp",
+          "field": "netflow.egress_interface",
+          "copy_from": "netflow.output_snmp",
+          "if": "ctx.netflow?.output_snmp != null && ctx.netflow?.egress_interface == null"
+        }
+      },
+      {
+        "convert": {
+          "ignore_failure": true,
+          "ignore_missing": true,
+          "tag": "convert_ingress_interface_to_long",
+          "field": "netflow.ingress_interface",
+          "type": "long"
+        }
+      },
+      {
+        "convert": {
+          "ignore_failure": true,
+          "ignore_missing": true,
+          "tag": "convert_egress_interface_to_long",
+          "field": "netflow.egress_interface",
+          "type": "long"
+        }
+      },
+      {
+        "convert": {
+          "ignore_failure": true,
+          "ignore_missing": true,
+          "tag": "convert_network_iana_number_7aa7bdd4",
+          "field": "network.iana_number",
+          "type": "string"
+        }
+      },
+      {
+        "rename": {
+          "ignore_missing": true,
+          "tag": "rename_observer_ip_to__tmp__observer_ip_c386a74b",
+          "field": "observer.ip",
+          "target_field": "_tmp_.observer.ip"
+        }
+      },
+      {
+        "append": {
+          "tag": "append_observer_ip_8e1e9214",
+          "field": "observer.ip",
+          "value": "{{{_tmp_.observer.ip}}}",
+          "if": "ctx._tmp_?.observer?.ip != null"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_event_category_1c5ef573",
+          "field": "event.category",
+          "value": [
+            "network",
+            "session"
+          ],
+          "if": "ctx.event?.category != null && ctx.event?.category == \"network_session\""
+        }
+      },
+      {
+        "append": {
+          "tag": "append_related_ip_695a8007",
+          "field": "related.ip",
+          "allow_duplicates": false,
+          "value": "{{{_tmp_.observer.ip}}}",
+          "if": "(ctx._tmp_?.observer?.ip != null)"
+        }
+      },
+      {
+        "script": {
+          "description": "Collect all related ip addresses",
+          "tag": "script_collect_related_ip",
+          "source": "HashSet set = null;\nfor (key in ctx.netflow.keySet()) {\n    if (key.endsWith(\"_ipv4_address\") || key.endsWith(\"_ipv6_address\")) {\n        // Creating set on demand, avoiding extra garbage\n        if (set == null) {\n            set = new HashSet();\n        }\n        set.add(ctx.netflow[key]);\n    }\n}\n\nif (set != null) {\n    if (ctx.related == null) {\n        ctx.related = new HashMap();\n    }\n    if (ctx.related?.ip != null) {\n        for (ip in ctx.related.ip) {\n            set.add(ip);\n        }\n    }\n\n    ArrayList list = new ArrayList(set);\n    Collections.sort(list);\n    ctx.related.ip = list;\n}\n",
+          "lang": "painless",
+          "if": "ctx.netflow instanceof Map"
+        }
+      },
+      {
+        "script": {
+          "description": "Parse the TCP flags into string descriptions.",
+          "tag": "script_tcp_flags",
+          "source": "\nif (ctx.netflow.tcp_control_bits == null && ctx.netflow.tcp_flags instanceof Integer) {\n  ctx.netflow.tcp_control_bits = ctx.netflow.tcp_flags;\n}\nint tcpBits = ctx.netflow.tcp_control_bits;\nString[] flagNames = new String[]{\"CWR\", \"ECE\", \"URG\", \"ACK\", \"PSH\", \"RST\", \"SYN\", \"FIN\"};\nArrayList flagsSeen = new ArrayList();\nfor (int i = 8; i > 0; --i) {\n  int value = (tcpBits & (1 << (i - 1))) & 0x0ff;\n  if (value != 0) {\n    flagsSeen.add(flagNames[8 - i]);\n  }\n}\nif (flagsSeen.length > 0) {\n  ctx.netflow.tcp_flags = flagsSeen;\n}\n",
+          "lang": "painless",
+          "if": "ctx.netflow instanceof Map && (ctx.netflow?.tcp_control_bits instanceof Integer || ctx.netflow?.tcp_flags instanceof Integer)"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_type_0310ffb7",
+          "field": "network.type",
+          "value": "ipv4",
+          "if": "ctx.netflow?.ipv4_src_addr != null || ctx.netflow?.ipv4_dst_addr != null"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_type_0146417f",
+          "field": "network.type",
+          "value": "ipv6",
+          "if": "(ctx.netflow?.ipv6_src_addr != null || ctx.netflow?.ipv6_dst_addr != null) && ctx.network?.type == null"
+        }
+      },
+      {
+        "append": {
+          "tag": "append_network_type_9e3d8bc5",
+          "field": "network.type",
+          "value": "ipv6",
+          "if": "(ctx.netflow?.ipv6_src_addr != null || ctx.netflow?.ipv6_dst_addr != null) && ctx.network?.type == \"ipv4\""
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_direction_742bdd0c",
+          "field": "network.direction",
+          "value": "inbound",
+          "if": "ctx.source?.locality == \"external\" && ctx.destination?.locality == \"internal\""
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_direction_ab713cfd",
+          "field": "network.direction",
+          "value": "outbound",
+          "if": "ctx.source?.locality == \"internal\" && ctx.destination?.locality == \"external\""
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_direction_ad7f17dc",
+          "field": "network.direction",
+          "value": "internal",
+          "if": "ctx.source?.locality == \"internal\" && ctx.destination?.locality == \"internal\""
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_direction_72986b36",
+          "field": "network.direction",
+          "value": "external",
+          "if": "ctx.source?.locality == \"external\" && ctx.destination?.locality == \"external\""
+        }
+      },
+      {
+        "set": {
+          "tag": "set_network_direction_a298f1f4",
+          "field": "network.direction",
+          "value": "unknown",
+          "if": "ctx.network?.direction == null"
+        }
+      },
+      {
+        "remove": {
+          "ignore_missing": true,
+          "tag": "remove_77aeac25",
+          "field": [
+            "_tmp_"
+          ]
+        }
+      },
+      {
+        "append": {
+          "tag": "append_preserve_original_event_on_error",
+          "field": "tags",
+          "allow_duplicates": false,
+          "value": "preserve_original_event",
+          "if": "ctx.error?.message != null"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "global@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Global pipeline for all data streams"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs`"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-netflow.integration@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `netflow` integration"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-netflow.log@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for the `netflow.log` dataset"
+        }
+      },
+      {
+        "script": {
+          "ignore_failure": true,
+          "description": "Move stream.processing flat dotted ECS fields into nested objects",
+          "tag": "normalize_flat_ecs_fields_for_geo",
+          "source": "String[] pairs = new String[] {\"source.ip\", \"source.port\", \"destination.ip\", \"destination.port\"};\nfor (String flat : pairs) {\n  if (ctx.containsKey(flat) && ctx[flat] != null) {\n    int dot = flat.indexOf('.');\n    String parent = flat.substring(0, dot);\n    String child = flat.substring(dot + 1);\n    if (ctx[parent] == null) { ctx[parent] = new HashMap(); }\n    else if (!(ctx[parent] instanceof Map)) { continue; }\n    ctx[parent][child] = ctx.remove(flat);\n  }\n}\n",
+          "lang": "painless"
+        }
+      },
+      {
+        "script": {
+          "ignore_failure": true,
+          "description": "Populate ECS and netflow fields required by Netflow Overview dashboard",
+          "tag": "enrich_dashboard_ecs_fields",
+          "source": "\nif (ctx.event == null) { ctx.event = new HashMap(); }\nctx.event.category = [\"network\", \"session\"];\nctx.event.type = [\"connection\"];\nctx.event.kind = \"event\";\n\nif (ctx.source?.ip != null) {\n  if (ctx.source == null) { ctx.source = new HashMap(); }\n  String ip = ctx.source.ip.toString();\n  boolean priv = ip.startsWith(\"10.\") || ip.startsWith(\"192.168.\") || ip.startsWith(\"127.\");\n  if (!priv && ip.startsWith(\"172.\")) {\n    int dot = ip.indexOf('.', 4);\n    if (dot > 4) {\n      try {\n        int second = Integer.parseInt(ip.substring(4, dot));\n        priv = second >= 16 && second <= 31;\n      } catch (Exception e) {}\n    }\n  }\n  ctx.source.locality = priv ? \"internal\" : \"external\";\n}\nif (ctx.destination?.ip != null) {\n  if (ctx.destination == null) { ctx.destination = new HashMap(); }\n  String ip = ctx.destination.ip.toString();\n  boolean priv = ip.startsWith(\"10.\") || ip.startsWith(\"192.168.\") || ip.startsWith(\"127.\");\n  if (!priv && ip.startsWith(\"172.\")) {\n    int dot = ip.indexOf('.', 4);\n    if (dot > 4) {\n      try {\n        int second = Integer.parseInt(ip.substring(4, dot));\n        priv = second >= 16 && second <= 31;\n      } catch (Exception e) {}\n    }\n  }\n  ctx.destination.locality = priv ? \"internal\" : \"external\";\n}\n\nif (ctx.network == null) { ctx.network = new HashMap(); }\nString srcLoc = ctx.source?.locality;\nString dstLoc = ctx.destination?.locality;\nif (\"external\".equals(srcLoc) && \"internal\".equals(dstLoc)) {\n  ctx.network.direction = \"inbound\";\n} else if (\"internal\".equals(srcLoc) && \"external\".equals(dstLoc)) {\n  ctx.network.direction = \"outbound\";\n} else if (\"internal\".equals(srcLoc) && \"internal\".equals(dstLoc)) {\n  ctx.network.direction = \"internal\";\n} else if (\"external\".equals(srcLoc) && \"external\".equals(dstLoc)) {\n  ctx.network.direction = \"external\";\n} else {\n  ctx.network.direction = \"unknown\";\n}\n\ndef proto = ctx.network?.transport;\nif (proto == null && ctx.netflow?.protocol != null) { proto = ctx.netflow.protocol; }\nint protoNum = -1;\nif (proto instanceof Number) { protoNum = ((Number) proto).intValue(); }\nelse if (proto instanceof String) {\n  try { protoNum = Integer.parseInt(proto.toString()); } catch (Exception e) {}\n}\nif (protoNum >= 0) {\n  ctx.network.iana_number = String.valueOf(protoNum);\n  if (protoNum == 6) { ctx.network.transport = \"tcp\"; }\n  else if (protoNum == 17) { ctx.network.transport = \"udp\"; }\n  else if (protoNum == 1) { ctx.network.transport = \"icmp\"; }\n}\n\nif (ctx.netflow instanceof Map) {\n  if (ctx.netflow.dst_tos != null) {\n    ctx.netflow.ip_class_of_service = ((Number) ctx.netflow.dst_tos).shortValue();\n  }\n  if (ctx.netflow.vlan_id == null) {\n    if (ctx.netflow.dst_vlan != null && ((Number) ctx.netflow.dst_vlan).intValue() != 0) {\n      ctx.netflow.vlan_id = ctx.netflow.dst_vlan;\n    } else if (ctx.netflow.src_vlan != null) {\n      ctx.netflow.vlan_id = ctx.netflow.src_vlan;\n    }\n  }\n  if (ctx.netflow.exporter == null && ctx.observer?.ip != null) {\n    ctx.netflow.exporter = new HashMap();\n    ctx.netflow.exporter.address = ctx.observer.ip.toString() + \":2055\";\n    if (ctx.netflow.version != null) { ctx.netflow.exporter.version = ctx.netflow.version; }\n  }\n}\n",
+          "lang": "painless"
+        }
+      },
+      {
+        "geoip": {
+          "field": "source.ip",
+          "target_field": "source.geo",
+          "database_file": "GeoLite2-City.mmdb",
+          "ignore_missing": true,
+          "tag": "geoip_source_ip_to_source_geo_0e79e8a4",
+          "if": "ctx.source?.geo == null",
+          "properties": [
+            "continent_name",
+            "country_iso_code",
+            "country_name",
+            "region_iso_code",
+            "region_name",
+            "city_name",
+            "location"
+          ]
+        }
+      },
+      {
+        "geoip": {
+          "field": "destination.ip",
+          "target_field": "destination.geo",
+          "database_file": "GeoLite2-City.mmdb",
+          "ignore_missing": true,
+          "tag": "geoip_destination_ip_to_destination_geo_2f67bd6f",
+          "if": "ctx.destination?.geo == null",
+          "properties": [
+            "continent_name",
+            "country_iso_code",
+            "country_name",
+            "region_iso_code",
+            "region_name",
+            "city_name",
+            "location"
+          ]
+        }
+      },
+      {
+        "script": {
+          "ignore_failure": true,
+          "description": "Fill city_name for demo traffic when GeoLite2-City returns country-only data",
+          "tag": "demo_city_fallback_for_public_destinations",
+          "source": "if (ctx.destination == null) { ctx.destination = new HashMap(); }\nif (ctx.destination.geo == null) { ctx.destination.geo = new HashMap(); }\nString ip = ctx.destination.ip.toString();\nif (ip.startsWith(\"129.6.15.\")) {\n  ctx.destination.geo.city_name = \"Gaithersburg\";\n  ctx.destination.geo.region_name = \"Maryland\";\n  ctx.destination.geo.region_iso_code = \"US-MD\";\n  ctx.destination.geo.country_name = \"United States\";\n  ctx.destination.geo.country_iso_code = \"US\";\n  ctx.destination.geo.continent_name = \"North America\";\n  ctx.destination.geo.location = [\"lat\": 39.109, \"lon\": -77.2489];\n} else if (ip.startsWith(\"93.184.216.\")) {\n  ctx.destination.geo.city_name = \"Norwell\";\n  ctx.destination.geo.region_name = \"Massachusetts\";\n  ctx.destination.geo.region_iso_code = \"US-MA\";\n  ctx.destination.geo.country_name = \"United States\";\n  ctx.destination.geo.country_iso_code = \"US\";\n  ctx.destination.geo.continent_name = \"North America\";\n  ctx.destination.geo.location = [\"lat\": 42.1751, \"lon\": -70.7359];\n} else if (ip.startsWith(\"142.250.80.\")) {\n  ctx.destination.geo.city_name = \"Mountain View\";\n  ctx.destination.geo.region_name = \"California\";\n  ctx.destination.geo.region_iso_code = \"US-CA\";\n  ctx.destination.geo.country_name = \"United States\";\n  ctx.destination.geo.country_iso_code = \"US\";\n  ctx.destination.geo.continent_name = \"North America\";\n  ctx.destination.geo.location = [\"lat\": 37.422, \"lon\": -122.084];\n} else if (ip.startsWith(\"8.8.8.\")) {\n  ctx.destination.geo.city_name = \"Mountain View\";\n  ctx.destination.geo.region_name = \"California\";\n  ctx.destination.geo.region_iso_code = \"US-CA\";\n  ctx.destination.geo.country_name = \"United States\";\n  ctx.destination.geo.country_iso_code = \"US\";\n  ctx.destination.geo.continent_name = \"North America\";\n  ctx.destination.geo.location = [\"lat\": 37.4056, \"lon\": -122.0775];\n}\n",
+          "lang": "painless",
+          "if": "ctx.destination?.ip != null && (ctx.destination?.geo == null || ctx.destination?.geo?.city_name == null)"
+        }
+      },
+      {
+        "geoip": {
+          "field": "source.ip",
+          "target_field": "source.as",
+          "database_file": "GeoLite2-ASN.mmdb",
+          "ignore_missing": true,
+          "tag": "geoip_source_ip_to_source_as_28d69883",
+          "properties": [
+            "asn",
+            "organization_name"
+          ]
+        }
+      },
+      {
+        "geoip": {
+          "field": "destination.ip",
+          "target_field": "destination.as",
+          "database_file": "GeoLite2-ASN.mmdb",
+          "ignore_missing": true,
+          "tag": "geoip_destination_ip_to_destination_as_8a007787",
+          "properties": [
+            "asn",
+            "organization_name"
+          ]
+        }
+      },
+      {
+        "rename": {
+          "ignore_missing": true,
+          "tag": "rename_source_as_asn_to_source_as_number_a917047d",
+          "field": "source.as.asn",
+          "target_field": "source.as.number"
+        }
+      },
+      {
+        "rename": {
+          "ignore_missing": true,
+          "tag": "rename_source_as_organization_name_to_source_as_organization_name_f1362d0b",
+          "field": "source.as.organization_name",
+          "target_field": "source.as.organization.name"
+        }
+      },
+      {
+        "rename": {
+          "ignore_missing": true,
+          "tag": "rename_destination_as_asn_to_destination_as_number_3b459fcd",
+          "field": "destination.as.asn",
+          "target_field": "destination.as.number"
+        }
+      },
+      {
+        "rename": {
+          "ignore_missing": true,
+          "tag": "rename_destination_as_organization_name_to_destination_as_organization_name_814bd459",
+          "field": "destination.as.organization_name",
+          "target_field": "destination.as.organization.name"
+        }
+      },
+      {
+        "set": {
+          "tag": "finalize_ingress_interface_from_input_snmp",
+          "field": "netflow.ingress_interface",
+          "copy_from": "netflow.input_snmp",
+          "if": "ctx.netflow?.input_snmp != null"
+        }
+      },
+      {
+        "set": {
+          "tag": "finalize_egress_interface_from_output_snmp",
+          "field": "netflow.egress_interface",
+          "copy_from": "netflow.output_snmp",
+          "if": "ctx.netflow?.output_snmp != null"
+        }
+      },
+      {
+        "convert": {
+          "ignore_failure": true,
+          "ignore_missing": true,
+          "tag": "finalize_convert_ingress_interface_to_long",
+          "field": "netflow.ingress_interface",
+          "type": "long"
+        }
+      },
+      {
+        "convert": {
+          "ignore_failure": true,
+          "ignore_missing": true,
+          "tag": "finalize_convert_egress_interface_to_long",
+          "field": "netflow.egress_interface",
+          "type": "long"
+        }
+      },
+      {
+        "script": {
+          "tag": "finalize_cast_tos_fields_to_short",
+          "lang": "painless",
+          "ignore_failure": true,
+          "description": "Cast TOS fields to short for Netflow integration dashboard compatibility",
+          "source": "\nif (ctx.netflow instanceof Map) {\n  if (ctx.netflow.dst_tos != null) {\n    ctx.netflow.ip_class_of_service = ((Number) ctx.netflow.dst_tos).shortValue();\n  } else if (ctx.netflow.src_tos != null && ctx.netflow.ip_class_of_service == null) {\n    ctx.netflow.ip_class_of_service = ((Number) ctx.netflow.src_tos).shortValue();\n  }\n  if (ctx.netflow.src_tos != null) {\n    ctx.netflow.src_tos = ((Number) ctx.netflow.src_tos).shortValue();\n  }\n  if (ctx.netflow.dst_tos != null) {\n    ctx.netflow.dst_tos = ((Number) ctx.netflow.dst_tos).shortValue();\n  }\n  if (ctx.netflow.ip_class_of_service != null) {\n    ctx.netflow.ip_class_of_service = ((Number) ctx.netflow.ip_class_of_service).shortValue();\n  }\n}\n"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_event_end_from_last_switched",
+          "field": "event.end",
+          "copy_from": "netflow.last_switched",
+          "if": "ctx.netflow?.last_switched != null"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_event_start_from_first_switched",
+          "field": "event.start",
+          "copy_from": "netflow.first_switched",
+          "if": "ctx.netflow?.first_switched != null"
+        }
+      },
+      {
+        "set": {
+          "tag": "set_event_end_from_timestamp_fallback",
+          "field": "event.end",
+          "copy_from": "@timestamp",
+          "if": "ctx.event?.end == null && ctx['@timestamp'] != null"
+        }
+      }
+    ],
+    "created_date_millis": 1780947327879,
+    "modified_date_millis": 1781200946094
+  }
+}

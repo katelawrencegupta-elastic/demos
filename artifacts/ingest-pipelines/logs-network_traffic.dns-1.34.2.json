@@ -1,0 +1,141 @@
+{
+  "logs-network_traffic.dns-1.34.2": {
+    "description": "Pipeline for processing dhcpv4 traffic",
+    "processors": [
+      {
+        "set": {
+          "field": "ecs.version",
+          "value": "8.17.0"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.dns-1.34.2-compatibility",
+          "tag": "compatibility_pipeline_processor",
+          "if": "ctx._conf?.map_to_ecs != null && ctx._conf.map_to_ecs"
+        }
+      },
+      {
+        "gsub": {
+          "pattern": "[-:.]",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac",
+          "field": "host.mac",
+          "replacement": ""
+        }
+      },
+      {
+        "gsub": {
+          "pattern": "(..)(?!$)",
+          "ignore_missing": true,
+          "tag": "gsub_host_mac",
+          "field": "host.mac",
+          "replacement": "$1-"
+        }
+      },
+      {
+        "uppercase": {
+          "field": "host.mac",
+          "ignore_missing": true
+        }
+      },
+      {
+        "append": {
+          "field": "related.hosts",
+          "allow_duplicates": false,
+          "value": "{{{observer.hostname}}}",
+          "if": "ctx.observer?.hostname != null && ctx.observer?.hostname != ''"
+        }
+      },
+      {
+        "foreach": {
+          "tag": "foreach_observer_ip",
+          "field": "observer.ip",
+          "if": "ctx.observer?.ip != null && ctx.observer.ip instanceof List",
+          "processor": {
+            "append": {
+              "field": "related.ip",
+              "allow_duplicates": false,
+              "value": "{{{_ingest._value}}}"
+            }
+          }
+        }
+      },
+      {
+        "remove": {
+          "field": "host",
+          "if": "ctx.host != null && ctx.tags != null && ctx.tags.contains('forwarded')"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.dns-1.34.2-geoip",
+          "tag": "pipeline_processor",
+          "if": "ctx._conf?.geoip_enrich != null && ctx._conf.geoip_enrich"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "3.0.1-ml_dga_ingest_pipeline"
+        }
+      },
+      {
+        "remove": {
+          "field": "_conf",
+          "ignore_missing": true
+        }
+      },
+      {
+        "pipeline": {
+          "name": "global@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Global pipeline for all data streams"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs`"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.integration@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `network_traffic` integration"
+        }
+      },
+      {
+        "pipeline": {
+          "name": "logs-network_traffic.dns@custom",
+          "ignore_missing_pipeline": true,
+          "description": "[Fleet] Pipeline for the `network_traffic.dns` dataset"
+        }
+      }
+    ],
+    "on_failure": [
+      {
+        "append": {
+          "field": "error.message",
+          "value": "Processor \"{{{ _ingest.on_failure_processor_type }}}\" with tag \"{{{ _ingest.on_failure_processor_tag }}}\" in pipeline \"{{{ _ingest.on_failure_pipeline }}}\" failed with message \"{{{ _ingest.on_failure_message }}}\""
+        }
+      },
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      }
+    ],
+    "_meta": {
+      "package": {
+        "name": "network_traffic"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "created_date_millis": 1780935980815,
+    "modified_date_millis": 1781023000188
+  }
+}

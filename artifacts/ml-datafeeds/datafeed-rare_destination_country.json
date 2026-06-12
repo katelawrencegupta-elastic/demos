@@ -1,0 +1,66 @@
+{
+  "count": 1,
+  "datafeeds": [
+    {
+      "datafeed_id": "datafeed-rare_destination_country",
+      "job_id": "rare_destination_country",
+      "authorization": {
+        "roles": [
+          "superuser"
+        ]
+      },
+      "query_delay": "60819ms",
+      "chunking_config": {
+        "mode": "auto"
+      },
+      "indices_options": {
+        "ignore_unavailable": false,
+        "expand_wildcards": [
+          "open"
+        ],
+        "allow_no_indices": true,
+        "ignore_throttled": true
+      },
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "term": {
+                "event.category": "network"
+              }
+            },
+            {
+              "exists": {
+                "field": "destination.geo.country_name"
+              }
+            }
+          ],
+          "must_not": {
+            "terms": {
+              "process.name": [
+                "elastic-agent.exe",
+                "elastic-agent",
+                "metricbeat.exe",
+                "metricbeat",
+                "filebeat.exe",
+                "filebeat",
+                "packetbeat.exe",
+                "packetbeat",
+                "winlogbeat.exe",
+                "winlogbeat"
+              ]
+            }
+          }
+        }
+      },
+      "indices": [
+        "*snort*"
+      ],
+      "scroll_size": 1000,
+      "delayed_data_check_config": {
+        "enabled": true
+      },
+      "max_empty_searches": 10
+    }
+  ]
+}

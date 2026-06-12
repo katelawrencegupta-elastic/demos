@@ -1,0 +1,45 @@
+{
+  "3.0.1-ml_dga_ingest_pipeline": {
+    "description": "Pipelines for enriching DNS data. Ignores non-DNS data.",
+    "processors": [
+      {
+        "registered_domain": {
+          "if": "ctx.network?.protocol == 'dns' && ctx.dns?.question?.name != null && ctx.dns?.question?.registered_domain == null",
+          "field": "dns.question.name",
+          "target_field": "dns.question",
+          "ignore_missing": true,
+          "ignore_failure": true
+        }
+      },
+      {
+        "pipeline": {
+          "if": "ctx.network?.protocol == 'dns' && ctx.dns?.question?.type != 'PTR'",
+          "name": "3.0.1-ml_dga_inference_pipeline"
+        }
+      }
+    ],
+    "on_failure": [
+      {
+        "set": {
+          "field": "event.kind",
+          "value": "pipeline_error"
+        }
+      },
+      {
+        "append": {
+          "field": "error.message",
+          "value": "{{{ _ingest.on_failure_message }}}"
+        }
+      }
+    ],
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true,
+      "package": {
+        "name": "dga"
+      }
+    },
+    "created_date_millis": 1781021807515,
+    "modified_date_millis": 1781021807515
+  }
+}

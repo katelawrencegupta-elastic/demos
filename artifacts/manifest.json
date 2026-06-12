@@ -1,0 +1,167 @@
+{
+  "exported_at": "2026-06-12T21:38:52.467680+00:00",
+  "source": "scripts/export-elastic-artifacts.py",
+  "elastic_hosts": "${ELASTIC_HOSTS}",
+  "ingest_pipelines": [
+    {
+      "id": "logs-netflow.log-2.25.1-klg",
+      "file": "ingest-pipelines/logs-netflow.log-2.25.1-klg.json",
+      "processors": 45
+    },
+    {
+      "id": "logs-network_traffic.flow-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.flow-1.34.2.json",
+      "processors": 20
+    },
+    {
+      "id": "logs-network_traffic.dns-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.dns-1.34.2.json",
+      "processors": 15
+    },
+    {
+      "id": "logs-network_traffic.http-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.http-1.34.2.json",
+      "processors": 16
+    },
+    {
+      "id": "logs-network_traffic.tls-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.tls-1.34.2.json",
+      "processors": 19
+    },
+    {
+      "id": "logs-network_traffic.icmp-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.icmp-1.34.2.json",
+      "processors": 15
+    },
+    {
+      "id": "logs-network_traffic.dhcpv4-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.dhcpv4-1.34.2.json",
+      "processors": 17
+    },
+    {
+      "id": "logs-network_traffic.amqp-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.amqp-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.cassandra-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.cassandra-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.mysql-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.mysql-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.pgsql-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.pgsql-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.redis-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.redis-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.thrift-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.thrift-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.mongodb-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.mongodb-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.memcached-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.memcached-1.34.2.json",
+      "processors": 17
+    },
+    {
+      "id": "logs-network_traffic.nfs-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.nfs-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-network_traffic.sip-1.34.2",
+      "file": "ingest-pipelines/logs-network_traffic.sip-1.34.2.json",
+      "processors": 14
+    },
+    {
+      "id": "logs-dga.dns-1.0.0",
+      "file": "ingest-pipelines/logs-dga.dns-1.0.0.json",
+      "processors": 2
+    },
+    {
+      "id": "logs-snort.log-1.21.2",
+      "file": "ingest-pipelines/logs-snort.log-1.21.2.json",
+      "processors": 46
+    },
+    {
+      "id": "1.6.0-ml_beaconing_ingest_pipeline",
+      "file": "ingest-pipelines/1.6.0-ml_beaconing_ingest_pipeline.json",
+      "processors": 7
+    },
+    {
+      "id": "3.0.1-ml_dga_ingest_pipeline",
+      "file": "ingest-pipelines/3.0.1-ml_dga_ingest_pipeline.json",
+      "processors": 2
+    },
+    {
+      "id": "3.0.1-ml_dga_inference_pipeline",
+      "file": "ingest-pipelines/3.0.1-ml_dga_inference_pipeline.json",
+      "processors": 3
+    }
+  ],
+  "transforms": [
+    {
+      "id": "logs-beaconing.pivot_transform-default-1.6.0",
+      "file": "transforms/logs-beaconing.pivot_transform-default-1.6.0.json",
+      "dest_index": "ml_beaconing-1.6.0"
+    }
+  ],
+  "ml_jobs": [
+    {
+      "id": "dga_high_sum_probability_ea",
+      "file": "ml-jobs/dga_high_sum_probability_ea.json"
+    },
+    {
+      "id": "high_count_network_events",
+      "file": "ml-jobs/high_count_network_events.json"
+    },
+    {
+      "id": "high_count_network_denies",
+      "file": "ml-jobs/high_count_network_denies.json"
+    },
+    {
+      "id": "rare_destination_country",
+      "file": "ml-jobs/rare_destination_country.json"
+    }
+  ],
+  "ml_datafeeds": [
+    {
+      "id": "datafeed-dga_high_sum_probability_ea",
+      "file": "ml-datafeeds/datafeed-dga_high_sum_probability_ea.json"
+    },
+    {
+      "id": "datafeed-high_count_network_events",
+      "file": "ml-datafeeds/datafeed-high_count_network_events.json"
+    },
+    {
+      "id": "datafeed-high_count_network_denies",
+      "file": "ml-datafeeds/datafeed-high_count_network_denies.json"
+    },
+    {
+      "id": "datafeed-rare_destination_country",
+      "file": "ml-datafeeds/datafeed-rare_destination_country.json"
+    }
+  ],
+  "ml_trained_models": [
+    {
+      "id": "dga_1611725_2.0",
+      "file": "ml-trained-models/dga_1611725_2.0.json"
+    }
+  ],
+  "errors": []
+}

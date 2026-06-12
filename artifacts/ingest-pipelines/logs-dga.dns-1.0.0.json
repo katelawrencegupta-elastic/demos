@@ -1,0 +1,21 @@
+{
+  "logs-dga.dns-1.0.0": {
+    "description": "DGA demo ingest: set event.ingested then run ML DGA scoring",
+    "processors": [
+      {
+        "set": {
+          "field": "event.ingested",
+          "value": "{{{_ingest.timestamp}}}",
+          "override": false
+        }
+      },
+      {
+        "pipeline": {
+          "name": "3.0.1-ml_dga_ingest_pipeline"
+        }
+      }
+    ],
+    "created_date_millis": 1781273886605,
+    "modified_date_millis": 1781273886605
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "1.6.0-ml_beaconing_ingest_pipeline": {
+    "processors": [
+      {
+        "fingerprint": {
+          "fields": [
+            "@timestamp",
+            "_id"
+          ],
+          "method": "SHA-256",
+          "target_field": "_id"
+        }
+      },
+      {
+        "date": {
+          "field": "event.ingested",
+          "formats": [
+            "UNIX",
+            "ISO8601"
+          ],
+          "target_field": "event.ingested"
+        }
+      },
+      {
+        "script": {
+          "description": "Casts flat underscore process fields in group-by to ECS nested types.",
+          "lang": "painless",
+          "source": "if (ctx.process_pid != null) {\n  String v = ctx.process_pid.toString();\n  if (!v.isEmpty()) {\n    if (ctx.process == null) { ctx.process = new HashMap(); }\n    ctx.process.pid = Long.parseLong(v);\n  }\n}\nif (ctx.process_parent_pid != null) {\n  String v = ctx.process_parent_pid.toString();\n  if (!v.isEmpty()) {\n    if (ctx.process == null) { ctx.process = new HashMap(); }\n    if (ctx.process.parent == null) { ctx.process.parent = new HashMap(); }\n    ctx.process.parent.pid = Long.parseLong(v);\n  }\n}\nif (ctx.process_code_signature_exists != null) {\n  String v = ctx.process_code_signature_exists.toString();\n  if (!v.isEmpty()) {\n    if (ctx.process == null) { ctx.process = new HashMap(); }\n    if (ctx.process.code_signature == null) { ctx.process.code_signature = new HashMap(); }\n    ctx.process.code_signature.exists = Boolean.parseBoolean(v);\n  }\n}\nif (ctx.process_code_signature_trusted != null) {\n  String v = ctx.process_code_signature_trusted.toString();\n  if (!v.isEmpty()) {\n    if (ctx.process == null) { ctx.process = new HashMap(); }\n    if (ctx.process.code_signature == null) { ctx.process.code_signature = new HashMap(); }\n    ctx.process.code_signature.trusted = Boolean.parseBoolean(v);\n  }\n}\n"
+        }
+      },
+      {
+        "remove": {
+          "field": "process_pid",
+          "ignore_missing": true
+        }
+      },
+      {
+        "remove": {
+          "field": "process_parent_pid",
+          "ignore_missing": true
+        }
+      },
+      {
+        "remove": {
+          "field": "process_code_signature_exists",
+          "ignore_missing": true
+        }
+      },
+      {
+        "remove": {
+          "field": "process_code_signature_trusted",
+          "ignore_missing": true
+        }
+      }
+    ],
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true,
+      "package": {
+        "name": "beaconing"
+      }
+    },
+    "created_date_millis": 1781024356109,
+    "modified_date_millis": 1781024356109
+  }
+}
