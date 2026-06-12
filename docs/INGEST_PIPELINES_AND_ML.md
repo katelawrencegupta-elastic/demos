@@ -4,18 +4,36 @@ Reference for the Elastic Demos stack: Logstash routing, Elasticsearch ingest pi
 
 > **Version note:** Pipeline IDs in `logstash/pipeline/main.conf` include integration version suffixes (e.g. `-1.34.2`, `-2.25.1-klg`). These must match pipelines installed in your Elastic deployment. Update `main.conf` if your Fleet integration versions differ.
 
+## Downloadable artifacts
+
+Full JSON exports of every ingest pipeline, transform, and ML job referenced in this document are available under [`artifacts/`](../artifacts/):
+
+| Artifact | Link |
+|----------|------|
+| **ZIP bundle (all files)** | [`elastic-demo-artifacts.zip`](../artifacts/elastic-demo-artifacts.zip) |
+| **Manifest** (index of all exports) | [`manifest.json`](../artifacts/manifest.json) |
+| **Artifact guide** (import examples) | [`artifacts/README.md`](../artifacts/README.md) |
+| **Export script** (regenerate from your cluster) | [`scripts/export-elastic-artifacts.py`](../scripts/export-elastic-artifacts.py) |
+
+Individual JSON files are linked inline throughout this document. Regenerate artifacts after upgrading Fleet integrations:
+
+```bash
+python3 scripts/export-elastic-artifacts.py
+```
+
 ---
 
 ## Table of contents
 
-1. [Pipeline architecture](#pipeline-architecture)
-2. [Logstash pipelines](#logstash-pipelines)
-3. [Elasticsearch ingest pipelines](#elasticsearch-ingest-pipelines)
-4. [Data stream routing](#data-stream-routing)
-5. [Field mappings](#field-mappings)
-6. [Generator source schemas](#generator-source-schemas)
-7. [ML transforms and jobs](#ml-transforms-and-jobs)
-8. [Detection rules and query indices](#detection-rules-and-query-indices)
+1. [Downloadable artifacts](#downloadable-artifacts)
+2. [Pipeline architecture](#pipeline-architecture)
+3. [Logstash pipelines](#logstash-pipelines)
+4. [Elasticsearch ingest pipelines](#elasticsearch-ingest-pipelines)
+5. [Data stream routing](#data-stream-routing)
+6. [Field mappings](#field-mappings)
+7. [Generator source schemas](#generator-source-schemas)
+8. [ML transforms and jobs](#ml-transforms-and-jobs)
+9. [Detection rules and query indices](#detection-rules-and-query-indices)
 
 ---
 
@@ -112,17 +130,17 @@ Configured in `logstash/config/pipelines.yml`. Each ingest pipeline has its own 
 
 Applied at index time via the Logstash `elasticsearch` output `pipeline` parameter.
 
-| Trigger condition (Logstash) | Data stream | Elasticsearch ingest pipeline |
-|-----------------------------|-------------|------------------------------|
-| `netflow` tag / `netflow` type / `[netflow][version]` | `logs-netflow.log-default` | `logs-netflow.log-2.25.1-klg` |
-| `beats` + `agent.type == packetbeat` | `logs-network_traffic.<protocol>-default` | `logs-%{[data_stream][dataset]}-1.34.2` (dynamic) |
-| `beacon` + `c2` tags | `logs-network_traffic.flow-default` | `logs-network_traffic.flow-1.34.2` |
-| `dga` + `dns` tags | `logs-dga.dns-default` | `logs-dga.dns-1.0.0` |
-| `snort` tag | `logs-snort.log-default` | `logs-snort.log-1.21.2` |
-| `endpoint_process` tag | `logs-endpoint.events.process-default` | _(none — direct write)_ |
-| `exfil` + `data_loss` tags | `logs-exfil.transfer-default` | _(none — direct write)_ |
-| `dga` + `snort` tags | `logs-dga.alert-default` | _(none — direct write)_ |
-| Default (unmatched syslog) | `logs-syslog-default` | _(none — direct write)_ |
+| Trigger condition (Logstash) | Data stream | Elasticsearch ingest pipeline | Artifact |
+|-----------------------------|-------------|------------------------------|----------|
+| `netflow` tag / `netflow` type / `[netflow][version]` | `logs-netflow.log-default` | `logs-netflow.log-2.25.1-klg` | [JSON](../artifacts/ingest-pipelines/logs-netflow.log-2.25.1-klg.json) |
+| `beats` + `agent.type == packetbeat` | `logs-network_traffic.<protocol>-default` | `logs-%{[data_stream][dataset]}-1.34.2` (dynamic) | [per-protocol JSON](../artifacts/ingest-pipelines/) |
+| `beacon` + `c2` tags | `logs-network_traffic.flow-default` | `logs-network_traffic.flow-1.34.2` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.flow-1.34.2.json) |
+| `dga` + `dns` tags | `logs-dga.dns-default` | `logs-dga.dns-1.0.0` | [JSON](../artifacts/ingest-pipelines/logs-dga.dns-1.0.0.json) |
+| `snort` tag | `logs-snort.log-default` | `logs-snort.log-1.21.2` | [JSON](../artifacts/ingest-pipelines/logs-snort.log-1.21.2.json) |
+| `endpoint_process` tag | `logs-endpoint.events.process-default` | _(none — direct write)_ | — |
+| `exfil` + `data_loss` tags | `logs-exfil.transfer-default` | _(none — direct write)_ | — |
+| `dga` + `snort` tags | `logs-dga.alert-default` | _(none — direct write)_ | — |
+| Default (unmatched syslog) | `logs-syslog-default` | _(none — direct write)_ | — |
 
 ### Dynamic Packetbeat pipelines
 
@@ -134,26 +152,26 @@ logs-<data_stream.dataset>-1.34.2
 
 Common datasets from the Packetbeat demo (`packetbeat/packetbeat.yml.template`):
 
-| Protocol | Typical `data_stream.dataset` |
-|----------|--------------------------------|
-| ICMP | `network_traffic.icmp` |
-| DHCP | `network_traffic.dhcpv4` |
-| DNS | `network_traffic.dns` |
-| HTTP | `network_traffic.http` |
-| AMQP | `network_traffic.amqp` |
-| Cassandra | `network_traffic.cassandra` |
-| MySQL | `network_traffic.mysql` |
-| PostgreSQL | `network_traffic.pgsql` |
-| Redis | `network_traffic.redis` |
-| Thrift | `network_traffic.thrift` |
-| MongoDB | `network_traffic.mongodb` |
-| Memcache | `network_traffic.memcached` |
-| NFS | `network_traffic.nfs` |
-| TLS | `network_traffic.tls` |
-| SIP | `network_traffic.sip` |
-| _(fallback)_ | `network_traffic.flow` |
+| Protocol | Typical `data_stream.dataset` | Ingest pipeline artifact |
+|----------|--------------------------------|------------------------|
+| ICMP | `network_traffic.icmp` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.icmp-1.34.2.json) |
+| DHCP | `network_traffic.dhcpv4` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.dhcpv4-1.34.2.json) |
+| DNS | `network_traffic.dns` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.dns-1.34.2.json) |
+| HTTP | `network_traffic.http` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.http-1.34.2.json) |
+| AMQP | `network_traffic.amqp` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.amqp-1.34.2.json) |
+| Cassandra | `network_traffic.cassandra` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.cassandra-1.34.2.json) |
+| MySQL | `network_traffic.mysql` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.mysql-1.34.2.json) |
+| PostgreSQL | `network_traffic.pgsql` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.pgsql-1.34.2.json) |
+| Redis | `network_traffic.redis` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.redis-1.34.2.json) |
+| Thrift | `network_traffic.thrift` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.thrift-1.34.2.json) |
+| MongoDB | `network_traffic.mongodb` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.mongodb-1.34.2.json) |
+| Memcache | `network_traffic.memcached` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.memcached-1.34.2.json) |
+| NFS | `network_traffic.nfs` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.nfs-1.34.2.json) |
+| TLS | `network_traffic.tls` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.tls-1.34.2.json) |
+| SIP | `network_traffic.sip` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.sip-1.34.2.json) |
+| _(fallback)_ | `network_traffic.flow` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.flow-1.34.2.json) |
 
-The DNS ingest pipeline (`logs-network_traffic.dns-1.34.2`) includes the Fleet **`ml_dga_ingest_pipeline`** processor for DGA ML scoring on live DNS traffic from Packetbeat.
+The DNS ingest pipeline ([`logs-network_traffic.dns-1.34.2`](../artifacts/ingest-pipelines/logs-network_traffic.dns-1.34.2.json)) includes the Fleet [**`3.0.1-ml_dga_ingest_pipeline`**](../artifacts/ingest-pipelines/3.0.1-ml_dga_ingest_pipeline.json) processor for DGA ML scoring on live DNS traffic from Packetbeat.
 
 ---
 
@@ -428,8 +446,10 @@ Process events report the **external** exfil URL in args (not `127.0.0.1`) so pr
 | Property | Value |
 |----------|-------|
 | **Transform ID** | `logs-beaconing.pivot_transform-default-1.6.0` |
+| **Transform artifact** | [JSON](../artifacts/transforms/logs-beaconing.pivot_transform-default-1.6.0.json) |
+| **Beaconing ingest pipeline** | [1.6.0-ml_beaconing_ingest_pipeline](../artifacts/ingest-pipelines/1.6.0-ml_beaconing_ingest_pipeline.json) |
 | **Source index** | `logs-network_traffic.flow-default` (and compatible flow indices) |
-| **Destination index** | `ml_beaconing.all` |
+| **Destination index** | `ml_beaconing-1.6.0` (alias: `ml_beaconing.all`) |
 | **Trigger script** | `security_use_cases/beacon/trigger-beacon-transform.py` |
 | **Key output field** | `beacon_stats.is_beaconing` (boolean) |
 
@@ -456,14 +476,27 @@ The beacon generator produces flow events shaped for the Network Beaconing integ
 
 DGA detection uses **Fleet-installed ML models** rather than a demo-managed transform.
 
-| Component | Details |
-|-----------|---------|
-| **Ingest enrichment** | `ml_dga_ingest_pipeline` inside `logs-network_traffic.dns-1.34.2` (Packetbeat DNS) and `logs-dga.dns-1.0.0` (demo DNS events) |
-| **Source data** | `logs-dga.dns-default` from DGA generator; `logs-network_traffic.dns-default` from Packetbeat |
-| **ML output fields** | Scored by Fleet DGA model (e.g. `ml_is_dga.malicious_prediction`, probability fields — exact names depend on integration version) |
-| **Demo script** | `security_use_cases/dga/enable-dga-rules.py` adds `logs-dga.dns-*` to rule index patterns |
+| Component | Details | Artifact |
+|-----------|---------|----------|
+| **DGA ingest pipeline** | Scores DNS at ingest time | [3.0.1-ml_dga_ingest_pipeline](../artifacts/ingest-pipelines/3.0.1-ml_dga_ingest_pipeline.json) |
+| **DGA inference pipeline** | Inference-time scoring | [3.0.1-ml_dga_inference_pipeline](../artifacts/ingest-pipelines/3.0.1-ml_dga_inference_pipeline.json) |
+| **DGA trained model** | Classification model | [dga_1611725_2.0](../artifacts/ml-trained-models/dga_1611725_2.0.json) |
+| **DGA ML job** | `dga_high_sum_probability_ea` | [job](../artifacts/ml-jobs/dga_high_sum_probability_ea.json) · [datafeed](../artifacts/ml-datafeeds/datafeed-dga_high_sum_probability_ea.json) |
+| **Demo DNS pipeline** | `logs-dga.dns-1.0.0` | [JSON](../artifacts/ingest-pipelines/logs-dga.dns-1.0.0.json) |
+| **Packetbeat DNS pipeline** | `logs-network_traffic.dns-1.34.2` | [JSON](../artifacts/ingest-pipelines/logs-network_traffic.dns-1.34.2.json) |
+| **Source data** | `logs-dga.dns-default` from DGA generator; `logs-network_traffic.dns-default` from Packetbeat | — |
+| **ML output fields** | Scored by Fleet DGA model (e.g. `ml_is_dga.malicious_prediction`, probability fields — exact names depend on integration version) | — |
+| **Demo script** | `security_use_cases/dga/enable-dga-rules.py` adds `logs-dga.dns-*` to rule index patterns | — |
 
-No transform ID is hardcoded in this repo for DGA; scoring is handled by the installed DGA integration ingest pipelines.
+No transform ID is hardcoded in this repo for DGA; scoring is handled by the installed DGA integration ingest pipelines (artifacts linked above).
+
+#### Network ML jobs (Packetbeat)
+
+| Job ID | Purpose | Artifacts |
+|--------|---------|-----------|
+| `high_count_network_events` | Network volume anomalies | [job](../artifacts/ml-jobs/high_count_network_events.json) · [datafeed](../artifacts/ml-datafeeds/datafeed-high_count_network_events.json) |
+| `high_count_network_denies` | Denied connection anomalies | [job](../artifacts/ml-jobs/high_count_network_denies.json) · [datafeed](../artifacts/ml-datafeeds/datafeed-high_count_network_denies.json) |
+| `rare_destination_country` | Rare geo anomalies | [job](../artifacts/ml-jobs/rare_destination_country.json) · [datafeed](../artifacts/ml-datafeeds/datafeed-rare_destination_country.json) |
 
 ### Exfiltration
 
@@ -515,13 +548,13 @@ Tag filter: **Use Case: Domain Generation Algorithm Detection**
 
 ## Quick reference: end-to-end paths
 
-| Demo | Generator path | Logstash input | ES ingest pipeline | Data stream | ML / rules |
-|------|----------------|----------------|-------------------|-------------|------------|
-| NetFlow dashboards | `netflow/` | UDP 2055 | `logs-netflow.log-2.25.1-klg` | `logs-netflow.log-default` | — |
-| Network Traffic dashboards | `packetbeat/` | TCP 5044 | `logs-network_traffic.<proto>-1.34.2` | `logs-network_traffic.*-default` | DGA ML on DNS |
-| C2 beaconing | `security_use_cases/beacon/` | Syslog 514 | `logs-network_traffic.flow-1.34.2` | `logs-network_traffic.flow-default` | Transform → `ml_beaconing.all` → rules |
-| DGA | `security_use_cases/dga/` | Syslog 514 | `logs-dga.dns-1.0.0` | `logs-dga.dns-default` | DGA ML ingest pipeline → rules |
-| Data exfil | `security_use_cases/exfil/` | Syslog 514 | _(none)_ | `logs-exfil.transfer-default`, `logs-endpoint.events.process-default` | Query rules |
+| Demo | Generator path | Logstash input | ES ingest pipeline | Data stream | ML / rules | Artifact |
+|------|----------------|----------------|-------------------|-------------|------------|----------|
+| NetFlow dashboards | `netflow/` | UDP 2055 | `logs-netflow.log-2.25.1-klg` | `logs-netflow.log-default` | — | [pipeline](../artifacts/ingest-pipelines/logs-netflow.log-2.25.1-klg.json) |
+| Network Traffic dashboards | `packetbeat/` | TCP 5044 | `logs-network_traffic.<proto>-1.34.2` | `logs-network_traffic.*-default` | DGA ML on DNS | [pipelines](../artifacts/ingest-pipelines/) |
+| C2 beaconing | `security_use_cases/beacon/` | Syslog 514 | `logs-network_traffic.flow-1.34.2` | `logs-network_traffic.flow-default` | Transform → `ml_beaconing.all` → rules | [pipeline](../artifacts/ingest-pipelines/logs-network_traffic.flow-1.34.2.json) · [transform](../artifacts/transforms/logs-beaconing.pivot_transform-default-1.6.0.json) |
+| DGA | `security_use_cases/dga/` | Syslog 514 | `logs-dga.dns-1.0.0` | `logs-dga.dns-default` | DGA ML ingest pipeline → rules | [pipeline](../artifacts/ingest-pipelines/logs-dga.dns-1.0.0.json) · [model](../artifacts/ml-trained-models/dga_1611725_2.0.json) |
+| Data exfil | `security_use_cases/exfil/` | Syslog 514 | _(none)_ | `logs-exfil.transfer-default`, `logs-endpoint.events.process-default` | Query rules | — |
 
 ---
 
@@ -536,9 +569,15 @@ Tag filter: **Use Case: Domain Generation Algorithm Detection**
 | `logstash/pipeline/syslog-ingest.conf` | Syslog input |
 | `security_use_cases/beacon/trigger-beacon-transform.py` | ML transform control |
 | `security_use_cases/*/enable-*-rules.py` | Detection rule installation |
-| `scripts/export-elastic-artifacts.py` | Export ingest pipelines, transforms, ML jobs to JSON |
-| `artifacts/elastic-demo-artifacts.zip` | Downloadable bundle of all exported artifacts |
-| `artifacts/README.md` | Artifact index and import examples |
+| [`scripts/export-elastic-artifacts.py`](../scripts/export-elastic-artifacts.py) | Export ingest pipelines, transforms, ML jobs to JSON |
+| [`artifacts/elastic-demo-artifacts.zip`](../artifacts/elastic-demo-artifacts.zip) | Downloadable bundle of all exported artifacts |
+| [`artifacts/manifest.json`](../artifacts/manifest.json) | Machine-readable index of all artifact files |
+| [`artifacts/README.md`](../artifacts/README.md) | Artifact index and import examples |
+| [`artifacts/ingest-pipelines/`](../artifacts/ingest-pipelines/) | 22 ingest pipeline JSON exports |
+| [`artifacts/transforms/`](../artifacts/transforms/) | Network beaconing transform export |
+| [`artifacts/ml-jobs/`](../artifacts/ml-jobs/) | ML anomaly detector job exports |
+| [`artifacts/ml-datafeeds/`](../artifacts/ml-datafeeds/) | ML datafeed exports |
+| [`artifacts/ml-trained-models/`](../artifacts/ml-trained-models/) | DGA trained model export |
 
 ---
 
