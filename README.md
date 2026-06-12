@@ -305,6 +305,8 @@ docker compose up -d --build
 
 ```
 demos/
+├── docs/
+│   └── INGEST_PIPELINES_AND_ML.md   # Ingest pipelines, field mappings, ML transforms
 ├── logstash/                 # Logstash image, pipelines, compose
 ├── netflow/                  # NetFlow v9 generator
 ├── packetbeat/               # Packetbeat + traffic generator (network_traffic)
@@ -315,3 +317,5 @@ demos/
 │   └── exfil/                # curl/wget exfil demo
 └── snort/                    # Standalone Snort alert generator (optional)
 ```
+
+See **[docs/INGEST_PIPELINES_AND_ML.md](docs/INGEST_PIPELINES_AND_ML.md)** for full ingest pipeline IDs, ECS field mappings, ML transform details, and detection-rule query indices.
