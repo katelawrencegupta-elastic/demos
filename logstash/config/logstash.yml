@@ -1,0 +1,9 @@
+http.host: "0.0.0.0"
+path.config: null
+pipeline.workers: 2
+pipeline.batch.size: 125
+
+# On-disk persistent queue root (each pipeline gets a subdirectory).
+path.queue: /usr/share/logstash/data/queue
+queue.checkpoint.writes: 1024
+queue.checkpoint.acks: 1024

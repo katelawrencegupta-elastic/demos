@@ -1,0 +1,31 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  beacon:
+    build: .
+    image: ${BEACON_IMAGE:-demos-beacon}
+    container_name: ${BEACON_CONTAINER_NAME:-beacon-generator}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      BEACON_OUTPUT_MODE: ${BEACON_OUTPUT_MODE:-all}
+      # Resolve logstash by container name on the shared `demos` network.
+      BEACON_SYSLOG_TARGET: ${BEACON_SYSLOG_TARGET:-logstash}
+      BEACON_SYSLOG_PORT: ${BEACON_SYSLOG_PORT:-514}
+      BEACON_NETFLOW_TARGET: ${BEACON_NETFLOW_TARGET:-logstash}
+      BEACON_NETFLOW_PORT: ${BEACON_NETFLOW_PORT:-2055}
+      BEACON_HOSTS: ${BEACON_HOSTS:-3}
+      BEACON_C2_COUNT: ${BEACON_C2_COUNT:-2}
+      BEACON_INTERVALS: ${BEACON_INTERVALS:-60,120,300}
+      BEACON_JITTER: ${BEACON_JITTER:-0.05}
+      BEACON_SNORT_FORMAT: ${BEACON_SNORT_FORMAT:-fast}
+      BEACON_HOSTNAME: ${BEACON_HOSTNAME:-beacon-demo}
+      BEACON_TICK: ${BEACON_TICK:-0.5}
+      BEACON_ALERT_PROBABILITY: ${BEACON_ALERT_PROBABILITY:-0.35}
+    restart: unless-stopped

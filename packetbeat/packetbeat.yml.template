@@ -1,0 +1,60 @@
+packetbeat.interfaces.device: any
+
+packetbeat.protocols:
+  - type: icmp
+    enabled: true
+
+  - type: dhcpv4
+    ports: [67, 68]
+
+  - type: dns
+    ports: [53]
+
+  - type: http
+    ports: [80, 8080, 8000, 5000, 8002]
+
+  - type: amqp
+    ports: [5672]
+
+  - type: cassandra
+    ports: [9042]
+
+  - type: mysql
+    ports: [3306, 3307]
+
+  - type: pgsql
+    ports: [5432]
+
+  - type: redis
+    ports: [6379]
+
+  - type: thrift
+    ports: [9090]
+
+  - type: mongodb
+    ports: [27017]
+
+  - type: memcache
+    ports: [11211]
+
+  - type: nfs
+    ports: [2049]
+
+  - type: tls
+    ports: [443, 8443]
+
+  - type: sip
+    ports: [5060, 5061]
+
+processors:
+  - add_host_metadata: ~
+
+output.logstash:
+  hosts: ["${LOGSTASH_HOST}:${LOGSTASH_PORT}"]
+
+logging.level: info
+logging.to_stderr: true
+logging.metrics.enabled: false
+
+setup.template.enabled: false
+setup.ilm.enabled: false

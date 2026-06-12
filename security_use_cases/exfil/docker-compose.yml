@@ -1,0 +1,30 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  exfil:
+    build: .
+    image: ${EXFIL_IMAGE:-demos-exfil}
+    container_name: ${EXFIL_CONTAINER_NAME:-exfil-generator}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      EXFIL_OUTPUT_MODE: ${EXFIL_OUTPUT_MODE:-all}
+      EXFIL_SYSLOG_TARGET: ${EXFIL_SYSLOG_TARGET:-logstash}
+      EXFIL_SYSLOG_PORT: ${EXFIL_SYSLOG_PORT:-514}
+      EXFIL_NETFLOW_TARGET: ${EXFIL_NETFLOW_TARGET:-logstash}
+      EXFIL_NETFLOW_PORT: ${EXFIL_NETFLOW_PORT:-2055}
+      EXFIL_RECEIVER_URL: ${EXFIL_RECEIVER_URL:-http://127.0.0.1:8888/upload}
+      EXFIL_INTERVAL: ${EXFIL_INTERVAL:-15}
+      EXFIL_JITTER: ${EXFIL_JITTER:-0.2}
+      EXFIL_SNORT_FORMAT: ${EXFIL_SNORT_FORMAT:-fast}
+      EXFIL_HOSTNAME: ${EXFIL_HOSTNAME:-exfil-demo}
+      EXFIL_ALERT_PROBABILITY: ${EXFIL_ALERT_PROBABILITY:-0.4}
+      EXFIL_HOSTS: ${EXFIL_HOSTS:-2}
+      EXFIL_TOOLS: ${EXFIL_TOOLS:-curl,wget}
+    restart: unless-stopped

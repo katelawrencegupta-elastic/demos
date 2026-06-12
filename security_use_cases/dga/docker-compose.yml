@@ -1,0 +1,31 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  dga:
+    build: .
+    image: ${DGA_IMAGE:-demos-dga}
+    container_name: ${DGA_CONTAINER_NAME:-dga-generator}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      DGA_OUTPUT_MODE: ${DGA_OUTPUT_MODE:-all}
+      # Resolve logstash by container name on the shared `demos` network.
+      DGA_SYSLOG_TARGET: ${DGA_SYSLOG_TARGET:-logstash}
+      DGA_SYSLOG_PORT: ${DGA_SYSLOG_PORT:-514}
+      DGA_NETFLOW_TARGET: ${DGA_NETFLOW_TARGET:-logstash}
+      DGA_NETFLOW_PORT: ${DGA_NETFLOW_PORT:-2055}
+      DGA_INTERVAL: ${DGA_INTERVAL:-3}
+      DGA_QUERIES_PER_BURST: ${DGA_QUERIES_PER_BURST:-3}
+      DGA_RATIO: ${DGA_RATIO:-0.7}
+      DGA_NXDOMAIN_RATIO: ${DGA_NXDOMAIN_RATIO:-0.92}
+      DGA_SNORT_FORMAT: ${DGA_SNORT_FORMAT:-fast}
+      DGA_HOSTNAME: ${DGA_HOSTNAME:-dga-demo}
+      DGA_INFECTED_HOSTS: ${DGA_INFECTED_HOSTS:-3}
+      DGA_ALGORITHM: ${DGA_ALGORITHM:-}
+    restart: unless-stopped

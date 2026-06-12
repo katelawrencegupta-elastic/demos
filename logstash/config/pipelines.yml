@@ -1,0 +1,21 @@
+# Start the processing pipeline before ingest pipelines connect.
+- pipeline.id: main
+  path.config: "/usr/share/logstash/pipeline/main.conf"
+  queue.type: persisted
+  queue.max_bytes: 1gb
+
+# One ingest pipeline per input, each with its own on-disk persistent queue.
+- pipeline.id: netflow-ingest
+  path.config: "/usr/share/logstash/pipeline/netflow-ingest.conf"
+  queue.type: persisted
+  queue.max_bytes: 256mb
+
+- pipeline.id: beats-ingest
+  path.config: "/usr/share/logstash/pipeline/beats-ingest.conf"
+  queue.type: persisted
+  queue.max_bytes: 256mb
+
+- pipeline.id: syslog-ingest
+  path.config: "/usr/share/logstash/pipeline/syslog-ingest.conf"
+  queue.type: persisted
+  queue.max_bytes: 256mb

@@ -1,0 +1,21 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  logstash:
+    build: .
+    image: ${LOGSTASH_IMAGE:-demos-logstash}
+    container_name: ${LOGSTASH_CONTAINER_NAME:-logstash}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    volumes:
+      - logstash-queue:/usr/share/logstash/data/queue
+    restart: unless-stopped
+
+volumes:
+  logstash-queue:
