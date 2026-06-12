@@ -2,6 +2,13 @@
 
 Synthetic data generators and a Logstash pipeline that ingest demo traffic into Elastic Cloud. Use this repo to populate NetFlow dashboards, Network Traffic analytics, and Elastic Security detection rules for C2 beaconing, DGA, and data exfiltration.
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [**Ingest Pipelines, Field Mappings & ML**](docs/INGEST_PIPELINES_AND_ML.md) | Full reference for Elasticsearch ingest pipelines, ECS field mappings, ML transforms/jobs, and detection-rule query targets |
+| [Artifact exports](artifacts/README.md) | Downloadable JSON for all ingest pipelines, transforms, and ML jobs ([zip](artifacts/elastic-demo-artifacts.zip)) |
+
 ## Architecture
 
 All generators send data to **Logstash** on a shared Docker network. Logstash normalizes events and writes them to Elastic data streams.
@@ -145,7 +152,7 @@ Central ingestion hub. Four pipelines (`config/pipelines.yml`):
 | `beats-ingest` | `pipeline/beats-ingest.conf` | TCP 5044 → `main` |
 | `syslog-ingest` | `pipeline/syslog-ingest.conf` | UDP/TCP 514 → `main` |
 
-The main pipeline enriches NetFlow records for the NetFlow integration, parses JSON syslog from demo programs (`beacon-demo`, `dga-demo`, `exfil-demo`, `endpoint-process-demo`), and routes events to the correct data stream.
+The main pipeline enriches NetFlow records for the NetFlow integration, parses JSON syslog from demo programs (`beacon-demo`, `dga-demo`, `exfil-demo`, `endpoint-process-demo`), and routes events to the correct data stream. See [Ingest Pipelines, Field Mappings & ML](docs/INGEST_PIPELINES_AND_ML.md) for pipeline IDs, field mappings, and routing details.
 
 **Configuration**
 
@@ -234,7 +241,7 @@ Simulates infected hosts (`10.0.50.0/24`) sending periodic TCP connections to C2
 | `BEACON_INTERVALS` | `60,120,300` | Beacon period choices (seconds) |
 | `BEACON_BACKFILL_HOURS` | `6` | Historical flow backfill on startup |
 
-**Rules:** Statistical Model Detected C2 Beaconing Activity (queries `ml_beaconing.all`)
+**Rules:** Statistical Model Detected C2 Beaconing Activity (queries `ml_beaconing.all`). See [ML transforms & jobs](docs/INGEST_PIPELINES_AND_ML.md#ml-transforms-and-jobs).
 
 ```bash
 cd security_use_cases/beacon
@@ -258,7 +265,7 @@ Simulates DNS queries mixing benign domains with algorithmically generated DGA d
 | `DGA_NXDOMAIN_RATIO` | `0.92` | Fraction of DGA queries that get NXDOMAIN |
 | `DGA_ALGORITHM` | _(random)_ | Pin one algorithm or leave empty |
 
-**Rules:** Potential DGA Activity (ML)
+**Rules:** Potential DGA Activity (ML). See [DGA ML pipelines](docs/INGEST_PIPELINES_AND_ML.md#dga-domain-generation-algorithm).
 
 ```bash
 cd security_use_cases/dga
@@ -280,7 +287,7 @@ Runs real **`curl`** and **`wget`** commands to upload synthetic sensitive files
 | `EXFIL_INTERVAL` | `15` | Seconds between exfil attempts |
 | `EXFIL_RECEIVER_URL` | `http://127.0.0.1:8888/upload` | Local upload endpoint |
 
-**Rules:** Potential Data Exfiltration Through Curl / Wget
+**Rules:** Potential Data Exfiltration Through Curl / Wget. See [detection rules](docs/INGEST_PIPELINES_AND_ML.md#detection-rules-and-query-indices).
 
 ```bash
 cd security_use_cases/exfil
@@ -306,8 +313,7 @@ docker compose up -d --build
 ```
 demos/
 ├── docs/
-│   ├── INGEST_PIPELINES_AND_ML.md   # Ingest pipelines, field mappings, ML transforms
-│   └── (see artifacts/ for JSON exports)
+│   └── INGEST_PIPELINES_AND_ML.md   # → docs/INGEST_PIPELINES_AND_ML.md
 ├── artifacts/                # Downloadable ingest pipeline, transform, ML job JSON
 │   ├── elastic-demo-artifacts.zip
 │   └── manifest.json
@@ -322,6 +328,4 @@ demos/
 └── snort/                    # Standalone Snort alert generator (optional)
 ```
 
-See **[docs/INGEST_PIPELINES_AND_ML.md](docs/INGEST_PIPELINES_AND_ML.md)** for full ingest pipeline IDs, ECS field mappings, ML transform details, and detection-rule query indices.
-
-**Downloadable JSON artifacts:** [artifacts/elastic-demo-artifacts.zip](artifacts/elastic-demo-artifacts.zip) (ingest pipelines, transforms, ML jobs). Regenerate with `python3 scripts/export-elastic-artifacts.py`.
+Full pipeline and ML reference: **[docs/INGEST_PIPELINES_AND_ML.md](docs/INGEST_PIPELINES_AND_ML.md)** — ingest pipeline IDs, ECS field mappings, ML transforms, detection-rule query indices, and links to [JSON artifacts](artifacts/elastic-demo-artifacts.zip). Regenerate artifacts with `python3 scripts/export-elastic-artifacts.py`.
