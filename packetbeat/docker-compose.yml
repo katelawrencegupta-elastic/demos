@@ -1,0 +1,24 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  packetbeat:
+    build: .
+    image: ${PACKETBEAT_IMAGE:-demos-packetbeat}
+    container_name: ${PACKETBEAT_CONTAINER_NAME:-packetbeat-demo}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      # Resolve logstash by container name on the shared `demos` network.
+      LOGSTASH_HOST: ${LOGSTASH_HOST:-logstash}
+      LOGSTASH_PORT: ${LOGSTASH_PORT:-5044}
+      TRAFFIC_INTERVAL: ${TRAFFIC_INTERVAL:-5}
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    restart: unless-stopped

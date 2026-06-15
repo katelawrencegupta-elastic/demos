@@ -1,0 +1,22 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  netflow:
+    build: .
+    image: ${NETFLOW_IMAGE:-demos-netflow}
+    container_name: ${NETFLOW_CONTAINER_NAME:-netflow-generator}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      # Resolve logstash by container name on the shared `demos` network.
+      NETFLOW_TARGET: ${NETFLOW_TARGET:-logstash}
+      NETFLOW_PORT: ${NETFLOW_PORT:-2055}
+      NETFLOW_INTERVAL: ${NETFLOW_INTERVAL:-1}
+      NETFLOW_FLOWS_PER_PACKET: ${NETFLOW_FLOWS_PER_PACKET:-8}
+    restart: unless-stopped

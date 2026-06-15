@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export LOGSTASH_HOST="${LOGSTASH_HOST:-172.17.0.2}"
+export LOGSTASH_HOST="${LOGSTASH_HOST:-logstash}"
 export LOGSTASH_PORT="${LOGSTASH_PORT:-5044}"
 
 envsubst '${LOGSTASH_HOST} ${LOGSTASH_PORT}' \
@@ -10,7 +10,8 @@ envsubst '${LOGSTASH_HOST} ${LOGSTASH_PORT}' \
 
 /usr/local/bin/start-services.sh
 sleep 15
-/usr/local/bin/wait-for-services.sh
+# Do not block Packetbeat if optional protocol servers are slow or unavailable.
+/usr/local/bin/wait-for-services.sh || echo "warning: not all protocol servers ready; starting Packetbeat anyway" >&2
 
 echo "Starting Packetbeat (output -> ${LOGSTASH_HOST}:${LOGSTASH_PORT})" >&2
 packetbeat --environment container -e -c /etc/packetbeat/packetbeat.yml &

@@ -107,7 +107,7 @@ Each input has its own ingest pipeline with a **persistent queue** (256 MB). The
 cd netflow && docker build -t demos-netflow . && docker run --rm --network demos --env-file .env demos-netflow
 
 # Live protocol traffic (Network Traffic dashboards)
-cd packetbeat && docker build -t demos-packetbeat . && docker run --rm --network demos --env-file .env demos-packetbeat
+cd packetbeat && cp .env.example .env && docker compose up -d --build
 
 # Security use cases
 cd security_use_cases/beacon && cp .env.example .env && docker compose up -d --build
@@ -212,11 +212,26 @@ Logstash maps Packetbeat events to `logs-network_traffic.*-default` data streams
 ```bash
 cd packetbeat
 cp .env.example .env
-docker build -t demos-packetbeat .
-docker run --rm --network demos --env-file .env demos-packetbeat
+docker compose up -d --build
 ```
 
 **Elastic output:** `logs-network_traffic.*-default`
+
+---
+
+## Snort generator
+
+**Path:** `snort/`
+
+Sends synthetic Snort IDS alerts to Logstash syslog (UDP 514).
+
+```bash
+cd snort
+cp .env.example .env
+docker compose up -d --build
+```
+
+**Elastic output:** `logs-snort.log-default`
 
 ---
 

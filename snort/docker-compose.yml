@@ -1,0 +1,24 @@
+networks:
+  demos:
+    name: demos
+    external: true
+
+services:
+  snort:
+    build: .
+    image: ${SNORT_IMAGE:-demos-snort}
+    container_name: ${SNORT_CONTAINER_NAME:-snort-generator}
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - demos
+    environment:
+      # Resolve logstash by container name on the shared `demos` network.
+      SNORT_TARGET: ${SNORT_TARGET:-logstash}
+      SNORT_PORT: ${SNORT_PORT:-514}
+      SNORT_INTERVAL: ${SNORT_INTERVAL:-2}
+      SNORT_ALERTS_PER_BURST: ${SNORT_ALERTS_PER_BURST:-1}
+      SNORT_FORMAT: ${SNORT_FORMAT:-fast}
+      SNORT_HOSTNAME: ${SNORT_HOSTNAME:-snort-demo}
+    restart: unless-stopped

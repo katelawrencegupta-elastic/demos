@@ -189,7 +189,7 @@ def build_alert(signature: tuple, pkt_num: int, now: datetime, alert_format: str
 
 
 def main() -> int:
-    target = os.environ.get("SNORT_TARGET", "172.17.0.2")
+    target = os.environ.get("SNORT_TARGET", "logstash")
     port = env_int("SNORT_PORT", 514)
     interval = float(os.environ.get("SNORT_INTERVAL", "2"))
     alerts_per_burst = env_int("SNORT_ALERTS_PER_BURST", 1)
