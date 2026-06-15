@@ -18,6 +18,7 @@ flowchart LR
   subgraph generators [Generators]
     NF[netflow]
     PB[packetbeat]
+    SN[snort]
     BC[beacon]
     DGA[dga]
     EX[exfil]
@@ -41,6 +42,7 @@ flowchart LR
 
   NF -->|NetFlow v9 UDP| NI
   PB -->|Beats TCP| BI
+  SN -->|Syslog UDP| SI
   BC -->|syslog + NetFlow| SI
   BC --> NI
   DGA -->|syslog + NetFlow| SI
@@ -57,6 +59,7 @@ flowchart LR
 |-----------|-------------------|----------------------------|
 | [netflow/](#netflow-generator) | UDP 2055 (NetFlow v9) | `logs-netflow.log-default` |
 | [packetbeat/](#network-traffic-packetbeat) | TCP 5044 (Beats) | `logs-network_traffic.*-default` |
+| [snort/](#snort-generator) | UDP 514 (Syslog) | `logs-snort.log-default` |
 | [beacon/](#beacon-c2-beaconing) | Syslog + NetFlow | `logs-network_traffic.flow-default` → ML transform `ml_beaconing.all` |
 | [dga/](#dga-domain-generation-algorithm) | Syslog + NetFlow | `logs-dga.dns-default`, `logs-dga.alert-default` |
 | [exfil/](#exfil-data-exfiltration) | Syslog + NetFlow | `logs-exfil.transfer-default`, `logs-endpoint.events.process-default` |
@@ -71,11 +74,13 @@ flowchart LR
 
 ## Shared Docker network
 
-Generators resolve Logstash by container name (`logstash`) on the external `demos` network:
+All generators and Logstash must share the external `demos` network. Containers reach Logstash by hostname **`logstash`** — not by Docker bridge IP (`172.17.0.2` is often packetbeat itself and will not work).
 
 ```bash
 docker network create demos
 ```
+
+Each generator includes a `docker-compose.yml` that joins `demos` and sets the Logstash target to `logstash`. Use `docker compose up` rather than plain `docker run` without `--network demos`.
 
 ## Quick start
 
@@ -102,12 +107,17 @@ Each input has its own ingest pipeline with a **persistent queue** (256 MB). The
 
 ### 2. Start generators
 
+Every generator uses the same pattern: copy `.env.example` to `.env`, then `docker compose up -d --build`.
+
 ```bash
 # Baseline NetFlow (NetFlow integration dashboards)
-cd netflow && docker build -t demos-netflow . && docker run --rm --network demos --env-file .env demos-netflow
+cd netflow && cp .env.example .env && docker compose up -d --build
 
 # Live protocol traffic (Network Traffic dashboards)
 cd packetbeat && cp .env.example .env && docker compose up -d --build
+
+# Snort IDS alerts
+cd snort && cp .env.example .env && docker compose up -d --build
 
 # Security use cases
 cd security_use_cases/beacon && cp .env.example .env && docker compose up -d --build
@@ -179,7 +189,7 @@ Sends synthetic **NetFlow v9** datagrams over UDP. Each packet includes a templa
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NETFLOW_TARGET` | `172.17.0.2` | Logstash host (`logstash` on `demos` network) |
+| `NETFLOW_TARGET` | `logstash` | Logstash hostname on `demos` network |
 | `NETFLOW_PORT` | `2055` | NetFlow UDP port |
 | `NETFLOW_INTERVAL` | `1` | Seconds between datagrams |
 | `NETFLOW_FLOWS_PER_PACKET` | `8` | Flow records per datagram |
@@ -187,8 +197,7 @@ Sends synthetic **NetFlow v9** datagrams over UDP. Each packet includes a templa
 ```bash
 cd netflow
 cp .env.example .env
-docker build -t demos-netflow .
-docker run --rm --network demos --env-file .env demos-netflow
+docker compose up -d --build
 ```
 
 **Elastic output:** `logs-netflow.log-default`
@@ -201,11 +210,13 @@ docker run --rm --network demos --env-file .env demos-netflow
 
 Runs **Packetbeat** plus local services (nginx, DNS, databases, message queues, etc.) and a traffic generator. Packetbeat captures real protocol conversations and ships ECS events to Logstash over Beats (TCP 5044).
 
+The compose file joins the `demos` network, sets `LOGSTASH_HOST=logstash`, and grants `NET_RAW` / `NET_ADMIN` for packet capture. Allow ~45 seconds after startup for internal services to become ready before Packetbeat begins shipping events.
+
 Logstash maps Packetbeat events to `logs-network_traffic.*-default` data streams (flow, dns, http, tls, and other protocol datasets).
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LOGSTASH_HOST` | `172.17.0.2` | Logstash host (`logstash` on `demos` network) |
+| `LOGSTASH_HOST` | `logstash` | Logstash hostname on `demos` network |
 | `LOGSTASH_PORT` | `5044` | Beats input port |
 | `TRAFFIC_INTERVAL` | `5` | Seconds between generated traffic bursts |
 
@@ -213,6 +224,7 @@ Logstash maps Packetbeat events to `logs-network_traffic.*-default` data streams
 cd packetbeat
 cp .env.example .env
 docker compose up -d --build
+docker logs -f packetbeat-demo   # look for: output -> logstash:5044
 ```
 
 **Elastic output:** `logs-network_traffic.*-default`
@@ -225,10 +237,18 @@ docker compose up -d --build
 
 Sends synthetic Snort IDS alerts to Logstash syslog (UDP 514).
 
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SNORT_TARGET` | `logstash` | Logstash hostname on `demos` network |
+| `SNORT_PORT` | `514` | Syslog UDP port |
+| `SNORT_INTERVAL` | `2` | Seconds between alert bursts |
+| `SNORT_FORMAT` | `fast` | `fast`, `snort3`, or `json` |
+
 ```bash
 cd snort
 cp .env.example .env
 docker compose up -d --build
+docker logs -f snort-generator   # look for: logstash:514
 ```
 
 **Elastic output:** `logs-snort.log-default`
@@ -315,7 +335,21 @@ docker compose up -d --build
 
 ## Troubleshooting
 
-**Generators cannot reach Logstash** — Confirm Logstash is on the `demos` network and use `logstash` as the target hostname. Run `connect-logstash.sh` if needed.
+**No data in a data stream** — Confirm the generator and Logstash are both on `demos`:
+
+```bash
+docker network inspect demos --format '{{range .Containers}}{{.Name}} {{end}}'
+```
+
+You should see `logstash` plus each running generator. Verify targets use hostname `logstash`, not `172.17.0.2` (that address is typically packetbeat on the default bridge network).
+
+**Generators cannot reach Logstash** — Use `docker compose` from each generator directory (not `docker run` without `--network demos`). Run `connect-logstash.sh` if Logstash was started before the network was created.
+
+**Packetbeat not indexing** — Check `docker logs packetbeat-demo` for `Starting Packetbeat (output -> logstash:5044)`. The container needs ~45s to start internal protocol servers. If you see `connection refused` to `172.17.0.2:5044`, recreate the container with compose so `LOGSTASH_HOST=logstash`.
+
+**Netflow or Snort not indexing** — Check generator logs show `logstash:2055` or `logstash:514`, not `172.17.0.2`. Redeploy with `docker compose up -d --build`.
+
+**Logstash main pipeline stopped** — If ingest pipelines log `Attempted to send event to 'main' but that address was unavailable`, the `main` pipeline may have crashed. Check `docker logs logstash` for errors and rebuild: `cd logstash && docker compose up -d --build`.
 
 **No documents in Elasticsearch** — Check `docker logs logstash` and verify `ELASTIC_HOSTS` / `ELASTIC_API_KEY` in `logstash/.env`.
 
@@ -333,14 +367,14 @@ demos/
 │   ├── elastic-demo-artifacts.zip
 │   └── manifest.json
 ├── logstash/                 # Logstash image, pipelines, compose
-├── netflow/                  # NetFlow v9 generator
+├── netflow/                  # NetFlow v9 generator (docker compose)
 ├── packetbeat/               # Packetbeat + traffic generator (network_traffic)
+├── snort/                    # Snort alert generator (docker compose)
 ├── security_use_cases/
 │   ├── elastic_env.py        # Shared .env loader for rule scripts
 │   ├── beacon/               # C2 beaconing demo
 │   ├── dga/                  # DGA DNS demo
 │   └── exfil/                # curl/wget exfil demo
-└── snort/                    # Standalone Snort alert generator (optional)
 ```
 
 Full pipeline and ML reference: **[docs/INGEST_PIPELINES_AND_ML.md](docs/INGEST_PIPELINES_AND_ML.md)** — ingest pipeline IDs, ECS field mappings, ML transforms, detection-rule query indices, and links to [JSON artifacts](artifacts/elastic-demo-artifacts.zip). Regenerate artifacts with `python3 scripts/export-elastic-artifacts.py`.
