@@ -1,0 +1,144 @@
+{
+  "title": "SRE-01 Workshop — Platform logs",
+  "time_range": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Total logs",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Errors",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE log.level == \"error\" | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 32, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "HTTP 5xx",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE http.response.status_code >= 500 | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 5, "w": 48, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "Log volume by level",
+        "axis": {
+          "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), log.level"
+            },
+            "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+            "y": [{ "column": "count" }],
+            "breakdown_by": { "column": "log.level" }
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "pie",
+        "title": "Logs by level",
+        "styling": { "donut_hole": "m" },
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY log.level"
+        },
+        "metrics": [{ "column": "count" }],
+        "group_by": [{ "column": "log.level" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "Logs by service",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY service.name | SORT count DESC | LIMIT 10"
+            },
+            "x": { "column": "service.name" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 32, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "HTTP status codes",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE http.response.status_code IS NOT NULL | STATS count = COUNT(*) BY http.response.status_code | SORT count DESC"
+            },
+            "x": { "column": "http.response.status_code" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 25, "w": 48, "h": 10 },
+      "config": {
+        "type": "data_table",
+        "title": "Errors and warnings by service",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE log.level IN (\"error\", \"warn\") | STATS count = COUNT(*) BY service.name, log.level | SORT count DESC | LIMIT 25"
+        },
+        "metrics": [{ "column": "count" }],
+        "rows": [{ "column": "service.name" }, { "column": "log.level" }]
+      }
+    }
+  ]
+}

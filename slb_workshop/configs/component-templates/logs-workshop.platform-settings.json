@@ -1,0 +1,10 @@
+{
+  "template": {
+    "settings": {
+      "index.default_pipeline": "logs-workshop.platform"
+    }
+  },
+  "_meta": {
+    "description": "Attach the workshop ingest pipeline to every backing index"
+  }
+}

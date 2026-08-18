@@ -1,0 +1,5 @@
+edot/logs/
+agents/logs/
+*.log
+.venv/
+.env

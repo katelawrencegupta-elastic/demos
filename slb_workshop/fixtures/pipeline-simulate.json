@@ -1,0 +1,15 @@
+{
+  "docs": [
+    {
+      "_source": {
+        "@timestamp": "2026-08-17T14:02:11.000Z",
+        "message": "{\"service\":{\"name\":\"well-data-api\",\"environment\":\"prod\"},\"log\":{\"level\":\"ERROR\"},\"http\":{\"request\":{\"method\":\"GET\"},\"response\":{\"status_code\":500}},\"url\":{\"path\":\"/v2/wells/8321/surveys\"},\"message\":\"survey lookup failed: upstream timeout\"}"
+      }
+    },
+    {
+      "_source": {
+        "message": "2026-08-17T14:03:44Z WARN [telemetry-gateway] retrying kafka produce topic=rig.metrics partition=3"
+      }
+    }
+  ]
+}

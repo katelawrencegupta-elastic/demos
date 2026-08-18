@@ -1,0 +1,46 @@
+# Standalone Elastic Agent in otel mode (not Fleet-enrolled).
+# Path C in labs/03-fleet-vs-edot.md
+x-agent: &agent
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.5.1
+  env_file:
+    - ../.env
+  environment:
+    ELASTIC_AGENT_OTEL: "true"
+  command: ["--config=/etc/otel/otel-agent.yml"]
+  volumes:
+    - ./otel-agent.yml:/etc/otel/otel-agent.yml:ro
+  restart: unless-stopped
+
+services:
+  agent-01:
+    <<: *agent
+    container_name: slb-workshop-agent-01
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      AGENT_ID: agent-01
+      HOST_NAME: aks-sre-01
+    ports:
+      - "14317:4317"
+      - "14318:4318"
+
+  agent-02:
+    <<: *agent
+    container_name: slb-workshop-agent-02
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      AGENT_ID: agent-02
+      HOST_NAME: aks-sre-02
+    ports:
+      - "15317:4317"
+      - "15318:4318"
+
+  agent-03:
+    <<: *agent
+    container_name: slb-workshop-agent-03
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      AGENT_ID: agent-03
+      HOST_NAME: aks-sre-03
+    ports:
+      - "16317:4317"
+      - "16318:4318"

@@ -1,0 +1,60 @@
+# Fleet-managed Elastic Agents (policy sre-01-workshop).
+# Enroll with: .venv/bin/python agents/enroll.py
+x-agent: &agent
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.5.1
+  user: root
+  restart: unless-stopped
+  env_file:
+    - ../.env
+  environment:
+    FLEET_ENROLL: "1"
+    FLEET_URL: ${FLEET_URL}
+    FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN}
+
+services:
+  agent-01:
+    <<: *agent
+    container_name: slb-workshop-agent-01
+    hostname: aks-sre-01
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN}
+      ELASTIC_AGENT_TAGS: workshop,sre-01,aks-sre-01
+    volumes:
+      - agent-01-state:/usr/share/elastic-agent/state
+      - ./logs/aks-sre-01/secure:/var/log/secure
+      - ./logs/aks-sre-01/messages:/var/log/messages
+
+  agent-02:
+    <<: *agent
+    container_name: slb-workshop-agent-02
+    hostname: aks-sre-02
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN}
+      ELASTIC_AGENT_TAGS: workshop,sre-01,aks-sre-02
+    volumes:
+      - agent-02-state:/usr/share/elastic-agent/state
+      - ./logs/aks-sre-02/secure:/var/log/secure
+      - ./logs/aks-sre-02/messages:/var/log/messages
+
+  agent-03:
+    <<: *agent
+    container_name: slb-workshop-agent-03
+    hostname: aks-sre-03
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN}
+      ELASTIC_AGENT_TAGS: workshop,sre-01,aks-sre-03
+    volumes:
+      - agent-03-state:/usr/share/elastic-agent/state
+      - ./logs/aks-sre-03/secure:/var/log/secure
+      - ./logs/aks-sre-03/messages:/var/log/messages
+
+volumes:
+  agent-01-state:
+  agent-02-state:
+  agent-03-state:

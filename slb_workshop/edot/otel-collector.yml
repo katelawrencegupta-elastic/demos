@@ -1,0 +1,53 @@
+receivers:
+  filelog/workshop:
+    include:
+      - /var/log/workshop/*.log
+    start_at: beginning
+    operators:
+      - type: json_parser
+        parse_from: body
+        if: body matches "^\\{"
+        on_error: send
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    send_batch_size: 256
+    timeout: 1s
+  resource/workshop:
+    attributes:
+      - key: deployment.environment
+        value: workshop
+        action: upsert
+
+exporters:
+  elasticsearch/otel:
+    endpoints:
+      - ${env:ELASTIC_URL}
+    api_key: ${env:ELASTIC_API_KEY}
+    mapping:
+      mode: otel
+
+service:
+  pipelines:
+    logs/filelog:
+      receivers: [filelog/workshop]
+      processors: [resource/workshop, batch]
+      exporters: [elasticsearch/otel]
+    logs/otlp:
+      receivers: [otlp]
+      processors: [resource/workshop, batch]
+      exporters: [elasticsearch/otel]
+    traces:
+      receivers: [otlp]
+      processors: [resource/workshop, batch]
+      exporters: [elasticsearch/otel]
+    metrics:
+      receivers: [otlp]
+      processors: [resource/workshop, batch]
+      exporters: [elasticsearch/otel]

@@ -1,0 +1,103 @@
+{
+  "description": "SRE-01 workshop pipeline: parse JSON or grok platform logs into ECS, then stamp dataset fields.",
+  "processors": [
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.original",
+        "copy_from": "message",
+        "override": false,
+        "ignore_empty_value": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "json": {
+        "field": "message",
+        "add_to_root": true,
+        "add_to_root_conflict_strategy": "merge",
+        "if": "ctx.message instanceof String && ctx.message.trim().startsWith('{')",
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:@timestamp} %{LOGLEVEL:log.level} \\[%{DATA:service.name}\\] %{GREEDYDATA:message}"
+        ],
+        "if": "ctx.message instanceof String && !ctx.message.trim().startsWith('{') && ctx.service?.name == null",
+        "ignore_failure": true
+      }
+    },
+    {
+      "date": {
+        "field": "@timestamp",
+        "formats": ["ISO8601", "yyyy-MM-dd'T'HH:mm:ss.SSSZ", "yyyy-MM-dd'T'HH:mm:ssX"],
+        "ignore_failure": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "log.level",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.type",
+        "value": "logs"
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.dataset",
+        "value": "workshop.platform"
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.namespace",
+        "value": "default"
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "copy_from": "data_stream.dataset"
+      }
+    },
+    {
+      "set": {
+        "field": "labels.workshop",
+        "value": "sre-01"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event",
+        "override": false
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    }
+  ]
+}

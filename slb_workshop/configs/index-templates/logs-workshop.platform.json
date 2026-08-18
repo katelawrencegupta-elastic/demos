@@ -1,0 +1,18 @@
+{
+  "index_patterns": ["logs-workshop.platform-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": [
+    "logs-workshop.platform-mappings",
+    "logs-workshop.platform-settings"
+  ],
+  "template": {
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "7d"
+    }
+  },
+  "_meta": {
+    "description": "SRE-01 workshop data stream: templates + pipeline + 7-day data stream lifecycle"
+  }
+}

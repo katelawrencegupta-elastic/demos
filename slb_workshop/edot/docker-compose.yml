@@ -1,0 +1,17 @@
+services:
+  edot-collector:
+    image: docker.elastic.co/elastic-agent/elastic-agent:9.5.1
+    container_name: slb-workshop-edot
+    env_file:
+      - ../.env
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+    command: ["--config=/etc/otel/otel-collector.motlp.yml"]
+    volumes:
+      - ./otel-collector.yml:/etc/otel/otel-collector.yml:ro
+      - ./otel-collector.motlp.yml:/etc/otel/otel-collector.motlp.yml:ro
+      - ./logs:/var/log/workshop
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped

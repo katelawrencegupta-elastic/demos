@@ -1,0 +1,441 @@
+{
+  "title": "SRE-01 Workshop — Agents vs EDOT",
+  "description": "Side-by-side logs, metrics, and traces: Fleet-managed Elastic Agent (ECS / System integration) vs EDOT collector (OTel-native via Managed OTLP).",
+  "time_range": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "title": "Overview",
+      "collapsed": false,
+      "grid": { "y": 0 },
+      "panels": [
+        {
+          "type": "markdown",
+          "grid": { "x": 0, "y": 0, "w": 48, "h": 5 },
+          "config": {
+            "content": "## Elastic Agent (Fleet) vs EDOT collector\n\n**Left:** Fleet-managed Elastic Agent on `aks-sre-01` .. `03` — System integration, **ECS**, ingest pipelines, `logs-system.*` / `metrics-system.*`. **Right:** EDOT collector → Managed OTLP — **OTel semantic conventions**, `*.otel-*` streams, ingest pipelines skipped.\n\nThese are not interchangeable: different streams, mappings, and on-call runbooks. Fleet System does **not** emit traces; EDOT does."
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "type": "metric",
+            "title": "Agent logs",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-system.auth-*, logs-system.syslog-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS count = COUNT(*)"
+            },
+            "metrics": [{ "type": "primary", "column": "count" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 8, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "type": "metric",
+            "title": "Agent metrics",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-system.* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS count = COUNT(*)"
+            },
+            "metrics": [{ "type": "primary", "column": "count" }]
+          }
+        },
+        {
+          "type": "markdown",
+          "grid": { "x": 16, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "content": "**Agent traces: none**\n\nSystem integration collects logs + host metrics only. Traces need an OTel/APM input on the policy."
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "type": "metric",
+            "title": "EDOT logs",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+            },
+            "metrics": [{ "type": "primary", "column": "count" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 32, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "type": "metric",
+            "title": "EDOT metrics",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+            },
+            "metrics": [{ "type": "primary", "column": "count" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 40, "y": 5, "w": 8, "h": 5 },
+          "config": {
+            "type": "metric",
+            "title": "EDOT traces",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE resource.attributes.`service.name` IN (\"well-data-api\", \"telemetry-gateway\", \"identity-service\", \"rig-scheduler\") | STATS count = COUNT(*)"
+            },
+            "metrics": [{ "type": "primary", "column": "count" }]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Logs",
+      "collapsed": false,
+      "grid": { "y": 12 },
+      "panels": [
+        {
+          "type": "markdown",
+          "grid": { "x": 0, "y": 0, "w": 24, "h": 3 },
+          "config": {
+            "content": "### Elastic Agent — logs (ECS)\n`logs-system.auth-*` / `logs-system.syslog-*` · parsed by the System ingest pipeline (`event.action`, `process.name`, `user.name`)."
+          }
+        },
+        {
+          "type": "markdown",
+          "grid": { "x": 24, "y": 0, "w": 24, "h": 3 },
+          "config": {
+            "content": "### EDOT — logs (OTel)\n`logs-*.otel-*` · body + `resource.attributes.service.name` · **no** ECS ingest pipeline. Includes app logs and OTLP syslog (`rsyslog`)."
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 3, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "Agent log volume by host",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "area_stacked",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-system.auth-*, logs-system.syslog-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS count = COUNT(*) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), host.name"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "count" }],
+                "breakdown_by": { "column": "host.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 3, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "EDOT log volume by service",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "area_stacked",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), resource.attributes.`service.name`"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "count" }],
+                "breakdown_by": { "column": "resource.attributes.service.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 13, "w": 12, "h": 10 },
+          "config": {
+            "type": "pie",
+            "title": "Agent logs by process",
+            "styling": { "donut_hole": "m" },
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-system.auth-*, logs-system.syslog-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS count = COUNT(*) BY process.name"
+            },
+            "metrics": [{ "column": "count" }],
+            "group_by": [{ "column": "process.name" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 12, "y": 13, "w": 12, "h": 10 },
+          "config": {
+            "type": "pie",
+            "title": "Agent auth outcome",
+            "styling": { "donut_hole": "m" },
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-system.auth-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE event.outcome IS NOT NULL | STATS count = COUNT(*) BY event.outcome"
+            },
+            "metrics": [{ "column": "count" }],
+            "group_by": [{ "column": "event.outcome" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 13, "w": 12, "h": 10 },
+          "config": {
+            "type": "pie",
+            "title": "EDOT logs by service",
+            "styling": { "donut_hole": "m" },
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY resource.attributes.`service.name`"
+            },
+            "metrics": [{ "column": "count" }],
+            "group_by": [{ "column": "resource.attributes.service.name" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 36, "y": 13, "w": 12, "h": 10 },
+          "config": {
+            "type": "pie",
+            "title": "EDOT severity",
+            "styling": { "donut_hole": "m" },
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY severity_text"
+            },
+            "metrics": [{ "column": "count" }],
+            "group_by": [{ "column": "severity_text" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 23, "w": 24, "h": 10 },
+          "config": {
+            "type": "data_table",
+            "title": "Agent logs by process and action",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-system.auth-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY process.name, event.action, event.outcome | SORT count DESC | LIMIT 20"
+            },
+            "metrics": [{ "column": "count" }],
+            "rows": [{ "column": "process.name" }, { "column": "event.action" }, { "column": "event.outcome" }]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 23, "w": 24, "h": 10 },
+          "config": {
+            "type": "data_table",
+            "title": "EDOT logs by service and severity",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY resource.attributes.`service.name`, severity_text | SORT count DESC | LIMIT 20"
+            },
+            "metrics": [{ "column": "count" }],
+            "rows": [{ "column": "resource.attributes.service.name" }, { "column": "severity_text" }]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Metrics",
+      "collapsed": false,
+      "grid": { "y": 50 },
+      "panels": [
+        {
+          "type": "markdown",
+          "grid": { "x": 0, "y": 0, "w": 24, "h": 3 },
+          "config": {
+            "content": "### Elastic Agent — host metrics (ECS)\n`metrics-system.*` from Metricbeat receivers. CPU / memory of the agent containers (`aks-sre-01` .. `03`)."
+          }
+        },
+        {
+          "type": "markdown",
+          "grid": { "x": 24, "y": 0, "w": 24, "h": 3 },
+          "config": {
+            "content": "### EDOT — app metrics (OTel)\n`metrics-workshop.otel.otel-*` · `http.server.request.total` as **counter** documents (cannot SUM; count of datapoints). Plus APM summary streams in `metrics-*.otel-*`."
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 3, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "Agent CPU (norm pct) by host",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "line",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM metrics-system.cpu-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS cpu = AVG(`system.cpu.total.norm.pct`) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), host.name"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "cpu" }],
+                "breakdown_by": { "column": "host.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 3, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "EDOT HTTP request datapoints by service",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "bar",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM metrics-workshop.otel.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE metrics.`http.server.request.total` IS NOT NULL | STATS requests = COUNT(*) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), resource.attributes.`service.name`"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "requests" }],
+                "breakdown_by": { "column": "resource.attributes.service.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 13, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "Agent memory used pct by host",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "line",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM metrics-system.memory-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS mem = AVG(`system.memory.actual.used.pct`) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), host.name"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "mem" }],
+                "breakdown_by": { "column": "host.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 13, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "EDOT HTTP datapoints by service",
+            "axis": {
+              "x": { "title": { "visible": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "bar_horizontal",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM metrics-workshop.otel.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE metrics.`http.server.request.total` IS NOT NULL | STATS requests = COUNT(*) BY resource.attributes.`service.name` | SORT requests DESC"
+                },
+                "x": { "column": "resource.attributes.service.name" },
+                "y": [{ "column": "requests" }]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Traces",
+      "collapsed": false,
+      "grid": { "y": 80 },
+      "panels": [
+        {
+          "type": "markdown",
+          "grid": { "x": 0, "y": 0, "w": 24, "h": 12 },
+          "config": {
+            "content": "### Elastic Agent — traces\n\n**Not collected** on policy `sre-01-workshop`.\n\nThe System integration ships host logs and metrics through Beat receivers into ECS data streams. Distributed traces require:\n\n1. An **OpenTelemetry** input package on the same Fleet policy (preview), or\n2. EDOT / Managed OTLP (right-hand column).\n\nThat gap is the operational lesson: adding traces later is a **new stream + new runbook**, not a toggle on these system dashboards."
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 0, "w": 24, "h": 12 },
+          "config": {
+            "type": "xy",
+            "title": "EDOT spans by service",
+            "axis": {
+              "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "area_stacked",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE resource.attributes.`service.name` IN (\"well-data-api\", \"telemetry-gateway\", \"identity-service\", \"rig-scheduler\") | STATS spans = COUNT(*) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), resource.attributes.`service.name`"
+                },
+                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "y": [{ "column": "spans" }],
+                "breakdown_by": { "column": "resource.attributes.service.name" }
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 0, "y": 12, "w": 24, "h": 10 },
+          "config": {
+            "type": "xy",
+            "title": "EDOT span names",
+            "axis": {
+              "x": { "title": { "visible": false } },
+              "y": { "title": { "visible": false } }
+            },
+            "layers": [
+              {
+                "type": "bar_horizontal",
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE resource.attributes.`service.name` IN (\"well-data-api\", \"telemetry-gateway\", \"identity-service\", \"rig-scheduler\") | STATS spans = COUNT(*) BY name | SORT spans DESC | LIMIT 12"
+                },
+                "x": { "column": "name" },
+                "y": [{ "column": "spans" }]
+              }
+            ]
+          }
+        },
+        {
+          "type": "vis",
+          "grid": { "x": 24, "y": 12, "w": 24, "h": 10 },
+          "config": {
+            "type": "data_table",
+            "title": "EDOT spans by service and name",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-*.otel-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE resource.attributes.`service.name` IN (\"well-data-api\", \"telemetry-gateway\", \"identity-service\", \"rig-scheduler\") | STATS spans = COUNT(*) BY resource.attributes.`service.name`, name | SORT spans DESC | LIMIT 20"
+            },
+            "metrics": [{ "column": "spans" }],
+            "rows": [{ "column": "resource.attributes.service.name" }, { "column": "name" }]
+          }
+        }
+      ]
+    }
+  ]
+}
