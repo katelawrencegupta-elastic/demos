@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Index sample platform logs into the workshop data stream."""
+"""Index sample platform logs into the workshop data stream.
+
+    .venv/bin/python scripts/ingest.py
+    .venv/bin/python scripts/ingest.py --days 7 --every 60
+"""
 
 from __future__ import annotations
 
+import argparse
 import random
 import sys
 from datetime import datetime, timedelta, timezone
@@ -46,14 +51,53 @@ GROK_LINES = (
 )
 
 
-def events(count: int = 40) -> list[dict]:
+def schedule(
+    *,
+    count: int | None = None,
+    days: float | None = None,
+    every: float = 60.0,
+) -> list[datetime]:
     now = datetime.now(timezone.utc)
+    if days:
+        start = now - timedelta(days=days)
+        n = max(1, int((now - start).total_seconds() / every))
+        return [start + timedelta(seconds=i * every) for i in range(n)]
+    total = count if count is not None else 40
+    return [now - timedelta(minutes=total - i) for i in range(total)]
+
+
+def _status_for(i: int, ts: datetime, rng: random.Random, patterned: bool) -> int:
+    if not patterned:
+        return 500 if i % 11 == 0 else 200 if i % 3 else 201 if i % 7 else 404
+    hour = ts.hour
+    error_p = 0.14 if 8 <= hour < 18 else 0.05
+    miss_p = 0.08
+    roll = rng.random()
+    if roll < error_p:
+        return 500
+    if roll < error_p + miss_p:
+        return 404
+    if roll < error_p + miss_p + 0.10:
+        return 201
+    return 200
+
+
+def events(
+    count: int | None = None,
+    days: float | None = None,
+    every: float = 60.0,
+    rng: random.Random | None = None,
+) -> list[dict]:
+    rng = rng or random.Random()
+    patterned = days is not None
     docs: list[dict] = []
-    for i in range(count):
-        ts = now - timedelta(minutes=count - i)
+    for i, ts in enumerate(schedule(count=count, days=days, every=every)):
+        if patterned and not _in_load_window(ts, rng):
+            continue
         ts_iso = ts.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
         service = SERVICES[i % len(SERVICES)]
-        if i % 5 == 0:
+        grok = (i % 5 == 0) if not patterned else rng.random() < 0.18
+        if grok:
             line = GROK_LINES[i % len(GROK_LINES)].format(
                 ts=ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 part=i % 8,
@@ -61,7 +105,7 @@ def events(count: int = 40) -> list[dict]:
             )
             docs.append({"@timestamp": ts_iso, "message": line})
             continue
-        status = 500 if i % 11 == 0 else 200 if i % 3 else 201 if i % 7 else 404
+        status = _status_for(i, ts, rng, patterned)
         level = "ERROR" if status >= 500 else "WARN" if status >= 400 else "INFO"
         msg = {
             200: "request completed",
@@ -71,28 +115,60 @@ def events(count: int = 40) -> list[dict]:
         }[status]
         payload = JSON_TEMPLATES.format(
             service=service,
-            host=random.choice(HOSTS),
+            host=rng.choice(HOSTS),
             level=level,
             method="GET" if status != 201 else "POST",
             status=status,
-            path=random.choice(PATHS),
-            team=random.choice(TEAMS),
+            path=rng.choice(PATHS),
+            team=rng.choice(TEAMS),
             msg=msg,
         )
         docs.append({"@timestamp": ts_iso, "message": payload})
     return docs
 
 
-def main() -> None:
+def _in_load_window(ts: datetime, rng: random.Random) -> bool:
+    hour = ts.hour
+    if 0 <= hour < 6:
+        return rng.random() < 0.22
+    if hour < 8 or hour >= 21:
+        return rng.random() < 0.50
+    return True
+
+
+def index_docs(docs: list[dict], stream: str = DATA_STREAM) -> tuple[int, int]:
     es = get_client()
-    docs = events()
     actions = (
-        {"_op_type": "create", "_index": DATA_STREAM, "_source": doc} for doc in docs
+        {"_op_type": "create", "_index": stream, "_source": doc} for doc in docs
     )
-    ok, errors = bulk(es, actions, refresh="wait_for", raise_on_error=False)
-    print(f"indexed={ok} errors={len(errors) if errors else 0} stream={DATA_STREAM}")
+    ok, errors = bulk(
+        es,
+        actions,
+        chunk_size=500,
+        refresh="wait_for",
+        raise_on_error=False,
+    )
+    nerr = len(errors) if errors else 0
+    print(f"indexed={ok} errors={nerr} stream={stream}")
     if errors:
         print(errors[:3])
+    return ok, nerr
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--count", type=int, default=40, help="recent events when --days is omitted")
+    parser.add_argument("--days", type=float, default=None, help="spread events over N days")
+    parser.add_argument(
+        "--every",
+        type=float,
+        default=60.0,
+        help="seconds between candidate events when --days is set",
+    )
+    args = parser.parse_args()
+    docs = events(count=args.count, days=args.days, every=args.every)
+    _, nerr = index_docs(docs)
+    if nerr:
         raise SystemExit(1)
 
 

@@ -112,7 +112,7 @@ Open **Discover** in Kibana on the `Workshop platform logs` data view, or run:
 ```
 
 That script also publishes the starter dashboard **SRE-01 Workshop — Platform logs**:
-https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9
+https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9
 
 ## 4. Look at backing indices and rollover
 

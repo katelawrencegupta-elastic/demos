@@ -273,16 +273,17 @@
             "title": "Agent CPU (norm pct) by host",
             "axis": {
               "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
-              "y": { "title": { "visible": false } }
+              "y": { "title": { "visible": false }, "domain": { "type": "fit", "rounding": false } }
             },
+            "legend": { "visibility": "visible", "position": "right" },
             "layers": [
               {
                 "type": "line",
                 "data_source": {
                   "type": "esql",
-                  "query": "FROM metrics-system.cpu-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS cpu = AVG(`system.cpu.total.norm.pct`) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), host.name"
+                  "query": "FROM metrics-system.cpu-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS cpu = AVG(`system.cpu.total.norm.pct`) * 100 BY `@timestamp` = TBUCKET(1 minute), host.name"
                 },
-                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "x": { "column": "@timestamp", "label": "@timestamp" },
                 "y": [{ "column": "cpu" }],
                 "breakdown_by": { "column": "host.name" }
               }
@@ -321,16 +322,17 @@
             "title": "Agent memory used pct by host",
             "axis": {
               "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
-              "y": { "title": { "visible": false } }
+              "y": { "title": { "visible": false }, "domain": { "type": "fit", "rounding": false } }
             },
+            "legend": { "visibility": "visible", "position": "right" },
             "layers": [
               {
                 "type": "line",
                 "data_source": {
                   "type": "esql",
-                  "query": "FROM metrics-system.memory-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS mem = AVG(`system.memory.actual.used.pct`) BY BUCKET(@timestamp, 75, ?_tstart, ?_tend), host.name"
+                  "query": "FROM metrics-system.memory-* | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.name IN (\"aks-sre-01\", \"aks-sre-02\", \"aks-sre-03\") | STATS mem = AVG(`system.memory.actual.used.pct`) * 100 BY `@timestamp` = TBUCKET(1 minute), host.name"
                 },
-                "x": { "column": "BUCKET(@timestamp, 75, ?_tstart, ?_tend)", "label": "@timestamp" },
+                "x": { "column": "@timestamp", "label": "@timestamp" },
                 "y": [{ "column": "mem" }],
                 "breakdown_by": { "column": "host.name" }
               }

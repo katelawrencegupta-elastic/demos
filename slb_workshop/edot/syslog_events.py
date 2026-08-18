@@ -30,8 +30,10 @@ SUDO_COMMANDS = (
 )
 
 
-def syslog_prefix(host: str, ident: str, pid: int) -> str:
-    stamp = datetime.now(timezone.utc).strftime("%b %e %H:%M:%S")
+def syslog_prefix(
+    host: str, ident: str, pid: int, when: datetime | None = None
+) -> str:
+    stamp = (when or datetime.now(timezone.utc)).strftime("%b %e %H:%M:%S")
     return f"{stamp} {host} {ident}[{pid}]"
 
 
@@ -79,11 +81,13 @@ def base_attrs(
     return attrs
 
 
-def ssh_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], SeverityNumber]:
+def ssh_event(
+    host: str, rng: random.Random, when: datetime | None = None
+) -> tuple[str, dict[str, object], SeverityNumber]:
     pid = rng.randint(1200, 32000)
     port = rng.randint(40000, 62000)
     ident = "sshd"
-    prefix = syslog_prefix(host, ident, pid)
+    prefix = syslog_prefix(host, ident, pid, when)
     roll = rng.random()
 
     if roll < 0.45:
@@ -145,7 +149,9 @@ def ssh_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], Se
     return body, attrs, SeverityNumber.WARN
 
 
-def sudo_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], SeverityNumber]:
+def sudo_event(
+    host: str, rng: random.Random, when: datetime | None = None
+) -> tuple[str, dict[str, object], SeverityNumber]:
     pid = rng.randint(1200, 32000)
     user = rng.choice(OPERATORS)
     tty = rng.randint(0, 8)
@@ -153,7 +159,7 @@ def sudo_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], S
     target = rng.choice(OPERATORS)
     cmd = rng.choice(SUDO_COMMANDS).format(user=target, group=rng.choice(GROUPS))
     ident = "sudo"
-    prefix = syslog_prefix(host, ident, pid)
+    prefix = syslog_prefix(host, ident, pid, when)
     denied = rng.random() < 0.18
     if denied:
         body = (
@@ -183,7 +189,9 @@ def sudo_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], S
     return body, attrs, sev
 
 
-def account_event(host: str, rng: random.Random) -> tuple[str, dict[str, object], SeverityNumber]:
+def account_event(
+    host: str, rng: random.Random, when: datetime | None = None
+) -> tuple[str, dict[str, object], SeverityNumber]:
     pid = rng.randint(1200, 32000)
     actor = rng.choice(("root", "ansible", "sre-oncall"))
     kind = rng.choice(("groupadd", "useradd", "usermod", "gpasswd"))
@@ -191,7 +199,7 @@ def account_event(host: str, rng: random.Random) -> tuple[str, dict[str, object]
         group = rng.choice(("rigops", "welldata", "sre", "docker", "nightshift"))
         gid = gid_for(group)
         ident = "groupadd"
-        prefix = syslog_prefix(host, ident, pid)
+        prefix = syslog_prefix(host, ident, pid, when)
         body = f"{prefix}: group added to /etc/group: name={group}, GID={gid}"
         attrs = base_attrs(
             ident=ident, pid=pid, action="group_add", outcome="success", category="iam",
@@ -209,7 +217,7 @@ def account_event(host: str, rng: random.Random) -> tuple[str, dict[str, object]
         user = rng.choice(("rigops", "welldata", "nightshift", "contractor", "breakglass"))
         uid = uid_for(user)
         ident = "useradd"
-        prefix = syslog_prefix(host, ident, pid)
+        prefix = syslog_prefix(host, ident, pid, when)
         body = (
             f"{prefix}: new user: name={user}, UID={uid}, GID={uid}, "
             f"home=/home/{user}, shell=/bin/bash"
@@ -233,12 +241,12 @@ def account_event(host: str, rng: random.Random) -> tuple[str, dict[str, object]
     group = rng.choice(GROUPS)
     if kind == "usermod":
         ident = "usermod"
-        prefix = syslog_prefix(host, ident, pid)
+        prefix = syslog_prefix(host, ident, pid, when)
         body = f"{prefix}: add '{user}' to group '{group}'"
         action = "group_member_add"
     else:
         ident = "gpasswd"
-        prefix = syslog_prefix(host, ident, pid)
+        prefix = syslog_prefix(host, ident, pid, when)
         body = f"{prefix}: user {user} added by {actor} to group {group}"
         action = "group_member_add"
     attrs = base_attrs(
@@ -254,11 +262,13 @@ def account_event(host: str, rng: random.Random) -> tuple[str, dict[str, object]
 
 
 def next_event(
-    host: str, rng: random.Random
+    host: str,
+    rng: random.Random,
+    when: datetime | None = None,
 ) -> tuple[str, dict[str, object], SeverityNumber]:
     kind = rng.choices(("ssh", "sudo", "account"), weights=(45, 35, 20), k=1)[0]
     if kind == "ssh":
-        return ssh_event(host, rng)
+        return ssh_event(host, rng, when)
     if kind == "sudo":
-        return sudo_event(host, rng)
-    return account_event(host, rng)
+        return sudo_event(host, rng, when)
+    return account_event(host, rng, when)

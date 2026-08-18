@@ -1,13 +1,13 @@
 # SRE-01 — Platform Operations Fundamentals
 
 Hands-on companion to the SLB SRE enablement session (Wed Aug 19, 2026).
-This workshop cluster is **Elastic Cloud Serverless** (`klgslbworkshopsre01`).
+This workshop cluster is **Elastic Cloud Serverless** (`my-observability-project`).
 
 | | URL |
 |---|---|
-| Elasticsearch | `https://klgslbworkshopsre01-cecd27.es.us-central1.gcp.elastic.cloud:443` |
-| Kibana | `https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud` |
-| Managed OTLP | `https://klgslbworkshopsre01-cecd27.ingest.us-central1.gcp.elastic.cloud` |
+| Elasticsearch | `https://my-observability-project-dce7f4.es.us-east-1.aws.elastic.cloud:443` |
+| Kibana | `https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud` |
+| Managed OTLP | `https://my-observability-project-dce7f4.ingest.us-east-1.aws.elastic.cloud` |
 
 ## What you will operate
 
@@ -50,9 +50,9 @@ Reset the lab objects with `.venv/bin/python scripts/teardown.py`.
 
 ## Kibana
 
-- Discover: [Workshop platform logs](https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/discover#/?_a=(index:'workshop-platform-logs'))
-- Dashboard: [SRE-01 Workshop — Platform logs](https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9)
-- Dashboard: [SRE-01 Workshop — Agents vs EDOT](https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/dashboards#/view/c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c)
+- Discover: [Workshop platform logs](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/discover#/?_a=(index:'workshop-platform-logs'))
+- Dashboard: [SRE-01 Workshop — Platform logs](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9)
+- Dashboard: [SRE-01 Workshop — Agents vs EDOT](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c)
 
 Recreate with `.venv/bin/python scripts/create_kibana.py`.
 

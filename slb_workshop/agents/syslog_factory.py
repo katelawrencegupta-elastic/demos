@@ -7,6 +7,7 @@ The System integration tails /var/log/secure (auth) and /var/log/messages
 Usage (repo root, Fleet agents already running with log mounts):
 
     .venv/bin/python agents/syslog_factory.py sample --count 80
+    .venv/bin/python agents/syslog_factory.py backfill --days 7
     .venv/bin/python agents/syslog_factory.py stream --tick 2
 """
 
@@ -17,6 +18,7 @@ import random
 import signal
 import sys
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,9 +56,13 @@ def _append(host: str, line: str) -> None:
             handle.flush()
 
 
-def emit_one(rng: random.Random, hosts: tuple[str, ...] = HOSTS) -> str:
+def emit_one(
+    rng: random.Random,
+    hosts: tuple[str, ...] = HOSTS,
+    when: datetime | None = None,
+) -> str:
     host = rng.choice(hosts)
-    body, _attrs, _severity = next_event(host, rng)
+    body, _attrs, _severity = next_event(host, rng, when)
     _append(host, body)
     return host
 
@@ -71,6 +77,24 @@ def sample(count: int, hosts: tuple[str, ...] = HOSTS) -> None:
         "syslog sample "
         + " ".join(f"{host}={n}" for host, n in tallies.items())
         + f" dir={LOG_ROOT}"
+    )
+
+
+def backfill(days: float, every: float, hosts: tuple[str, ...] = HOSTS) -> None:
+    """Append syslog lines with timestamps spread over the last N days."""
+    ensure_log_files(hosts)
+    rng = random.Random()
+    now = datetime.now(timezone.utc)
+    start = now - timedelta(days=days)
+    n = max(1, int((now - start).total_seconds() / every))
+    tallies = {host: 0 for host in hosts}
+    for i in range(n):
+        ts = start + timedelta(seconds=i * every)
+        tallies[emit_one(rng, hosts, when=ts)] += 1
+    print(
+        "syslog backfill "
+        + " ".join(f"{host}={n}" for host, n in tallies.items())
+        + f" days={days} every={every}s dir={LOG_ROOT}"
     )
 
 
@@ -103,10 +127,17 @@ def stream(tick: float, duration: float | None, hosts: tuple[str, ...] = HOSTS) 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("sample", "stream", "init"))
+    parser.add_argument("mode", choices=("sample", "stream", "init", "backfill"))
     parser.add_argument("--count", type=int, default=80)
     parser.add_argument("--tick", type=float, default=2.0)
     parser.add_argument("--duration", type=float, default=None)
+    parser.add_argument("--days", type=float, default=7.0, help="lookback window for backfill")
+    parser.add_argument(
+        "--every",
+        type=float,
+        default=180.0,
+        help="seconds between syslog lines for backfill",
+    )
     args = parser.parse_args()
     if args.mode == "init":
         ensure_log_files()
@@ -114,8 +145,11 @@ def main() -> None:
         return
     if args.mode == "sample":
         sample(args.count)
-    else:
-        stream(args.tick, args.duration)
+        return
+    if args.mode == "backfill":
+        backfill(args.days, args.every)
+        return
+    stream(args.tick, args.duration)
 
 
 if __name__ == "__main__":

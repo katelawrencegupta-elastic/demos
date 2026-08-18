@@ -23,7 +23,7 @@ from syslog_factory import ensure_log_files  # noqa: E402
 POLICY_ID = "sre-01-workshop"
 POLICY_NAME = "sre-01-workshop"
 DEFAULT_FLEET_URL = (
-    "https://cecd277c19e246068d5a2ff685d6f72a.fleet.us-central1.gcp.elastic.cloud:443"
+    "https://dce7f444d6664d4ca4ed4405cb9e472c.fleet.us-east-1.aws.elastic.cloud:443"
 )
 
 
@@ -47,6 +47,55 @@ def ensure_policy() -> dict:
         },
     )
     return created.get("item", created)
+
+
+def _system_package_version() -> str:
+    pkg = kibana_request("GET", "/api/fleet/epm/packages/system")
+    item = pkg.get("item") or pkg
+    version = item.get("version")
+    if not version:
+        raise RuntimeError("Fleet did not return a System integration version")
+    return version
+
+
+def ensure_system_integration(policy_id: str) -> None:
+    packages = kibana_request("GET", "/api/fleet/package_policies?perPage=100")
+    existing = [
+        p
+        for p in packages.get("items") or []
+        if (p.get("package") or {}).get("name") == "system"
+        and (
+            p.get("policy_id") == policy_id
+            or policy_id in (p.get("policy_ids") or [])
+        )
+    ]
+    if existing:
+        print(f"system integration already on policy ({existing[0].get('name')})")
+        return
+
+    version = _system_package_version()
+    try:
+        kibana_request("POST", f"/api/fleet/epm/packages/system/{version}", {"force": True})
+    except RuntimeError as exc:
+        if "-> 409" not in str(exc) and "already installed" not in str(exc).lower():
+            # Install is optional if create-package-policy installs it.
+            print(f"note: system package install: {exc}")
+
+    created = kibana_request(
+        "POST",
+        "/api/fleet/package_policies",
+        {
+            "name": "system-sre-01-workshop",
+            "description": "Host logs and metrics for workshop Elastic Agents",
+            "namespace": "default",
+            "policy_id": policy_id,
+            "enabled": True,
+            "inputs": {},
+            "package": {"name": "system", "version": version},
+        },
+    )
+    name = (created.get("item") or created).get("name", "system-sre-01-workshop")
+    print(f"system integration: {name} v{version}")
 
 
 def fleet_url() -> str:
@@ -95,6 +144,7 @@ def compose_up(url: str, token: str) -> None:
 def main() -> None:
     policy = ensure_policy()
     policy_id = policy["id"]
+    ensure_system_integration(policy_id)
     url = fleet_url()
     token = enrollment_token(policy_id)
     print(f"Enrolling agents into policy {policy.get('name')} ({policy_id})")

@@ -35,9 +35,9 @@ If time is short, **cut Docker** and keep Fleet UI + the support-boundary slide.
 .venv/bin/python scripts/verify.py
 ```
 
-Confirm Kibana login and that Fleet is visible on the Serverless project. Managed OTLP is `https://klgslbworkshopsre01-cecd27.ingest.us-central1.gcp.elastic.cloud` (`ELASTIC_OTLP_ENDPOINT` in `.env`).
+Confirm Kibana login and that Fleet is visible on the Serverless project. Managed OTLP is `https://my-observability-project-dce7f4.ingest.us-east-1.aws.elastic.cloud` (`ELASTIC_OTLP_ENDPOINT` in `.env`).
 
-Dashboard: https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9
+Dashboard: https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9
 
 Do not paste API keys into slides or chat transcripts.
 

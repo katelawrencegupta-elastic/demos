@@ -31,7 +31,7 @@ They are **not** supported against **APM Server’s OTLP intake**. Data may appe
 
 On **this Serverless project**, the supported EDOT path is Managed OTLP (optional Gateway at the edge for extra processing). Self-managed / ECE / ECK have no Managed OTLP — those estates **must** run Agent Gateway.
 
-Find the Managed OTLP URL: Elastic Cloud Console → project **Manage** → **OpenTelemetry** (or in-product **Add data → Applications → OpenTelemetry**). This workshop project is already set in `.env` as `ELASTIC_OTLP_ENDPOINT=https://klgslbworkshopsre01-cecd27.ingest.us-central1.gcp.elastic.cloud`.
+Find the Managed OTLP URL: Elastic Cloud Console → project **Manage** → **OpenTelemetry** (or in-product **Add data → Applications → OpenTelemetry**). This workshop project is already set in `.env` as `ELASTIC_OTLP_ENDPOINT=https://my-observability-project-dce7f4.ingest.us-east-1.aws.elastic.cloud`.
 
 ## Comparison you can take to a workstream
 
@@ -108,7 +108,7 @@ To fall back to the Elasticsearch exporter instead, change the compose command t
 
 Search Kibana **Applications → Service Inventory** for `well-data-api`, `telemetry-gateway`, `identity-service`, and `rig-scheduler`. OTel-native documents land in streams such as `logs-workshop.otel-default` / `traces-*.otel-default` / `metrics-*.otel-default`, **not** in `logs-workshop.platform-default`. That is the operational non-equivalence: different streams, different mappings, different pipelines.
 
-Side-by-side in Kibana: [SRE-01 Workshop — Agents vs EDOT](https://klgslbworkshopsre01-cecd27.kb.us-central1.gcp.elastic.cloud/app/dashboards#/view/c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c) (recreate with `.venv/bin/python scripts/create_kibana.py`).
+Side-by-side in Kibana: [SRE-01 Workshop — Agents vs EDOT](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c) (recreate with `.venv/bin/python scripts/create_kibana.py`).
 
 Stop the collector with `docker compose -f edot/docker-compose.yml down`.
 
