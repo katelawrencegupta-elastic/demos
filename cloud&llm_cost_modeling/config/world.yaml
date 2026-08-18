@@ -1,0 +1,221 @@
+# Meridian Dynamics -- fictional org powering all synthetic data.
+# Everything downstream (activity, security findings, billing) derives from
+# this file plus the deterministic expansion in src/world/model.py.
+#
+# Complexity notes (v2):
+# - 5 BUs incl. Embedded FinTech + shadow-IT Skunkworks
+# - 9 AWS accounts / 5 GCP projects / 3 Azure subscriptions
+# - ~120 EC2, ~46 GCE, ~27 Azure VMs; 25 identities
+# - Scenarios: crypto mining, ML burn, cost leak, S3 public exposure,
+#   GenAI shadow-IT ramp, Sunday ETL batch window
+company: Meridian Dynamics
+domain: meridiandynamics.io
+seed: 42
+
+business_units:
+  - key: ecommerce
+    name: E-Commerce
+    cost_center: CC-1001
+  - key: mlplatform
+    name: ML Platform
+    cost_center: CC-2040
+  - key: corpit
+    name: Corporate IT
+    cost_center: CC-3300
+  - key: fintech
+    name: Embedded FinTech
+    cost_center: CC-5120
+  - key: skunkworks
+    name: R&D Skunkworks
+    cost_center: null   # shadow IT -- no cost center assigned on purpose
+
+aws:
+  organization_id: o-mrdn7k2x9
+  regions: [us-east-1, us-west-2, eu-west-1]
+  accounts:
+    - id: "111111111111"
+      name: meridian-prod
+      env: prod
+      business_unit: ecommerce
+      ec2_count: 30
+      s3_buckets: [meridian-prod-assets, meridian-prod-orders, meridian-prod-media, meridian-prod-backups, meridian-prod-events]
+    - id: "222222222222"
+      name: meridian-staging
+      env: staging
+      business_unit: ecommerce
+      ec2_count: 14
+      s3_buckets: [meridian-staging-assets, meridian-staging-fixtures]
+    - id: "333333333333"
+      name: meridian-dev
+      env: dev
+      business_unit: ecommerce
+      ec2_count: 16
+      s3_buckets: [meridian-dev-scratch, meridian-dev-builds]
+    - id: "444444444444"
+      name: meridian-security
+      env: prod
+      business_unit: corpit
+      ec2_count: 5
+      s3_buckets: [meridian-sec-audit]
+    - id: "555555555555"
+      name: meridian-logging
+      env: prod
+      business_unit: corpit
+      ec2_count: 5
+      s3_buckets: [meridian-central-logs, meridian-cloudtrail-archive]
+    - id: "666666666666"
+      name: meridian-sandbox
+      env: dev
+      business_unit: skunkworks
+      ec2_count: 12
+      s3_buckets: [mrdn-skunk-data, mrdn-skunk-models, mrdn-skunk-llm-corpus]
+    - id: "777777777777"
+      name: meridian-mlops
+      env: prod
+      business_unit: mlplatform
+      ec2_count: 16
+      s3_buckets: [meridian-ml-features, meridian-ml-artifacts]
+    - id: "888888888888"
+      name: meridian-fintech-prod
+      env: prod
+      business_unit: fintech
+      ec2_count: 14
+      s3_buckets: [meridian-fintech-exports, meridian-fintech-data, meridian-fintech-audit]
+    - id: "999999999999"
+      name: meridian-fintech-dev
+      env: dev
+      business_unit: fintech
+      ec2_count: 8
+      s3_buckets: [meridian-fintech-dev-scratch]
+  services: [AmazonEC2, AmazonS3, AmazonRDS, AWSLambda, AmazonEKS, AmazonCloudWatch, AWSDataTransfer, AmazonGuardDuty]
+
+gcp:
+  billing_account_id: 01A2B3-C4D5E6-F7A8B9
+  regions: [us-central1, us-east4]
+  projects:
+    - id: meridian-ml-prod
+      number: "731945820164"
+      env: prod
+      business_unit: mlplatform
+      gce_count: 18
+    - id: meridian-ml-dev
+      number: "731945820165"
+      env: dev
+      business_unit: mlplatform
+      gce_count: 8
+    - id: meridian-data-warehouse
+      number: "731945820166"
+      env: prod
+      business_unit: mlplatform
+      gce_count: 6
+    - id: meridian-experiments
+      number: "731945820167"
+      env: dev
+      business_unit: skunkworks
+      gce_count: 6
+    - id: meridian-genai-poc
+      number: "731945820168"
+      env: dev
+      business_unit: skunkworks
+      gce_count: 8
+  services:
+    - {id: "6F81-5844-456A", description: Compute Engine}
+    - {id: "24E6-581D-38E5", description: BigQuery}
+    - {id: "C3BE-24A5-0975", description: Vertex AI}
+    - {id: "95FF-2EF5-5EA1", description: Cloud Storage}
+    - {id: "58CD-E7C3-72CA", description: Cloud Logging}
+    - {id: "9662-B51E-5089", description: Cloud SQL}
+
+azure:
+  tenant_id: 8f1d9e02-6f5b-4a8e-9c3d-2b7a5e4f1c90
+  region: eastus
+  subscriptions:
+    - id: 3a7c2d91-4e8f-4b2a-a1d5-9c6b8e0f3a72
+      name: meridian-corp-prod
+      env: prod
+      business_unit: corpit
+      resource_groups: [rg-corp-identity, rg-corp-vdi, rg-corp-shared-svcs]
+      vm_count: 14
+    - id: b5e9f0a3-1c2d-4f6e-8a9b-7d4c5e2f1a08
+      name: meridian-corp-dev
+      env: dev
+      business_unit: corpit
+      resource_groups: [rg-dev-apps, rg-dev-sandbox]
+      vm_count: 8
+    - id: c8d2e4f6-3a5b-4c7d-9e1f-2a4b6c8d0e13
+      name: meridian-skunk-az
+      env: dev
+      business_unit: skunkworks
+      resource_groups: [rg-skunk-genai, rg-skunk-misc]
+      vm_count: 5
+  services: [Virtual Machines, Storage, Azure Kubernetes Service, Azure Monitor, Virtual Network, Azure Active Directory]
+
+identities:
+  humans:
+    - {user: alice.chen, bu: ecommerce, role: platform-engineer}
+    - {user: bob.kowalski, bu: ecommerce, role: sre}
+    - {user: carla.mendes, bu: ecommerce, role: backend-dev}
+    - {user: deepak.rao, bu: mlplatform, role: ml-engineer}
+    - {user: elena.sokolova, bu: mlplatform, role: data-engineer}
+    - {user: frank.osei, bu: mlplatform, role: ml-engineer}
+    - {user: grace.lim, bu: corpit, role: cloud-admin}
+    - {user: hugo.alvarez, bu: corpit, role: security-analyst}
+    - {user: iris.nakamura, bu: corpit, role: identity-admin}
+    - {user: jack.moreau, bu: skunkworks, role: researcher}
+    - {user: kara.olsen, bu: skunkworks, role: researcher}
+    - {user: liam.oconnor, bu: ecommerce, role: frontend-dev}
+    - {user: nadia.petrov, bu: fintech, role: data-engineer}
+    - {user: omar.haddad, bu: fintech, role: backend-dev}
+    - {user: priya.sharma, bu: fintech, role: quant-analyst}
+    - {user: quentin.dubois, bu: mlplatform, role: ml-engineer}
+    - {user: rosa.martinez, bu: ecommerce, role: sre}
+    - {user: sam.whitfield, bu: corpit, role: network-admin}
+    - {user: tina.varga, bu: skunkworks, role: researcher}
+  service_accounts:
+    - {user: ci-deployer, bu: ecommerce}
+    - {user: terraform-runner, bu: corpit}
+    - {user: batch-etl, bu: mlplatform}
+    - {user: backup-agent, bu: corpit}
+    - {user: genai-batch, bu: skunkworks}
+    - {user: fintech-ci, bu: fintech}
+
+# Scenario windows are expressed in days relative to "now" (negative = past).
+scenarios:
+  crypto_incident:
+    aws_account: "333333333333"     # meridian-dev
+    start_day: -12
+    end_day: -9
+  ml_burn:
+    gcp_project: meridian-ml-prod
+    start_day: -20
+    end_day: -16
+    cost_multiplier: 3.8
+  cost_leak:
+    aws_account: "222222222222"     # meridian-staging: orphaned resources, spend w/o activity
+    daily_cost_usd: 340.0
+  s3_exposure:
+    aws_account: "888888888888"     # fintech-prod: bucket accidentally made public
+    bucket: meridian-fintech-exports
+    start_day: -6
+    end_day: -4
+  genai_ramp:
+    gcp_project: meridian-genai-poc  # skunkworks shadow-IT GPU spend, ramping up
+    start_day: -15
+    end_multiplier: 2.8
+  # --- LLM-specific narratives ---
+  llm_agent_loop:
+    app: checkout-assistant         # buggy retry loop burns tokens
+    start_day: -8
+    end_day: -6
+    rate_multiplier: 12.0
+  llm_model_migration:
+    app: support-copilot            # migrates openai -> anthropic mid-window
+    cutover_day: -14
+    from_provider: openai
+    to_provider: anthropic
+  llm_cache_miss_storm:
+    app: rag-research
+    start_day: -5
+    end_day: -3
+    cache_hit_rate: 0.05            # normally ~0.55
+  growth_pct_per_day: 0.8           # organic month-over-month growth
