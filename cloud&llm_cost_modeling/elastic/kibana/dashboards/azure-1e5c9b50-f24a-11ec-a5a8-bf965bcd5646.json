@@ -1,0 +1,876 @@
+{
+  "id": "azure-1e5c9b50-f24a-11ec-a5a8-bf965bcd5646",
+  "data": {
+    "description": "Dashboard providing statistics about alerts ingested from the Azure Firewall Application Rule Log events.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-azure-default"
+    ],
+    "title": "[Logs Azure] Firewall Application Rule Log",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "azure.firewall_logs"
+        }
+      },
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "azure.firewall.operation_name",
+          "operator": "is",
+          "value": "AzureFirewallApplicationRuleLog"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 7,
+          "w": 8,
+          "x": 24,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Unique Source IPs",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Unique Source IPs",
+            "operation": "formula",
+            "formula": "unique_count(source.ip)",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "dfcf4383-4ce2-42a2-b0a9-a48dbf39db64",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 8,
+          "x": 32,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Unique Destination IPs",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Unique Destination IPs",
+            "operation": "formula",
+            "formula": "unique_count(destination.ip)",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "4c85d573-baea-49ca-bb9e-4013a0373da7",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 8,
+          "x": 24,
+          "y": 7
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Unique Source Countries",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Unique Source Countries",
+            "operation": "formula",
+            "formula": "unique_count(source.geo.country_name)",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "b0b8c30c-2096-49ee-95b3-9adbf27808e5",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 8,
+          "x": 32,
+          "y": 7
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Unique Destination Countries",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Unique Destination Countries",
+            "operation": "formula",
+            "formula": "unique_count(destination.geo.country_name)",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "e0be3094-1544-4c59-858c-05320b57c3a7",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 8,
+          "x": 40,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Unique Network Protocols",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Unique Network Protocols",
+            "operation": "formula",
+            "formula": "unique_count(network.protocol)",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "673dd2b3-e271-4ad9-9b86-83e4e1070647",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 0,
+          "y": 14
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Event Generating Firewalls",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Firewall",
+              "fields": [
+                "observer.name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ce8caf3c-c830-4500-a4bf-66a9f354cd49",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 12,
+          "y": 14
+        },
+        "config": {
+          "type": "pie",
+          "title": "Top Source Countries",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "source.geo.country_name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "2148efa5-f130-4751-909d-6a79eed2e16b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 24,
+          "y": 14
+        },
+        "config": {
+          "type": "pie",
+          "title": "Top Destination Countries",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "destination.geo.country_name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6790d45f-4fa9-4a70-b0e1-a3e10682c852",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 36,
+          "y": 14
+        },
+        "config": {
+          "type": "pie",
+          "title": "Network Protocols and Applications",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "network.protocol"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "f7c1e866-ba0d-45af-95bf-2736901431dc",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 12,
+          "x": 0,
+          "y": 29
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Event Rules",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Rules",
+              "fields": [
+                "rule.name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ffc33e34-3225-40da-97c6-ea9fbfa6db02",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 12,
+          "x": 12,
+          "y": 29
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Event Source Addresses",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Source Address",
+              "fields": [
+                "source.address"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "9609e04b-0043-4b3a-a31b-a2461c1e3dcb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 12,
+          "x": 24,
+          "y": 29
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Event Destination Addresses",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Destination Address",
+              "fields": [
+                "destination.address"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "8a1bd282-e360-473d-b26d-e73f2b470c81",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 12,
+          "x": 36,
+          "y": 29
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Network Protocols",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Network Protocol",
+              "fields": [
+                "network.protocol"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "3b9a2a5f-1226-415c-88d5-21496508d060",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 17,
+          "w": 48,
+          "x": 0,
+          "y": 40
+        },
+        "config": {
+          "ref_id": "azure-671ff040-f24e-11ec-a5a8-bf965bcd5646",
+          "overrides": {}
+        },
+        "id": "01c53b97-697b-40fb-874d-6e7d720eb3fe",
+        "type": "discover_session"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "7cbe886c-4cc4-4fec-beff-7336b0965067",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Subscription",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "cloud.account.id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "3ae71a2b-35ee-4659-b6b5-c2ea9e1ab609",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Firewall ",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "observer.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:46.871Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:48.454Z",
+    "version": "WzIxNSwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Navigation**\n\n[Overview](/app/dashboards#/view/azure-280493a0-f1a1-11ec-a5a8-bf965bcd5646)  \n[Network Rule Logs](/app/dashboards#/view/azure-91224490-f1a6-11ec-a5a8-bf965bcd5646)  \n[Network NAT Rule Logs](/app/dashboards#/view/azure-8731b980-f1aa-11ec-a5a8-bf965bcd5646)  \n**[Application Rule Logs (This Page)](/app/dashboards#/view/azure-1e5c9b50-f24a-11ec-a5a8-bf965bcd5646)**  \n[DNS Proxy Logs](/app/dashboards#/view/azure-cad82b40-f251-11ec-a5a8-bf965bcd5646)\n\n[Integrations Page](/app/integrations/detail/azure/overview?integration=firewall_logs)    \n\n**Overview**\n\nThis dashboard provides an overall view of Azure Firewall Application Rule Log events.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "type": "visualization"
+      }
+    }
+  ]
+}

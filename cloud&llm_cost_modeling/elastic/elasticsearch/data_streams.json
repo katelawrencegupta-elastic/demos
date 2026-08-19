@@ -1,0 +1,625 @@
+[
+  {
+    "name": "logs-agent_builder.otel-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-agent_builder.otel-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-otel@template",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-aws.cloudtrail-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-aws.cloudtrail-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-aws.cloudtrail",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-aws.guardduty-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-aws.guardduty-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-aws.guardduty",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-aws.s3access-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-aws.s3access-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-aws.s3access",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-aws_bedrock.invocation-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-aws_bedrock.invocation-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-aws_bedrock.invocation",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-azure.activitylogs-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-azure.activitylogs-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-azure.activitylogs",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-azure_openai.logs-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-azure_openai.logs-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-azure_openai.logs",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-elastic_agent.status_change-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-elastic_agent.status_change-default-2026.08.12-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-elastic_agent.status_change",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-gcp.audit-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-gcp.audit-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-gcp.audit",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-gcp_vertexai.prompt_response_logs-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-gcp_vertexai.prompt_response_logs-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-gcp_vertexai.prompt_response_logs",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.audio_speeches-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.audio_speeches-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.audio_speeches",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.audio_transcriptions-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.audio_transcriptions-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.audio_transcriptions",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.completions-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.completions-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.completions",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.embeddings-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.embeddings-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.embeddings",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.images-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.images-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.images",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.moderations-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.moderations-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.moderations",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-openai.rate_limits-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-openai.rate_limits-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-openai.rate_limits",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-synthetic-probe",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-synthetic-probe-2026.08.12-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-anthropic_metrics.cost-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-anthropic_metrics.cost-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-anthropic_metrics.cost",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-anthropic_metrics.usage-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-anthropic_metrics.usage-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-anthropic_metrics.usage",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-aws.billing-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-aws.billing-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-aws.billing",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-aws.ec2_metrics-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-aws.ec2_metrics-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-aws.ec2_metrics",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-aws_bedrock.runtime-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-aws_bedrock.runtime-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-aws_bedrock.runtime",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-aws_billing.cur-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-aws_billing.cur-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-aws_billing.cur",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-azure.billing-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-azure.billing-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-azure.billing",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-azure.open_ai-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-azure.open_ai-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-azure.open_ai",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-fleet_server.agent_status-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-fleet_server.agent_status-default-2026.08.12-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-fleet_server.agent_status",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": {
+      "temporal_ranges": [
+        {
+          "start": "2026-08-12T16:16:55.000Z",
+          "end": "2026-08-18T19:13:07.000Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "metrics-fleet_server.agent_versions-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-fleet_server.agent_versions-default-2026.08.12-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-fleet_server.agent_versions",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": {
+      "temporal_ranges": [
+        {
+          "start": "2026-08-12T16:16:57.000Z",
+          "end": "2026-08-18T19:13:07.000Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "metrics-gcp.billing-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-gcp.billing-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-gcp.billing",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-gcp_vertexai.metrics-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-gcp_vertexai.metrics-default-2026.08.13-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-gcp_vertexai.metrics",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "traces-agent_builder.otel-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-traces-agent_builder.otel-default-2026.08.17-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "traces-otel@template",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "traces-apm-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-traces-apm-default-2026.08.13-000001",
+      ".ds-traces-apm-default-2026.08.14-000002"
+    ],
+    "generation": 2,
+    "status": "GREEN",
+    "template": "traces-apm@template",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  }
+]

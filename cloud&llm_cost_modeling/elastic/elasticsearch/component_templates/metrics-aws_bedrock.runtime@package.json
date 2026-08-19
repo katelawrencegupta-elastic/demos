@@ -1,0 +1,167 @@
+{
+  "name": "metrics-aws_bedrock.runtime@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws_bedrock.runtime-1.6.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "metrics_names_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "cloudwatch": {
+                "properties": {
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "aws_bedrock": {
+            "properties": {
+              "runtime": {
+                "properties": {
+                  "invocation_server_errors": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "image_size": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "legacymodel_invocations": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "model_id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "invocation_throttles": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "bucketed_step_size": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "invocations": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "input_token_count": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "quality": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "invocation_client_errors": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "output_token_count": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "output_image_count": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "invocation_latency": {
+                    "time_series_metric": "gauge",
+                    "meta": {
+                      "unit": "ms"
+                    },
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws_bedrock"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

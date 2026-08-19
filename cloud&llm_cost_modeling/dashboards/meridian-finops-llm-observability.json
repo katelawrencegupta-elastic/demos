@@ -22,12 +22,165 @@
   },
   "panels": [
     {
-      "title": "Overview \u2014 multi-cloud + LLM spend",
+      "title": "FinOps integration — native cloud provider dashboards",
       "collapsed": false,
       "grid": {
         "y": 0
       },
-      "id": "9b4da5b9-4701-47e9-923a-04bf2b3ff037",
+      "id": "e3b13bcf-4a3c-406a-8678-971983bba0d1",
+      "panels": [
+        {
+          "grid": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 10
+          },
+          "config": {
+            "hide_title": true,
+            "title": "",
+            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.",
+            "settings": {
+              "open_links_in_new_tab": true
+            }
+          },
+          "id": "d70b7e6e-c562-4ab1-a983-62e6e8f2961c",
+          "type": "markdown"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 0,
+            "w": 24,
+            "h": 10
+          },
+          "config": {
+            "title": "Provider FinOps & LLM packs",
+            "links": [
+              {
+                "label": "AWS CUR — current month",
+                "type": "dashboardLink",
+                "destination": "aws_billing-01aace34-9219-4c6c-80a9-b903af48950f",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "AWS CUR — all time",
+                "type": "dashboardLink",
+                "destination": "aws_billing-81918d21-70c6-4bc0-a03e-9e298460a525",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "GCP Billing Overview",
+                "type": "dashboardLink",
+                "destination": "gcp-76c9e920-e890-11ea-bf8c-d13ebf358a78",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "Azure Billing Overview",
+                "type": "dashboardLink",
+                "destination": "azure_billing-d3efeb30-c1c7-11ea-b7e7-0f48178cdb3c",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "Anthropic Cost & Billing",
+                "type": "dashboardLink",
+                "destination": "anthropic_metrics-2bd61c2c-4418-458f-a79e-12a74c34b2f0",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "OpenAI Usage Overview",
+                "type": "dashboardLink",
+                "destination": "openai-651bb059-f606-44fc-b704-2078d0af26da",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "Azure OpenAI Billing",
+                "type": "dashboardLink",
+                "destination": "azure_openai-f5bbc591-5e6b-4af7-b6c5-b02065a06455",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "Azure OpenAI Overview",
+                "type": "dashboardLink",
+                "destination": "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "Amazon Bedrock Overview",
+                "type": "dashboardLink",
+                "destination": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "GCP Vertex AI Metrics",
+                "type": "dashboardLink",
+                "destination": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "APM Monitoring Overview",
+                "type": "dashboardLink",
+                "destination": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              }
+            ]
+          },
+          "id": "478da001-eb81-4c42-97d1-e7d4640e17a1",
+          "type": "links"
+        }
+      ]
+    },
+    {
+      "title": "Overview — multi-cloud + LLM spend",
+      "collapsed": false,
+      "grid": {
+        "y": 12
+      },
+      "id": "a4a4e8f7-e920-4936-9c0f-5572b69e543a",
       "panels": [
         {
           "grid": {
@@ -39,12 +192,12 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "## Meridian Dynamics \u2014 FinOps & LLM Observability\n\nCost allocation across AWS accounts, GCP projects, and Azure subscriptions, correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, latency, quality) for every application flow.\n\nTime range is stored with the dashboard (14 Jul \u2013 14 Aug 2026 backfill).",
+            "content": "## Meridian Dynamics — FinOps & LLM Observability\n\nCost allocation across AWS accounts, GCP projects, and Azure subscriptions, correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, latency, quality) for every application flow.\n\nTime range is stored with the dashboard (14 Jul – 14 Aug 2026 backfill).",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "fec06bcb-1177-4b1e-b592-e82479d0aba3",
+          "id": "2c385b50-b631-40e4-88a1-1b01e4d5db43",
           "type": "markdown"
         },
         {
@@ -87,7 +240,7 @@
               }
             ]
           },
-          "id": "c41cef0f-9305-432a-8668-834da0f036e1",
+          "id": "e1b1b20c-6e74-4a70-8299-54e773b015cf",
           "type": "vis"
         },
         {
@@ -130,7 +283,7 @@
               }
             ]
           },
-          "id": "196e6baf-72dc-4003-98eb-b92db046ba14",
+          "id": "d7b434ee-0552-4d75-8227-36521ef35bdf",
           "type": "vis"
         },
         {
@@ -173,7 +326,7 @@
               }
             ]
           },
-          "id": "eceafde7-7dfa-4f79-ae0a-a012e7bfe0f2",
+          "id": "c6d18661-8c87-4867-8004-f1bdd8b43264",
           "type": "vis"
         },
         {
@@ -216,7 +369,7 @@
               }
             ]
           },
-          "id": "87ec01db-4355-4a5c-9479-5281df61653d",
+          "id": "40421794-b9a3-4eba-a9b6-4e266d966ed4",
           "type": "vis"
         },
         {
@@ -272,7 +425,7 @@
               }
             ]
           },
-          "id": "ca9848ac-22a9-452e-880d-717ea96059ee",
+          "id": "c77b54fa-cdc2-4c1f-b100-ea01fadff9fc",
           "type": "vis"
         },
         {
@@ -347,13 +500,13 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               },
               "areas": {
-                "fill_opacity": 0.3,
-                "fill": "solid"
+                "fill_opacity": 0.75,
+                "fill": "gradient"
               }
             },
             "layers": [
@@ -388,18 +541,18 @@
               }
             ]
           },
-          "id": "b5e5ae48-c945-47ca-bc43-ee62cd9097a1",
+          "id": "62132ac3-73c5-4675-8665-f37c45c7b9c5",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "Cost allocation \u2014 account, subscription, service, team, tag, region",
+      "title": "Cost allocation — account, subscription, service, team, tag, region",
       "collapsed": false,
       "grid": {
-        "y": 24
+        "y": 36
       },
-      "id": "c639ae81-fb47-427a-b9bc-9a83fa0649fe",
+      "id": "7a30eea3-e0cb-446d-bee0-01c00cdfbf75",
       "panels": [
         {
           "grid": {
@@ -416,7 +569,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "5ec65b38-005d-4647-92b6-3a27b2f81aff",
+          "id": "b2e49e15-803f-4d28-a875-e4e50dd1356f",
           "type": "markdown"
         },
         {
@@ -523,7 +676,7 @@
               }
             ]
           },
-          "id": "e7970769-7807-4075-89e1-fcf372eb1e62",
+          "id": "49457b8c-b655-44db-8e3e-2ca4fa222a34",
           "type": "vis"
         },
         {
@@ -630,7 +783,7 @@
               }
             ]
           },
-          "id": "abee41a3-228e-4a05-97d1-4430dfb16ecb",
+          "id": "1d5a1ad0-cc7f-4d09-be42-8beaebf94761",
           "type": "vis"
         },
         {
@@ -686,7 +839,7 @@
               }
             ]
           },
-          "id": "27a17836-8eec-4bb7-b5b3-6fa1be775264",
+          "id": "a64fd87e-ae6b-47d6-a523-67290c128449",
           "type": "vis"
         },
         {
@@ -793,7 +946,7 @@
               }
             ]
           },
-          "id": "391497f3-37ff-46f7-805d-d9036e1f22b5",
+          "id": "643c0e84-aae7-44b3-bc93-b83eb9c94bcc",
           "type": "vis"
         },
         {
@@ -900,7 +1053,7 @@
               }
             ]
           },
-          "id": "786899a1-bd94-4c84-bd04-56fe26bf35bf",
+          "id": "acb1d2fb-7788-42dc-82b3-91b0bd7376ac",
           "type": "vis"
         },
         {
@@ -912,7 +1065,7 @@
           },
           "config": {
             "type": "data_table",
-            "title": "AWS CUR allocation \u2014 account \u00d7 service \u00d7 tags",
+            "title": "AWS CUR allocation — account × service × tags",
             "sampling": 1,
             "ignore_global_filters": false,
             "data_source": {
@@ -973,7 +1126,7 @@
               }
             ]
           },
-          "id": "9425ab39-e3f8-4379-8570-33fd1f70dd99",
+          "id": "6ede032b-b46b-4ecf-b270-ae55fd86cfb6",
           "type": "vis"
         },
         {
@@ -985,7 +1138,7 @@
           },
           "config": {
             "type": "data_table",
-            "title": "Azure allocation \u2014 department \u00d7 product \u00d7 region",
+            "title": "Azure allocation — department × product × region",
             "sampling": 1,
             "ignore_global_filters": false,
             "data_source": {
@@ -1047,7 +1200,7 @@
               }
             ]
           },
-          "id": "534eea32-a421-4eac-9d45-06bd0e9696f1",
+          "id": "178f3502-a2e2-4dba-9667-64a75988442e",
           "type": "vis"
         },
         {
@@ -1154,7 +1307,7 @@
               }
             ]
           },
-          "id": "c2f50cf2-44f1-4055-a912-88b951a149db",
+          "id": "29624673-32a1-4f3a-aba1-ec40f70bb163",
           "type": "vis"
         },
         {
@@ -1261,18 +1414,18 @@
               }
             ]
           },
-          "id": "2d2398db-26b4-4c8b-8bce-4e3ae317caf0",
+          "id": "353fa58f-cad2-47d9-a684-58dd199bcc46",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "Engineering & Ops \u2014 usage correlated with cost",
+      "title": "Engineering & Ops — usage correlated with cost",
       "collapsed": false,
       "grid": {
-        "y": 78
+        "y": 90
       },
-      "id": "4af14abb-ae8d-4063-9ba0-9a1aea914af6",
+      "id": "f0910111-6d2e-48db-a510-96aece40d1c7",
       "panels": [
         {
           "grid": {
@@ -1289,7 +1442,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "555be642-cfbd-4c77-a861-55c0ab54e990",
+          "id": "1e5b5d38-bb01-4025-9461-96b2d3bf08e1",
           "type": "markdown"
         },
         {
@@ -1364,7 +1517,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -1393,7 +1546,7 @@
               }
             ]
           },
-          "id": "7693b03c-d3f2-43e1-a791-edc42167b1fb",
+          "id": "b2a7b4ac-0eff-4649-9786-5afa1b1bad74",
           "type": "vis"
         },
         {
@@ -1468,7 +1621,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -1497,7 +1650,7 @@
               }
             ]
           },
-          "id": "9d8f95ae-ba19-45fc-84e2-6bbfa59de9df",
+          "id": "ba090ec3-539f-4029-b7f3-86a689fdadbc",
           "type": "vis"
         },
         {
@@ -1572,7 +1725,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -1601,7 +1754,7 @@
               }
             ]
           },
-          "id": "24b78044-1f5b-4c05-95a2-cb378a2c17ef",
+          "id": "790e09ad-a9a3-4e60-b0c2-56d137b9da1a",
           "type": "vis"
         },
         {
@@ -1708,7 +1861,7 @@
               }
             ]
           },
-          "id": "72cc1513-9b9f-4d0d-b975-2b02fdfeea4a",
+          "id": "ce53173b-386c-4820-b74c-6857979ba6e4",
           "type": "vis"
         },
         {
@@ -1780,7 +1933,7 @@
               }
             ]
           },
-          "id": "0e770699-a680-40eb-84e7-6a87d8d5d60b",
+          "id": "1ef89785-cace-4676-a225-571f7f4ab556",
           "type": "vis"
         }
       ]
@@ -1789,9 +1942,9 @@
       "title": "Historical cost & 7-day run-rate forecast",
       "collapsed": false,
       "grid": {
-        "y": 116
+        "y": 128
       },
-      "id": "0b440904-5592-4c8e-9f59-923fd13eca28",
+      "id": "f24757dc-35b8-4ee5-a59c-ee8cb1b5aeaa",
       "panels": [
         {
           "grid": {
@@ -1803,12 +1956,12 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "Daily CUR history plus a trailing 7-day average run-rate. `projected_30d` = last-7-day daily average \u00d7 30 (not a statistical model \u2014 a FinOps run-rate).",
+            "content": "Daily CUR history plus a trailing 7-day average run-rate. `projected_30d` = last-7-day daily average × 30 (not a statistical model — a FinOps run-rate).",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "6de7b68c-4625-47f2-a09a-29d54fe42320",
+          "id": "4df2b9d4-f972-493c-9ae9-28df83942aa6",
           "type": "markdown"
         },
         {
@@ -1883,7 +2036,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -1912,7 +2065,7 @@
               }
             ]
           },
-          "id": "3db1c039-a8cb-4805-8888-d4120cfc2eb0",
+          "id": "1004f708-b44f-4799-a256-2dd177e33619",
           "type": "vis"
         },
         {
@@ -1955,7 +2108,7 @@
               }
             ]
           },
-          "id": "76fe67b5-00c7-4d87-8034-496ded9d0e02",
+          "id": "4a5ff285-b436-41d5-8b12-f90b8a000bfb",
           "type": "vis"
         },
         {
@@ -1998,7 +2151,7 @@
               }
             ]
           },
-          "id": "7568d849-6f0b-4847-a01a-becb08456fca",
+          "id": "a90d633a-d53c-4b5d-aeee-e6dce9f03cce",
           "type": "vis"
         },
         {
@@ -2073,7 +2226,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -2102,7 +2255,7 @@
               }
             ]
           },
-          "id": "86717dbd-a2cd-4979-90b3-01dd97428a31",
+          "id": "aa15c532-4f12-4691-8482-bcef22424b24",
           "type": "vis"
         },
         {
@@ -2177,7 +2330,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -2206,171 +2359,18 @@
               }
             ]
           },
-          "id": "4a73bac8-920d-4fc6-b23b-13e033150d1d",
+          "id": "1b68e2fa-d207-479b-a7ef-37bbb8dab703",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "FinOps integration \u2014 native cloud provider dashboards",
-      "collapsed": false,
-      "grid": {
-        "y": 144
-      },
-      "id": "0c28cca3-072c-47a4-9b28-163ff069d2bc",
-      "panels": [
-        {
-          "grid": {
-            "x": 0,
-            "y": 0,
-            "w": 24,
-            "h": 10
-          },
-          "config": {
-            "hide_title": true,
-            "title": "",
-            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.",
-            "settings": {
-              "open_links_in_new_tab": true
-            }
-          },
-          "id": "9490c383-44bd-4dd2-b00f-43a5cd4edeae",
-          "type": "markdown"
-        },
-        {
-          "grid": {
-            "x": 24,
-            "y": 0,
-            "w": 24,
-            "h": 10
-          },
-          "config": {
-            "title": "Provider FinOps & LLM packs",
-            "links": [
-              {
-                "label": "AWS CUR \u2014 current month",
-                "type": "dashboardLink",
-                "destination": "aws_billing-01aace34-9219-4c6c-80a9-b903af48950f",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "AWS CUR \u2014 all time",
-                "type": "dashboardLink",
-                "destination": "aws_billing-81918d21-70c6-4bc0-a03e-9e298460a525",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "GCP Billing Overview",
-                "type": "dashboardLink",
-                "destination": "gcp-76c9e920-e890-11ea-bf8c-d13ebf358a78",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "Azure Billing Overview",
-                "type": "dashboardLink",
-                "destination": "azure_billing-d3efeb30-c1c7-11ea-b7e7-0f48178cdb3c",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "Anthropic Cost & Billing",
-                "type": "dashboardLink",
-                "destination": "anthropic_metrics-2bd61c2c-4418-458f-a79e-12a74c34b2f0",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "OpenAI Usage Overview",
-                "type": "dashboardLink",
-                "destination": "openai-651bb059-f606-44fc-b704-2078d0af26da",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "Azure OpenAI Billing",
-                "type": "dashboardLink",
-                "destination": "azure_openai-f5bbc591-5e6b-4af7-b6c5-b02065a06455",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "Azure OpenAI Overview",
-                "type": "dashboardLink",
-                "destination": "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "Amazon Bedrock Overview",
-                "type": "dashboardLink",
-                "destination": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "GCP Vertex AI Metrics",
-                "type": "dashboardLink",
-                "destination": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              },
-              {
-                "label": "APM Monitoring Overview",
-                "type": "dashboardLink",
-                "destination": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
-                "options": {
-                  "use_filters": false,
-                  "use_time_range": true,
-                  "open_in_new_tab": true
-                }
-              }
-            ]
-          },
-          "id": "d0d07609-cabe-43e5-a7f4-ee446bf2809c",
-          "type": "links"
-        }
-      ]
-    },
-    {
-      "title": "LLM traces \u2014 end-to-end call, tokens, and cost",
+      "title": "LLM traces — end-to-end call, tokens, and cost",
       "collapsed": false,
       "grid": {
         "y": 156
       },
-      "id": "2fdb8c68-a5d8-4afa-b4a3-1cc7a3547f48",
+      "id": "ffaa17b1-4750-4e3d-b94e-9a0fbd380ce8",
       "panels": [
         {
           "grid": {
@@ -2382,12 +2382,12 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the request id \u2014 open APM to inspect the parent FastAPI transaction.",
+            "content": "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the request id — open APM to inspect the parent FastAPI transaction.",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "fa92d184-873d-471c-a1f2-1af5bea95003",
+          "id": "5643d8e3-424a-4b59-a17d-a37d84c4ffbb",
           "type": "markdown"
         },
         {
@@ -2429,7 +2429,7 @@
               }
             ]
           },
-          "id": "694789d5-dc51-4788-97b1-661fe54597fd",
+          "id": "c42016ea-19a5-4efc-82c3-a3c17087a6cb",
           "type": "vis"
         },
         {
@@ -2471,7 +2471,7 @@
               }
             ]
           },
-          "id": "c8ef8f8d-4a61-49e6-b099-ebaf6f1549cc",
+          "id": "c9a10f01-1b3d-4db2-828c-4836ca074e64",
           "type": "vis"
         },
         {
@@ -2513,7 +2513,7 @@
               }
             ]
           },
-          "id": "582b2d6d-ee95-41a0-b888-8ef449ad81b3",
+          "id": "feb0bc91-d6b9-430d-8a31-9d72a0a17114",
           "type": "vis"
         },
         {
@@ -2555,7 +2555,7 @@
               }
             ]
           },
-          "id": "340edb1a-efcc-47e2-94e8-3adc1d73bd17",
+          "id": "75fb9061-647d-4ef0-921c-b41e4548bcff",
           "type": "vis"
         },
         {
@@ -2567,7 +2567,7 @@
           },
           "config": {
             "type": "data_table",
-            "title": "Recent LLM calls \u2014 trace, model, tokens, cost, latency",
+            "title": "Recent LLM calls — trace, model, tokens, cost, latency",
             "sampling": 1,
             "ignore_global_filters": false,
             "data_source": {
@@ -2697,18 +2697,18 @@
               }
             ]
           },
-          "id": "93316e31-844b-46d4-a133-b36cd70cdb14",
+          "id": "a3aa5280-f65a-4d08-ab4a-51964a00c872",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "Token usage per request \u2014 prompt, completion, total",
+      "title": "Token usage per request — prompt, completion, total",
       "collapsed": false,
       "grid": {
         "y": 180
       },
-      "id": "8feddf9b-c1a9-4f28-aef8-236fc86d6c49",
+      "id": "ac4fe75a-4add-4c46-af2f-1ab40c9f39b8",
       "panels": [
         {
           "grid": {
@@ -2782,13 +2782,13 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               },
               "areas": {
-                "fill_opacity": 0.3,
-                "fill": "solid"
+                "fill_opacity": 0.75,
+                "fill": "gradient"
               }
             },
             "layers": [
@@ -2829,7 +2829,7 @@
               }
             ]
           },
-          "id": "3c1ebf27-f558-40b7-a086-354565ed6a15",
+          "id": "434b5525-d7b9-444d-80c6-c5b82a72fb1e",
           "type": "vis"
         },
         {
@@ -2885,7 +2885,7 @@
               }
             ]
           },
-          "id": "f794ca4e-cf29-4425-89d6-36bc7bb07d9d",
+          "id": "3ddcb003-03bc-4cb2-bf25-6b307fb5ad79",
           "type": "vis"
         },
         {
@@ -2897,7 +2897,7 @@
           },
           "config": {
             "type": "xy",
-            "title": "OpenAI completions \u2014 input vs output tokens",
+            "title": "OpenAI completions — input vs output tokens",
             "legend": {
               "visibility": "visible",
               "placement": "outside",
@@ -2960,13 +2960,13 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               },
               "areas": {
-                "fill_opacity": 0.3,
-                "fill": "solid"
+                "fill_opacity": 0.75,
+                "fill": "gradient"
               }
             },
             "layers": [
@@ -3000,7 +3000,7 @@
               }
             ]
           },
-          "id": "1e9705a8-00c7-4b4b-8132-00423bf868e6",
+          "id": "f2752ed7-009a-4f0b-8152-2aeb71d593c7",
           "type": "vis"
         },
         {
@@ -3012,7 +3012,7 @@
           },
           "config": {
             "type": "xy",
-            "title": "Vertex AI \u2014 prompt vs candidate tokens",
+            "title": "Vertex AI — prompt vs candidate tokens",
             "legend": {
               "visibility": "visible",
               "placement": "outside",
@@ -3075,13 +3075,13 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               },
               "areas": {
-                "fill_opacity": 0.3,
-                "fill": "solid"
+                "fill_opacity": 0.75,
+                "fill": "gradient"
               }
             },
             "layers": [
@@ -3115,18 +3115,18 @@
               }
             ]
           },
-          "id": "5848272e-b369-4597-a759-25f1762ba94e",
+          "id": "2c86b330-ec76-4ae6-9e8c-116005d0b073",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "LLM cost \u2014 model, user, feature, team",
+      "title": "LLM cost — model, user, feature, team",
       "collapsed": false,
       "grid": {
         "y": 206
       },
-      "id": "d11a7460-398d-4f87-afe2-930ef9f830b3",
+      "id": "69b61e81-9b65-4e63-b28f-2c67f1934213",
       "panels": [
         {
           "grid": {
@@ -3232,7 +3232,7 @@
               }
             ]
           },
-          "id": "d48f0ac8-05cf-41d1-b747-5f7c85f5e220",
+          "id": "da4e5e99-4c46-49e1-8be1-6ac7af0e2ca5",
           "type": "vis"
         },
         {
@@ -3339,7 +3339,7 @@
               }
             ]
           },
-          "id": "cb9635a1-d411-4d7d-acbe-b1bb4ca6e566",
+          "id": "574e8b10-f73a-436d-b81f-00b94715b342",
           "type": "vis"
         },
         {
@@ -3446,7 +3446,7 @@
               }
             ]
           },
-          "id": "17423f58-fc03-47b8-ae8f-b7f18fd1a5bb",
+          "id": "8f09850c-bf8e-4636-9520-3965690aa2ce",
           "type": "vis"
         },
         {
@@ -3553,7 +3553,7 @@
               }
             ]
           },
-          "id": "b558e118-9c7b-4d7d-9a11-7614fca41574",
+          "id": "d3a512af-6ffd-4539-b6da-52adbc77c3aa",
           "type": "vis"
         },
         {
@@ -3565,7 +3565,7 @@
           },
           "config": {
             "type": "data_table",
-            "title": "Cost \u00d7 tokens by model and provider",
+            "title": "Cost × tokens by model and provider",
             "sampling": 1,
             "ignore_global_filters": false,
             "data_source": {
@@ -3633,7 +3633,7 @@
               }
             ]
           },
-          "id": "c2d11563-5ca3-4e97-b33a-7e53b9bf4cd3",
+          "id": "480e0cf9-0182-4b41-9280-92539fca3ff7",
           "type": "vis"
         },
         {
@@ -3706,7 +3706,7 @@
               }
             ]
           },
-          "id": "32496944-a5bc-499a-b68d-f59207b84485",
+          "id": "b8f7d42c-5cf1-49d2-b93e-6fdbf7fd06df",
           "type": "vis"
         }
       ]
@@ -3717,7 +3717,7 @@
       "grid": {
         "y": 246
       },
-      "id": "cc314438-c617-408a-837c-cad841d88259",
+      "id": "9597f3ef-d17f-4aa4-bb2d-8ee06ade7800",
       "panels": [
         {
           "grid": {
@@ -3758,7 +3758,7 @@
               }
             ]
           },
-          "id": "aa5a35de-1a94-442d-97b7-c4c0e0172034",
+          "id": "5b651b41-5156-4e30-b210-2ed7c8e9fb99",
           "type": "vis"
         },
         {
@@ -3800,7 +3800,7 @@
               }
             ]
           },
-          "id": "428b4af3-13cd-4f1f-8cf4-1aa5784f987e",
+          "id": "2bc356ce-a4d9-44b2-821a-7383211b5792",
           "type": "vis"
         },
         {
@@ -3842,7 +3842,7 @@
               }
             ]
           },
-          "id": "eeb5aa99-1735-4081-8c8d-7c73a7ec3e7c",
+          "id": "efbf40e2-2b6d-4f61-8036-1952969bc963",
           "type": "vis"
         },
         {
@@ -3898,7 +3898,7 @@
               }
             ]
           },
-          "id": "94ca4584-abca-4ba2-b8a3-bf833d48c61c",
+          "id": "2645e306-b712-45fd-b6ec-82dd6482dbcc",
           "type": "vis"
         },
         {
@@ -4012,7 +4012,7 @@
               }
             ]
           },
-          "id": "e2490309-4a7a-4fec-accd-704ea7587202",
+          "id": "42e52c09-b632-4617-871f-2fa69edc39a9",
           "type": "vis"
         },
         {
@@ -4087,7 +4087,7 @@
                   "visible": false
                 }
               },
-              "interpolation": "linear",
+              "interpolation": "smooth",
               "points": {
                 "visibility": "auto"
               }
@@ -4116,18 +4116,18 @@
               }
             ]
           },
-          "id": "18496e3c-febe-48ff-8a51-81c8d194d33f",
+          "id": "70f12654-f6ed-4fdc-97ca-76e1da886fb9",
           "type": "vis"
         }
       ]
     },
     {
-      "title": "Funnel \u2014 which user flows consume the most tokens",
+      "title": "Funnel — which user flows consume the most tokens",
       "collapsed": false,
       "grid": {
         "y": 278
       },
-      "id": "273f62fa-9768-4d53-bdd0-6243e29727e5",
+      "id": "27a61b0b-a861-44af-aa96-b4685af6c979",
       "panels": [
         {
           "grid": {
@@ -4139,12 +4139,12 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, `rag-research`, `skunk-agent-lab`, \u2026). Ranked by total tokens, then cost and calls. Shadow-IT (`skunk-agent-lab`, `prompt-playground`) and the agent-loop scenario show up here.",
+            "content": "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, `rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. Shadow-IT (`skunk-agent-lab`, `prompt-playground`) and the agent-loop scenario show up here.",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "b50695cb-203d-47ac-83f0-663c75f46563",
+          "id": "5c5e64a3-096d-45e8-a183-eb7949c972fe",
           "type": "markdown"
         },
         {
@@ -4251,7 +4251,7 @@
               }
             ]
           },
-          "id": "190ca7d9-5b60-4515-a123-1e6d9947759e",
+          "id": "eaa89800-6d5a-49ff-b893-64ac0628ac64",
           "type": "vis"
         },
         {
@@ -4307,7 +4307,7 @@
               }
             ]
           },
-          "id": "ba3541ef-7bda-48d3-ad30-4d1e5cd9a2d4",
+          "id": "71a1e7ab-e07b-43e4-bbda-daeda6e583ad",
           "type": "vis"
         },
         {
@@ -4319,7 +4319,7 @@
           },
           "config": {
             "type": "data_table",
-            "title": "Flow funnel \u2014 tokens, prompt/completion split, cost, latency",
+            "title": "Flow funnel — tokens, prompt/completion split, cost, latency",
             "sampling": 1,
             "ignore_global_filters": false,
             "data_source": {
@@ -4420,7 +4420,7 @@
               }
             ]
           },
-          "id": "4da7c189-6eae-464b-a07d-70f98e1a08d1",
+          "id": "f6b3240d-14ff-4159-9fe5-18ce4217ccdd",
           "type": "vis"
         }
       ]

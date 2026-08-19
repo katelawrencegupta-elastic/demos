@@ -1,0 +1,170 @@
+{
+  "name": "logs-openai.rate_limits-2.4.0",
+  "on_failure": [
+    {
+      "append": {
+        "tag": "append_error_message",
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}'\nwith tag '{{{ _ingest.on_failure_processor_tag }}}'\nin pipeline '{{{ _ingest.on_failure_pipeline }}}'\nfailed with message '{{{ _ingest.on_failure_message }}}'\n"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind_pipeline_error",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_preserve_original_event",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643468280,
+  "description": "Pipeline for processing OpenAI rate limits.",
+  "_meta": {
+    "package": {
+      "name": "openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643468280,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "9.3.0"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "metric"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "json_event_original",
+        "field": "event.original",
+        "target_field": "openai.rate_limits",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drops the keep-alive sentinel the CEL program emits for an empty project or rate-limit page. The sentinel exists only to keep filebeat's want_more chain alive (a zero-event evaluation ends the polling cycle early); it carries no rate-limit data and must not be indexed.",
+        "tag": "drop_pagination_sentinel",
+        "if": "ctx.openai?.rate_limits?.skip != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the copy of the original message unless the user opted in to preserve it.",
+        "tag": "remove_event_original",
+        "field": "event.original",
+        "if": "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_date_collected_at_failure",
+              "field": "tags",
+              "allow_duplicates": false,
+              "value": "_date_collected_at_parse_failure"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "openai.rate_limits.collected_at",
+        "target_field": "@timestamp",
+        "tag": "date_collected_at",
+        "if": "ctx.openai?.rate_limits?.collected_at != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_event_created",
+        "field": "event.created",
+        "copy_from": "@timestamp"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_into_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_preserve_original_event_tag",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `openai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.rate_limits@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `openai.rate_limits` dataset"
+      }
+    }
+  ]
+}

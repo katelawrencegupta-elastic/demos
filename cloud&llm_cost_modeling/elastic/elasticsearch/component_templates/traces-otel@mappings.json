@@ -1,0 +1,132 @@
+{
+  "name": "traces-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "sort": {
+            "field": [
+              "resource.attributes.host.name",
+              "@timestamp"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "dropped_events_count": {
+            "type": "long"
+          },
+          "parent_span_id": {
+            "type": "keyword"
+          },
+          "span.name": {
+            "path": "name",
+            "type": "alias"
+          },
+          "trace_id": {
+            "type": "keyword"
+          },
+          "trace_state": {
+            "type": "keyword"
+          },
+          "http.request.body.bytes": {
+            "path": "attributes.http.request.body.size",
+            "type": "alias"
+          },
+          "span_id": {
+            "type": "keyword"
+          },
+          "kind": {
+            "type": "keyword"
+          },
+          "span.id": {
+            "path": "span_id",
+            "type": "alias"
+          },
+          "dropped_links_count": {
+            "type": "long"
+          },
+          "http.response.body.bytes": {
+            "path": "attributes.http.response.body.size",
+            "type": "alias"
+          },
+          "duration": {
+            "meta": {
+              "unit": "nanos"
+            },
+            "type": "long"
+          },
+          "trace.id": {
+            "path": "trace_id",
+            "type": "alias"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "parent.id": {
+            "path": "parent_span_id",
+            "type": "alias"
+          },
+          "attributes": {
+            "dynamic": true,
+            "type": "passthrough",
+            "priority": 20,
+            "properties": {
+              "http.response.body.size": {
+                "type": "long"
+              },
+              "elastic.profiler_stack_trace_ids": {
+                "type": "counted_keyword"
+              },
+              "http.request.body.size": {
+                "type": "long"
+              },
+              "http.response.status_code": {
+                "type": "long"
+              }
+            }
+          },
+          "links": {
+            "synthetic_source_keep": "arrays",
+            "properties": {
+              "trace_id": {
+                "type": "keyword"
+              },
+              "trace_state": {
+                "type": "keyword"
+              },
+              "dropped_attributes_count": {
+                "type": "long"
+              },
+              "span_id": {
+                "type": "keyword"
+              },
+              "attributes": {
+                "dynamic": true,
+                "type": "object",
+                "subobjects": false
+              }
+            }
+          },
+          "status": {
+            "properties": {
+              "code": {
+                "type": "keyword"
+              },
+              "message": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "version": 19,
+    "_meta": {
+      "description": "Default mappings for OpenTelemetry traces",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,751 @@
+{
+  "id": "gcp-48e12760-cbe4-11ec-b519-85ccf621cbbf",
+  "data": {
+    "description": "Overview of the audit log data from Google Cloud.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-gcp-default",
+      "security-solution-default"
+    ],
+    "title": "[Logs GCP] Audit",
+    "filters": [
+      {
+        "disabled": false,
+        "label": "Only data from gcp.audit dataset",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "gcp.audit"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 9,
+          "w": 48,
+          "x": 0,
+          "y": 29
+        },
+        "config": {
+          "hide_title": false,
+          "title": "Audit Event List",
+          "ref_id": "gcp-d88364c0-73a1-11ea-a345-f985c61fe654",
+          "overrides": {}
+        },
+        "id": "95ebbda8-9b00-4b23-b116-72569ea031e3",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Logs GCP] Audit Events Outcome over time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.audit"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Count",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "event.outcome: Descending",
+                "fields": [
+                  "event.outcome"
+                ],
+                "limit": 5,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "@timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "9f857560-27dd-4dfc-8b9d-814d0877fa0c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 0,
+          "y": 15
+        },
+        "config": {
+          "type": "pie",
+          "title": "[Logs GCP] Audit Event Action",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.audit"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "event.action: Descending",
+              "fields": [
+                "event.action"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "4e8256f8-eb9f-4d9d-8712-f237d7d653f3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 24,
+          "y": 15
+        },
+        "config": {
+          "type": "pie",
+          "title": "[Logs GCP] Audit User Agent",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.audit"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "User Agent",
+              "fields": [
+                "user_agent.name"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "9ba4db1f-9ea5-4bb0-b7d2-afc82a7ca177",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 36,
+          "y": 15
+        },
+        "config": {
+          "type": "pie",
+          "title": "[Logs GCP] Audit Resource Name",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.audit"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Resource Name",
+              "fields": [
+                "gcp.audit.resource_name"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "80c40a0a-c2f5-4e8b-9268-fa281d46295d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 12,
+          "y": 15
+        },
+        "config": {
+          "type": "pie",
+          "title": "[Logs GCP] Audit Event Email",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.audit"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Users",
+              "fields": [
+                "client.user.email"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "65544fcc-cd1d-4e52-8109-cd09d104fe4d",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:39.499Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:41.500Z",
+    "version": "WzE4NiwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: map. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "map",
+      "panel_config": {
+        "attributes": {
+          "title": "Audit Source Locations [Logs GCP]",
+          "layers": [
+            {
+              "alpha": 1,
+              "id": "866b5ce1-6ca0-47db-a6f2-54c5e0dcd2f0",
+              "label": null,
+              "maxZoom": 24,
+              "minZoom": 0,
+              "sourceDescriptor": {
+                "isAutoSelect": true,
+                "type": "EMS_TMS",
+                "lightModeDefault": "road_map"
+              },
+              "style": {},
+              "type": "EMS_VECTOR_TILE",
+              "visible": true
+            },
+            {
+              "alpha": 0.75,
+              "id": "279da950-e9a7-4287-ab37-25906e448455",
+              "joins": [],
+              "label": "Source Locations",
+              "maxZoom": 24,
+              "minZoom": 0,
+              "query": {
+                "language": "kuery",
+                "query": "data_stream.dataset:gcp.audit"
+              },
+              "sourceDescriptor": {
+                "applyGlobalQuery": true,
+                "filterByMapBounds": true,
+                "geoField": "source.geo.location",
+                "id": "79ec6461-7561-45e4-a6a2-9d6fbd4cf986",
+                "scalingType": "LIMIT",
+                "sortField": "",
+                "sortOrder": "desc",
+                "tooltipProperties": [],
+                "topHitsSize": 1,
+                "type": "ES_SEARCH",
+                "indexPatternId": "logs-*"
+              },
+              "style": {
+                "isTimeAware": true,
+                "properties": {
+                  "fillColor": {
+                    "options": {
+                      "color": "#54B399"
+                    },
+                    "type": "STATIC"
+                  },
+                  "icon": {
+                    "options": {
+                      "value": "marker"
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconOrientation": {
+                    "options": {
+                      "orientation": 0
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconSize": {
+                    "options": {
+                      "size": 6
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderColor": {
+                    "options": {
+                      "color": "#FFFFFF"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderSize": {
+                    "options": {
+                      "size": "SMALL"
+                    }
+                  },
+                  "labelColor": {
+                    "options": {
+                      "color": "#000000"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelSize": {
+                    "options": {
+                      "size": 14
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelText": {
+                    "options": {
+                      "value": ""
+                    },
+                    "type": "STATIC"
+                  },
+                  "lineColor": {
+                    "options": {
+                      "color": "#41937c"
+                    },
+                    "type": "STATIC"
+                  },
+                  "lineWidth": {
+                    "options": {
+                      "size": 1
+                    },
+                    "type": "STATIC"
+                  },
+                  "symbolizeAs": {
+                    "options": {
+                      "value": "circle"
+                    }
+                  }
+                },
+                "type": "VECTOR"
+              },
+              "type": "GEOJSON_VECTOR",
+              "visible": true
+            }
+          ],
+          "zoom": 1.97,
+          "center": {
+            "lon": -48.67493,
+            "lat": 32.1625
+          },
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "filters": [
+            {
+              "meta": {
+                "disabled": false,
+                "negate": false,
+                "alias": null,
+                "index": "logs-*",
+                "key": "data_stream.dataset",
+                "field": "data_stream.dataset",
+                "params": {
+                  "query": "gcp.audit"
+                },
+                "type": "phrase"
+              },
+              "query": {
+                "match_phrase": {
+                  "data_stream.dataset": "gcp.audit"
+                }
+              },
+              "$state": {
+                "store": "appState"
+              }
+            }
+          ],
+          "settings": {
+            "autoFitToDataBounds": false,
+            "backgroundColor": "#ffffff",
+            "customIcons": [],
+            "disableInteractive": false,
+            "disableTooltipControl": false,
+            "hideToolbarOverlay": false,
+            "hideLayerControl": false,
+            "hideViewControl": false,
+            "initialLocation": "LAST_SAVED_LOCATION",
+            "fixedLocation": {
+              "lat": 0,
+              "lon": 0,
+              "zoom": 2
+            },
+            "browserLocation": {
+              "zoom": 2
+            },
+            "keydownScrollZoom": false,
+            "maxZoom": 24,
+            "minZoom": 0,
+            "showScaleControl": false,
+            "showSpatialFilters": true,
+            "showTimesliderToggleButton": true,
+            "spatialFiltersAlpa": 0.3,
+            "spatialFiltersFillColor": "#DA8B45",
+            "spatialFiltersLineColor": "#DA8B45"
+          },
+          "refreshInterval": {
+            "pause": true,
+            "value": 0
+          },
+          "timeFilters": {
+            "from": "now-10y",
+            "to": "now"
+          },
+          "isLayerTOCOpen": false,
+          "openTOCDetails": []
+        },
+        "hiddenLayers": [],
+        "isLayerTOCOpen": false,
+        "mapCenter": {
+          "lat": 32.1625,
+          "lon": -48.67493,
+          "zoom": 1.97
+        },
+        "openTOCDetails": [],
+        "type": "map",
+        "title": "Audit Source Locations",
+        "hide_title": false
+      }
+    }
+  ]
+}

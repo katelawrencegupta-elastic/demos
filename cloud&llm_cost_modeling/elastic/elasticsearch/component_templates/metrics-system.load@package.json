@@ -1,0 +1,192 @@
+{
+  "name": "metrics-system.load@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-system.load-2.22.3",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "availability_zone": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "instance": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "provider": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "container": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "system": {
+            "properties": {
+              "load": {
+                "properties": {
+                  "1": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "scaling_factor": 1000,
+                    "type": "scaled_float"
+                  },
+                  "cores": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "type": "long"
+                  },
+                  "15": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "scaling_factor": 1000,
+                    "type": "scaled_float"
+                  },
+                  "5": {
+                    "time_series_metric": "gauge",
+                    "meta": {},
+                    "scaling_factor": 1000,
+                    "type": "scaled_float"
+                  },
+                  "norm": {
+                    "properties": {
+                      "1": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "scaling_factor": 1000,
+                        "type": "scaled_float"
+                      },
+                      "15": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "scaling_factor": 1000,
+                        "type": "scaled_float"
+                      },
+                      "5": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "scaling_factor": 1000,
+                        "type": "scaled_float"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              },
+              "name": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "system"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "system.load"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "system"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

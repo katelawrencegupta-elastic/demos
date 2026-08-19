@@ -1,0 +1,776 @@
+{
+  "name": "logs-aws.securityhub_insights@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.securityhub_insights-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "observer": {
+            "properties": {
+              "vendor": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "securityhub_insights": {
+                "properties": {
+                  "group_by_attribute": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "insight_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "filters": {
+                    "properties": {
+                      "note": {
+                        "properties": {
+                          "updated_at": {
+                            "properties": {
+                              "date_range": {
+                                "properties": {
+                                  "unit": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "value": {
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "by": {
+                                "type": "flattened"
+                              },
+                              "start": {
+                                "type": "date"
+                              },
+                              "end": {
+                                "type": "date"
+                              }
+                            }
+                          },
+                          "updated_by": {
+                            "type": "flattened"
+                          },
+                          "text": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "related_findings": {
+                        "properties": {
+                          "product": {
+                            "properties": {
+                              "arn": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "id": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "criticality": {
+                        "type": "flattened"
+                      },
+                      "created_at": {
+                        "properties": {
+                          "date_range": {
+                            "properties": {
+                              "unit": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "start": {
+                            "type": "date"
+                          },
+                          "end": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "description": {
+                        "type": "flattened"
+                      },
+                      "generator": {
+                        "properties": {
+                          "id": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "title": {
+                        "type": "flattened"
+                      },
+                      "type": {
+                        "type": "flattened"
+                      },
+                      "source_url": {
+                        "type": "flattened"
+                      },
+                      "network": {
+                        "properties": {
+                          "protocol": {
+                            "type": "flattened"
+                          },
+                          "destination": {
+                            "properties": {
+                              "port": {
+                                "type": "flattened"
+                              },
+                              "domain": {
+                                "type": "flattened"
+                              },
+                              "ip": {
+                                "properties": {
+                                  "v6": {
+                                    "type": "flattened"
+                                  },
+                                  "v4": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "source": {
+                            "properties": {
+                              "port": {
+                                "type": "flattened"
+                              },
+                              "domain": {
+                                "type": "flattened"
+                              },
+                              "ip": {
+                                "properties": {
+                                  "v6": {
+                                    "type": "flattened"
+                                  },
+                                  "v4": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "mac": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "direction": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "user_defined_fields": {
+                        "type": "flattened"
+                      },
+                      "aws_account_id": {
+                        "type": "flattened"
+                      },
+                      "finding_provider_fields": {
+                        "properties": {
+                          "severity": {
+                            "properties": {
+                              "original": {
+                                "type": "flattened"
+                              },
+                              "label": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "types": {
+                            "type": "flattened"
+                          },
+                          "related_findings": {
+                            "properties": {
+                              "product": {
+                                "properties": {
+                                  "arn": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "id": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "confidence": {
+                            "type": "flattened"
+                          },
+                          "criticality": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "updated_at": {
+                        "properties": {
+                          "date_range": {
+                            "properties": {
+                              "unit": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "start": {
+                            "type": "date"
+                          },
+                          "end": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "company": {
+                        "properties": {
+                          "name": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "first_observed_at": {
+                        "properties": {
+                          "date_range": {
+                            "properties": {
+                              "unit": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "start": {
+                            "type": "date"
+                          },
+                          "end": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "id": {
+                        "type": "flattened"
+                      },
+                      "keyword": {
+                        "type": "flattened"
+                      },
+                      "verification": {
+                        "properties": {
+                          "state": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "severity": {
+                        "properties": {
+                          "product": {
+                            "type": "flattened"
+                          },
+                          "normalized": {
+                            "type": "flattened"
+                          },
+                          "label": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "process": {
+                        "properties": {
+                          "parent": {
+                            "properties": {
+                              "pid": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "path": {
+                            "type": "flattened"
+                          },
+                          "launched_at": {
+                            "properties": {
+                              "date_range": {
+                                "properties": {
+                                  "unit": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "value": {
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "start": {
+                                "type": "date"
+                              },
+                              "end": {
+                                "type": "date"
+                              }
+                            }
+                          },
+                          "name": {
+                            "type": "flattened"
+                          },
+                          "pid": {
+                            "type": "flattened"
+                          },
+                          "terminated_at": {
+                            "properties": {
+                              "date_range": {
+                                "properties": {
+                                  "unit": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "value": {
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "start": {
+                                "type": "date"
+                              },
+                              "end": {
+                                "type": "date"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "product": {
+                        "properties": {
+                          "name": {
+                            "type": "flattened"
+                          },
+                          "arn": {
+                            "type": "flattened"
+                          },
+                          "fields": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "malware": {
+                        "properties": {
+                          "path": {
+                            "type": "flattened"
+                          },
+                          "name": {
+                            "type": "flattened"
+                          },
+                          "state": {
+                            "type": "flattened"
+                          },
+                          "type": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "workflow": {
+                        "properties": {
+                          "state": {
+                            "type": "flattened"
+                          },
+                          "status": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "resource": {
+                        "properties": {
+                          "container": {
+                            "properties": {
+                              "image": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  },
+                                  "id": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "launched_at": {
+                                "properties": {
+                                  "date_range": {
+                                    "properties": {
+                                      "unit": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "value": {
+                                        "type": "long"
+                                      }
+                                    }
+                                  },
+                                  "start": {
+                                    "type": "date"
+                                  },
+                                  "end": {
+                                    "type": "date"
+                                  }
+                                }
+                              },
+                              "name": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "aws_iam_access_key": {
+                            "properties": {
+                              "principal": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "created_at": {
+                                "properties": {
+                                  "date_range": {
+                                    "properties": {
+                                      "unit": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "value": {
+                                        "type": "long"
+                                      }
+                                    }
+                                  },
+                                  "start": {
+                                    "type": "date"
+                                  },
+                                  "end": {
+                                    "type": "date"
+                                  }
+                                }
+                              },
+                              "user": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "status": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "partition": {
+                            "type": "flattened"
+                          },
+                          "details_other": {
+                            "type": "flattened"
+                          },
+                          "id": {
+                            "type": "flattened"
+                          },
+                          "aws_iam_user": {
+                            "properties": {
+                              "user": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "region": {
+                            "type": "flattened"
+                          },
+                          "type": {
+                            "type": "flattened"
+                          },
+                          "aws_ec2_instance": {
+                            "properties": {
+                              "image": {
+                                "properties": {
+                                  "id": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "subnet": {
+                                "properties": {
+                                  "id": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "iam_instance_profile": {
+                                "properties": {
+                                  "arn": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "launched_at": {
+                                "properties": {
+                                  "date_range": {
+                                    "properties": {
+                                      "unit": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "value": {
+                                        "type": "long"
+                                      }
+                                    }
+                                  },
+                                  "start": {
+                                    "type": "date"
+                                  },
+                                  "end": {
+                                    "type": "date"
+                                  }
+                                }
+                              },
+                              "ip": {
+                                "properties": {
+                                  "v6_addresses": {
+                                    "type": "flattened"
+                                  },
+                                  "v4_addresses": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "vpc": {
+                                "properties": {
+                                  "id": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              },
+                              "type": {
+                                "type": "flattened"
+                              },
+                              "key": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "aws_s3_bucket": {
+                            "properties": {
+                              "owner": {
+                                "properties": {
+                                  "name": {
+                                    "type": "flattened"
+                                  },
+                                  "id": {
+                                    "type": "flattened"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "tags": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "record_state": {
+                        "type": "flattened"
+                      },
+                      "confidence": {
+                        "type": "flattened"
+                      },
+                      "sample": {
+                        "type": "flattened"
+                      },
+                      "threat_intel_indicator": {
+                        "properties": {
+                          "last_observed_at": {
+                            "properties": {
+                              "date_range": {
+                                "properties": {
+                                  "unit": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "value": {
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "start": {
+                                "type": "date"
+                              },
+                              "end": {
+                                "type": "date"
+                              }
+                            }
+                          },
+                          "source": {
+                            "type": "flattened"
+                          },
+                          "category": {
+                            "type": "flattened"
+                          },
+                          "type": {
+                            "type": "flattened"
+                          },
+                          "value": {
+                            "type": "flattened"
+                          },
+                          "source_url": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "recommendation_text": {
+                        "type": "flattened"
+                      },
+                      "last_observed_at": {
+                        "properties": {
+                          "date_range": {
+                            "properties": {
+                              "unit": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "start": {
+                            "type": "date"
+                          },
+                          "end": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "compliance": {
+                        "properties": {
+                          "status": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "region": {
+                        "type": "flattened"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

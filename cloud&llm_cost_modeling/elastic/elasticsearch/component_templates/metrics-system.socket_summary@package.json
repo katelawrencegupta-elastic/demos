@@ -1,0 +1,260 @@
+{
+  "name": "metrics-system.socket_summary@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-system.socket_summary-2.22.3",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "availability_zone": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "instance": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "provider": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "container": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "system": {
+            "properties": {
+              "socket": {
+                "properties": {
+                  "summary": {
+                    "properties": {
+                      "all": {
+                        "properties": {
+                          "listening": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "tcp": {
+                        "properties": {
+                          "all": {
+                            "properties": {
+                              "listening": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "established": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "syn_sent": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "syn_recv": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "closing": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "time_wait": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "last_ack": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "orphan": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "close_wait": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "fin_wait1": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              },
+                              "fin_wait2": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "memory": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "udp": {
+                        "properties": {
+                          "all": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "memory": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              },
+              "name": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "system"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "system.socket_summary"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "system"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

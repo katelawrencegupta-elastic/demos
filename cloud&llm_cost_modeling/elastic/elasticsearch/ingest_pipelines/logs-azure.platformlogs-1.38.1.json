@@ -1,0 +1,675 @@
+{
+  "name": "logs-azure.platformlogs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408246,
+  "description": "Pipeline for parsing azure platform logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408246,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
+        "params": {
+          "empty_field_name": "\"\":\"\","
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the `azureLogForwarder` field to `azure_log_forwarder` to workaround the issue with invalid field names in the Azure Native ISV logs.",
+        "override": false,
+        "field": "azureLogForwarder",
+        "target_field": "azure_log_forwarder"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the `azureLogForwarder.resourceType` field to `azure_log_forwarder.resource_type` to workaround the issue with invalid field names in the Azure Native ISV logs.",
+        "override": false,
+        "field": "azure_log_forwarder.resourceType",
+        "target_field": "azure_log_forwarder.resource_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the `azureLogForwarder.serviceProvider` field to `azure_log_forwarder.service_provider` to workaround the issue with invalid field names in the Azure Native ISV logs.",
+        "override": false,
+        "field": "azure_log_forwarder.serviceProvider",
+        "target_field": "azure_log_forwarder.service_provider"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the `dataStream` field to `data_stream` to workaround the issue with invalid field names in the Azure Native ISV logs.",
+        "override": false,
+        "field": "dataStream",
+        "target_field": "data_stream"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "description": "Use the `timestamp` field to set the `@timestamp` field to workaround the invalid field names in the Azure Native ISV logs.",
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "timestamp",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "timestamp",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "grok": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "event.original",
+              "patterns": [
+                "resourceId\": ?\"%{DATA:azure.platformlogs.resourceId}\""
+              ]
+            }
+          },
+          {
+            "grok": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "event.original",
+              "patterns": [
+                "category\": ?\"%{DATA:azure.platformlogs.category}\""
+              ]
+            }
+          },
+          {
+            "grok": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "event.original",
+              "patterns": [
+                "time\": ?\"%{DATA:azure.platformlogs.time}\""
+              ]
+            }
+          },
+          {
+            "set": {
+              "ignore_failure": true,
+              "field": "error.message",
+              "value": "Received invalid json from the Azure Cloud platform. Unable to parse the source log message"
+            }
+          },
+          {
+            "append": {
+              "ignore_failure": true,
+              "field": "tags",
+              "value": [
+                "preserve_original_event"
+              ]
+            }
+          }
+        ],
+        "field": "event.original",
+        "target_field": "azure.platformlogs"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "description": "Temporarily store the properties string.",
+        "field": "temp_properties",
+        "value": "{{azure.platformlogs.properties}}",
+        "if": "ctx.azure?.platformlogs?.properties instanceof String"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the properties string field.",
+        "field": "azure.platformlogs.properties",
+        "if": "ctx.temp_properties != null"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Convert single quotes to double quotes in the properties string to make it valid JSON.",
+        "source": "if (ctx?.temp_properties != null) {\n  ctx.temp_properties = ctx.temp_properties.replace(\"'\", \"\\\"\");\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "description": "Parse the stringified JSON properties field into a nested object.",
+        "field": "temp_properties",
+        "target_field": "azure.platformlogs.properties",
+        "if": "ctx.temp_properties != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the temporary field after successful parsing.",
+        "field": "temp_properties"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Standardize the `Identity` field name to `identity` for consistency.",
+        "field": "azure.platformlogs.Identity",
+        "target_field": "azure.platformlogs.identity"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename the field to `identity_name` to avoid conflicts with the `identity` containing a JSON object.",
+        "field": "azure.platformlogs.identity",
+        "target_field": "azure.platformlogs.identity_name",
+        "if": "ctx.azure?.platformlogs?.identity instanceof String"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.platformlogs.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.platformlogs.EventTimeString",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.platformlogs.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.resourceId",
+        "target_field": "azure.resource_id",
+        "if": "ctx?.azure?.resource_id == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.ResourceId",
+        "target_field": "azure.resource_id",
+        "if": "ctx?.azure?.resource_id == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.Region",
+        "target_field": "cloud.region"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename `Host` field to `host.name` for ECS compliance.",
+        "field": "azure.platformlogs.Host",
+        "target_field": "host.name"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.platformlogs.EventProperties",
+        "target_field": "azure.platformlogs.properties"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": [
+          "azure.platformlogs.EventProperties"
+        ],
+        "if": "ctx.azure.platformlogs.properties != null"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.platformlogs.properties.log",
+        "target_field": "azure.platformlogs.properties.log"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.properties.log",
+        "target_field": "message",
+        "if": "ctx.azure?.platformlogs?.properties?.log != null && ctx.azure?.platformlogs?.properties?.log instanceof String"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.EventName",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename `EventIpAddress` to `callerIpAddress` to be processed by subsequent processors.",
+        "field": "azure.platformlogs.EventIpAddress",
+        "target_field": "azure.platformlogs.callerIpAddress"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "azure.platformlogs.callerIpAddress",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.platformlogs.callerIpAddress",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.callerIpAddress",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "client.ip",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.level",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "azure.platformlogs.durationMs",
+        "target_field": "event.duration",
+        "ignore_missing": true,
+        "type": "long",
+        "if": "ctx?.azure?.platformlogs?.durationMs != null && ctx?.azure?.platformlogs?.durationMs instanceof String"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.platformlogs.durationMs",
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.location",
+        "target_field": "geo.name"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx?.azure?.platformlogs?.properties?.eventCategory != null) {\n  ctx.azure.platformlogs.event_category = ctx.azure.platformlogs.properties.eventCategory;\n} else if (ctx?.azure?.platformlogs?.properties?.policies != null)  {\n  ctx.azure.platformlogs.event_category = 'Policy';\n} else {\n  ctx.azure.platformlogs.event_category = 'Administrative';\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.resultType",
+        "target_field": "azure.platformlogs.result_type"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.platformlogs.result_type",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.azure?.platformlogs?.result_type != null && ctx.azure.platformlogs.result_type instanceof String && (ctx.azure.platformlogs.result_type.toLowerCase() == 'success' || ctx.azure.platformlogs.result_type.toLowerCase() == 'failure')"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.platformlogs.properties.result",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.event?.outcome == null && ctx?.azure?.platformlogs?.properties?.result != null && ctx?.azure?.platformlogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.platformlogs?.properties?.result)"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.platformlogs.Status",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.event?.outcome == null && ctx?.azure?.platformlogs?.Status != null && ctx?.azure?.platformlogs?.Status instanceof String && ['success', 'failure', 'unknown', 'Succeeded', 'Failed'].contains(ctx.azure?.platformlogs?.Status)"
+      }
+    },
+    {
+      "set": {
+        "override": true,
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.event?.outcome != null && ctx?.event?.outcome == \"Succeeded\""
+      }
+    },
+    {
+      "set": {
+        "override": true,
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.event?.outcome != null && ctx?.event?.outcome == \"Failed\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.operationName",
+        "target_field": "azure.platformlogs.operation_name"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.operation_name",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.resultSignature",
+        "target_field": "azure.platformlogs.result_signature"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.correlationId",
+        "target_field": "azure.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.properties.statusCode",
+        "target_field": "azure.platformlogs.properties.status_code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.Status",
+        "target_field": "azure.platformlogs.status"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "geo"
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx?.azure?.platformlogs?.category == null) {\n  return;\n} def category = ctx.azure.platformlogs.category.toLowerCase(); if (params.get(category) == null) {\n  return;\n} def hm = new HashMap(params.get(category)); hm.forEach((k, v) -> ctx.event[k] = v);",
+        "lang": "painless",
+        "params": {
+          "action": {
+            "type": [
+              "change"
+            ]
+          },
+          "read": {
+            "type": [
+              "access"
+            ]
+          },
+          "write": {
+            "type": [
+              "change"
+            ]
+          },
+          "delete": {
+            "type": [
+              "deletion"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.platformlogs-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.platformlogs-1.38.1-springcloudlogs-inner-pipeline",
+        "if": "ctx?.azure_log_forwarder?.resource_type != null && (ctx?.azure_log_forwarder?.resource_type == 'Microsoft.AppPlatform/Spring'|| ctx?.azure_log_forwarder?.resource_type == 'MICROSOFT.APPPLATFORM/SPRING')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs.resultDescription",
+        "target_field": "azure.platformlogs.result_description"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.platformlogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.platformlogs` dataset"
+      }
+    }
+  ]
+}

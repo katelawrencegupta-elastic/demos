@@ -1,0 +1,16 @@
+{
+  "description": "Extension point invoked by logs@default-pipeline. Workshop: GeoIP on host.ip.",
+  "processors": [
+    {
+      "pipeline": {
+        "name": "logs-workshop.host-geoip",
+        "ignore_missing_pipeline": true,
+        "description": "GeoIP lookup from host.ip into host.geo"
+      }
+    }
+  ],
+  "_meta": {
+    "managed_by": "slb_workshop",
+    "description": "Do not edit logs@default-pipeline; put processors here instead"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "traces-apm.sampled@template",
+  "index_template": {
+    "index_patterns": [
+      "traces-apm.sampled-*"
+    ],
+    "template": {
+      "mappings": {
+        "properties": {
+          "event.ingested": {
+            "format": "date_time_no_millis",
+            "type": "date",
+            "script": "emit(System.currentTimeMillis())"
+          },
+          "data_stream.dataset": {
+            "type": "constant_keyword",
+            "value": "apm.sampled"
+          },
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "traces"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "1h"
+      }
+    },
+    "composed_of": [
+      "traces@mappings",
+      "apm@mappings",
+      "apm@settings",
+      "traces-apm.sampled-fallback@ilm",
+      "traces@custom",
+      "traces-apm.sampled@custom",
+      "ecs@mappings"
+    ],
+    "priority": 210,
+    "version": 103,
+    "_meta": {
+      "description": "Index template for traces-apm.sampled-*",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "traces@custom",
+      "traces-apm.sampled@custom",
+      "traces-apm.sampled-fallback@ilm"
+    ],
+    "created_date_millis": 1786555716283,
+    "modified_date_millis": 1786555716283
+  }
+}

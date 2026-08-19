@@ -1,0 +1,661 @@
+{
+  "name": "logs-gcp.audit@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-gcp.audit-2.50.2",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "target": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "labels": {
+            "properties": {
+              "cluster_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "payload": {
+                "properties": {
+                  "resource": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "currentVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resourceType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "targetVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "project_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "cluster_location": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type_url": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "actor": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "related": {
+            "properties": {
+              "entity": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "gcp": {
+            "properties": {
+              "audit": {
+                "properties": {
+                  "request": {
+                    "type": "flattened"
+                  },
+                  "metadata": {
+                    "type": "flattened"
+                  },
+                  "access": {
+                    "properties": {
+                      "method_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "caller_ip_geo": {
+                        "properties": {
+                          "region_code": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "service_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "principal_email": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_agent": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "principal_subject": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "action_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "receive_timestamp": {
+                    "type": "date"
+                  },
+                  "learn_more_uri": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "policy_violation_info": {
+                    "properties": {
+                      "payload": {
+                        "type": "flattened"
+                      },
+                      "violations": {
+                        "type": "nested",
+                        "properties": {
+                          "checkedValue": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "policyType": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "errorMessage": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "constraint": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "resource_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_tags": {
+                        "type": "flattened"
+                      }
+                    }
+                  },
+                  "source_log_ids": {
+                    "properties": {
+                      "insert_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "query_uri": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_container": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "log_time": {
+                        "type": "date"
+                      }
+                    }
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resource_location": {
+                    "properties": {
+                      "current_locations": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "notification": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action_time": {
+                    "type": "date"
+                  },
+                  "method_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "affected_resources": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_data": {
+                    "properties": {
+                      "policy_delta": {
+                        "properties": {
+                          "binding_deltas": {
+                            "type": "nested",
+                            "properties": {
+                              "condition": {
+                                "properties": {
+                                  "expression": {
+                                    "type": "text"
+                                  },
+                                  "description": {
+                                    "type": "text"
+                                  },
+                                  "location": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "title": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              },
+                              "role": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "member": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "action": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "num_response_items": {
+                    "type": "long"
+                  },
+                  "authorization_info": {
+                    "type": "nested",
+                    "properties": {
+                      "resource": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "permission": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_attributes": {
+                        "properties": {
+                          "service": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "granted": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "flattened": {
+                    "type": "flattened"
+                  },
+                  "resource": {
+                    "properties": {
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "labels": {
+                        "properties": {
+                          "resource_container": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "request_metadata": {
+                    "properties": {
+                      "caller_ip": {
+                        "type": "ip"
+                      },
+                      "raw": {
+                        "properties": {
+                          "caller_ip": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "caller_supplied_user_agent": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "service_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "labels": {
+                    "type": "flattened"
+                  },
+                  "authentication_info": {
+                    "properties": {
+                      "service_account_key_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "third_party_principal": {
+                        "type": "flattened"
+                      },
+                      "principal_email": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authority_selector": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "principal_subject": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "service_account_delegation_info": {
+                        "type": "flattened"
+                      }
+                    }
+                  },
+                  "response": {
+                    "type": "flattened"
+                  },
+                  "logentry_operation": {
+                    "properties": {
+                      "last": {
+                        "type": "boolean"
+                      },
+                      "producer": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "first": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "resource_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "status": {
+                    "properties": {
+                      "code": {
+                        "type": "long"
+                      },
+                      "details": {
+                        "type": "flattened"
+                      },
+                      "message": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "destination": {
+                "properties": {
+                  "instance": {
+                    "properties": {
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "vpc": {
+                    "properties": {
+                      "vpc_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "subnetwork_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "source": {
+                "properties": {
+                  "instance": {
+                    "properties": {
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "vpc": {
+                    "properties": {
+                      "vpc_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "subnetwork_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "service": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              },
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "gcp"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "gcp.audit"
+              }
+            }
+          },
+          "user": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "entity": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "target": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

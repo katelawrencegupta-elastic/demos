@@ -1,0 +1,58 @@
+{
+  "name": "logs-azure_openai.logs-1.14.0-azure-shared-pipeline",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643486651,
+  "description": "Pipeline for parsing Azure shared log fields.",
+  "_meta": {
+    "package": {
+      "name": "azure_openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643486651,
+  "processors": [
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "azure"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "azure.resource.id",
+        "ignore_missing": true
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource.id",
+        "pattern_definitions": {
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+          "GROUPID": ".+",
+          "PROVIDERNAME": "([A-Za-z])\\w+.([A-Za-z])\\w+/([A-Za-z])\\w+.",
+          "NAME": ".+$"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}"
+        ]
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "cloud.account.id",
+        "copy_from": "azure.subscription_id"
+      }
+    }
+  ]
+}

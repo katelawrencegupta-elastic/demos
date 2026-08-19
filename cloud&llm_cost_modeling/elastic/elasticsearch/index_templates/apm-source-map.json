@@ -1,0 +1,47 @@
+{
+  "name": "apm-source-map",
+  "index_template": {
+    "index_patterns": [
+      ".apm-source-map"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "file.path": {
+            "type": "keyword"
+          },
+          "service.name": {
+            "type": "keyword"
+          },
+          "service.version": {
+            "type": "keyword"
+          },
+          "content_sha256": {
+            "type": "keyword"
+          },
+          "created": {
+            "type": "date"
+          },
+          "fleet_id": {
+            "type": "keyword"
+          },
+          "content": {
+            "type": "binary"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "version": 1,
+    "created_date_millis": 1786555731387,
+    "modified_date_millis": 1786555731387
+  }
+}

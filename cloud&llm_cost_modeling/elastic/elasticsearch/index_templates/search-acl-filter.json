@@ -1,0 +1,35 @@
+{
+  "name": "search-acl-filter",
+  "index_template": {
+    "index_patterns": [
+      ".search-acl-filter-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "number_of_replicas": "1"
+        }
+      },
+      "mappings": {
+        "dynamic": "false",
+        "properties": {
+          "created_at": {
+            "type": "date"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 110,
+    "version": 3,
+    "_meta": {
+      "description": "Built-in template for access control indices",
+      "managed": true
+    },
+    "allow_auto_create": true,
+    "created_date_millis": 1786555715148,
+    "modified_date_millis": 1786555715148
+  }
+}

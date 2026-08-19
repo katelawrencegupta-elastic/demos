@@ -1,0 +1,568 @@
+{
+  "id": "azure-5ee36c30-32dc-11ed-a2e6-916b60bbea71",
+  "data": {
+    "description": "Provide an overview and statistics of the Microsoft Entra ID Identity Protection activities on your enterprise applications.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-azure-default"
+    ],
+    "title": "[Logs Azure] Microsoft Entra ID Identity Protection",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "azure.identity_protection"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 10,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Detection Sources",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.identityprotection.category : \"UserRiskEvents\" "
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Source",
+              "fields": [
+                "azure.identityprotection.properties.source"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "0705b471-583f-4593-916e-46b213966691",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 8,
+          "x": 8,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Detected Risk Type",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.identityprotection.category : \"UserRiskEvents\" "
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Detected Risk Type",
+              "fields": [
+                "azure.identityprotection.properties.risk_event_type"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b5e5ace6-ace9-4c70-a6d2-60e2991a1d40",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 32,
+          "x": 16,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "Detection Timeline",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.identityprotection.category : \"UserRiskEvents\" "
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Risk Type Event",
+                "fields": [
+                  "azure.identityprotection.properties.risk_event_type"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Detected Date",
+                "field": "azure.identityprotection.properties.detected_datetime",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "854eeccf-1660-4c42-b5c9-23fd59f8546e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 16,
+          "x": 0,
+          "y": 10
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Risky Users",
+          "query": {
+            "language": "kql",
+            "expression": "azure.identityprotection.category : \"RiskyUsers\" "
+          },
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "custom",
+                  "max_lines": 3
+                },
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            },
+            "paging": 10
+          },
+          "metrics": [
+            {
+              "label": "Risk State",
+              "filter": {
+                "language": "kql",
+                "expression": "azure.identityprotection.properties.risk_state: *"
+              },
+              "field": "azure.identityprotection.properties.risk_state",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Name",
+              "fields": [
+                "azure.identityprotection.properties.user_display_name"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "48157948-c755-4eee-9f28-aa5846bcc8c9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 32,
+          "x": 16,
+          "y": 10
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Risky Sign-ins",
+          "query": {
+            "language": "kql",
+            "expression": " azure.identityprotection.category : \"UserRiskEvents\" "
+          },
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "custom",
+                  "max_lines": 3
+                },
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            },
+            "paging": 10
+          },
+          "metrics": [
+            {
+              "label": "Date",
+              "filter": {
+                "language": "kql",
+                "expression": "azure.identityprotection.properties.detected_datetime: *"
+              },
+              "field": "azure.identityprotection.properties.detected_datetime",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Name",
+              "fields": [
+                "azure.identityprotection.properties.user_display_name"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "IP Address",
+              "fields": [
+                "azure.identityprotection.properties.ip_address"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Risk State",
+              "fields": [
+                "azure.identityprotection.properties.risk_state"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Risk Level",
+              "fields": [
+                "azure.identityprotection.properties.risk_level"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Detection Timing",
+              "fields": [
+                "azure.identityprotection.properties.detection_timing_type"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "5d0136d7-0ba1-4054-95ce-218ad42e157e",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:46.871Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:48.454Z",
+    "version": "WzIyMiwxXQ=="
+  }
+}

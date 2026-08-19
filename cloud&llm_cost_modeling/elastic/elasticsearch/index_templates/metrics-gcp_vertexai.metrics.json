@@ -1,0 +1,49 @@
+{
+  "name": "metrics-gcp_vertexai.metrics",
+  "index_template": {
+    "index_patterns": [
+      "metrics-gcp_vertexai.metrics-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "gcp_vertexai"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@settings",
+      "metrics-gcp_vertexai.metrics@package",
+      "metrics@custom",
+      "gcp_vertexai@custom",
+      "metrics-gcp_vertexai.metrics@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "gcp_vertexai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "gcp_vertexai@custom",
+      "metrics-gcp_vertexai.metrics@custom"
+    ],
+    "created_date_millis": 1786643498683,
+    "modified_date_millis": 1786643498683
+  }
+}

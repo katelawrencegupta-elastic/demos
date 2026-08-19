@@ -1,0 +1,469 @@
+{
+  "name": "metrics-aws.redshift@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws.redshift-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "aws.*.metrics.*.*": {
+              "path_match": "aws.*.metrics.*.*",
+              "mapping": {
+                "type": "double"
+              },
+              "match_mapping_type": "double"
+            }
+          },
+          {
+            "aws.*.metrics.*": {
+              "path_match": "aws.*.metrics.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "aws.*.metrics": {
+              "path_match": "aws.*.metrics",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "aws.*": {
+              "path_match": "aws.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "dynamic": true,
+            "type": "object",
+            "properties": {
+              "redshift": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "ReadIOPS": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AutoVacuumSpaceFreed": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "PercentageQuotaUsed": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WLMQueriesCompletedPerSecond": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WriteThroughput": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalTableCount": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WLMQueueLength": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WLMQueueWaitTime": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "DatabaseConnections": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NetworkReceiveThroughput": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CPUUtilization": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "scaling_factor": 1000,
+                            "type": "scaled_float"
+                          }
+                        }
+                      },
+                      "QueryDuration": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SchemaQuota": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WriteLatency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "QueryRuntimeBreakdown": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ReadThroughput": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NumExceededSchemaQuotas": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NetworkTransmitThroughput": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HealthStatus": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "scaling_factor": 1000,
+                            "type": "scaled_float"
+                          }
+                        }
+                      },
+                      "ConcurrencyScalingActiveClusters": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CommitQueueLength": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WLMRunningQueries": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MaxConfiguredConcurrencyScalingClusters": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "StorageUsed": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WriteIOPS": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WLMQueryDuration": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ConcurrencyScalingSeconds": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "QueriesCompletedPerSecond": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MaintenanceMode": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "scaling_factor": 1000,
+                            "type": "scaled_float"
+                          }
+                        }
+                      },
+                      "PercentageDiskSpaceUsed": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "scaling_factor": 1000,
+                            "type": "scaled_float"
+                          }
+                        }
+                      },
+                      "ReadLatency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudwatch": {
+                "properties": {
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "dimensions": {
+                "properties": {
+                  "QueryPriority": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "stage": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "latency": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "NodeID": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "ClusterIdentifier": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "wlmid": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "InstanceType": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "QueueName": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "service_class": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "tags": {
+                "type": "flattened"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

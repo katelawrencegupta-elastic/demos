@@ -1,0 +1,126 @@
+{
+  "name": "logs-aws.emr_logs-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378992,
+  "description": "Pipeline for EMR logs",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378992,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version_0f7334bb",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original_c74b1d7e",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message_2ee3a7d4",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "tag": "grok_event_original_46a3eccb",
+        "field": "event.original",
+        "pattern_definitions": {
+          "GREEDYMULTILINE": "(.|\\n)*"
+        },
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:_tmp.timestamp}%{SPACE}%{LOGLEVEL:log.level}%{SPACE}%{DATA:process.name}(?:\\\\[%{GREEDYDATA:process.entrypoint}\\\\])?:%{SPACE}%{GREEDYDATA:message}%{SPACE}%{GREEDYMULTILINE:process.message}"
+        ]
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "tag": "date__tmp_timestamp_to_timestamp_a2e51d3f",
+        "formats": [
+          "ISO8601",
+          "yyyy-MM-dd HH:mm:ss,SSS"
+        ],
+        "field": "_tmp.timestamp",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_3f4f84fc",
+        "field": [
+          "_tmp"
+        ]
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Drops null/empty values recursively",
+        "tag": "script_9d6fa8ba",
+        "source": "boolean drop(Object o) {\n  if (o == null || o == \"\") {\n    return true;\n  } else if (o instanceof Map) {\n    ((Map) o).values().removeIf(v -> drop(v));\n    return (((Map) o).size() == 0);\n  } else if (o instanceof List) {\n    ((List) o).removeIf(v -> drop(v));\n    return (((List) o).length == 0);\n  }\n  return false;\n}\ndrop(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.emr_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.emr_logs` dataset"
+      }
+    }
+  ]
+}

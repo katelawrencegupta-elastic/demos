@@ -1,0 +1,136 @@
+{
+  "name": "logs-gcp_vertexai.prompt_response_logs-1.5.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643498031,
+  "description": "Pipeline for Google Cloud Vertex AI Prompt Response logs",
+  "_meta": {
+    "package": {
+      "name": "gcp_vertexai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643498031,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.vertexai_logs",
+        "target_field": "gcp.vertexai.prompt_response_logs"
+      }
+    },
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.17.0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.type",
+        "value": [
+          "info"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.service.name",
+        "value": "vertex-ai"
+      }
+    },
+    {
+      "set": {
+        "field": "service.name",
+        "value": "vertex-ai"
+      }
+    },
+    {
+      "set": {
+        "field": "service.type",
+        "value": "ai-platform"
+      }
+    },
+    {
+      "set": {
+        "field": "event.action",
+        "copy_from": "gcp.vertexai.prompt_response_logs.api_method",
+        "if": "ctx.gcp?.vertexai?.prompt_response_logs?.api_method != null"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "Map keysToSnakeCase(Map m) {\n    def regex = /_?([a-z])([A-Z]+)/;\n    def snakeCaseMap = [:];\n    for (entry in m.entrySet()) {\n    def k = entry.getKey();\n    def v = entry.getValue();\n    if (v instanceof Map) {\n        v = keysToSnakeCase(v);\n    } else if (v instanceof List) {\n        for (int i = 0; i < v.size(); i++) {\n        def item = v.get(i);\n        if (item instanceof Map) {\n            v.set(i, keysToSnakeCase(item));\n        }\n        }\n    }\n    k = regex.matcher(k).replaceAll('$1_$2').toLowerCase();\n    snakeCaseMap.put(k, v);\n    }\n    return snakeCaseMap;\n}\n\nif (ctx.gcp?.vertexai?.prompt_response_logs?.full_request != null) {\n    ctx.gcp.vertexai.prompt_response_logs.full_request = keysToSnakeCase(ctx.gcp.vertexai.prompt_response_logs.full_request);\n}\nif (ctx.gcp?.vertexai?.prompt_response_logs?.full_response != null) {\n    ctx.gcp.vertexai.prompt_response_logs.full_response = keysToSnakeCase(ctx.gcp.vertexai.prompt_response_logs.full_response);\n}\n"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Drops null/empty values recursively.",
+        "tag": "painless_remove_null",
+        "source": "boolean drop(Object object) {\n  if (object == null || object == '') {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(v -> drop(v));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(v -> drop(v));\n    return (((List) object).length == 0);\n  }\n  return false;\n}\ndrop(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "field": "gcp.vertexai_logs",
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp_vertexai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp_vertexai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp_vertexai.prompt_response_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp_vertexai.prompt_response_logs` dataset"
+      }
+    }
+  ]
+}

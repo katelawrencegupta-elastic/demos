@@ -1,0 +1,138 @@
+{
+  "name": ".chat-agents",
+  "index_template": {
+    "index_patterns": [
+      ".chat-agents-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "83f238c87ae24f889e211edcf800178b6970447a"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "access_control": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "entries": {
+                "type": "nested",
+                "properties": {
+                  "role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "access_mode": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "description": {
+            "type": "text"
+          },
+          "created_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "avatar_symbol": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "type": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "created_by_name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "space": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "labels": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "avatar_color": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "updated_by_name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "updated_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "updated_by_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "created_by_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "config": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "workflow_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "skill_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "ai_indices": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "plugin_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "connector_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      },
+      "aliases": {
+        ".chat-agents": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "83f238c87ae24f889e211edcf800178b6970447a"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1786555731830,
+    "modified_date_millis": 1786556240361
+  }
+}

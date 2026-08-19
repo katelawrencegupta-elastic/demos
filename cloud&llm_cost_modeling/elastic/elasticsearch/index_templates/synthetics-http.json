@@ -1,0 +1,46 @@
+{
+  "name": "synthetics-http",
+  "index_template": {
+    "index_patterns": [
+      "synthetics-http-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "synthetics"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "synthetics-http@package",
+      "synthetics@custom",
+      "synthetics-http@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "synthetics"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "synthetics@custom",
+      "synthetics-http@custom"
+    ],
+    "created_date_millis": 1786555762404,
+    "modified_date_millis": 1786555762404
+  }
+}

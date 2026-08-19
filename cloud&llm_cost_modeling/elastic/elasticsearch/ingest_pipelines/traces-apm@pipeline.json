@@ -1,0 +1,66 @@
+{
+  "name": "traces-apm@pipeline",
+  "modified_date_millis": 1786555720159,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in ingest pipeline for traces-apm-* data streams",
+  "created_date_millis": 1786555720159,
+  "processors": [
+    {
+      "set": {
+        "field": "processor.event",
+        "if": "ctx.transaction?.type != null",
+        "value": "transaction"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "processor.event",
+        "value": "span"
+      }
+    },
+    {
+      "script": {
+        "if": "ctx[ctx.processor.event]?.duration == null",
+        "source": "def eventDuration = ctx.event?.duration ?: 0;\ndef rootObjectName = ctx.processor?.event;\ndef rootObject = ctx[rootObjectName];\nif (rootObject == null) {\n  rootObject = [:];\n  ctx[rootObjectName] = rootObject;\n}\nrootObject.duration = [\"us\": (long)(eventDuration/1000)];\n"
+      }
+    },
+    {
+      "remove": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": [
+          "event.duration"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.success_count",
+        "if": "ctx.event?.outcome == 'failure'",
+        "value": 0
+      }
+    },
+    {
+      "set": {
+        "field": "event.success_count",
+        "if": "ctx.event?.outcome == 'success'",
+        "value": 1
+      }
+    },
+    {
+      "script": {
+        "if": "ctx.event?.outcome == 'success' && ctx[ctx.processor?.event]?.representative_count != null",
+        "source": "ctx.event.success_count = ctx[ctx.processor?.event]?.representative_count;"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "apm@pipeline"
+      }
+    }
+  ],
+  "version": 103
+}

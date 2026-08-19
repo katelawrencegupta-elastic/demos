@@ -1,0 +1,21 @@
+{
+  "name": ".slo-observability.sli-v3.6",
+  "index_template": {
+    "index_patterns": [
+      ".slo-observability.sli-v3.6*"
+    ],
+    "composed_of": [
+      ".slo-observability.sli-mappings-v3.6",
+      ".slo-observability.sli-settings-v3.6"
+    ],
+    "priority": 600,
+    "_meta": {
+      "description": "Template for SLO rollup data",
+      "managed_by": "observability",
+      "version": 3.6,
+      "managed": true
+    },
+    "created_date_millis": 1786555747233,
+    "modified_date_millis": 1786555747233
+  }
+}

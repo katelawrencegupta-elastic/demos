@@ -1,0 +1,55 @@
+{
+  "name": "logs.otel@stream",
+  "index_template": {
+    "index_patterns": [
+      "logs.otel"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs.otel@stream.processing"
+        }
+      },
+      "mappings": {
+        "properties": {
+          "stream.name": {
+            "type": "constant_keyword",
+            "value": "logs.otel"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true
+      },
+      "data_stream_options": {
+        "failure_store": {
+          "enabled": true,
+          "lifecycle": {
+            "enabled": true,
+            "data_retention": "30d"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "logs.otel@stream.layer"
+    ],
+    "priority": 9223372036854775807,
+    "version": 1,
+    "_meta": {
+      "description": "The index template for logs.otel stream",
+      "managed_by": "streams",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "logs.otel@stream.layer"
+    ],
+    "created_date_millis": 1786555746820,
+    "modified_date_millis": 1786555746820
+  }
+}

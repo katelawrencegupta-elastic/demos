@@ -1,0 +1,23 @@
+{
+  "name": "ai-index-idx",
+  "index_template": {
+    "index_patterns": [
+      "ai-index-idx-*"
+    ],
+    "composed_of": [
+      "ai-index@mappings",
+      "ai-index@custom"
+    ],
+    "priority": 500,
+    "version": 2,
+    "_meta": {
+      "description": "Template applied by default to standard-index backed AI indices.",
+      "managed": true
+    },
+    "ignore_missing_component_templates": [
+      "ai-index@custom"
+    ],
+    "created_date_millis": 1786555715915,
+    "modified_date_millis": 1786631516961
+  }
+}

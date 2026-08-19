@@ -1,0 +1,505 @@
+{
+  "id": "gcp_vertexai-d566516f-06fd-47e0-aba1-44148598c59a",
+  "data": {
+    "description": "Overview of the VertexAI audit log data from Google Cloud.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-gcp_vertexai-default"
+    ],
+    "title": "[GCP VertexAI] AuditLogs",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 0,
+          "y": 17
+        },
+        "config": {
+          "type": "pie",
+          "title": "Audit event action",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp_vertexai.auditlogs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "event.action: Descending",
+              "fields": [
+                "event.action"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "5fc9d243-b394-4977-bf51-1768a3523200",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 24,
+          "y": 17
+        },
+        "config": {
+          "type": "pie",
+          "title": "Audit user agent",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp_vertexai.auditlogs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "User Agent",
+              "fields": [
+                "user_agent.name"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "3a657f29-e03a-4830-9a1f-675ea2ee81aa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 36,
+          "y": 17
+        },
+        "config": {
+          "type": "pie",
+          "title": "Audit resource name",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp_vertexai.auditlogs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Resource Name",
+              "fields": [
+                "gcp.vertexai.audit.resource_name"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "de50b46c-7b5b-40d1-8af8-e39fccf16cf0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 12,
+          "x": 12,
+          "y": 17
+        },
+        "config": {
+          "type": "pie",
+          "title": "Audit event email",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp_vertexai.auditlogs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Users",
+              "fields": [
+                "client.user.email"
+              ],
+              "limit": 15,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "8f1327de-f061-4b8b-82bc-03b99b86d5c8",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 48,
+          "x": 0,
+          "y": 31
+        },
+        "config": {
+          "description": "",
+          "title": "VertexAI Audit event ",
+          "ref_id": "gcp_vertexai-201625b6-343e-43c7-ab67-e77d1f8ed790",
+          "overrides": {
+            "column_settings": {
+              "event.action": {
+                "width": 290
+              },
+              "gcp.vertexai.audit.service_name": {
+                "width": 368
+              },
+              "gcp.vertexai.audit.type": {
+                "width": 1074
+              }
+            }
+          }
+        },
+        "id": "d4ce3f8d-9753-4c8c-99f1-25bb8a832c4e",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 2,
+          "w": 48,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "links": [
+            {
+              "type": "dashboardLink",
+              "destination": "gcp_vertexai-d566516f-06fd-47e0-aba1-44148598c59a",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "type": "dashboardLink",
+              "destination": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "horizontal"
+        },
+        "id": "cb0b5812-19e9-4f5f-8324-3b94f927a69c",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 36,
+          "y": 2
+        },
+        "config": {
+          "type": "data_table",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "field": "source.geo.region_name",
+              "empty_as_null": true,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Region Name ",
+              "fields": [
+                "source.geo.region_name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "3daeb1cb-0a9d-43f2-a91a-b7d7b2737424",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-13T17:51:37.740Z",
+    "managed": true,
+    "updated_at": "2026-08-13T17:51:39.296Z",
+    "version": "WzQ3NSwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: map. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "map",
+      "panel_config": {
+        "description": "",
+        "hiddenLayers": [],
+        "isLayerTOCOpen": false,
+        "mapBuffer": {
+          "maxLat": 85.05113,
+          "maxLon": 360,
+          "minLat": -66.51326,
+          "minLon": -270
+        },
+        "mapCenter": {
+          "lat": 44.53083,
+          "lon": 24.03939,
+          "zoom": 1.24
+        },
+        "openTOCDetails": [],
+        "savedObjectId": "gcp_vertexai-a60a5081-be88-4802-aea1-fd33bd008591",
+        "title": "VertexAI Audit source locations"
+      }
+    }
+  ]
+}

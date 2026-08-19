@@ -1,0 +1,53 @@
+{
+  "name": "metrics-elastic_agent.packetbeat",
+  "index_template": {
+    "index_patterns": [
+      "metrics-elastic_agent.packetbeat-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "elastic_agent"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-elastic_agent.packetbeat@package",
+      "metrics@custom",
+      "elastic_agent@custom",
+      "metrics-elastic_agent.packetbeat@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "elastic_agent"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "elastic_agent@custom",
+      "metrics-elastic_agent.packetbeat@custom"
+    ],
+    "created_date_millis": 1786558591201,
+    "modified_date_millis": 1786558591201
+  }
+}

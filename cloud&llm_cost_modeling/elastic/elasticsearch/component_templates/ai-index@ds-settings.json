@@ -1,0 +1,24 @@
+{
+  "name": "ai-index@ds-settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "sort": {
+            "field": "@timestamp",
+            "order": "desc"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "90d"
+      }
+    },
+    "version": 2,
+    "_meta": {
+      "description": "Template settings applied by default to data stream backed AI indices.",
+      "managed": true
+    }
+  }
+}

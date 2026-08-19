@@ -1,0 +1,183 @@
+{
+  "title": "SRE-01 Workshop — Traces",
+  "description": "EDOT / Managed OTLP traces on traces-workshop.otel.otel-default. Same layout as Platform logs.",
+  "time_range": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Total spans",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Failures",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE attributes.`event.outcome` == \"failure\" | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 32, "y": 0, "w": 16, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "HTTP 5xx",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE attributes.`http.response.status_code` >= 500 | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 5, "w": 48, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "Span volume by service",
+        "axis": {
+          "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY `@timestamp` = BUCKET(@timestamp, 75, ?_tstart, ?_tend), resource.attributes.`service.name`"
+            },
+            "x": { "column": "@timestamp", "label": "@timestamp" },
+            "y": [{ "column": "count" }],
+            "breakdown_by": { "column": "resource.attributes.service.name" }
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "pie",
+        "title": "Spans by outcome",
+        "styling": { "donut_hole": "m" },
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY attributes.`event.outcome`"
+        },
+        "metrics": [{ "column": "count" }],
+        "group_by": [{ "column": "attributes.event.outcome" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "Spans by service",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY resource.attributes.`service.name` | SORT count DESC | LIMIT 10"
+            },
+            "x": { "column": "resource.attributes.service.name" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 32, "y": 15, "w": 16, "h": 10 },
+      "config": {
+        "type": "xy",
+        "title": "HTTP status codes",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE attributes.`http.response.status_code` IS NOT NULL | STATS count = COUNT(*) BY attributes.`http.response.status_code` | SORT count DESC"
+            },
+            "x": { "column": "attributes.http.response.status_code" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 25, "w": 48, "h": 10 },
+      "config": {
+        "type": "data_table",
+        "title": "Failures by service and span",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE attributes.`event.outcome` == \"failure\" | STATS count = COUNT(*) BY resource.attributes.`service.name`, name | SORT count DESC | LIMIT 25"
+        },
+        "metrics": [{ "column": "count" }],
+        "rows": [{ "column": "resource.attributes.service.name" }, { "column": "name" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 35, "w": 16, "h": 12 },
+      "config": {
+        "type": "pie",
+        "title": "GeoIP by country",
+        "styling": { "donut_hole": "m" },
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.geo.country_name IS NOT NULL | STATS count = COUNT(*) BY host.geo.country_name"
+        },
+        "metrics": [{ "column": "count" }],
+        "group_by": [{ "column": "host.geo.country_name" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 35, "w": 32, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "GeoIP by country",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-workshop.otel.otel-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.geo.country_name IS NOT NULL | STATS count = COUNT(*) BY host.geo.country_name | SORT count DESC | LIMIT 10"
+            },
+            "x": { "column": "host.geo.country_name" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    }
+  ]
+}

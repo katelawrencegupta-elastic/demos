@@ -1,0 +1,1045 @@
+{
+  "id": "aws-3dc1a3a8-ae96-43aa-9065-074bda487262",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default"
+    ],
+    "title": "[Logs AWS] WAF Log Overview",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 4,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Total Request",
+              "empty_as_null": false,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ]
+        },
+        "id": "a88b2010-d019-43d3-90e4-e2f0ac0ab2aa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 12,
+          "x": 24,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "72fb021e-146c-44dc-845a-800bb43ecdf0",
+              "type": "condition",
+              "condition": {
+                "field": "event.action",
+                "operator": "is",
+                "value": "ALLOW"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Total Allowed Request",
+              "empty_as_null": false,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#54B399"
+              }
+            }
+          ]
+        },
+        "id": "2f034189-d484-4c02-bfc4-87d78b79e6af",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 12,
+          "x": 36,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "11884407-8be8-4c90-bf3f-2f6066cb08df",
+              "type": "condition",
+              "condition": {
+                "field": "event.action",
+                "operator": "is",
+                "value": "BLOCK"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Total Blocked Request",
+              "empty_as_null": false,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#E7664C"
+              }
+            }
+          ]
+        },
+        "id": "080d135d-8c0e-45f7-aa39-bd01de70addf",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 36,
+          "x": 12,
+          "y": 4
+        },
+        "config": {
+          "type": "xy",
+          "title": "Request by Action over Time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Event Action",
+                "fields": [
+                  "event.action"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": [
+                    {
+                      "values": [
+                        "ALLOW"
+                      ],
+                      "color": {
+                        "type": "from_palette",
+                        "index": 0,
+                        "palette": "eui_amsterdam"
+                      }
+                    },
+                    {
+                      "values": [
+                        "BLOCK"
+                      ],
+                      "color": {
+                        "type": "from_palette",
+                        "index": 9,
+                        "palette": "eui_amsterdam"
+                      }
+                    }
+                  ]
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "fd6a2712-3080-47cc-99dc-7650789f48aa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 48,
+          "x": 0,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "Top Countries by Request Status",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Event Action",
+                "fields": [
+                  "event.action"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": [
+                    {
+                      "values": [
+                        "ALLOW"
+                      ],
+                      "color": {
+                        "type": "from_palette",
+                        "index": 0,
+                        "palette": "eui_amsterdam"
+                      }
+                    },
+                    {
+                      "values": [
+                        "BLOCK"
+                      ],
+                      "color": {
+                        "type": "from_palette",
+                        "index": 9,
+                        "palette": "eui_amsterdam"
+                      }
+                    }
+                  ]
+                }
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Country",
+                "fields": [
+                  "source.geo.country_name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ]
+        },
+        "id": "855111a1-2337-4aca-8a87-a7d77e33c09f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 24,
+          "x": 0,
+          "y": 45
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Source IP",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Source IP",
+              "fields": [
+                "source.ip"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "8eceb4b7-b562-4264-af59-de5433cb2c46",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 24,
+          "x": 24,
+          "y": 45
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Blocked URL Path",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "a6cf8090-9738-46ee-bc71-c2721e18707a",
+              "type": "condition",
+              "condition": {
+                "field": "event.action",
+                "operator": "is",
+                "value": "BLOCK"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "URL Path",
+              "fields": [
+                "url.path"
+              ],
+              "limit": 9,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "fd3488f0-26ce-4739-894e-cf27b481446e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 18,
+          "x": 30,
+          "y": 17
+        },
+        "config": {
+          "type": "pie",
+          "title": "Request by Source Name",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Source Name",
+              "fields": [
+                "aws.waf.source.name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "f8141d27-b305-4e54-9fe7-752a6a1b31fd",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 30,
+          "x": 0,
+          "y": 17
+        },
+        "config": {
+          "type": "xy",
+          "title": "Request by Terminating Rules over Time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "aws.waf"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "area",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Rule ID",
+                "fields": [
+                  "rule.id"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "4224e488-4504-412c-8679-1e4d74165028",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "74f584d1-4e87-4d04-b517-a80b6f6480c8",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Action",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "event.action",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "d081ee9d-2687-48f8-954c-a5f15aeb8870",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Ruleset",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "rule.ruleset",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "845295e0-16d3-4195-b21a-6639cd724007",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Request Method",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "http.request.method",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:21.831Z",
+    "version": "Wzg0LDFd"
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Overview**\n\nThis dashboard visualizes traffic and threat patterns from AWS WAF logs integration.\n\nThis dashboard includes  request trends by action and rule, country and source distribution, top\nIPs and blocked URL paths. Use this dashboard to monitor attacks, validate WAF rule performance, and detect unusual\ntraffic behavior.\n\n[**Integration Page**](/app/integrations/detail/aws/overview?integration=waf)",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Table of Content"
+      }
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "name": "logs-azure.identity_protection@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure.identity_protection-1.38.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "geo": {
+            "properties": {
+              "continent_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "region_iso_code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "city_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_iso_code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "location": {
+                "type": "geo_point"
+              },
+              "region_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "azure"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "azure.identity_protection"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "tenant_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "correlation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "identityprotection": {
+                "properties": {
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "properties": {
+                    "properties": {
+                      "activity": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_guest": {
+                        "type": "boolean"
+                      },
+                      "resource_tenant_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "risk_last_updated_datetime": {
+                        "type": "date"
+                      },
+                      "token_issuer_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_deleted": {
+                        "type": "boolean"
+                      },
+                      "user_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_processing": {
+                        "type": "boolean"
+                      },
+                      "detected_datetime": {
+                        "type": "date"
+                      },
+                      "risk_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "home_tenant_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "ip_address": {
+                        "type": "ip"
+                      },
+                      "risk_detail": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "risk_state": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "cross_tenant_access_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "risk_level": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_principal_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "additional_info": {
+                        "type": "flattened"
+                      },
+                      "user_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "correlation_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "last_updated_datetime": {
+                        "type": "date"
+                      },
+                      "activity_datetime": {
+                        "type": "date"
+                      },
+                      "location": {
+                        "type": "flattened"
+                      },
+                      "risk_event_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "detection_timing_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "request_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_display_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,671 @@
+{
+  "name": "logs-azure.provisioning-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408246,
+  "description": "Pipeline for parsing Azure Provisioning logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408246,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
+        "params": {
+          "empty_field_name": "\"\":\"\","
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "azure.provisioning"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop events that are not Azure Provisioning logs.",
+        "if": "ctx?.azure?.provisioning?.category == null || ctx.azure.provisioning.category != 'ProvisioningLogs'"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "ISO8601",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.provisioning.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.provisioning.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "azure.provisioning.callerIpAddress",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.provisioning.callerIpAddress",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.callerIpAddress",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.durationMs",
+        "target_field": "event.duration"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.resultType",
+        "target_field": "azure.provisioning.result_type"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.provisioning.result_type",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.azure?.provisioning?.result_type != null && ctx.azure.provisioning.result_type instanceof String && (ctx.azure.provisioning.result_type.toLowerCase() == 'success' || ctx.azure.provisioning.result_type.toLowerCase() == 'failure')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.operationName",
+        "target_field": "azure.provisioning.operation_name"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.operation_name",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.operationVersion",
+        "target_field": "azure.provisioning.operation_version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.tenantId",
+        "target_field": "azure.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.Level",
+        "target_field": "azure.provisioning.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.resultSignature",
+        "target_field": "azure.provisioning.result_signature"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.correlationId",
+        "target_field": "azure.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.tenantId",
+        "target_field": "azure.provisioning.properties.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.activityDateTime",
+        "target_field": "azure.provisioning.properties.activity_datetime"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.changeId",
+        "target_field": "azure.provisioning.properties.change_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.cycleId",
+        "target_field": "azure.provisioning.properties.cycle_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.durationInMilliseconds",
+        "target_field": "azure.provisioning.properties.duration_ms"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.initiatedBy",
+        "target_field": "azure.provisioning.properties.initiated_by"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.initiated_by.Id",
+        "target_field": "azure.provisioning.properties.initiated_by.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.initiated_by.Name",
+        "target_field": "azure.provisioning.properties.initiated_by.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.initiated_by.Type",
+        "target_field": "azure.provisioning.properties.initiated_by.type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.jobId",
+        "target_field": "azure.provisioning.properties.job_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.modifiedProperties",
+        "target_field": "azure.provisioning.properties.modified_properties"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.modified_properties.displayName",
+        "target_field": "azure.provisioning.properties.modified_properties.display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.modified_properties.newValue",
+        "target_field": "azure.provisioning.properties.modified_properties.new_value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.modified_properties.oldValue",
+        "target_field": "azure.provisioning.properties.modified_properties.old_value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioningAction",
+        "target_field": "azure.provisioning.properties.provisioning_action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioningStatusInfo",
+        "target_field": "azure.provisioning.properties.provisioning_status_info"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.Status",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.status"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove errorInformation if it is null to avoid field value parsing errors",
+        "field": "azure.provisioning.properties.provisioning_status_info.errorInformation",
+        "if": "ctx?.azure?.provisioning?.properties?.provisioning_status_info?.errorInformation == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.errorInformation",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.error_information"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.error_information.additionalDetails",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.error_information.additional_details"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.error_information.errorCategory",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.error_information.error_category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.error_information.errorCode",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.error_information.error_code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_status_info.error_information.recommendedAction",
+        "target_field": "azure.provisioning.properties.provisioning_status_info.error_information.recommended_action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.servicePrincipal",
+        "target_field": "azure.provisioning.properties.service_principal"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.service_principal.Id",
+        "target_field": "azure.provisioning.properties.service_principal.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.service_principal.Name",
+        "target_field": "azure.provisioning.properties.service_principal.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.sourceIdentity",
+        "target_field": "azure.provisioning.properties.source_identity"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_identity.Id",
+        "target_field": "azure.provisioning.properties.source_identity.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_identity.Name",
+        "target_field": "azure.provisioning.properties.source_identity.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_identity.identityType",
+        "target_field": "azure.provisioning.properties.source_identity.identity_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_identity.details.DisplayName",
+        "target_field": "azure.provisioning.properties.source_identity.details.display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_identity.details.UserPrincipalName",
+        "target_field": "azure.provisioning.properties.source_identity.details.user_principal_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.targetIdentity",
+        "target_field": "azure.provisioning.properties.target_identity"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_identity.Id",
+        "target_field": "azure.provisioning.properties.target_identity.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_identity.Name",
+        "target_field": "azure.provisioning.properties.target_identity.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_identity.identityType",
+        "target_field": "azure.provisioning.properties.target_identity.identity_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_identity.details.DisplayName",
+        "target_field": "azure.provisioning.properties.target_identity.details.display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_identity.details.UserPrincipalName",
+        "target_field": "azure.provisioning.properties.target_identity.details.user_principal_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.sourceSystem",
+        "target_field": "azure.provisioning.properties.source_system"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_system.Id",
+        "target_field": "azure.provisioning.properties.source_system.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_system.Name",
+        "target_field": "azure.provisioning.properties.source_system.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_system.details.ApplicationId",
+        "target_field": "azure.provisioning.properties.source_system.details.application_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_system.details.ServicePrincipalDisplayName",
+        "target_field": "azure.provisioning.properties.source_system.details.dervice_principal_display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.source_system.details.ServicePrincipalId",
+        "target_field": "azure.provisioning.properties.source_system.details.service_principal_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.targetSystem",
+        "target_field": "azure.provisioning.properties.target_system"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_system.Id",
+        "target_field": "azure.provisioning.properties.target_system.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_system.Name",
+        "target_field": "azure.provisioning.properties.target_system.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_system.details.ApplicationId",
+        "target_field": "azure.provisioning.properties.target_system.details.application_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_system.details.ServicePrincipalDisplayName",
+        "target_field": "azure.provisioning.properties.target_system.details.dervice_principal_display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.target_system.details.ServicePrincipalId",
+        "target_field": "azure.provisioning.properties.target_system.details.service_principal_id"
+      }
+    },
+    {
+      "remove": {
+        "description": "It looks like statusInfo contains the same information as provisioningStatusInfo, so we remove it. The statusInfo field is not documented at https://docs.microsoft.com/en-us/azure/azure-monitor/reference/tables/aadprovisioninglogs.\n",
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.statusInfo"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioningSteps",
+        "target_field": "azure.provisioning.properties.provisioning_steps"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.provisioning_steps",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "field": "_ingest._value.provisioningStepType",
+            "target_field": "_ingest._value.provisioning_step_type"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.provisioning.properties.activityDateTime",
+        "target_field": "azure.provisioning.properties.activity_datetime"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.provisioning-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.provisioning@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.provisioning` dataset"
+      }
+    }
+  ]
+}

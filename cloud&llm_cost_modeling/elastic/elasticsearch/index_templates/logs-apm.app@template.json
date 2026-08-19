@@ -1,0 +1,45 @@
+{
+  "name": "logs-apm.app@template",
+  "index_template": {
+    "index_patterns": [
+      "logs-apm.app.*-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-apm.app@default-pipeline",
+          "final_pipeline": "logs-apm@pipeline"
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "apm@mappings",
+      "apm@settings",
+      "apm-10d@lifecycle",
+      "logs-apm@settings",
+      "logs-apm.app-fallback@ilm",
+      "logs@custom",
+      "logs-apm.app@custom",
+      "ecs@mappings"
+    ],
+    "priority": 210,
+    "version": 103,
+    "_meta": {
+      "description": "Index template for logs-apm.app.*-*",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "logs-apm.app@custom",
+      "logs-apm.app-fallback@ilm"
+    ],
+    "created_date_millis": 1786555716301,
+    "modified_date_millis": 1786555716301
+  }
+}

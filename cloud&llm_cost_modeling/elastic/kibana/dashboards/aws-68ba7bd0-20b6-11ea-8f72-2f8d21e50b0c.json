@@ -1,0 +1,1263 @@
+{
+  "id": "aws-68ba7bd0-20b6-11ea-8f72-2f8d21e50b0c",
+  "data": {
+    "description": "Overview of DynamoDB AWS Cloudwatch metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default",
+      "security-solution-default"
+    ],
+    "title": "[Metrics AWS] DynamoDB Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.dynamodb"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 9,
+          "w": 17,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "Consumed Read Capacity Units",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "41098b1c-1235-4e3d-abce-12881e711800",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 16,
+          "x": 17,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "Consumed Write Capacity Units",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "16ee4814-23ac-4ea7-bbac-047c401dc419",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 15,
+          "x": 33,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "Max Read/Write Account Limits",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Account Max Reads",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": true
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar",
+              "y": [
+                {
+                  "label": "Reads",
+                  "field": "aws.dynamodb.metrics.AccountMaxReads.max",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Table Reads",
+                  "field": "aws.dynamodb.metrics.AccountMaxTableLevelReads.max",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Writes",
+                  "field": "aws.dynamodb.metrics.AccountMaxWrites.max",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Table Writes",
+                  "field": "aws.dynamodb.metrics.AccountMaxTableLevelWrites.max",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "id": "1bd7141d-b410-4ca0-8550-f8f645d97983",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 17,
+          "x": 0,
+          "y": 9
+        },
+        "config": {
+          "type": "xy",
+          "title": "Successful Request Latency",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "d2265eb9-a514-41cd-b74a-dd64038b9da5",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 17,
+          "y": 9
+        },
+        "config": {
+          "type": "xy",
+          "title": "Read Throttle Events",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.ReadThrottleEvents.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "cc033c54-b309-49d1-a85f-e531e825a987",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 15,
+          "x": 33,
+          "y": 9
+        },
+        "config": {
+          "type": "xy",
+          "title": "Throttle Requests",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.ThrottledRequests.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "40f53b55-57bb-4a5c-8d5a-eb1c1a35c318",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 17,
+          "x": 0,
+          "y": 19
+        },
+        "config": {
+          "type": "xy",
+          "title": "Max Request Latency Per Operation",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.Operation"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.SuccessfulRequestLatency.max",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "5e4ef2f0-08b0-477b-a00e-887bccbe0ec2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 16,
+          "x": 17,
+          "y": 19
+        },
+        "config": {
+          "type": "xy",
+          "title": "Write Throttle Events",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.TableName"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "field": "aws.dynamodb.metrics.WriteThrottleEvents.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "1m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "39f07744-5a8e-46eb-950a-5cdc4d5d6575",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 15,
+          "x": 33,
+          "y": 19
+        },
+        "config": {
+          "type": "xy",
+          "title": "Account Provisioned Write Capacity Utilization",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": true
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear",
+              "emphasize": false
+            },
+            "interpolation": "smooth",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Write Utilization",
+                  "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Read Utilization",
+                  "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "e81e9817-c971-454b-881a-09cec10da0e9",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "a640b937-e20b-47dd-ae2f-ab558071266b",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "AWS Region",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.region",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "4645a197-9a7e-46d5-81c0-2053172ae200",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "AWS Account Name",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.account.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:22.724Z",
+    "version": "WzE0NCwxXQ=="
+  }
+}

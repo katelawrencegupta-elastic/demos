@@ -1,0 +1,2492 @@
+{
+  "id": "gcp-1ae960c0-f9f8-11eb-bc38-79936db7c106",
+  "data": {
+    "description": "Overview of GCP GKE Metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-gcp-default"
+    ],
+    "title": "[Metrics GCP] GKE Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "label": "Only data from gcp.gke dataset",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "gcp.gke"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 7,
+          "w": 4,
+          "x": 14,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Clusters",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "label": "Clusters",
+            "field": "gcp.labels.resource.cluster_name",
+            "empty_as_null": false,
+            "operation": "unique_count",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "a4a26c8f-3415-4cb2-a44e-27fe2e706862",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 4,
+          "x": 18,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Nodes",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "label": " Nodes",
+            "field": "gcp.labels.resource.node_name",
+            "empty_as_null": false,
+            "operation": "unique_count",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "6018a29a-f6f0-4dec-9940-9094b3ed841d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 4,
+          "x": 22,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Namespaces",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "label": "Namespaces",
+            "field": "gcp.labels.resource.namespace_name",
+            "empty_as_null": false,
+            "operation": "unique_count",
+            "size": "m",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "6f1f7601-f921-4051-899d-10fda75d07df",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 4,
+          "x": 26,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Pods",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "label": "Pods",
+            "field": "gcp.labels.resource.pod_name",
+            "empty_as_null": false,
+            "operation": "unique_count",
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "1d22e757-a6ec-43df-a60f-decda1d057c2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 4,
+          "x": 30,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Container restarts",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "format": {
+              "type": "number",
+              "decimals": 0,
+              "compact": false
+            },
+            "label": "Container restarts",
+            "filter": {
+              "language": "kql",
+              "expression": "gcp.gke.container.restart.count: *"
+            },
+            "field": "gcp.gke.container.restart.count",
+            "operation": "last_value",
+            "time_field": "@timestamp",
+            "multi_value": true,
+            "size": "xl",
+            "labels": {
+              "alignment": "bottom"
+            },
+            "values": {
+              "alignment": "center"
+            },
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "7541ca7c-3333-4065-9d98-f8fa11c29ebf",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 12
+        },
+        "config": {
+          "type": "xy",
+          "title": "Pods per cluster",
+          "legend": {
+            "visibility": "hidden",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.cluster_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": "Pods number",
+                  "field": "gcp.labels.resource.pod_name",
+                  "empty_as_null": false,
+                  "operation": "unique_count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "10a4fa84-84c1-45ac-921a-7d4e7ba0a461",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 12
+        },
+        "config": {
+          "type": "xy",
+          "title": "Nodes per cluster",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.cluster_name"
+                ],
+                "limit": 3,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": "Nodes",
+                  "field": "gcp.labels.resource.node_name",
+                  "empty_as_null": false,
+                  "operation": "unique_count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "8261db16-766d-4c27-b988-87c90ed067d0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 21
+        },
+        "config": {
+          "type": "xy",
+          "title": "CPU usage by Pod (seconds)",
+          "legend": {
+            "visibility": "hidden",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.pod_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 1,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "CPU usage per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.container.cpu.core_usage_time.sec",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Total Core usage per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.container.cpu.core_usage_time.sec",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#b9a888"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "1df880b1-44bc-468b-aba7-0cec27b74b12",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 21
+        },
+        "config": {
+          "type": "xy",
+          "title": "CPU limit utilization by Pod",
+          "legend": {
+            "visibility": "hidden",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "custom",
+                "min": 0,
+                "max": 1,
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.pod_name"
+                ],
+                "limit": 100,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 1,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "CPU usage per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.container.cpu.core_usage_time.sec",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ce28d9df-4506-4020-b2de-6274ac0d46b7",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 24,
+          "y": 21
+        },
+        "config": {
+          "type": "xy",
+          "title": "CPU usage per Node (seconds)",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.node_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 1,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "CPU usage per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.node.cpu.core_usage_time.sec",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "f3275c69-84ce-4c6d-bd49-3cd6f1c606f9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 36,
+          "y": 21
+        },
+        "config": {
+          "type": "xy",
+          "title": "Memory usage",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median allocatable memory",
+                  "field": "gcp.gke.node.memory.allocatable.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median used memory",
+                  "field": "gcp.gke.node.memory.used.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Min total available memory",
+                  "field": "gcp.gke.node.memory.total.bytes",
+                  "operation": "min",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "cadc827f-4efb-4045-b98b-7395264e4c16",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 30
+        },
+        "config": {
+          "type": "xy",
+          "title": "Memory usage",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total memory used",
+                  "field": "gcp.gke.container.memory.used.bytes",
+                  "empty_as_null": false,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total memory limits",
+                  "field": "gcp.gke.container.memory.limit.bytes",
+                  "empty_as_null": false,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "5551e0b7-722f-401c-90fd-a0094e919618",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 30
+        },
+        "config": {
+          "type": "xy",
+          "title": "Memory usage by Pod",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.pod_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median memory used",
+                  "field": "gcp.gke.container.memory.used.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "610b04b2-7483-4995-b3f6-a11c09c2b2f2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 24,
+          "y": 30
+        },
+        "config": {
+          "type": "xy",
+          "title": "Network traffic (bytes count)",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Received bytes per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.node.network.received.bytes",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Sent bytes per second",
+                  "operation": "differences",
+                  "of": {
+                    "field": "gcp.gke.node.network.sent.bytes",
+                    "operation": "max"
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total network traffic per second",
+                  "operation": "formula",
+                  "formula": "differences(max(gcp.gke.node.network.received.bytes)) + differences(max(gcp.gke.node.network.sent.bytes))",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "a1714037-fe75-468b-bfea-d4a8e1769cbf",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 36,
+          "y": 30
+        },
+        "config": {
+          "type": "pie",
+          "title": "Inbound network traffic top nodes",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "legend": {
+            "nested": true,
+            "truncate_after_lines": 1,
+            "visibility": "hidden",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 2
+              },
+              "label": "Received bytes count",
+              "filter": {
+                "language": "kql",
+                "expression": "gcp.gke.node.network.received.bytes: *"
+              },
+              "field": "gcp.gke.node.network.received.bytes",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "gcp.labels.resource.node_name"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "f09d76ba-490b-4392-b6cb-051e4fcc03c9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 39
+        },
+        "config": {
+          "type": "xy",
+          "title": "Storage requests",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median storage request",
+                  "field": "gcp.gke.container.ephemeral_storage.request.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median storage used",
+                  "field": "gcp.gke.container.ephemeral_storage.used.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Median storage limit",
+                  "field": "gcp.gke.container.ephemeral_storage.limit.bytes",
+                  "operation": "median",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "eea592ea-3598-4104-96b6-ea33a0d9845d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 39
+        },
+        "config": {
+          "type": "xy",
+          "title": "Volume utilization by Pod",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.pod_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "field": "gcp.gke.pod.volume.utilization.pct",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "17973ffd-05c1-4075-97eb-4990a3e9b61e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 24,
+          "y": 39
+        },
+        "config": {
+          "type": "xy",
+          "title": "Ephemeral storage usage",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total ephemeral storage",
+                  "field": "gcp.gke.node.ephemeral_storage.total.bytes",
+                  "empty_as_null": false,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total ephemeral storage used",
+                  "field": "gcp.gke.node.ephemeral_storage.used.bytes",
+                  "empty_as_null": false,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "4611dd47-5619-485a-8a19-8edcc37d2f4e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 36,
+          "y": 39
+        },
+        "config": {
+          "type": "xy",
+          "title": "Ephemeral storage usage by Node",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.labels.resource.node_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Total ephemeral storage used",
+                  "field": "gcp.gke.node.ephemeral_storage.used.bytes",
+                  "empty_as_null": false,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "fe426912-61f1-4913-81d1-1dc734c50111",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 12,
+          "x": 24,
+          "y": 48
+        },
+        "config": {
+          "type": "xy",
+          "title": "Used PID vs limit",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "PID Limit",
+                  "field": "gcp.gke.node.pid_limit.value",
+                  "operation": "min",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Used PID",
+                  "field": "gcp.gke.node.pid_used.value",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#d36086"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "60s",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "6f9ca350-a898-4865-8aef-4b593bd341ff",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "b9f22fe4-2657-4791-b984-b1c9cd614ca9",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Project ID",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.account.id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "639a6ca6-35be-49e6-beb3-6eb896c76def",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Cluster",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "gcp.labels.resource.cluster_name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "70d902f0-3d48-4b91-89ee-2719ab7a1cc5",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Location",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "gcp.labels.resource.location",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:39.499Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:41.192Z",
+    "version": "WzE3MSwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "# Pods",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "type": "visualization"
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "# Nodes",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "type": "visualization"
+      }
+    }
+  ]
+}

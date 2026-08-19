@@ -1,0 +1,558 @@
+{
+  "name": "logs-openai.audit-2.4.0",
+  "on_failure": [
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{_ingest.on_failure_processor_type}}}'\n{{{#_ingest.on_failure_processor_tag}}}with tag '{{{_ingest.on_failure_processor_tag}}}'\n{{{/_ingest.on_failure_processor_tag}}}failed with message '{{{_ingest.on_failure_message}}}'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_to_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_tags",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643468276,
+  "description": "Pipeline for processing audit logs.",
+  "_meta": {
+    "package": {
+      "name": "openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643468276,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "9.3.0"
+      }
+    },
+    {
+      "terminate": {
+        "description": "error message set and no data to process.",
+        "tag": "data_collection_error",
+        "if": "ctx.error?.message != null && ctx.message == null && ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Removes the fields added by Agentless as metadata, as they can collide with ECS fields.",
+        "ignore_missing": true,
+        "tag": "remove_agentless_tags",
+        "field": [
+          "organization",
+          "division",
+          "team"
+        ],
+        "if": "ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "json_event_original",
+        "field": "event.original",
+        "target_field": "openai.audit"
+      }
+    },
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "tag": "fingerprint_event_original",
+        "fields": [
+          "openai.audit.id"
+        ],
+        "target_field": "_id"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_iam_into_event_category",
+        "field": "event.category",
+        "value": "iam"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_change_into_event_type",
+        "field": "event.type",
+        "value": "change"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_observer_vendor",
+        "field": "observer.vendor",
+        "value": "OpenAI"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_observer_product",
+        "field": "observer.product",
+        "value": "OpenAI"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_service_id_from_audit_actor_api_key_service_account_id",
+        "field": "service.id",
+        "copy_from": "openai.audit.actor.api_key.service_account.id"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_audit_actor_api_key_user_email_into_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{openai.audit.actor.api_key.user.email}}}",
+        "if": "ctx.openai?.audit?.actor?.api_key?.user?.email != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_audit_actor_api_key_user_id_into_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{openai.audit.actor.api_key.user.id}}}",
+        "if": "ctx.openai?.audit?.actor?.api_key?.user?.id != null"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "openai.audit.actor.session.ip_address",
+        "ignore_missing": true,
+        "tag": "convert_actor_session_ip_address_to_ip",
+        "type": "ip",
+        "if": "ctx.openai.audit?.actor?.session?.ip_address != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_ip_from_audit_actor_session_ip_address",
+        "field": "source.ip",
+        "copy_from": "openai.audit.actor.session.ip_address"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_location",
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.as",
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_asn",
+        "if": "ctx.source?.ip != null",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_asn_to_source_as_number",
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_organization_name",
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_audit_actor_session_ip_address_into_related_ip",
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{{openai.audit.actor.session.ip_address}}}",
+        "if": "ctx.openai?.audit?.actor?.session?.ip_address != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "convert_actor_session_ip_address_details_asn_to_long",
+        "field": "openai.audit.actor.session.ip_address_details.asn",
+        "type": "long"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_as_number_from_audit_actor_session_ip_address_details_asn",
+        "override": false,
+        "field": "source.as.number",
+        "copy_from": "openai.audit.actor.session.ip_address_details.asn"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_geo_city_name_from_audit_actor_session_ip_address_details_city",
+        "override": false,
+        "field": "source.geo.city_name",
+        "copy_from": "openai.audit.actor.session.ip_address_details.city"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_geo_country_iso_code_from_audit_actor_session_ip_address_details_country",
+        "override": false,
+        "field": "source.geo.country_iso_code",
+        "copy_from": "openai.audit.actor.session.ip_address_details.country"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "convert_actor_session_ip_address_details_latitude_to_long",
+        "field": "openai.audit.actor.session.ip_address_details.latitude",
+        "type": "double"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_geo_location_from_audit_actor_session_ip_address_details_latitude",
+        "override": false,
+        "field": "source.geo.location.lat",
+        "copy_from": "openai.audit.actor.session.ip_address_details.latitude"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "convert_actor_session_ip_address_details_longitude_to_long",
+        "field": "openai.audit.actor.session.ip_address_details.longitude",
+        "type": "double"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_openai_audit_actor_session_ip_address_details_longitude_into_source_geo_location",
+        "override": false,
+        "field": "source.geo.location.lon",
+        "copy_from": "openai.audit.actor.session.ip_address_details.longitude"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_geo_region_name_from_audit_actor_session_ip_address_details_region",
+        "override": false,
+        "field": "source.geo.region_name",
+        "copy_from": "openai.audit.actor.session.ip_address_details.region"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_geo_region_iso_code_from_audit_actor_session_ip_address_details_region_code",
+        "override": false,
+        "field": "source.geo.region_iso_code",
+        "copy_from": "openai.audit.actor.session.ip_address_details.region_code"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_tls_client_ja3_from_audit_actor_session_ja3",
+        "field": "tls.client.ja3",
+        "copy_from": "openai.audit.actor.session.ja3"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_email_from_audit_actor_session_user_email",
+        "field": "user.email",
+        "copy_from": "openai.audit.actor.session.user.email"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{}@%{user.domain}",
+        "tag": "dissect_user_email",
+        "field": "user.email",
+        "if": "ctx.user?.email != null && ctx.user.email.contains('@')"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_audit_actor_session_user_email_into_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{openai.audit.actor.session.user.email}}}",
+        "if": "ctx.openai?.audit?.actor?.session?.user?.email != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_id_from_audit_actor_session_user_id",
+        "field": "user.id",
+        "copy_from": "openai.audit.actor.session.user.id"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_audit_actor_session_user_id_into_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{openai.audit.actor.session.user.id}}}",
+        "if": "ctx.openai?.audit?.actor?.session?.user?.id != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_agent_original_from_audit_actor_session_user_agent",
+        "field": "user_agent.original",
+        "copy_from": "openai.audit.actor.session.user_agent"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_event_action_from_audit_type",
+        "field": "event.action",
+        "copy_from": "openai.audit.type"
+      }
+    },
+    {
+      "lowercase": {
+        "ignore_missing": true,
+        "tag": "lowercase_event_action",
+        "field": "event.action"
+      }
+    },
+    {
+      "split": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "event.action",
+        "ignore_missing": true,
+        "tag": "split_event_action",
+        "separator": "[.]",
+        "if": "ctx.event?.action != ''"
+      }
+    },
+    {
+      "join": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "join_event_action",
+        "field": "event.action",
+        "separator": "-",
+        "if": "ctx.event?.action != null && ctx.event.action != ''"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX"
+        ],
+        "field": "openai.audit.effective_at",
+        "target_field": "openai.audit.effective_at",
+        "tag": "date_effective_at",
+        "if": "ctx.openai.audit?.effective_at != null && ctx.openai.audit.effective_at != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_@timestamp_from_audit_effective_at",
+        "field": "@timestamp",
+        "copy_from": "openai.audit.effective_at"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_event_id_from_audit_id",
+        "field": "event.id",
+        "copy_from": "openai.audit.id"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_custom_duplicate_fields",
+        "field": [
+          "openai.audit.actor.api_key.service_account.id",
+          "openai.audit.actor.session.ip_address",
+          "openai.audit.actor.session.ja3",
+          "openai.audit.actor.session.user.email",
+          "openai.audit.actor.session.user.id",
+          "openai.audit.actor.session.user_agent",
+          "openai.audit.type",
+          "openai.audit.effective_at",
+          "openai.audit.id"
+        ],
+        "if": "ctx.tags == null || !ctx.tags.contains('preserve_duplicate_custom_fields')"
+      }
+    },
+    {
+      "script": {
+        "description": "Remove null or empty values from the document.",
+        "tag": "remove_null_values",
+        "source": "void handleMap(Map map) {\n  map.values().removeIf(v -> {\n    if (v instanceof Map) {\n      handleMap(v);\n    } else if (v instanceof List) {\n      handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nvoid handleList(List list) {\n  list.removeIf(v -> {\n    if (v instanceof Map) {\n      handleMap(v);\n    } else if (v instanceof List) {\n      handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nhandleMap(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_into_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_tags",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `openai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.audit@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `openai.audit` dataset"
+      }
+    }
+  ]
+}

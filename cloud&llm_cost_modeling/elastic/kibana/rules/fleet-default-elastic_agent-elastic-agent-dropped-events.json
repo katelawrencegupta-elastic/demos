@@ -1,0 +1,53 @@
+{
+  "id": "fleet-default-elastic_agent-elastic-agent-dropped-events",
+  "enabled": false,
+  "name": "[Elastic Agent] Dropped events",
+  "tags": [
+    "Elastic Agent",
+    "Pipeline and Queues"
+  ],
+  "rule_type_id": ".es-query",
+  "consumer": "alerts",
+  "schedule": {
+    "interval": "1m"
+  },
+  "actions": [],
+  "params": {
+    "searchType": "esqlQuery",
+    "timeWindowSize": 3,
+    "timeWindowUnit": "m",
+    "threshold": [
+      0
+    ],
+    "thresholdComparator": ">",
+    "size": 100,
+    "esqlQuery": {
+      "esql": "FROM metrics-elastic_agent.*beat-*\n| WHERE data_stream.dataset LIKE \"elastic_agent.*beat\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS \n  events_dropped_max = max(to_long(beat.stats.libbeat.pipeline.events.dropped)),\n  events_dropped_min = min(to_long(beat.stats.libbeat.pipeline.events.dropped)), \n  pipeline_acked_max = max(to_long(beat.stats.libbeat.pipeline.queue.acked)), \n  pipeline_acked_min = min(to_long(beat.stats.libbeat.pipeline.queue.acked)) \n  BY time_bucket = DATE_TRUNC(1 minute, @timestamp), elastic_agent.id, component.id\n| EVAL \n  events_dropped = events_dropped_max - events_dropped_min, \n  events_acked = pipeline_acked_max - pipeline_acked_min\n| EVAL drop_pct = CASE(\n  events_acked > 0, events_dropped / events_acked, \n  0\n)\n| WHERE drop_pct >= 0.05\n| STATS MAX(drop_pct) BY elastic_agent.id, component.id"
+    },
+    "aggType": "count",
+    "groupBy": "row",
+    "termSize": 5,
+    "sourceFields": [],
+    "timeField": "@timestamp",
+    "excludeHitsFromPreviousRun": true
+  },
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-12T18:16:35.015Z",
+  "updated_at": "2026-08-12T18:16:35.015Z",
+  "api_key_owner": null,
+  "api_key_created_by_user": null,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "pending",
+    "last_execution_date": "2026-08-12T18:16:35.015Z"
+  },
+  "revision": 0,
+  "running": false,
+  "alert_delay": {
+    "active": 1
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "logs-system.system-2.22.3",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591739,
+  "description": "Pipeline for Windows System Event Logs",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591739,
+  "processors": [
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "error.code",
+        "type": "string"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `system` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.system@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `system.system` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "logs-azure.events",
+  "index_template": {
+    "index_patterns": [
+      "logs-azure.events-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "azure"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-azure.events@package",
+      "logs@custom",
+      "azure@custom",
+      "logs-azure.events@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "azure@custom",
+      "logs-azure.events@custom"
+    ],
+    "created_date_millis": 1786557409018,
+    "modified_date_millis": 1786557409018
+  }
+}

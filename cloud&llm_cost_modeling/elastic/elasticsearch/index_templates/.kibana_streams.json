@@ -1,0 +1,61 @@
+{
+  "name": ".kibana_streams",
+  "index_template": {
+    "index_patterns": [
+      ".kibana_streams-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "9078a3336e954445ee5c5a46ff0b3d129d2ce915"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "updated_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "query": {
+            "type": "object",
+            "enabled": false
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "description": {
+            "type": "text"
+          },
+          "field_descriptions": {
+            "type": "object",
+            "enabled": false
+          },
+          "type": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "query_streams": {
+            "type": "object",
+            "enabled": false
+          },
+          "ingest": {
+            "type": "object",
+            "enabled": false
+          }
+        }
+      },
+      "aliases": {
+        ".kibana_streams": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "9078a3336e954445ee5c5a46ff0b3d129d2ce915"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1786555749080,
+    "modified_date_millis": 1786555749080
+  }
+}

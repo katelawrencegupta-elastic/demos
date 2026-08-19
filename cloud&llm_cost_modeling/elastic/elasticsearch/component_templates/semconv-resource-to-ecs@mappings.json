@@ -1,0 +1,248 @@
+{
+  "name": "semconv-resource-to-ecs@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "kubernetes.node.name": {
+            "path": "resource.attributes.k8s.node.name",
+            "type": "alias"
+          },
+          "orchestrator.cluster.name": {
+            "path": "resource.attributes.k8s.cluster.name",
+            "type": "alias"
+          },
+          "kubernetes.node.uid": {
+            "path": "resource.attributes.k8s.node.uid",
+            "type": "alias"
+          },
+          "kubernetes.daemonset.name": {
+            "path": "resource.attributes.k8s.daemonset.name",
+            "type": "alias"
+          },
+          "container.image.tag": {
+            "path": "resource.attributes.container.image.tags",
+            "type": "alias"
+          },
+          "kubernetes.node.hostname": {
+            "path": "resource.attributes.k8s.node.hostname",
+            "type": "alias"
+          },
+          "kubernetes.deployment.name": {
+            "path": "resource.attributes.k8s.deployment.name",
+            "type": "alias"
+          },
+          "host.os.full": {
+            "path": "resource.attributes.os.description",
+            "type": "alias"
+          },
+          "service.node.name": {
+            "path": "resource.attributes.service.instance.id",
+            "type": "alias"
+          },
+          "kubernetes.pod.uid": {
+            "path": "resource.attributes.k8s.pod.uid",
+            "type": "alias"
+          },
+          "service.language.name": {
+            "path": "resource.attributes.telemetry.sdk.language",
+            "type": "alias"
+          },
+          "host.os.version": {
+            "path": "resource.attributes.os.version",
+            "type": "alias"
+          },
+          "kubernetes.namespace": {
+            "path": "resource.attributes.k8s.namespace.name",
+            "type": "alias"
+          },
+          "host.os.name": {
+            "path": "resource.attributes.os.name",
+            "type": "alias"
+          },
+          "kubernetes.pod.name": {
+            "path": "resource.attributes.k8s.pod.name",
+            "type": "alias"
+          },
+          "process.executable": {
+            "path": "resource.attributes.process.executable.path",
+            "type": "alias"
+          },
+          "service.environment": {
+            "path": "resource.attributes.deployment.environment",
+            "type": "alias"
+          },
+          "kubernetes.container.name": {
+            "path": "resource.attributes.k8s.container.name",
+            "type": "alias"
+          },
+          "resource": {
+            "properties": {
+              "attributes": {
+                "dynamic": true,
+                "time_series_dimension": true,
+                "type": "passthrough",
+                "priority": 40,
+                "properties": {
+                  "k8s.container.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.namespace.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.cluster.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.cronjob.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.pod.uid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.statefulset.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "process.runtime.version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "os.type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "os.version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "telemetry.sdk.language": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "process.runtime.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service.instance.id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.pod.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "os.description": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "host.arch": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.deployment.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "os.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "host.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.node.uid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "cloud.platform": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.daemonset.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "deployment.environment": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.replicaset.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.job.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.node.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "k8s.node.hostname": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "process.executable.path": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "container.image.tags": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "kubernetes.replicaset.name": {
+            "path": "resource.attributes.k8s.replicaset.name",
+            "type": "alias"
+          },
+          "service.runtime.name": {
+            "path": "resource.attributes.process.runtime.name",
+            "type": "alias"
+          },
+          "kubernetes.cronjob.name": {
+            "path": "resource.attributes.k8s.cronjob.name",
+            "type": "alias"
+          },
+          "service.runtime.version": {
+            "path": "resource.attributes.process.runtime.version",
+            "type": "alias"
+          },
+          "host.architecture": {
+            "path": "resource.attributes.host.arch",
+            "type": "alias"
+          },
+          "kubernetes.job.name": {
+            "path": "resource.attributes.k8s.job.name",
+            "type": "alias"
+          },
+          "kubernetes.statefulset.name": {
+            "path": "resource.attributes.k8s.statefulset.name",
+            "type": "alias"
+          },
+          "cloud.service.name": {
+            "path": "resource.attributes.cloud.platform",
+            "type": "alias"
+          },
+          "host.os.platform": {
+            "path": "resource.attributes.os.type",
+            "type": "alias"
+          }
+        }
+      }
+    },
+    "version": 19,
+    "_meta": {
+      "description": "Aliases from OpenTelemetry SemConv resource attribute fields to ECS (and some non-ECS) fields",
+      "managed": true
+    }
+  }
+}

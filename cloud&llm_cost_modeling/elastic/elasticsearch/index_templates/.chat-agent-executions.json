@@ -1,0 +1,91 @@
+{
+  "name": ".chat-agent-executions",
+  "index_template": {
+    "index_patterns": [
+      ".chat-agent-executions-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "bc9e3bb3c2077a33bcef46901aab870c61bf43f3"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "metadata": {
+            "type": "flattened"
+          },
+          "agent_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "event_count": {
+            "type": "long"
+          },
+          "parent_execution_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "last_heartbeat": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "error": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "message": {
+                "type": "text"
+              }
+            }
+          },
+          "execution_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "execution_mode": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "agent_params": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "space_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "events": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "status": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {
+        ".chat-agent-executions": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "bc9e3bb3c2077a33bcef46901aab870c61bf43f3"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1786994003492,
+    "modified_date_millis": 1786994003492
+  }
+}

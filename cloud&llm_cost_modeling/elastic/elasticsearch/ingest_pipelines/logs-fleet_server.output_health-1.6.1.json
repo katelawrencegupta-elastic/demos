@@ -1,0 +1,42 @@
+{
+  "name": "logs-fleet_server.output_health-1.6.1",
+  "_meta": {
+    "package": {
+      "name": "fleet_server"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786555754497,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-fleet_server.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `fleet_server` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-fleet_server.output_health@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `fleet_server.output_health` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786555754497
+}

@@ -40,6 +40,11 @@ SERVICES = (
     "rig-scheduler",
 )
 HOSTS = ("aks-sre-01", "aks-sre-02", "aks-sre-03")
+HOST_IPS = {
+    "aks-sre-01": "8.8.8.8",
+    "aks-sre-02": "80.67.169.12",
+    "aks-sre-03": "202.12.27.33",
+}
 ROUTES = {
     "well-data-api": (("/v2/wells/{well}/surveys", "GET"), ("/v2/wells/{well}/logs", "GET")),
     "telemetry-gateway": (("/v1/ingest", "POST"), ("/health", "GET")),
@@ -94,6 +99,7 @@ def _resource(service: str, host: str | None = None, dataset: str = "workshop.ot
             "service.version": "8.2312.0" if service == SYSLOG_SERVICE else "1.8.2",
             "deployment.environment": "workshop",
             "host.name": resolved_host,
+            "host.ip": HOST_IPS.get(resolved_host, "8.8.8.8"),
             "data_stream.dataset": dataset,
             "data_stream.namespace": "default",
             "team": TEAMS[service],

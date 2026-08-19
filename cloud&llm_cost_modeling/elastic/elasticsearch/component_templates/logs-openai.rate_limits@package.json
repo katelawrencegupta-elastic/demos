@@ -1,0 +1,137 @@
+{
+  "name": "logs-openai.rate_limits@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-openai.rate_limits-2.4.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "openai": {
+            "properties": {
+              "rate_limits": {
+                "properties": {
+                  "batch_1_day_max_input_tokens": {
+                    "type": "long"
+                  },
+                  "project_status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "max_tokens_per_1_minute": {
+                    "type": "long"
+                  },
+                  "max_images_per_1_minute": {
+                    "type": "long"
+                  },
+                  "project_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "max_requests_per_1_minute": {
+                    "type": "long"
+                  },
+                  "max_requests_per_1_day": {
+                    "type": "long"
+                  },
+                  "collected_at": {
+                    "type": "date"
+                  },
+                  "project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "max_audio_megabytes_per_1_minute": {
+                    "type": "long"
+                  },
+                  "max_tokens_per_1_day": {
+                    "type": "long"
+                  },
+                  "object": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "base": {
+                "properties": {
+                  "num_model_requests": {
+                    "type": "long"
+                  },
+                  "project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "usage_tokens": {
+                    "type": "long"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "usage_images": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

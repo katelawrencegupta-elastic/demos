@@ -1,0 +1,142 @@
+{
+  "name": ".slo-observability.composite-summary-mappings-v1",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "summaryUpdatedAt": {
+            "format": "date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "compositeSlo": {
+            "properties": {
+              "createdAt": {
+                "format": "date_optional_time||epoch_millis",
+                "type": "date"
+              },
+              "timeWindow": {
+                "properties": {
+                  "duration": {
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "description": {
+                "type": "text"
+              },
+              "id": {
+                "type": "keyword"
+              },
+              "budgetingMethod": {
+                "type": "keyword"
+              },
+              "tags": {
+                "type": "keyword"
+              },
+              "objective": {
+                "properties": {
+                  "target": {
+                    "type": "double"
+                  }
+                }
+              },
+              "updatedAt": {
+                "format": "date_optional_time||epoch_millis",
+                "type": "date"
+              }
+            }
+          },
+          "summary": {
+            "properties": {
+              "oneHourBurnRate": {
+                "type": "double"
+              },
+              "fiveMinuteBurnRate": {
+                "type": "double"
+              },
+              "oneDayBurnRate": {
+                "type": "double"
+              },
+              "errorBudget": {
+                "properties": {
+                  "consumed": {
+                    "type": "double"
+                  },
+                  "isEstimated": {
+                    "type": "boolean"
+                  },
+                  "initial": {
+                    "type": "double"
+                  },
+                  "remaining": {
+                    "type": "double"
+                  }
+                }
+              },
+              "sliValue": {
+                "type": "double"
+              },
+              "status": {
+                "type": "keyword"
+              }
+            }
+          },
+          "spaceId": {
+            "type": "keyword"
+          },
+          "members": {
+            "properties": {
+              "instanceId": {
+                "type": "keyword"
+              },
+              "sloId": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "weight": {
+                "type": "double"
+              },
+              "normalisedWeight": {
+                "type": "double"
+              },
+              "sliValue": {
+                "type": "double"
+              },
+              "status": {
+                "type": "keyword"
+              }
+            }
+          },
+          "unresolvedMemberIds": {
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "_meta": {
+      "description": "SLO composite summary mappings template",
+      "managed_by": "observability",
+      "version": 1,
+      "managed": true
+    }
+  }
+}

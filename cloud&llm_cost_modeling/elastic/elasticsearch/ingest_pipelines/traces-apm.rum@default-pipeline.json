@@ -1,0 +1,30 @@
+{
+  "name": "traces-apm.rum@default-pipeline",
+  "modified_date_millis": 1786555716897,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in default ingest pipeline for traces-apm.rum-* data streams.\n\nThis pipeline exists purely for routing, which cannot be\nperformed in a final pipeline, and for invoking user-defined\ncustom pipelines. All built-in processing occurs in the final\npipeline.\n",
+  "created_date_millis": 1786555716897,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "traces@custom",
+        "ignore_missing_pipeline": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "traces-apm.rum@custom",
+        "ignore_missing_pipeline": true
+      }
+    }
+  ],
+  "version": 103
+}

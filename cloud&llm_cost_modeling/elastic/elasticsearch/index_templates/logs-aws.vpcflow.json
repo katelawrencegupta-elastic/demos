@@ -1,0 +1,50 @@
+{
+  "name": "logs-aws.vpcflow",
+  "index_template": {
+    "index_patterns": [
+      "logs-aws.vpcflow-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "aws"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-aws.vpcflow@package",
+      "logs@custom",
+      "aws@custom",
+      "logs-aws.vpcflow@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "aws@custom",
+      "logs-aws.vpcflow@custom"
+    ],
+    "created_date_millis": 1786557382254,
+    "modified_date_millis": 1786557382254
+  }
+}

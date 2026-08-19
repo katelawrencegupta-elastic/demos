@@ -1,0 +1,42 @@
+{
+  "name": "synthetics-http-1.9.0",
+  "_meta": {
+    "package": {
+      "name": "synthetics"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786555762193,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "synthetics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `synthetics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "synthetics-synthetics.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `synthetics` defined by the `synthetics` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "synthetics-http@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `http` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786555762193
+}

@@ -1,0 +1,21 @@
+{
+  "name": ".slo-observability.composite-summary-v1",
+  "index_template": {
+    "index_patterns": [
+      ".slo-observability.composite-summary-v1*"
+    ],
+    "composed_of": [
+      ".slo-observability.composite-summary-mappings-v1",
+      ".slo-observability.summary-settings-v3.6"
+    ],
+    "priority": 600,
+    "_meta": {
+      "description": "SLO composite summary index template",
+      "managed_by": "observability",
+      "version": 1,
+      "managed": true
+    },
+    "created_date_millis": 1786555747814,
+    "modified_date_millis": 1786555747814
+  }
+}

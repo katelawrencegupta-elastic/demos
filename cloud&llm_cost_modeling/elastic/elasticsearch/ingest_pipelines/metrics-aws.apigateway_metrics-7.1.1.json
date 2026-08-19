@@ -1,0 +1,42 @@
+{
+  "name": "metrics-aws.apigateway_metrics-7.1.1",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557377915,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.apigateway_metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.apigateway_metrics` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557377915
+}

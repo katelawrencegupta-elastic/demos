@@ -1,0 +1,71 @@
+{
+  "name": ".workflows-events",
+  "index_template": {
+    "index_patterns": [
+      ".workflows-events*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "eventId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "spaceId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "subscriptions": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "payload": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "triggerId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "kibana": {
+            "properties": {
+              "space_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "sourceExecutionId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 100,
+    "_meta": {
+      "userAgent": "@kbn/data-streams",
+      "previousVersions": [],
+      "version": 3,
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555731778,
+    "modified_date_millis": 1786555731778
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "behavioral_analytics-events-settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "codec": "best_compression",
+          "final_pipeline": "behavioral_analytics-events-final_pipeline",
+          "sort": {
+            "field": [
+              "session.id",
+              "@timestamp"
+            ],
+            "order": [
+              "asc",
+              "asc"
+            ]
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "180d"
+      }
+    },
+    "version": 3,
+    "_meta": {
+      "description": "Built-in settings applied by default to behavioral analytics event data streams.",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "name": "logs-gcp_vertexai.prompt_response_logs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-gcp_vertexai.prompt_response_logs-1.5.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "vertexai": {
+                "properties": {
+                  "prompt_response_logs": {
+                    "properties": {
+                      "logging_time": {
+                        "type": "date"
+                      },
+                      "model_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "endpoint": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "metadata": {
+                        "properties": {
+                          "request_latency": {
+                            "type": "float"
+                          }
+                        }
+                      },
+                      "api_method": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "full_request": {
+                        "properties": {
+                          "endpoint": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "safety_settings": {
+                            "properties": {
+                              "threshold": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "category": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "contents": {
+                            "properties": {
+                              "role": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "parts": {
+                                "properties": {
+                                  "text": {
+                                    "type": "text"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "model": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "system_instruction": {
+                            "properties": {
+                              "parts": {
+                                "properties": {
+                                  "text": {
+                                    "type": "text"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "generation_config": {
+                            "properties": {
+                              "temperature": {
+                                "type": "float"
+                              },
+                              "max_output_tokens": {
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "full_response": {
+                        "properties": {
+                          "candidates": {
+                            "properties": {
+                              "safety_ratings": {
+                                "properties": {
+                                  "severity": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "probability_score": {
+                                    "type": "float"
+                                  },
+                                  "probability": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "category": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "severity_score": {
+                                    "type": "float"
+                                  }
+                                }
+                              },
+                              "score": {
+                                "type": "float"
+                              },
+                              "finish_reason": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "avg_logprobs": {
+                                "type": "float"
+                              },
+                              "content": {
+                                "properties": {
+                                  "role": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "parts": {
+                                    "properties": {
+                                      "text": {
+                                        "type": "text"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "model_version": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "create_time": {
+                            "type": "date"
+                          },
+                          "usage_metadata": {
+                            "properties": {
+                              "candidates_token_count": {
+                                "type": "long"
+                              },
+                              "billable_prompt_usage": {
+                                "properties": {
+                                  "text_count": {
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "thoughts_token_count": {
+                                "type": "long"
+                              },
+                              "total_token_count": {
+                                "type": "long"
+                              },
+                              "prompt_tokens_details": {
+                                "properties": {
+                                  "token_count": {
+                                    "type": "long"
+                                  },
+                                  "modality": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              },
+                              "traffic_type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "candidates_tokens_details": {
+                                "properties": {
+                                  "token_count": {
+                                    "type": "long"
+                                  },
+                                  "modality": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              },
+                              "prompt_token_count": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "response_id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "model": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "request_payload": {
+                        "type": "text"
+                      },
+                      "deployed_model_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "request_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "response_payload": {
+                        "type": "text"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp_vertexai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

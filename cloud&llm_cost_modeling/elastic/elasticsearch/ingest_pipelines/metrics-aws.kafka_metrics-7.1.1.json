@@ -1,0 +1,96 @@
+{
+  "name": "metrics-aws.kafka_metrics-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378993,
+  "description": "Pipeline for Amazon MSK metrics",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378993,
+  "processors": [
+    {
+      "dot_expander": {
+        "ignore_failure": true,
+        "tag": "dot_expander_*_c2762c23",
+        "field": "*"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_dimensions_Cluster_Name_to_aws_dimensions_ClusterName_c395738e",
+        "field": "aws.dimensions.Cluster Name",
+        "target_field": "aws.dimensions.ClusterName"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_dimensions_Consumer_Group_to_aws_dimensions_ConsumerGroup_8f2fbc2a",
+        "field": "aws.dimensions.Consumer Group",
+        "target_field": "aws.dimensions.ConsumerGroup"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_dimensions_Broker_ID_to_aws_dimensions_BrokerID_22ec9d9a",
+        "field": "aws.dimensions.Broker ID",
+        "target_field": "aws.dimensions.BrokerID"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_dimensions_Client_Authentication_to_aws_dimensions_ClientAuthentication_05f2be7c",
+        "field": "aws.dimensions.Client Authentication",
+        "target_field": "aws.dimensions.ClientAuthentication"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.kafka_metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.kafka_metrics` dataset"
+      }
+    }
+  ]
+}

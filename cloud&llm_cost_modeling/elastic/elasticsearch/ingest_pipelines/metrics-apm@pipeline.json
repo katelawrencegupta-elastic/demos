@@ -1,0 +1,29 @@
+{
+  "name": "metrics-apm@pipeline",
+  "modified_date_millis": 1786555720159,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in ingest pipeline for metrics-apm.*-* data streams",
+  "created_date_millis": 1786555720159,
+  "processors": [
+    {
+      "script": {
+        "if": "ctx._metric_descriptions != null",
+        "source": "Map dynamic_templates = new HashMap();\nfor (entry in ctx._metric_descriptions.entrySet()) {\n  String name = entry.getKey();\n  Map description = entry.getValue();\n  String metric_type = description.type;\n  if (metric_type == \"histogram\") {\n    dynamic_templates[name] = \"histogram_metrics\";\n  } else if (metric_type == \"summary\") {\n    dynamic_templates[name] = \"summary_metrics\";\n  } else {\n    dynamic_templates[name] = \"double_metrics\";\n  }\n}\nctx._dynamic_templates = dynamic_templates;\nctx.remove(\"_metric_descriptions\");\n"
+      }
+    },
+    {
+      "script": {
+        "if": "ctx.metricset?.samples != null",
+        "source": "Map dynamic_templates = new HashMap();\nfor (sample in ctx.metricset.samples) {\n  String name = sample.name;\n  String metric_type = sample.type;\n  if (metric_type == \"histogram\") {\n    dynamic_templates[name] = \"histogram_metrics\";\n    ctx.put(name, [\"values\": sample.values, \"counts\": sample.counts]);\n  } else if (metric_type == \"summary\") {\n    dynamic_templates[name] = \"summary_metrics\";\n    ctx.put(name, [\"value_count\": sample.value_count, \"sum\": sample.sum]);\n  } else {\n    dynamic_templates[name] = \"double_metrics\";\n    ctx.put(name, sample.value);\n  }\n}\nctx._dynamic_templates = dynamic_templates;\nctx.metricset.remove(\"samples\");\n"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "apm@pipeline"
+      }
+    }
+  ],
+  "version": 103
+}

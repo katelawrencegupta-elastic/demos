@@ -1,0 +1,52 @@
+{
+  "id": "fleet-default-elastic_agent-elastic-agent-unenrolled-status",
+  "enabled": false,
+  "name": "[Elastic Agent] Unenrolled status",
+  "tags": [
+    "Elastic Agent"
+  ],
+  "rule_type_id": ".es-query",
+  "consumer": "alerts",
+  "schedule": {
+    "interval": "1m"
+  },
+  "actions": [],
+  "params": {
+    "searchType": "esqlQuery",
+    "timeWindowSize": 5,
+    "timeWindowUnit": "m",
+    "threshold": [
+      0
+    ],
+    "thresholdComparator": ">",
+    "size": 100,
+    "esqlQuery": {
+      "esql": "FROM logs-elastic_agent.status_change-default\n| WHERE data_stream.dataset == \"elastic_agent.status_change\" and agentless == false and health_status == \"unenrolled\""
+    },
+    "aggType": "count",
+    "groupBy": "row",
+    "termSize": 5,
+    "sourceFields": [],
+    "timeField": "@timestamp",
+    "excludeHitsFromPreviousRun": true
+  },
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-12T18:16:35.017Z",
+  "updated_at": "2026-08-12T18:16:35.017Z",
+  "api_key_owner": null,
+  "api_key_created_by_user": null,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "pending",
+    "last_execution_date": "2026-08-12T18:16:35.017Z"
+  },
+  "revision": 0,
+  "running": false,
+  "alert_delay": {
+    "active": 1
+  }
+}

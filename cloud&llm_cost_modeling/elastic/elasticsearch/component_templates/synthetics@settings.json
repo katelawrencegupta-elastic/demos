@@ -1,0 +1,17 @@
+{
+  "name": "synthetics@settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "codec": "best_compression"
+        }
+      }
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default settings for the synthetics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

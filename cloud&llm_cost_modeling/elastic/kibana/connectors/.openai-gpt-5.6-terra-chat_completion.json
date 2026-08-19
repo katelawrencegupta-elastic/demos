@@ -1,0 +1,19 @@
+{
+  "id": ".openai-gpt-5.6-terra-chat_completion",
+  "name": "OpenAI GPT-5.6 Terra",
+  "config": {
+    "provider": "elastic",
+    "taskType": "chat_completion",
+    "inferenceId": ".openai-gpt-5.6-terra-chat_completion",
+    "providerConfig": {
+      "model_id": "openai-gpt-5.6-terra"
+    }
+  },
+  "connector_type_id": ".inference",
+  "is_preconfigured": true,
+  "is_deprecated": false,
+  "referenced_by_count": 0,
+  "is_system_action": false,
+  "is_connector_type_deprecated": true,
+  "auth_mode": "shared"
+}

@@ -1,0 +1,176 @@
+{
+  "name": "metrics-aws_bedrock.runtime-1.6.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643492429,
+  "description": "Pipeline for Amazon Bedrock runtime metrics",
+  "_meta": {
+    "package": {
+      "name": "aws_bedrock"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643492429,
+  "processors": [
+    {
+      "dot_expander": {
+        "field": "*",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "cloud.account.name",
+        "copy_from": "cloud.account.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.bedrock.metrics",
+        "target_field": "aws_bedrock.runtime"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.Invocations.sum",
+        "target_field": "aws_bedrock.runtime.invocations"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.InvocationLatency.avg",
+        "target_field": "aws_bedrock.runtime.invocation_latency"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.InvocationClientErrors.sum",
+        "target_field": "aws_bedrock.runtime.invocation_client_errors"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.InvocationServerErrors.sum",
+        "target_field": "aws_bedrock.runtime.invocation_server_errors"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.InvocationThrottles.sum",
+        "target_field": "aws_bedrock.runtime.invocation_throttles"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.InputTokenCount.sum",
+        "target_field": "aws_bedrock.runtime.input_token_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.LegacyModelInvocations.sum",
+        "target_field": "aws_bedrock.runtime.legacymodel_invocations"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.OutputTokenCount.sum",
+        "target_field": "aws_bedrock.runtime.output_token_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.runtime.OutputImageCount.sum",
+        "target_field": "aws_bedrock.runtime.output_image_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.ModelId",
+        "target_field": "aws_bedrock.runtime.model_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.ImageSize",
+        "target_field": "aws_bedrock.runtime.image_size"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.Quality",
+        "target_field": "aws_bedrock.runtime.quality"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.BucketedStepSize",
+        "target_field": "aws_bedrock.runtime.bucketed_step_size"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws_bedrock.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws_bedrock` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws_bedrock.runtime@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws_bedrock.runtime` dataset"
+      }
+    }
+  ]
+}

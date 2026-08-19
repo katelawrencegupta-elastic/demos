@@ -1,0 +1,175 @@
+{
+  "name": "logs-azure.platformlogs-1.38.1-springcloudlogs-inner-pipeline",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408246,
+  "description": "Pipeline for parsing azure spring cloud logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408246,
+  "processors": [
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "ctx['_index'] = ctx['_index'].replace('platformlogs', 'springcloudlogs')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.platformlogs",
+        "target_field": "azure.springcloudlogs"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "event.dataset",
+        "value": "azure.springcloudlogs"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "data_stream.dataset",
+        "value": "azure.springcloudlogs"
+      }
+    },
+    {
+      "drop": {
+        "ignore_failure": true,
+        "if": "ctx.azure.springcloudlogs.category != \"SystemLogs\" && ctx.azure.springcloudlogs.category != \"ApplicationConsole\" && ctx.azure.springcloudlogs.category != \"IngressLogs\" && ctx.azure.springcloudlogs.category != \"BuildLogs\" && ctx.azure.springcloudlogs.category != \"ContainerEventLogs\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.LogFormat",
+        "target_field": "azure.springcloudlogs.log_format"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.InstanceName",
+        "target_field": "azure.springcloudlogs.properties.instance_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Log",
+        "target_field": "azure.springcloudlogs.properties.log"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.ServiceName",
+        "target_field": "azure.springcloudlogs.properties.service_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Stream",
+        "target_field": "azure.springcloudlogs.properties.stream"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.AppName",
+        "target_field": "azure.springcloudlogs.properties.app_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.ServiceId",
+        "target_field": "azure.springcloudlogs.properties.service_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Type",
+        "target_field": "azure.springcloudlogs.properties.type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Level",
+        "target_field": "azure.springcloudlogs.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Logger",
+        "target_field": "azure.springcloudlogs.properties.logger"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Stack",
+        "target_field": "azure.springcloudlogs.properties.stack"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.properties.Thread",
+        "target_field": "azure.springcloudlogs.properties.thread"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.level",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.operationName",
+        "target_field": "azure.springcloudlogs.operation_name"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.springcloudlogs.operation_name",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    }
+  ]
+}

@@ -139,6 +139,44 @@
         "metrics": [{ "column": "count" }],
         "rows": [{ "column": "service.name" }, { "column": "log.level" }]
       }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 35, "w": 16, "h": 12 },
+      "config": {
+        "type": "pie",
+        "title": "GeoIP by country",
+        "styling": { "donut_hole": "m" },
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.geo.country_name IS NOT NULL | STATS count = COUNT(*) BY host.geo.country_name"
+        },
+        "metrics": [{ "column": "count" }],
+        "group_by": [{ "column": "host.geo.country_name" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 16, "y": 35, "w": 32, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "GeoIP by country",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-workshop.platform-default | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE host.geo.country_name IS NOT NULL | STATS count = COUNT(*) BY host.geo.country_name | SORT count DESC | LIMIT 10"
+            },
+            "x": { "column": "host.geo.country_name" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
     }
   ]
 }

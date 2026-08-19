@@ -1,0 +1,74 @@
+{
+  "name": "logs-openai.code_interpreter_sessions@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-openai.code_interpreter_sessions-2.4.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "openai": {
+            "properties": {
+              "code_interpreter_sessions": {
+                "properties": {
+                  "sessions": {
+                    "type": "long"
+                  }
+                }
+              },
+              "base": {
+                "properties": {
+                  "start_time": {
+                    "type": "date"
+                  },
+                  "project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "end_time": {
+                    "type": "date"
+                  },
+                  "usage_object_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

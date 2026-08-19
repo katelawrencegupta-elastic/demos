@@ -1,0 +1,31 @@
+[
+  {
+    "model_id": "lang_ident_model_1",
+    "model_type": "lang_ident",
+    "created_by": "_xpack",
+    "version": "7.6.0",
+    "create_time": 1575548914594,
+    "model_size_bytes": 1053992,
+    "estimated_operations": 39629,
+    "license_level": "basic",
+    "description": "Model used for identifying language from arbitrary input text.",
+    "tags": [
+      "lang_ident",
+      "prepackaged"
+    ],
+    "input": {
+      "field_names": [
+        "text"
+      ]
+    },
+    "inference_config": {
+      "classification": {
+        "num_top_classes": 0,
+        "top_classes_results_field": "top_classes",
+        "results_field": "predicted_value",
+        "num_top_feature_importance_values": 0,
+        "prediction_field_type": "string"
+      }
+    }
+  }
+]

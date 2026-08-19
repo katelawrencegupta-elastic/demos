@@ -1,0 +1,71 @@
+{
+  "name": "logs.ecs@stream.layer",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "codec": "best_compression",
+          "mapping": {
+            "total_fields": {
+              "ignore_dynamic_beyond_limit": "true"
+            },
+            "ignore_malformed": "true"
+          },
+          "sort": {
+            "field": [
+              "host.name",
+              "@timestamp"
+            ],
+            "order": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "trace.id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "scope.name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "service.name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "log.level": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "span.id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "host.name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "message": {
+            "type": "match_only_text"
+          }
+        },
+        "subobjects": false
+      }
+    },
+    "version": 1,
+    "_meta": {
+      "description": "Default settings for the logs.ecs stream",
+      "managed": true
+    }
+  }
+}

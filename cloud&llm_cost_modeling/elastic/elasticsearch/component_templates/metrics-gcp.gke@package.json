@@ -1,0 +1,655 @@
+{
+  "name": "metrics-gcp.gke@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-gcp.gke-2.50.2",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "gcp.labels.user.*": {
+              "path_match": "gcp.labels.user.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metadata.*": {
+              "path_match": "gcp.labels.metadata.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metrics.*": {
+              "path_match": "gcp.labels.metrics.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.system.*": {
+              "path_match": "gcp.labels.system.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.resource.*": {
+              "path_match": "gcp.labels.resource.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*.*",
+              "mapping": {
+                "type": "double"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*.*": {
+              "path_match": "gcp.metrics.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*": {
+              "path_match": "gcp.metrics.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "gke": {
+                "properties": {
+                  "container": {
+                    "properties": {
+                      "memory": {
+                        "properties": {
+                          "request": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "page_fault": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "limit": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "limit_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "request_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "restart": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "counter",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "cpu": {
+                        "properties": {
+                          "request_cores": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "core_usage_time": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "limit_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "request_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "limit_cores": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "ephemeral_storage": {
+                        "properties": {
+                          "request": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "limit": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "uptime": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "node": {
+                    "properties": {
+                      "memory": {
+                        "properties": {
+                          "allocatable": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "allocatable_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "total": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "cpu": {
+                        "properties": {
+                          "allocatable_utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "core_usage_time": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "total_cores": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "allocatable_cores": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pid_used": {
+                        "properties": {
+                          "value": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ephemeral_storage": {
+                        "properties": {
+                          "allocatable": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "total": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "inodes_total": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "inodes_free": {
+                            "properties": {
+                              "value": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pid_limit": {
+                        "properties": {
+                          "value": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "network": {
+                        "properties": {
+                          "received": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "sent": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "pod": {
+                    "properties": {
+                      "volume": {
+                        "properties": {
+                          "total": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "network": {
+                        "properties": {
+                          "received": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "sent": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "node_daemon": {
+                    "properties": {
+                      "memory": {
+                        "properties": {
+                          "used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "cpu": {
+                        "properties": {
+                          "core_usage_time": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "counter",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "labels_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "metrics": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "labels": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "system": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "resource": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "metrics": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "user": {
+                    "dynamic": true,
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "gcp"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "gcp.gke"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

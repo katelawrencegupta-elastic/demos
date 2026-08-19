@@ -1,0 +1,1244 @@
+{
+  "id": "gcp-8a1fb690-cbeb-11ec-b519-85ccf621cbbf",
+  "data": {
+    "description": "Overview of the firewall log data from Google Cloud.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-gcp-default",
+      "security-solution-default"
+    ],
+    "title": "[Logs GCP] Firewall",
+    "filters": [
+      {
+        "disabled": false,
+        "label": "Only data from gcp.firewall dataset",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "gcp.firewall"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "GCP Project",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "cloud.project.id"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "77c85299-e3b8-4338-9113-a3b56ba741c7",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 8,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "GCP region",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "cloud.region"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "0fc7a288-d3c6-4f18-8d0e-ca3c0f66aeb6",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 16,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Rule direction",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "gcp.firewall.rule_details.direction"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "fe15fb67-185b-426d-a575-86a6570e9b39",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 24,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Rule action",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "gcp.firewall.rule_details.action"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "5e11178e-7303-48dc-8549-73e80f5c9b2c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 32,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Protocols",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "gcp.firewall.rule_details.ip_port_info.ip_protocol"
+              ],
+              "limit": 7,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "735c4030-d5b3-459c-9000-427ca5cb9d70",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 8,
+          "x": 40,
+          "y": 0
+        },
+        "config": {
+          "type": "pie",
+          "title": "Target Tag",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "s"
+          },
+          "metrics": [
+            {
+              "label": "Events",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Target Tag",
+              "fields": [
+                "gcp.firewall.rule_details.target_tag"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b8028d6f-bf4e-43a0-b19a-65047c757821",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 48,
+          "x": 0,
+          "y": 11
+        },
+        "config": {
+          "type": "xy",
+          "title": "Firewall events over time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "gcp.firewall.rule_details.action"
+                ],
+                "limit": 3,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": "Events",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "63b2dd96-9ce1-43cc-add3-7bc34ff4b296",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 24,
+          "x": 0,
+          "y": 21
+        },
+        "config": {
+          "type": "xy",
+          "title": "Top VMs",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal",
+              "breakdown_by": {
+                "operation": "histogram",
+                "label": "Priority",
+                "field": "gcp.firewall.rule_details.priority",
+                "granularity": "auto",
+                "include_empty_rows": false,
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "label": "Events",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "VM",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e9a02bc3-c20c-4a38-8c75-2db4923c60a3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 24,
+          "x": 24,
+          "y": 21
+        },
+        "config": {
+          "type": "treemap",
+          "title": "Firewall rules",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "rule.name"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "c704818b-a568-4142-92f0-3ff09f0fb8e6",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 34
+        },
+        "config": {
+          "type": "heatmap",
+          "legend": {
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right",
+            "size": "auto"
+          },
+          "title": "Events between Ports",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "axis": {
+            "x": {
+              "title": {
+                "text": ""
+              },
+              "labels": {
+                "visible": true,
+                "orientation": "horizontal"
+              },
+              "scale": "ordinal"
+            },
+            "y": {
+              "title": {
+                "text": ""
+              },
+              "labels": {
+                "visible": true
+              }
+            }
+          },
+          "x": {
+            "operation": "terms",
+            "label": "Destination Port",
+            "fields": [
+              "destination.port"
+            ],
+            "limit": 5,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          },
+          "y": {
+            "operation": "terms",
+            "label": "Source IP",
+            "fields": [
+              "source.port"
+            ],
+            "limit": 5,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          },
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "cells": {
+              "labels": {
+                "visible": false
+              }
+            }
+          },
+          "metric": {
+            "format": {
+              "type": "number",
+              "decimals": 2,
+              "compact": false
+            },
+            "label": "Events",
+            "empty_as_null": false,
+            "operation": "count",
+            "color": {
+              "type": "distributed_palette",
+              "palette": "cool"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "f5d8c4eb-716d-4286-9f82-4cff620b3b11",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 34
+        },
+        "config": {
+          "type": "heatmap",
+          "legend": {
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right",
+            "size": "auto"
+          },
+          "title": "Events between IPs",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "gcp.firewall"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "axis": {
+            "x": {
+              "title": {
+                "text": ""
+              },
+              "labels": {
+                "visible": true,
+                "orientation": "horizontal"
+              },
+              "scale": "ordinal"
+            },
+            "y": {
+              "title": {
+                "text": ""
+              },
+              "labels": {
+                "visible": true
+              }
+            }
+          },
+          "x": {
+            "operation": "terms",
+            "label": "Destination IP",
+            "fields": [
+              "destination.ip"
+            ],
+            "limit": 5,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          },
+          "y": {
+            "operation": "terms",
+            "label": "Source IP",
+            "fields": [
+              "source.ip"
+            ],
+            "limit": 5,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          },
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "cells": {
+              "labels": {
+                "visible": false
+              }
+            }
+          },
+          "metric": {
+            "format": {
+              "type": "number",
+              "decimals": 2,
+              "compact": false
+            },
+            "label": "Events",
+            "empty_as_null": false,
+            "operation": "count",
+            "color": {
+              "type": "distributed_palette",
+              "palette": "cool"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "bfc4e50a-001c-4d8a-9074-8b1c969eabd5",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:39.499Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:41.502Z",
+    "version": "WzE5MCwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [
+                {
+                  "$state": {
+                    "store": "appState"
+                  },
+                  "meta": {
+                    "alias": null,
+                    "disabled": false,
+                    "field": "data_stream.dataset",
+                    "key": "data_stream.dataset",
+                    "negate": false,
+                    "params": {
+                      "query": "gcp.firewall"
+                    },
+                    "type": "phrase",
+                    "index": "logs-*"
+                  },
+                  "query": {
+                    "match_phrase": {
+                      "data_stream.dataset": "gcp.firewall"
+                    }
+                  }
+                }
+              ],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "spec": "{\r\n  $schema: https://vega.github.io/schema/vega/v3.0.json\r\n  data: [\r\n    {\r\n      // query ES based on the currently selected time range and filter string\r\n      name: rawData\r\n      url: {\r\n        %context%: true\r\n        %timefield%: @timestamp\r\n        index: logs*\r\n        body: {\r\n          size: 0\r\n          aggs: {\r\n            table: {\r\n              composite: {\r\n                size: 10000\r\n                sources: [\r\n                  {\r\n                    stk1: {\r\n                      terms: {field: \"source.domain\"}\r\n                    }\r\n                  }\r\n                  {\r\n                    stk2: {\r\n                      terms: {field: \"destination.domain\"}\r\n                    }\r\n                  }\r\n                ]\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n      // From the result, take just the data we are interested in\r\n      format: {property: \"aggregations.table.buckets\"}\r\n      // Convert key.stk1 -> stk1 for simpler access below\r\n      transform: [\r\n        {type: \"formula\", expr: \"datum.key.stk1\", as: \"stk1\"}\r\n        {type: \"formula\", expr: \"datum.key.stk2\", as: \"stk2\"}\r\n        {type: \"formula\", expr: \"datum.doc_count\", as: \"size\"}\r\n      ]\r\n    }\r\n    {\r\n      name: nodes\r\n      source: rawData\r\n      transform: [\r\n        // when a country is selected, filter out unrelated data\r\n        {\r\n          type: filter\r\n          expr: !groupSelector || groupSelector.stk1 == datum.stk1 || groupSelector.stk2 == datum.stk2\r\n        }\r\n        // Set new key for later lookups - identifies each node\r\n        {type: \"formula\", expr: \"datum.stk1+datum.stk2\", as: \"key\"}\r\n        // instead of each table row, create two new rows,\r\n        // one for the source (stack=stk1) and one for destination node (stack=stk2).\r\n        // The country code stored in stk1 and stk2 fields is placed into grpId field.\r\n        {\r\n          type: fold\r\n          fields: [\"stk1\", \"stk2\"]\r\n          as: [\"stack\", \"grpId\"]\r\n        }\r\n        // Create a sortkey, different for stk1 and stk2 stacks.\r\n        // Space separator ensures proper sort order in some corner cases.\r\n        {\r\n          type: formula\r\n          expr: datum.stack == 'stk1' ? datum.stk1+' '+datum.stk2 : datum.stk2+' '+datum.stk1\r\n          as: sortField\r\n        }\r\n        // Calculate y0 and y1 positions for stacking nodes one on top of the other,\r\n        // independently for each stack, and ensuring they are in the proper order,\r\n        // alphabetical from the top (reversed on the y axis)\r\n        {\r\n          type: stack\r\n          groupby: [\"stack\"]\r\n          sort: {field: \"sortField\", order: \"descending\"}\r\n          field: size\r\n        }\r\n        // calculate vertical center point for each node, used to draw edges\r\n        {type: \"formula\", expr: \"(datum.y0+datum.y1)/2\", as: \"yc\"}\r\n      ]\r\n    }\r\n    {\r\n      name: groups\r\n      source: nodes\r\n      transform: [\r\n        // combine all nodes into country groups, summing up the doc counts\r\n        {\r\n          type: aggregate\r\n          groupby: [\"stack\", \"grpId\"]\r\n          fields: [\"size\"]\r\n          ops: [\"sum\"]\r\n          as: [\"total\"]\r\n        }\r\n        // re-calculate the stacking y0,y1 values\r\n        {\r\n          type: stack\r\n          groupby: [\"stack\"]\r\n          sort: {field: \"grpId\", order: \"descending\"}\r\n          field: total\r\n        }\r\n        // project y0 and y1 values to screen coordinates\r\n        // doing it once here instead of doing it several times in marks\r\n        {type: \"formula\", expr: \"scale('y', datum.y0)\", as: \"scaledY0\"}\r\n        {type: \"formula\", expr: \"scale('y', datum.y1)\", as: \"scaledY1\"}\r\n        // boolean flag if the label should be on the right of the stack\r\n        {type: \"formula\", expr: \"datum.stack == 'stk1'\", as: \"rightLabel\"}\r\n        // Calculate traffic percentage for this country using \"y\" scale\r\n        // domain upper bound, which represents the total traffic\r\n        {\r\n          type: formula\r\n          expr: datum.total/domain('y')[1]\r\n          as: percentage\r\n        }\r\n      ]\r\n    }\r\n    {\r\n      // This is a temp lookup table with all the 'stk2' stack nodes\r\n      name: destinationNodes\r\n      source: nodes\r\n      transform: [\r\n        {type: \"filter\", expr: \"datum.stack == 'stk2'\"}\r\n      ]\r\n    }\r\n    {\r\n      name: edges\r\n      source: nodes\r\n      transform: [\r\n        // we only want nodes from the left stack\r\n        {type: \"filter\", expr: \"datum.stack == 'stk1'\"}\r\n        // find corresponding node from the right stack, keep it as \"target\"\r\n        {\r\n          type: lookup\r\n          from: destinationNodes\r\n          key: key\r\n          fields: [\"key\"]\r\n          as: [\"target\"]\r\n        }\r\n        // calculate SVG link path between stk1 and stk2 stacks for the node pair\r\n        {\r\n          type: linkpath\r\n          orient: horizontal\r\n          shape: diagonal\r\n          sourceY: {expr: \"scale('y', datum.yc)\"}\r\n          sourceX: {expr: \"scale('x', 'stk1') + bandwidth('x')\"}\r\n          targetY: {expr: \"scale('y', datum.target.yc)\"}\r\n          targetX: {expr: \"scale('x', 'stk2')\"}\r\n        }\r\n        // A little trick to calculate the thickness of the line.\r\n        // The value needs to be the same as the hight of the node, but scaling\r\n        // size to screen's height gives inversed value because screen's Y\r\n        // coordinate goes from the top to the bottom, whereas the graph's Y=0\r\n        // is at the bottom. So subtracting scaled doc count from screen height\r\n        // (which is the \"lower\" bound of the \"y\" scale) gives us the right value\r\n        {\r\n          type: formula\r\n          expr: range('y')[0]-scale('y', datum.size)\r\n          as: strokeWidth\r\n        }\r\n        // Tooltip needs individual link's percentage of all traffic\r\n        {\r\n          type: formula\r\n          expr: datum.size/domain('y')[1]\r\n          as: percentage\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n  scales: [\r\n    {\r\n      // calculates horizontal stack positioning\r\n      name: x\r\n      type: band\r\n      range: width\r\n      domain: [\"stk1\", \"stk2\"]\r\n      paddingOuter: 0.05\r\n      paddingInner: 0.95\r\n    }\r\n    {\r\n      // this scale goes up as high as the highest y1 value of all nodes\r\n      name: y\r\n      type: linear\r\n      range: height\r\n      domain: {data: \"nodes\", field: \"y1\"}\r\n    }\r\n    {\r\n      // use rawData to ensure the colors stay the same when clicking.\r\n      name: color\r\n      type: ordinal\r\n      range: category\r\n      domain: {data: \"rawData\", fields: [\"stk1\", \"stk2\"]}\r\n    }\r\n    {\r\n      // this scale is used to map internal ids (stk1, stk2) to stack names\r\n      name: stackNames\r\n      type: ordinal\r\n      range: [\"Source\", \"Destination\"]\r\n      domain: [\"stk1\", \"stk2\"]\r\n    }\r\n  ]\r\n  axes: [\r\n    {\r\n      // x axis should use custom label formatting to print proper stack names\r\n      orient: bottom\r\n      scale: x\r\n      encode: {\r\n        labels: {\r\n          update: {\r\n            text: {scale: \"stackNames\", field: \"value\"}\r\n          }\r\n        }\r\n      }\r\n    }\r\n    {orient: \"left\", scale: \"y\"}\r\n  ]\r\n  marks: [\r\n    {\r\n      // draw the connecting line between stacks\r\n      type: path\r\n      name: edgeMark\r\n      from: {data: \"edges\"}\r\n      // this prevents some autosizing issues with large strokeWidth for paths\r\n      clip: true\r\n      encode: {\r\n        update: {\r\n          // By default use color of the left node, except when showing traffic\r\n          // from just one country, in which case use destination color.\r\n          stroke: [\r\n            {\r\n              test: groupSelector && groupSelector.stack=='stk1'\r\n              scale: color\r\n              field: stk2\r\n            }\r\n            {scale: \"color\", field: \"stk1\"}\r\n          ]\r\n          strokeWidth: {field: \"strokeWidth\"}\r\n          path: {field: \"path\"}\r\n          // when showing all traffic, and hovering over a country,\r\n          // highlight the traffic from that country.\r\n          strokeOpacity: {\r\n            signal: !groupSelector && (groupHover.stk1 == datum.stk1 || groupHover.stk2 == datum.stk2) ? 0.9 : 0.3\r\n          }\r\n          // Ensure that the hover-selected edges show on top\r\n          zindex: {\r\n            signal: !groupSelector && (groupHover.stk1 == datum.stk1 || groupHover.stk2 == datum.stk2) ? 1 : 0\r\n          }\r\n          // format tooltip string\r\n          tooltip: {\r\n            signal: datum.stk1 + ' &#x2192; ' + datum.stk2 + '    ' + format(datum.size, ',.0f') + '   (' + format(datum.percentage, '.1%') + ')'\r\n          }\r\n        }\r\n        // Simple mouseover highlighting of a single line\r\n        hover: {\r\n          strokeOpacity: {value: 1}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // draw stack groups (countries)\r\n      type: rect\r\n      name: groupMark\r\n      from: {data: \"groups\"}\r\n      encode: {\r\n        enter: {\r\n          fill: {scale: \"color\", field: \"grpId\"}\r\n          width: {scale: \"x\", band: 1}\r\n        }\r\n        update: {\r\n          x: {scale: \"x\", field: \"stack\"}\r\n          y: {field: \"scaledY0\"}\r\n          y2: {field: \"scaledY1\"}\r\n          fillOpacity: {value: 0.6}\r\n          tooltip: {\r\n            signal: datum.grpId + '   ' + format(datum.total, ',.0f') + '   (' + format(datum.percentage, '.1%') + ')'\r\n          }\r\n        }\r\n        hover: {\r\n          fillOpacity: {value: 1}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // draw country code labels on the inner side of the stack\r\n      type: text\r\n      from: {data: \"groups\"}\r\n      // don't process events for the labels - otherwise line mouseover is unclean\r\n      interactive: false\r\n      encode: {\r\n        update: {\r\n          // depending on which stack it is, position x with some padding\r\n          x: {\r\n            signal: scale('x', datum.stack) + (datum.rightLabel ? bandwidth('x') + 8 : -8)\r\n          }\r\n          // middle of the group\r\n          yc: {signal: \"(datum.scaledY0 + datum.scaledY1)/2\"}\r\n          align: {signal: \"datum.rightLabel ? 'left' : 'right'\"}\r\n          baseline: {value: \"middle\"}\r\n          fontWeight: {value: \"bold\"}\r\n          // only show text label if the group's height is large enough\r\n          text: {signal: \"abs(datum.scaledY0-datum.scaledY1) > 13 ? datum.grpId : ''\"}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // Create a \"show all\" button. Shown only when a country is selected.\r\n      type: group\r\n      data: [\r\n        // We need to make the button show only when groupSelector signal is true.\r\n        // Each mark is drawn as many times as there are elements in the backing data.\r\n        // Which means that if values list is empty, it will not be drawn.\r\n        // Here I create a data source with one empty object, and filter that list\r\n        // based on the signal value. This can only be done in a group.\r\n        {\r\n          name: dataForShowAll\r\n          values: [{}]\r\n          transform: [{type: \"filter\", expr: \"groupSelector\"}]\r\n        }\r\n      ]\r\n      // Set button size and positioning\r\n      encode: {\r\n        enter: {\r\n          xc: {signal: \"width/2\"}\r\n          y: {value: 30}\r\n          width: {value: 80}\r\n          height: {value: 30}\r\n        }\r\n      }\r\n      marks: [\r\n        {\r\n          // This group is shown as a button with rounded corners.\r\n          type: group\r\n          // mark name allows signal capturing\r\n          name: groupReset\r\n          // Only shows button if dataForShowAll has values.\r\n          from: {data: \"dataForShowAll\"}\r\n          encode: {\r\n            enter: {\r\n              cornerRadius: {value: 6}\r\n              fill: {value: \"#f5f5f5\"}\r\n              stroke: {value: \"#c1c1c1\"}\r\n              strokeWidth: {value: 2}\r\n              // use parent group's size\r\n              height: {\r\n                field: {group: \"height\"}\r\n              }\r\n              width: {\r\n                field: {group: \"width\"}\r\n              }\r\n            }\r\n            update: {\r\n              // groups are transparent by default\r\n              opacity: {value: 1}\r\n            }\r\n            hover: {\r\n              opacity: {value: 0.7}\r\n            }\r\n          }\r\n          marks: [\r\n            {\r\n              type: text\r\n              // if true, it will prevent clicking on the button when over text.\r\n              interactive: false\r\n              encode: {\r\n                enter: {\r\n                  // center text in the paren group\r\n                  xc: {\r\n                    field: {group: \"width\"}\r\n                    mult: 0.5\r\n                  }\r\n                  yc: {\r\n                    field: {group: \"height\"}\r\n                    mult: 0.5\r\n                    offset: 2\r\n                  }\r\n                  align: {value: \"center\"}\r\n                  baseline: {value: \"middle\"}\r\n                  fontWeight: {value: \"bold\"}\r\n                  text: {value: \"Show All\"}\r\n                }\r\n              }\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n  signals: [\r\n    {\r\n      // used to highlight traffic to/from the same country\r\n      name: groupHover\r\n      value: {}\r\n      on: [\r\n        {\r\n          events: @groupMark:mouseover\r\n          update: \"{stk1:datum.stack=='stk1' && datum.grpId, stk2:datum.stack=='stk2' && datum.grpId}\"\r\n        }\r\n        {events: \"mouseout\", update: \"{}\"}\r\n      ]\r\n    }\r\n    // used to filter only the data related to the selected country\r\n    {\r\n      name: groupSelector\r\n      value: false\r\n      on: [\r\n        {\r\n          // Clicking groupMark sets this signal to the filter values\r\n          events: @groupMark:click!\r\n          update: \"{stack:datum.stack, stk1:datum.stack=='stk1' && datum.grpId, stk2:datum.stack=='stk2' && datum.grpId}\"\r\n        }\r\n        {\r\n          // Clicking \"show all\" button, or double-clicking anywhere resets it\r\n          events: [\r\n            {type: \"click\", markname: \"groupReset\"}\r\n            {type: \"dblclick\"}\r\n          ]\r\n          update: \"false\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}"
+          },
+          "title": "[GCP] Sankey Source to Destination domain",
+          "type": "vega",
+          "uiState": {}
+        },
+        "type": "visualization",
+        "title": "Sankey Source to Destination domain",
+        "hide_title": false
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [
+                {
+                  "$state": {
+                    "store": "appState"
+                  },
+                  "meta": {
+                    "alias": null,
+                    "disabled": false,
+                    "field": "data_stream.dataset",
+                    "key": "data_stream.dataset",
+                    "negate": false,
+                    "params": {
+                      "query": "gcp.firewall"
+                    },
+                    "type": "phrase",
+                    "index": "logs-*"
+                  },
+                  "query": {
+                    "match_phrase": {
+                      "data_stream.dataset": "gcp.firewall"
+                    }
+                  }
+                }
+              ],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "spec": "{\r\n  $schema: https://vega.github.io/schema/vega/v3.0.json\r\n  data: [\r\n    {\r\n      // query ES based on the currently selected time range and filter string\r\n      name: rawData\r\n      url: {\r\n        %context%: true\r\n        %timefield%: @timestamp\r\n        index: logs*\r\n        body: {\r\n          size: 0\r\n          aggs: {\r\n            table: {\r\n              composite: {\r\n                size: 10000\r\n                sources: [\r\n                  {\r\n                    stk1: {\r\n                      terms: {field: \"gcp.source.vpc.vpc_name\"}\r\n                    }\r\n                  }\r\n                  {\r\n                    stk2: {\r\n                      terms: {field: \"gcp.destination.vpc.vpc_name\"}\r\n                    }\r\n                  }\r\n                ]\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n      // From the result, take just the data we are interested in\r\n      format: {property: \"aggregations.table.buckets\"}\r\n      // Convert key.stk1 -> stk1 for simpler access below\r\n      transform: [\r\n        {type: \"formula\", expr: \"datum.key.stk1\", as: \"stk1\"}\r\n        {type: \"formula\", expr: \"datum.key.stk2\", as: \"stk2\"}\r\n        {type: \"formula\", expr: \"datum.doc_count\", as: \"size\"}\r\n      ]\r\n    }\r\n    {\r\n      name: nodes\r\n      source: rawData\r\n      transform: [\r\n        // when a country is selected, filter out unrelated data\r\n        {\r\n          type: filter\r\n          expr: !groupSelector || groupSelector.stk1 == datum.stk1 || groupSelector.stk2 == datum.stk2\r\n        }\r\n        // Set new key for later lookups - identifies each node\r\n        {type: \"formula\", expr: \"datum.stk1+datum.stk2\", as: \"key\"}\r\n        // instead of each table row, create two new rows,\r\n        // one for the source (stack=stk1) and one for destination node (stack=stk2).\r\n        // The country code stored in stk1 and stk2 fields is placed into grpId field.\r\n        {\r\n          type: fold\r\n          fields: [\"stk1\", \"stk2\"]\r\n          as: [\"stack\", \"grpId\"]\r\n        }\r\n        // Create a sortkey, different for stk1 and stk2 stacks.\r\n        // Space separator ensures proper sort order in some corner cases.\r\n        {\r\n          type: formula\r\n          expr: datum.stack == 'stk1' ? datum.stk1+' '+datum.stk2 : datum.stk2+' '+datum.stk1\r\n          as: sortField\r\n        }\r\n        // Calculate y0 and y1 positions for stacking nodes one on top of the other,\r\n        // independently for each stack, and ensuring they are in the proper order,\r\n        // alphabetical from the top (reversed on the y axis)\r\n        {\r\n          type: stack\r\n          groupby: [\"stack\"]\r\n          sort: {field: \"sortField\", order: \"descending\"}\r\n          field: size\r\n        }\r\n        // calculate vertical center point for each node, used to draw edges\r\n        {type: \"formula\", expr: \"(datum.y0+datum.y1)/2\", as: \"yc\"}\r\n      ]\r\n    }\r\n    {\r\n      name: groups\r\n      source: nodes\r\n      transform: [\r\n        // combine all nodes into country groups, summing up the doc counts\r\n        {\r\n          type: aggregate\r\n          groupby: [\"stack\", \"grpId\"]\r\n          fields: [\"size\"]\r\n          ops: [\"sum\"]\r\n          as: [\"total\"]\r\n        }\r\n        // re-calculate the stacking y0,y1 values\r\n        {\r\n          type: stack\r\n          groupby: [\"stack\"]\r\n          sort: {field: \"grpId\", order: \"descending\"}\r\n          field: total\r\n        }\r\n        // project y0 and y1 values to screen coordinates\r\n        // doing it once here instead of doing it several times in marks\r\n        {type: \"formula\", expr: \"scale('y', datum.y0)\", as: \"scaledY0\"}\r\n        {type: \"formula\", expr: \"scale('y', datum.y1)\", as: \"scaledY1\"}\r\n        // boolean flag if the label should be on the right of the stack\r\n        {type: \"formula\", expr: \"datum.stack == 'stk1'\", as: \"rightLabel\"}\r\n        // Calculate traffic percentage for this country using \"y\" scale\r\n        // domain upper bound, which represents the total traffic\r\n        {\r\n          type: formula\r\n          expr: datum.total/domain('y')[1]\r\n          as: percentage\r\n        }\r\n      ]\r\n    }\r\n    {\r\n      // This is a temp lookup table with all the 'stk2' stack nodes\r\n      name: destinationNodes\r\n      source: nodes\r\n      transform: [\r\n        {type: \"filter\", expr: \"datum.stack == 'stk2'\"}\r\n      ]\r\n    }\r\n    {\r\n      name: edges\r\n      source: nodes\r\n      transform: [\r\n        // we only want nodes from the left stack\r\n        {type: \"filter\", expr: \"datum.stack == 'stk1'\"}\r\n        // find corresponding node from the right stack, keep it as \"target\"\r\n        {\r\n          type: lookup\r\n          from: destinationNodes\r\n          key: key\r\n          fields: [\"key\"]\r\n          as: [\"target\"]\r\n        }\r\n        // calculate SVG link path between stk1 and stk2 stacks for the node pair\r\n        {\r\n          type: linkpath\r\n          orient: horizontal\r\n          shape: diagonal\r\n          sourceY: {expr: \"scale('y', datum.yc)\"}\r\n          sourceX: {expr: \"scale('x', 'stk1') + bandwidth('x')\"}\r\n          targetY: {expr: \"scale('y', datum.target.yc)\"}\r\n          targetX: {expr: \"scale('x', 'stk2')\"}\r\n        }\r\n        // A little trick to calculate the thickness of the line.\r\n        // The value needs to be the same as the hight of the node, but scaling\r\n        // size to screen's height gives inversed value because screen's Y\r\n        // coordinate goes from the top to the bottom, whereas the graph's Y=0\r\n        // is at the bottom. So subtracting scaled doc count from screen height\r\n        // (which is the \"lower\" bound of the \"y\" scale) gives us the right value\r\n        {\r\n          type: formula\r\n          expr: range('y')[0]-scale('y', datum.size)\r\n          as: strokeWidth\r\n        }\r\n        // Tooltip needs individual link's percentage of all traffic\r\n        {\r\n          type: formula\r\n          expr: datum.size/domain('y')[1]\r\n          as: percentage\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n  scales: [\r\n    {\r\n      // calculates horizontal stack positioning\r\n      name: x\r\n      type: band\r\n      range: width\r\n      domain: [\"stk1\", \"stk2\"]\r\n      paddingOuter: 0.05\r\n      paddingInner: 0.95\r\n    }\r\n    {\r\n      // this scale goes up as high as the highest y1 value of all nodes\r\n      name: y\r\n      type: linear\r\n      range: height\r\n      domain: {data: \"nodes\", field: \"y1\"}\r\n    }\r\n    {\r\n      // use rawData to ensure the colors stay the same when clicking.\r\n      name: color\r\n      type: ordinal\r\n      range: category\r\n      domain: {data: \"rawData\", fields: [\"stk1\", \"stk2\"]}\r\n    }\r\n    {\r\n      // this scale is used to map internal ids (stk1, stk2) to stack names\r\n      name: stackNames\r\n      type: ordinal\r\n      range: [\"Source\", \"Destination\"]\r\n      domain: [\"stk1\", \"stk2\"]\r\n    }\r\n  ]\r\n  axes: [\r\n    {\r\n      // x axis should use custom label formatting to print proper stack names\r\n      orient: bottom\r\n      scale: x\r\n      encode: {\r\n        labels: {\r\n          update: {\r\n            text: {scale: \"stackNames\", field: \"value\"}\r\n          }\r\n        }\r\n      }\r\n    }\r\n    {orient: \"left\", scale: \"y\"}\r\n  ]\r\n  marks: [\r\n    {\r\n      // draw the connecting line between stacks\r\n      type: path\r\n      name: edgeMark\r\n      from: {data: \"edges\"}\r\n      // this prevents some autosizing issues with large strokeWidth for paths\r\n      clip: true\r\n      encode: {\r\n        update: {\r\n          // By default use color of the left node, except when showing traffic\r\n          // from just one country, in which case use destination color.\r\n          stroke: [\r\n            {\r\n              test: groupSelector && groupSelector.stack=='stk1'\r\n              scale: color\r\n              field: stk2\r\n            }\r\n            {scale: \"color\", field: \"stk1\"}\r\n          ]\r\n          strokeWidth: {field: \"strokeWidth\"}\r\n          path: {field: \"path\"}\r\n          // when showing all traffic, and hovering over a country,\r\n          // highlight the traffic from that country.\r\n          strokeOpacity: {\r\n            signal: !groupSelector && (groupHover.stk1 == datum.stk1 || groupHover.stk2 == datum.stk2) ? 0.9 : 0.3\r\n          }\r\n          // Ensure that the hover-selected edges show on top\r\n          zindex: {\r\n            signal: !groupSelector && (groupHover.stk1 == datum.stk1 || groupHover.stk2 == datum.stk2) ? 1 : 0\r\n          }\r\n          // format tooltip string\r\n          tooltip: {\r\n            signal: datum.stk1 + ' &#x2192; ' + datum.stk2 + '    ' + format(datum.size, ',.0f') + '   (' + format(datum.percentage, '.1%') + ')'\r\n          }\r\n        }\r\n        // Simple mouseover highlighting of a single line\r\n        hover: {\r\n          strokeOpacity: {value: 1}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // draw stack groups (countries)\r\n      type: rect\r\n      name: groupMark\r\n      from: {data: \"groups\"}\r\n      encode: {\r\n        enter: {\r\n          fill: {scale: \"color\", field: \"grpId\"}\r\n          width: {scale: \"x\", band: 1}\r\n        }\r\n        update: {\r\n          x: {scale: \"x\", field: \"stack\"}\r\n          y: {field: \"scaledY0\"}\r\n          y2: {field: \"scaledY1\"}\r\n          fillOpacity: {value: 0.6}\r\n          tooltip: {\r\n            signal: datum.grpId + '   ' + format(datum.total, ',.0f') + '   (' + format(datum.percentage, '.1%') + ')'\r\n          }\r\n        }\r\n        hover: {\r\n          fillOpacity: {value: 1}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // draw country code labels on the inner side of the stack\r\n      type: text\r\n      from: {data: \"groups\"}\r\n      // don't process events for the labels - otherwise line mouseover is unclean\r\n      interactive: false\r\n      encode: {\r\n        update: {\r\n          // depending on which stack it is, position x with some padding\r\n          x: {\r\n            signal: scale('x', datum.stack) + (datum.rightLabel ? bandwidth('x') + 8 : -8)\r\n          }\r\n          // middle of the group\r\n          yc: {signal: \"(datum.scaledY0 + datum.scaledY1)/2\"}\r\n          align: {signal: \"datum.rightLabel ? 'left' : 'right'\"}\r\n          baseline: {value: \"middle\"}\r\n          fontWeight: {value: \"bold\"}\r\n          // only show text label if the group's height is large enough\r\n          text: {signal: \"abs(datum.scaledY0-datum.scaledY1) > 13 ? datum.grpId : ''\"}\r\n        }\r\n      }\r\n    }\r\n    {\r\n      // Create a \"show all\" button. Shown only when a country is selected.\r\n      type: group\r\n      data: [\r\n        // We need to make the button show only when groupSelector signal is true.\r\n        // Each mark is drawn as many times as there are elements in the backing data.\r\n        // Which means that if values list is empty, it will not be drawn.\r\n        // Here I create a data source with one empty object, and filter that list\r\n        // based on the signal value. This can only be done in a group.\r\n        {\r\n          name: dataForShowAll\r\n          values: [{}]\r\n          transform: [{type: \"filter\", expr: \"groupSelector\"}]\r\n        }\r\n      ]\r\n      // Set button size and positioning\r\n      encode: {\r\n        enter: {\r\n          xc: {signal: \"width/2\"}\r\n          y: {value: 30}\r\n          width: {value: 80}\r\n          height: {value: 30}\r\n        }\r\n      }\r\n      marks: [\r\n        {\r\n          // This group is shown as a button with rounded corners.\r\n          type: group\r\n          // mark name allows signal capturing\r\n          name: groupReset\r\n          // Only shows button if dataForShowAll has values.\r\n          from: {data: \"dataForShowAll\"}\r\n          encode: {\r\n            enter: {\r\n              cornerRadius: {value: 6}\r\n              fill: {value: \"#f5f5f5\"}\r\n              stroke: {value: \"#c1c1c1\"}\r\n              strokeWidth: {value: 2}\r\n              // use parent group's size\r\n              height: {\r\n                field: {group: \"height\"}\r\n              }\r\n              width: {\r\n                field: {group: \"width\"}\r\n              }\r\n            }\r\n            update: {\r\n              // groups are transparent by default\r\n              opacity: {value: 1}\r\n            }\r\n            hover: {\r\n              opacity: {value: 0.7}\r\n            }\r\n          }\r\n          marks: [\r\n            {\r\n              type: text\r\n              // if true, it will prevent clicking on the button when over text.\r\n              interactive: false\r\n              encode: {\r\n                enter: {\r\n                  // center text in the paren group\r\n                  xc: {\r\n                    field: {group: \"width\"}\r\n                    mult: 0.5\r\n                  }\r\n                  yc: {\r\n                    field: {group: \"height\"}\r\n                    mult: 0.5\r\n                    offset: 2\r\n                  }\r\n                  align: {value: \"center\"}\r\n                  baseline: {value: \"middle\"}\r\n                  fontWeight: {value: \"bold\"}\r\n                  text: {value: \"Show All\"}\r\n                }\r\n              }\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n  signals: [\r\n    {\r\n      // used to highlight traffic to/from the same country\r\n      name: groupHover\r\n      value: {}\r\n      on: [\r\n        {\r\n          events: @groupMark:mouseover\r\n          update: \"{stk1:datum.stack=='stk1' && datum.grpId, stk2:datum.stack=='stk2' && datum.grpId}\"\r\n        }\r\n        {events: \"mouseout\", update: \"{}\"}\r\n      ]\r\n    }\r\n    // used to filter only the data related to the selected country\r\n    {\r\n      name: groupSelector\r\n      value: false\r\n      on: [\r\n        {\r\n          // Clicking groupMark sets this signal to the filter values\r\n          events: @groupMark:click!\r\n          update: \"{stack:datum.stack, stk1:datum.stack=='stk1' && datum.grpId, stk2:datum.stack=='stk2' && datum.grpId}\"\r\n        }\r\n        {\r\n          // Clicking \"show all\" button, or double-clicking anywhere resets it\r\n          events: [\r\n            {type: \"click\", markname: \"groupReset\"}\r\n            {type: \"dblclick\"}\r\n          ]\r\n          update: \"false\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}"
+          },
+          "title": "[GCP] Sankey Source to Destination VPC",
+          "type": "vega",
+          "uiState": {}
+        },
+        "type": "visualization",
+        "title": "Sankey Source to Destination VPC",
+        "hide_title": false
+      }
+    }
+  ]
+}

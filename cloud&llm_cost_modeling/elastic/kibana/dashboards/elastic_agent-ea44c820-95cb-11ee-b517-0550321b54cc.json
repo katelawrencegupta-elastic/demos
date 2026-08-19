@@ -1,0 +1,1461 @@
+{
+  "id": "elastic_agent-ea44c820-95cb-11ee-b517-0550321b54cc",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-elastic_agent-default"
+    ],
+    "title": "[Elastic Agent] Filestream Input Metrics",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 14,
+          "w": 7,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "hide_title": true,
+          "title": "Navigation",
+          "links": [
+            {
+              "label": "Overview",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a148dc70-6b3c-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Concerning Agents",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Agent Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f47f18cc-9c7d-4278-b2ea-a6dee816d395",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Integrations",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Input Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a8192f90-cd3f-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "826e4c29-7e04-4488-b80a-6357079c7f0d",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 24,
+          "w": 7,
+          "x": 0,
+          "y": 14
+        },
+        "config": {
+          "hide_title": false,
+          "title": "Inputs",
+          "links": [
+            {
+              "label": "Azure Blob Storage",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-3718c2f0-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Azure Eventhub",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0f79f070-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "CEL",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f16b4870-9811-11ee-80a4-550241a842c0",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "CloudWatch",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a7b5e7a0-cd44-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Entity Analytics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-02117980-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "ETW",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f704cce0-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Filestream",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ea44c820-95cb-11ee-b517-0550321b54cc",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "GCP Pub/Sub",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ea7a59e0-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Google Cloud Storage",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ddcc3240-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "HTTP Endpoint",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-7986a100-9817-11ee-80a4-550241a842c0",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "HTTP JSON",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-92846340-95ab-11ee-8ec1-093013efb0e3",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Lumberjack",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-077f7390-6087-11f0-b451-cd284a6efe62",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "S3",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-77cdb1c0-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Streaming",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-b7719f90-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "TCP",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-7d110ba0-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "UDP",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-87ad4330-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Unified Logs",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-9eab2fa0-5e7c-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Unix",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-86203230-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Winlog",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1badd650-d136-11ed-b85f-4be0157fc90c",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "826e4c29-7e04-4488-b80a-6357079c7f0d-inputs",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 7,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Average Processing Time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 2,
+                "compact": true
+              },
+              "label": "Average Processing Time (Milliseconds)",
+              "operation": "formula",
+              "formula": "divide(last_value(filebeat_input.processing_time.histogram.mean), 1000000)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "68d62673-3ebf-4493-9277-f3b868275d6e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 15,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Messages",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Messages Read Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.messages_read_total\": *"
+              },
+              "field": "filebeat_input.messages_read_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "323bd174-3b65-414c-9f20-3080f93cca69",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 23,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Files Active",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Current Active Files",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.files_active\": *"
+              },
+              "field": "filebeat_input.files_active",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "70a2fc2b-382a-4674-9fb0-469eacf10788",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 31,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Files Closed",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Files Closed Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.files_closed_total\": *"
+              },
+              "field": "filebeat_input.files_closed_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "2c8bd9e3-6fa6-4766-9c31-5c9b0cea69e1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 39,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Files Opened",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Files Opened Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.files_opened_total\": *"
+              },
+              "field": "filebeat_input.files_opened_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "fff9b419-4670-4cd3-99bb-b63b02e105e3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 7,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Events Processed",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Events Processed Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.events_processed_total\": *"
+              },
+              "field": "filebeat_input.events_processed_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b9defd12-6796-4308-a071-e20a4b0ebb86",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 15,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Bytes Processed",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 0
+              },
+              "label": "Bytes Processed Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.bytes_processed_total\": *"
+              },
+              "field": "filebeat_input.bytes_processed_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6872c825-d438-485c-ad14-ad7ff1adb6dc",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 31,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Pipeline: Events Filtered (9.1+)",
+          "description": "This dashboard displays metrics that require Elastic Agent version 9.1 or newer. If you encounter an error stating Field `filebeat_input.events_*` was not found, it indicates that the data is being sent from an older version of the Elastic Agent where this metric is not available.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Pipeline: Events Filtered",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.events_pipeline_filtered_total\": *"
+              },
+              "field": "filebeat_input.events_pipeline_filtered_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ea4c9dbd-2317-4b6c-b2d0-a9de694c1495",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 39,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Errors",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Errors Total",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.processing_errors_total\": *"
+              },
+              "field": "filebeat_input.processing_errors_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "dynamic",
+                "range": "absolute",
+                "steps": [
+                  {
+                    "gte": 0,
+                    "lt": 1,
+                    "color": "#54B399"
+                  },
+                  {
+                    "gte": 1,
+                    "color": "#E7664C"
+                  }
+                ]
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "a85112e6-55bf-4bb1-9301-23001334694b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 8,
+          "x": 23,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "[Elastic Agent] Events Published (9.1+)",
+          "description": "This dashboard displays metrics that require Elastic Agent version 9.1 or newer. If you encounter an error stating Field `filebeat_input.events_*` was not found, it indicates that the data is being sent from an older version of the Elastic Agent where this metric is not available.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "97d460a6-1ab7-4031-a34d-4a8c2de02032",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Pipeline: Events Published",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.events_pipeline_published_total\": *"
+              },
+              "field": "filebeat_input.events_pipeline_published_total",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "f78c3a6c-1c00-4cf1-a3d3-6dd8785e404c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 41,
+          "x": 7,
+          "y": 12
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Filestream Processing Time (Milliseconds)",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Processing Time (Milliseconds)",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area",
+              "y": [
+                {
+                  "label": "Average",
+                  "operation": "formula",
+                  "formula": "divide(last_value(filebeat_input.processing_time.histogram.mean), 1000000)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "divide(last_value(filebeat_input.processing_time.histogram.p99), 1000000)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Errors",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "\"filebeat_input.processing_errors_total\": *"
+                  },
+                  "field": "filebeat_input.processing_errors_total",
+                  "operation": "last_value",
+                  "time_field": "@timestamp",
+                  "multi_value": true,
+                  "color": {
+                    "type": "static",
+                    "color": "#e5281e"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "9ad8dbf6-b80a-427a-a838-5aeed8376f07",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 41,
+          "x": 7,
+          "y": 23
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] File Processing",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "f78abc83-4524-45af-bb4e-29e14dd52d22",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "filestream"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Count",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area",
+              "y": [
+                {
+                  "label": "Messages Read",
+                  "operation": "differences",
+                  "of": {
+                    "label": "Average",
+                    "field": "filebeat_input.messages_read_total",
+                    "operation": "last_value",
+                    "time_field": "@timestamp",
+                    "multi_value": true
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Events Processed",
+                  "operation": "differences",
+                  "of": {
+                    "filter": {
+                      "language": "kql",
+                      "expression": "\"filebeat_input.events_processed_total\": *"
+                    },
+                    "field": "filebeat_input.events_processed_total",
+                    "operation": "last_value",
+                    "time_field": "@timestamp",
+                    "multi_value": true
+                  },
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Files Active",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "\"filebeat_input.files_active\": *"
+                  },
+                  "field": "filebeat_input.files_active",
+                  "operation": "last_value",
+                  "time_field": "@timestamp",
+                  "multi_value": true,
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Errors",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "\"filebeat_input.processing_errors_total\": *"
+                  },
+                  "field": "filebeat_input.processing_errors_total",
+                  "operation": "last_value",
+                  "time_field": "@timestamp",
+                  "multi_value": true,
+                  "color": {
+                    "type": "static",
+                    "color": "#e5281e"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e3186db1-f05f-4c22-b702-1c4d5b54b87b",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "dec9b9e6-d4e1-42da-9314-317d1dc3083d",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Agent Name",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "agent.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "e8a50690-1492-48bb-ba69-e490aa9d036a",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Input ID",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "filebeat_input.id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.890Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.183Z",
+    "version": "WzM4MSwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Overview**\n\nThis dashboards is used to monitor and troubleshoot ingest performance from integrations.  \n\n**For the best experience, filter on the specific Agent of interest and its related Input ID to visualize the metrics correctly.**\n\n**This dashboard requires that \"Collect Agent Metrics\" are configured on the relevant Elastic Agent policy.**",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "hide_title": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "name": "metrics-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "time_series": {
+            "temporality_field": "temporality"
+          },
+          "mapping": {
+            "total_fields": {
+              "limit": "10000"
+            },
+            "ignore_malformed": "true"
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "histogram": {
+              "mapping": {
+                "time_series_metric": "histogram",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "histogram"
+              }
+            }
+          },
+          {
+            "exponential_histogram": {
+              "mapping": {
+                "time_series_metric": "histogram",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "exponential_histogram"
+              }
+            }
+          },
+          {
+            "counter_long": {
+              "mapping": {
+                "time_series_metric": "counter",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "long"
+              }
+            }
+          },
+          {
+            "gauge_long": {
+              "mapping": {
+                "time_series_metric": "gauge",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "long"
+              }
+            }
+          },
+          {
+            "counter_double": {
+              "mapping": {
+                "time_series_metric": "counter",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "double"
+              }
+            }
+          },
+          {
+            "gauge_double": {
+              "mapping": {
+                "time_series_metric": "gauge",
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "type": "double"
+              }
+            }
+          },
+          {
+            "summary": {
+              "mapping": {
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "metrics": [
+                  "sum",
+                  "value_count"
+                ],
+                "type": "aggregate_metric_double",
+                "default_metric": "value_count"
+              }
+            }
+          },
+          {
+            "summary_minmax": {
+              "mapping": {
+                "meta": {
+                  "unit": "{{unit}}"
+                },
+                "metrics": [
+                  "sum",
+                  "value_count",
+                  "min",
+                  "max"
+                ],
+                "type": "aggregate_metric_double",
+                "default_metric": "value_count"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "unit": {
+            "ignore_above": 1024,
+            "time_series_dimension": true,
+            "type": "keyword"
+          },
+          "start_timestamp": {
+            "type": "date"
+          },
+          "_metric_names_hash": {
+            "time_series_dimension": true,
+            "type": "keyword"
+          },
+          "attributes": {
+            "dynamic": true,
+            "time_series_dimension": true,
+            "type": "passthrough",
+            "priority": 20,
+            "properties": {
+              "http.response.status_code": {
+                "type": "long"
+              }
+            }
+          },
+          "metrics": {
+            "dynamic": true,
+            "type": "passthrough",
+            "priority": 10
+          },
+          "temporality": {
+            "time_series_dimension": true,
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "version": 19,
+    "_meta": {
+      "description": "Default mappings for the OpenTelemetry metrics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,583 @@
+{
+  "name": "logs-azure.application_gateway-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "json",
+          "_conf",
+          "message"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ],
+  "modified_date_millis": 1786557407462,
+  "description": "Pipeline for processing Azure firewall logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557407462,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.category",
+        "value": [
+          "network"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.type",
+        "value": [
+          "connection"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "json.time",
+        "target_field": "@timestamp",
+        "if": "ctx.json?.time != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.timeStamp",
+        "target_field": "json.timestamp",
+        "if": "ctx.json?.timeStamp != null"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "json.timestamp",
+        "target_field": "@timestamp",
+        "if": "ctx.json?.timestamp != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.clientIp",
+        "target_field": "json.properties.clientIP"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.clientIP",
+        "target_field": "source.address"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "source.address",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.properties.clientPort",
+        "target_field": "source.port",
+        "type": "long",
+        "if": "ctx.json.properties?.clientPort != \"\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.httpMethod",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `json.properties.requestUri` field to `url.path` to match the ECS field name. The `url.path` field is not touched if the document already has one.",
+        "field": "json.properties.requestUri",
+        "target_field": "url.path",
+        "if": "ctx.url?.path == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `json.properties.httpMethod` field is no longer required if the document has a `url.path` field.",
+        "field": "json.properties.httpMethod",
+        "if": "ctx.url?.path != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "url.path",
+        "copy_from": "url.original"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.requestQuery",
+        "target_field": "url.query"
+      }
+    },
+    {
+      "user_agent": {
+        "ignore_missing": true,
+        "field": "json.properties.userAgent",
+        "if": "ctx.json?.properties?.userAgent != \"-\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.httpStatus",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{}/%{http.version}",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.properties.httpVersion"
+      }
+    },
+    {
+      "set": {
+        "field": "network.protocol",
+        "value": "http"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.receivedBytes",
+        "target_field": "source.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.sentBytes",
+        "target_field": "destination.bytes"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes",
+        "lang": "painless",
+        "if": "ctx.source?.bytes != null && ctx.destination?.bytes != null && ctx.network?.bytes == null"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.event.duration *= params.MS_TO_NS;",
+        "lang": "painless",
+        "params": {
+          "MS_TO_NS": 1000000
+        },
+        "if": "ctx.event?.duration != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.host",
+        "target_field": "url.domain"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "destination.address",
+        "copy_from": "url.domain"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "destination.domain",
+        "copy_from": "url.domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.sslCipher",
+        "target_field": "tls.cipher"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{tls.version_protocol}v%{tls.version}",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.properties.sslProtocol"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "if": "ctx?.source?.ip != null",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "if": "ctx?.destination?.domain != null",
+        "value": "{{destination.domain}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "if": "ctx?.url?.domain != null",
+        "value": "{{url.domain}}"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.operationName",
+        "target_field": "azure.application_gateway.operation_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.instanceId",
+        "target_field": "azure.application_gateway.instance_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.hostname",
+        "target_field": "azure.application_gateway.hostname"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.action",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "set": {
+        "field": "json.event.alert.action",
+        "value": "denied",
+        "if": "ctx.azure?.firewall?.action == 'Deny'"
+      }
+    },
+    {
+      "set": {
+        "field": "json.event.alert.action",
+        "value": "allowed",
+        "if": "ctx.azure?.firewall?.action == 'Allow'"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "allowed",
+        "if": "ctx.event?.action != null && [\"Allowed\",\"Matched\",\"Detected\"].contains(ctx.event.action)"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "denied",
+        "if": "ctx.event?.action != null && [\"Blocked\"].contains(ctx.event.action)"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.details.data",
+        "target_field": "event.reason",
+        "if": "ctx.json?.properties?.details?.message != null && !ctx.json.properties.details.message.contains(\"Equal 0\") && !ctx.json.properties.details.message.contains(\"EQ matched 0\")"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ruleSetType",
+        "target_field": "rule.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ruleSetVersion",
+        "target_field": "rule.version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ruleId",
+        "target_field": "rule.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ruleGroup",
+        "target_field": "rule.ruleset"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.message",
+        "target_field": "message"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.details.message",
+        "target_field": "rule.description"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.transactionId",
+        "target_field": "azure.application_gateway.transaction_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.policyId",
+        "target_field": "azure.application_gateway.policy.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.policyScope",
+        "target_field": "azure.application_gateway.policy.scope"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.policyScopeName",
+        "target_field": "azure.application_gateway.policy.scope_name"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.type",
+        "value": "firewall"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.vendor",
+        "value": "Azure"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.product",
+        "value": "Web Application Firewall"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "json"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.application_gateway-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "observer.name",
+        "copy_from": "azure.resource.name"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "source": "boolean dropEmptyFields(Object object) {\n  if (object == null || object == \"\") {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(value -> dropEmptyFields(value));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(value -> dropEmptyFields(value));\n    return (((List) object).length == 0);\n  }\n  return false;\n}\ndropEmptyFields(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.application_gateway@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.application_gateway` dataset"
+      }
+    }
+  ]
+}

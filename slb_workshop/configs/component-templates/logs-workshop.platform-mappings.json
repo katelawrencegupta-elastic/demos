@@ -29,7 +29,19 @@
         "host": {
           "properties": {
             "name": { "type": "keyword" },
-            "hostname": { "type": "keyword" }
+            "hostname": { "type": "keyword" },
+            "ip": { "type": "ip" },
+            "geo": {
+              "properties": {
+                "location": { "type": "geo_point" },
+                "continent_name": { "type": "keyword" },
+                "country_iso_code": { "type": "keyword" },
+                "country_name": { "type": "keyword" },
+                "region_iso_code": { "type": "keyword" },
+                "region_name": { "type": "keyword" },
+                "city_name": { "type": "keyword" }
+              }
+            }
           }
         },
         "http": {

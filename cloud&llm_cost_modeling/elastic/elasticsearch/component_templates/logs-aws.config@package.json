@@ -1,0 +1,281 @@
+{
+  "name": "logs-aws.config@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.config-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "provider": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "result": {
+            "properties": {
+              "evaluation": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "observer": {
+            "properties": {
+              "vendor": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "resource": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "rule": {
+            "properties": {
+              "tags": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "aws.config"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "config": {
+                "properties": {
+                  "annotation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_recorded_time": {
+                    "type": "date"
+                  },
+                  "config_rule_invoked_time": {
+                    "type": "date"
+                  },
+                  "rule_info": {
+                    "properties": {
+                      "input_parameters": {
+                        "type": "flattened"
+                      },
+                      "scope": {
+                        "properties": {
+                          "compliance_resource_id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "tag_value": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "tag_key": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "compliance_resource_types": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "config_rule_arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "config_rule_state": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "description": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "maximum_execution_frequency": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "config_rule_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source": {
+                        "properties": {
+                          "owner": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "custom_policy_details": {
+                            "properties": {
+                              "enable_debug_log_delivery": {
+                                "type": "boolean"
+                              },
+                              "policy_runtime": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "policy_text": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "source_details": {
+                            "properties": {
+                              "event_source": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "maximum_execution_frequency": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "message_type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "source_identifier": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "evaluation_modes": {
+                        "properties": {
+                          "mode": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "created_by": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "config_rule_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "result_token": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "compliance_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "evaluation_result_identifier": {
+                    "properties": {
+                      "evaluation_result_qualifier": {
+                        "properties": {
+                          "evaluation_mode": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "resource_type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "resource_id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "config_rule_name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "resource_evaluation_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "ordering_timestamp": {
+                        "type": "date"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "7d"
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

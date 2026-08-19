@@ -1,0 +1,125 @@
+{
+  "name": "logs-azure.eventhub-1.38.1-parsed-message",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408247,
+  "description": "Pipeline for parsing azure activity logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408247,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "azure.eventhub"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename the field to `properties.raw` to avoid parse errors when `properties` is a string.",
+        "field": "azure.eventhub.properties",
+        "target_field": "azure.eventhub.properties.raw",
+        "if": "ctx.azure?.eventhub?.properties instanceof String"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.eventhub.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.eventhub.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.eventhub.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.eventhub.durationMs",
+        "target_field": "event.duration"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        }
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "source": "boolean dropEmptyFields(Object object) {\n  if (object == null || object == \"\") {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(value -> dropEmptyFields(value));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(value -> dropEmptyFields(value));\n    return (((List) object).size() == 0);\n  }\n  return false;\n}\ndropEmptyFields(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.eventhub-1.38.1-azure-shared-pipeline",
+        "ignore_failure": true
+      }
+    }
+  ]
+}

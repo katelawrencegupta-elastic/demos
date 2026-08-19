@@ -1,0 +1,77 @@
+{
+  "name": ".slm-history-7",
+  "index_template": {
+    "index_patterns": [
+      ".slm-history-7*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "snapshot_name": {
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "format": "epoch_millis",
+            "type": "date"
+          },
+          "configuration": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "indices": {
+                "type": "keyword"
+              },
+              "include_global_state": {
+                "type": "boolean"
+              },
+              "partial": {
+                "type": "boolean"
+              }
+            }
+          },
+          "error_details": {
+            "index": false,
+            "type": "text"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "repository": {
+            "type": "keyword"
+          },
+          "operation": {
+            "type": "keyword"
+          },
+          "policy": {
+            "type": "keyword"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "90d"
+      }
+    },
+    "composed_of": [],
+    "priority": 2147483647,
+    "version": 7,
+    "_meta": {
+      "description": "index template for SLM history indices",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "created_date_millis": 1786555715048,
+    "modified_date_millis": 1786555715048
+  }
+}

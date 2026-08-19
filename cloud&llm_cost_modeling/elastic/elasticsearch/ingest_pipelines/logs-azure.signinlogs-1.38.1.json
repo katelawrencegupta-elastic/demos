@@ -1,0 +1,604 @@
+{
+  "name": "logs-azure.signinlogs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557407464,
+  "description": "Pipeline for parsing Azure sign-in logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557407464,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "json": {
+        "field": "message",
+        "target_field": "azure.signinlogs"
+      }
+    },
+    {
+      "script": {
+        "description": "Convert Azure JSON keys to snake case.",
+        "tag": "azure-json-keys-to-snake-case",
+        "source": "Map keysToSnakeCase(Map m) {\n  def regex = /([a-z])([A-Z]+)/;\n  def out = [:];\n\n  for (entry in m.entrySet()) {\n    def k = entry.getKey();\n    def v = entry.getValue();\n\n    if (v instanceof Map) {\n      v = keysToSnakeCase(v);\n    } else if (v instanceof List) {\n      for (int i = 0; i < v.size(); i++) {\n        def item = v.get(i);\n        if (item instanceof Map) {\n          v.set(i, keysToSnakeCase(item));\n        }\n      }\n    }\n\n    k = regex.matcher(k).replaceAll('$1_$2').toLowerCase();\n    out.put(k, v);\n  }\n\n  return out;\n}\n\nctx.azure['signinlogs'] = keysToSnakeCase(ctx.azure.signinlogs);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop non-SignInLogs.",
+        "if": "ctx.azure?.signinlogs?.category == null || !ctx.azure.signinlogs.category.endsWith('SignInLogs')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Fallback to handle special cases for log category: use `created_date_time` as `time` if `time` is not already set.",
+        "field": "azure.signinlogs.created_date_time",
+        "target_field": "azure.signinlogs.time",
+        "if": "ctx.azure?.signinlogs?.time == null"
+      }
+    },
+    {
+      "date": {
+        "field": "azure.signinlogs.time",
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.signinlogs.time"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.resource_id",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "source.address",
+        "if": "ctx?.source?.address == null",
+        "value": "{{{azure.signinlogs.properties.ipaddress}}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "source.address",
+        "if": "ctx?.source?.address == null",
+        "value": "{{{azure.signinlogs.properties.ip_address}}}"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "source.address",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "azure.signinlogs.caller_ip_address",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "azure.signinlogs.properties.ipaddress",
+          "azure.signinlogs.properties.ip_address"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "if": "ctx?.source?.ip != null",
+        "value": "{{{source.ip}}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "client.ip",
+        "value": "{{{source.ip}}}"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.level",
+        "target_field": "log.level",
+        "type": "string"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.signinlogs.level",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "azure.signinlogs.duration_ms",
+        "target_field": "event.duration",
+        "ignore_missing": true,
+        "description": "Convert duration_ms to event.duration as long (if it is a string).",
+        "type": "long",
+        "if": "ctx.azure?.signinlogs?.duration_ms != null && ctx.azure.signinlogs.duration_ms instanceof String"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename duration_ms to event.duration (if it is not a string).",
+        "field": "azure.signinlogs.duration_ms",
+        "target_field": "event.duration",
+        "if": "ctx.azure?.signinlogs?.duration_ms != null && !(ctx.azure.signinlogs.duration_ms instanceof String)"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Clean up duration_ms field, if it is still there after the conversion.",
+        "field": "azure.signinlogs.duration_ms"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.event.duration = ctx.event.duration * 1000000",
+        "lang": "painless",
+        "if": "ctx.event?.duration != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.location",
+        "target_field": "geo.country_iso_code"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.operation_name",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.tenant_id",
+        "target_field": "azure.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.correlation_id",
+        "target_field": "azure.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.created_date_time",
+        "target_field": "azure.signinlogs.properties.created_at"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.processing_time_in_milliseconds",
+        "target_field": "azure.signinlogs.properties.processing_time_ms"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.risk_level_during_sign_in",
+        "target_field": "azure.signinlogs.properties.risk_level_during_signin"
+      }
+    },
+    {
+      "script": {
+        "description": "Build message field using a combination of failure reason and additional details",
+        "source": "String reason = ctx?.azure?.signinlogs?.properties?.status?.failure_reason; String details = ctx?.azure?.signinlogs?.properties?.status?.additional_details; if (reason != null && details != null) { ctx['message'] = reason + ' (' + details + ')'; } else if (reason != null) { ctx['message'] = reason; } else if (details != null) { ctx['message'] = details; }"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.signinlogs.properties.status.failure_reason",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.signinlogs.properties.status.additional_details",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.location.city",
+        "target_field": "geo.city_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.location.state",
+        "target_field": "geo.region_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.location.geo_coordinates.latitude",
+        "target_field": "geo.location.lat"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.location.geo_coordinates.longitude",
+        "target_field": "geo.location.lon"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "azure.signinlogs.properties.location"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "description": "Turns the authentication_processing_details array elements into key/value pairs. For example, the array element ``{key: 'key1', value: 'value1'}`` becomes ``{key1: 'value1'}``.",
+        "source": "def tmp = [:];\nfor (item in ctx.azure.signinlogs.properties.authentication_processing_details) {\n    tmp[item.key] = item.value;\n}\nctx.azure.signinlogs.properties.authentication_processing_details = tmp;\n",
+        "lang": "painless",
+        "if": "ctx.azure?.signinlogs?.properties?.authentication_processing_details != null && ctx.azure.signinlogs.properties.authentication_processing_details instanceof List"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.category",
+        "value": [
+          "authentication"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.type",
+        "value": [
+          "info"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.azure?.signinlogs?.properties?.status?.error_code == null || ctx.azure.signinlogs.properties.status.error_code == 0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.azure?.signinlogs?.properties?.status?.error_code != null && ctx.azure.signinlogs.properties.status.error_code > 0"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "event.id",
+        "value": "{{{azure.signinlogs.properties.id}}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_name",
+        "field": "user.name",
+        "copy_from": "azure.signinlogs.properties.user_principal_name"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_user_email",
+        "field": "user.email",
+        "copy_from": "user.name",
+        "if": "ctx.user?.email == null && ctx.user?.name != null && ctx.user.name.indexOf(\"@\") > 0"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.user_display_name",
+        "target_field": "user.full_name",
+        "type": "string"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop user_id field if value is null.",
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.user_id",
+        "if": "ctx?.azure?.signinlogs?.properties?.user_id == null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.signinlogs.properties.user_id",
+        "target_field": "user.id",
+        "type": "string"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.id}}}",
+        "if": "ctx.user?.id != null"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.name}}}",
+        "if": "ctx.user?.name != null"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.full_name}}}",
+        "if": "ctx.user?.full_name != null"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `azure.signinlogs.properties.user_agent` field to `user_agent.original` to match the ECS field name. The `user_agent.original` field is not touched if the document already has one.",
+        "field": "azure.signinlogs.properties.user_agent",
+        "target_field": "user_agent.original",
+        "if": "ctx.user_agent?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `azure.signinlogs.properties.user_agent` field is no longer required if the document has a `user_agent.original` field.",
+        "field": "azure.signinlogs.properties.user_agent",
+        "if": "ctx.user_agent?.original != null"
+      }
+    },
+    {
+      "user_agent": {
+        "field": "user_agent.original",
+        "ignore_missing": true
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.app_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.app_id != null && ctx.azure.signinlogs.properties.app_id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.resource_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.resource_id != null && ctx.azure.signinlogs.properties.resource_id != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "service.name",
+        "copy_from": "azure.signinlogs.properties.service_principal_name"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.service_principal_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.service_principal_id != null && ctx.azure.signinlogs.properties.service_principal_id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.service_principal_credential_key_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.service_principal_credential_key_id != null && ctx.azure.signinlogs.properties.service_principal_credential_key_id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.user_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.user_id != null && ctx.azure.signinlogs.properties.user_id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.signinlogs.properties.device_detail.device_id }}}",
+        "if": "ctx.azure?.signinlogs?.properties?.device_detail?.device_id != null && ctx.azure.signinlogs.properties.device_detail.device_id != ''"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.signinlogs-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "source": "boolean dropEmptyFields(Object object) {\n  if (object == null || object == \"\") {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(value -> dropEmptyFields(value));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(value -> dropEmptyFields(value));\n    return (((List) object).length == 0);\n  }\n  return false;\n}\ndropEmptyFields(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.signinlogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.signinlogs` dataset"
+      }
+    }
+  ]
+}

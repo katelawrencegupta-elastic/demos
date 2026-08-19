@@ -1,0 +1,29 @@
+{
+  "name": ".fleet_event_ingested-1",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "final_pipeline": ".fleet_event_ingested_pipeline-1"
+        }
+      },
+      "mappings": {
+        "properties": {
+          "event": {
+            "properties": {
+              "ingested": {
+                "format": "strict_date_time_no_millis||strict_date_optional_time||epoch_millis",
+                "ignore_malformed": false,
+                "type": "date"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

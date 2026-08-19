@@ -1,0 +1,116 @@
+{
+  "name": ".slo-observability.sli-mappings-v3.6",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "spaceId": {
+            "type": "keyword"
+          },
+          "observer": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "format": "date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "service": {
+            "properties": {
+              "environment": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "slo": {
+            "properties": {
+              "instanceId": {
+                "type": "keyword"
+              },
+              "groupings": {
+                "type": "flattened"
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "id": {
+                "ignore_above": 256,
+                "type": "keyword"
+              },
+              "tags": {
+                "type": "keyword"
+              },
+              "revision": {
+                "type": "long"
+              },
+              "numerator": {
+                "type": "long"
+              },
+              "denominator": {
+                "type": "long"
+              },
+              "isGoodSlice": {
+                "type": "byte"
+              }
+            }
+          },
+          "monitor": {
+            "properties": {
+              "config_id": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "ingested": {
+                "format": "strict_date_optional_time",
+                "type": "date"
+              }
+            }
+          },
+          "transaction": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "description": "Mappings for SLO rollup data",
+      "managed_by": "observability",
+      "version": 3.6,
+      "managed": true
+    }
+  }
+}

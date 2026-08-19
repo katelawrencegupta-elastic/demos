@@ -1,0 +1,30 @@
+{
+  "name": ".slo-observability.sli-settings-v3.6",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "sort": {
+            "field": [
+              "slo.id",
+              "slo.revision",
+              "slo.instanceId"
+            ],
+            "order": [
+              "asc",
+              "asc",
+              "asc"
+            ]
+          }
+        }
+      }
+    },
+    "_meta": {
+      "description": "Settings for SLO rollup data",
+      "managed_by": "observability",
+      "version": 3.6,
+      "managed": true
+    }
+  }
+}

@@ -17,10 +17,17 @@ FIXTURES = ROOT / "fixtures"
 
 DATA_STREAM = "logs-workshop.platform-default"
 PIPELINE_ID = "logs-workshop.platform"
+GEOIP_PIPELINE_ID = "logs-workshop.host-geoip"
+LOGS_CUSTOM_PIPELINE_ID = "logs@custom"
 INDEX_TEMPLATE = "logs-workshop.platform"
 COMPONENT_TEMPLATES = (
     "logs-workshop.platform-mappings",
     "logs-workshop.platform-settings",
+)
+OTEL_CUSTOM_COMPONENT_TEMPLATES = (
+    "logs-otel@custom",
+    "metrics-otel@custom",
+    "traces-otel@custom",
 )
 DATA_VIEW_NAME = "Workshop platform logs"
 DATA_VIEW_ID = "workshop-platform-logs"
@@ -29,6 +36,10 @@ DASHBOARD_ID = "bb3f65fa-c3d7-4b09-8295-b9645c789de9"
 DASHBOARD_TITLE = "SRE-01 Workshop — Platform logs"
 COMPARE_DASHBOARD_ID = "c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c"
 COMPARE_DASHBOARD_TITLE = "SRE-01 Workshop — Agents vs EDOT"
+METRICS_DASHBOARD_ID = "f1a8c3d2-4e6b-4a90-9c17-2d5e8b0a4f63"
+METRICS_DASHBOARD_TITLE = "SRE-01 Workshop — Metrics"
+TRACES_DASHBOARD_ID = "a9c4e7b1-5f8d-4b21-8e36-1c7a0d9f5e24"
+TRACES_DASHBOARD_TITLE = "SRE-01 Workshop — Traces"
 COMPARE_DATA_VIEWS = (
     ("workshop-agent-logs", "logs-system.auth-*,logs-system.syslog-*", "Workshop agent logs"),
     ("workshop-agent-metrics", "metrics-system.*", "Workshop agent metrics"),

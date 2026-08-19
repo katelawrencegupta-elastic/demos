@@ -1,0 +1,130 @@
+{
+  "name": "logs-aws.lambda_logs-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557379001,
+  "description": "Pipeline for AWS Lambda logs.",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557379001,
+  "processors": [
+    {
+      "rename": {
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original_b273fe21",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message_2ee3a7d4",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_ecs_version_0f7334bb",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_service_name_cb418706",
+        "field": "cloud.service.name",
+        "value": "aws_lambda"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_provider_208bdd6b",
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "grok": {
+        "tag": "grok_event_original_fc1a0163",
+        "field": "event.original",
+        "pattern_definitions": {
+          "CHAR": "."
+        },
+        "patterns": [
+          "^%{CHAR:first_char}"
+        ]
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.lambda_logs-7.1.1-aws-lambda-plaintext",
+        "tag": "pipeline_35b524a9",
+        "if": "ctx.first_char != '{'"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.lambda_logs-7.1.1-aws-lambda-json",
+        "tag": "pipeline_d8833c14",
+        "if": "ctx.first_char == '{'"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the `first_char` field used to determine the log format.",
+        "tag": "remove_first_char_c4836df3",
+        "field": "first_char"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.lambda_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.lambda_logs` dataset"
+      }
+    }
+  ]
+}

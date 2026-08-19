@@ -1,0 +1,137 @@
+{
+  "name": "metrics-gcp.storage-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557401716,
+  "description": "Pipeline for parsing GCP Storage metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557401716,
+  "processors": [
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "gcp.labels"
+        ],
+        "target_field": "gcp.labels_fingerprint"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.api.request.count",
+        "target_field": "gcp.storage.api.request.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.authz.acl_based_object_access.count",
+        "target_field": "gcp.storage.authz.acl_based_object_access.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.authz.acl_operations.count",
+        "target_field": "gcp.storage.authz.acl_operations.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.authz.object_specific_acl_mutation.count",
+        "target_field": "gcp.storage.authz.object_specific_acl_mutation.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.network.received.bytes",
+        "target_field": "gcp.storage.network.received.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.network.sent.bytes",
+        "target_field": "gcp.storage.network.sent.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.storage.object.count",
+        "target_field": "gcp.storage.storage.object.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.storage.total_byte_seconds.bytes",
+        "target_field": "gcp.storage.storage.total_byte_seconds.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.storage.total.bytes",
+        "target_field": "gcp.storage.storage.total.bytes"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.storage@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.storage` dataset"
+      }
+    }
+  ]
+}

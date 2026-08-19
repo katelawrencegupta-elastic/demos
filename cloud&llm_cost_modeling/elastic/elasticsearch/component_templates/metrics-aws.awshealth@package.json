@@ -1,0 +1,182 @@
+{
+  "name": "metrics-aws.awshealth@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws.awshealth-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "aws.awshealth.affected_entities": {
+              "path_match": "aws.awshealth.affected_entities.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "region": {
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "awshealth": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "status_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "affected_entities_resolved": {
+                    "meta": {},
+                    "type": "float"
+                  },
+                  "affected_entities_pending": {
+                    "meta": {},
+                    "type": "float"
+                  },
+                  "end_time": {
+                    "type": "date"
+                  },
+                  "event_description": {
+                    "type": "text"
+                  },
+                  "affected_entities_others": {
+                    "meta": {},
+                    "type": "float"
+                  },
+                  "event_type_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "start_time": {
+                    "type": "date"
+                  },
+                  "event_scope_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "last_updated_time": {
+                    "type": "date"
+                  },
+                  "event_type_category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "affected_entities": {
+                    "dynamic": true,
+                    "type": "object",
+                    "properties": {
+                      "entity_value": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "entity_url": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "status_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "aws_account_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "last_updated_time": {
+                        "type": "date"
+                      },
+                      "entity_arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "event_arn": {
+                    "type": "keyword"
+                  },
+                  "region": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "linked_account": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "tags": {
+                "type": "flattened"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

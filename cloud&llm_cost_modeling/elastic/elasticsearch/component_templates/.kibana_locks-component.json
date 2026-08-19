@@ -1,0 +1,24 @@
+{
+  "name": ".kibana_locks-component",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "createdAt": {
+            "type": "date"
+          },
+          "metadata": {
+            "enabled": false
+          },
+          "expiresAt": {
+            "type": "date"
+          },
+          "token": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}

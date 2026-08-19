@@ -52,6 +52,8 @@ Reset the lab objects with `.venv/bin/python scripts/teardown.py`.
 
 - Discover: [Workshop platform logs](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/discover#/?_a=(index:'workshop-platform-logs'))
 - Dashboard: [SRE-01 Workshop — Platform logs](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/bb3f65fa-c3d7-4b09-8295-b9645c789de9)
+- Dashboard: [SRE-01 Workshop — Metrics](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/f1a8c3d2-4e6b-4a90-9c17-2d5e8b0a4f63)
+- Dashboard: [SRE-01 Workshop — Traces](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/a9c4e7b1-5f8d-4b21-8e36-1c7a0d9f5e24)
 - Dashboard: [SRE-01 Workshop — Agents vs EDOT](https://my-observability-project-dce7f4.kb.us-east-1.aws.elastic.cloud/app/dashboards#/view/c8f4e1a2-9b3d-4e6f-a7c0-1d2e3f4a5b6c)
 
 Recreate with `.venv/bin/python scripts/create_kibana.py`.

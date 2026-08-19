@@ -1,0 +1,54 @@
+{
+  "name": ".alerts-dataset.quality.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "dynamic_templates": [
+          {
+            "strings_as_keywords": {
+              "path_match": "kibana.alert.grouping.*",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "evaluation": {
+                    "properties": {
+                      "threshold": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "reason": {
+                    "type": "keyword"
+                  },
+                  "grouping": {
+                    "dynamic": true,
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "traces-otel@template",
+  "index_template": {
+    "index_patterns": [
+      "traces-*.otel-*"
+    ],
+    "template": {
+      "mappings": {
+        "properties": {
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "traces"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "traces@mappings",
+      "traces@settings",
+      "otel@mappings",
+      "otel@settings",
+      "traces-otel@mappings",
+      "semconv-resource-to-ecs@mappings",
+      "traces@custom",
+      "traces-otel@custom",
+      "ecs@mappings"
+    ],
+    "priority": 120,
+    "version": 19,
+    "_meta": {
+      "description": "default OpenTelemetry traces template installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "traces@custom",
+      "traces-otel@custom"
+    ],
+    "created_date_millis": 1786555716059,
+    "modified_date_millis": 1786555716059
+  }
+}

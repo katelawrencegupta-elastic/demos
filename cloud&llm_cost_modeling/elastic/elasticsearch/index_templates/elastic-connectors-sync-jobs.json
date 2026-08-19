@@ -1,0 +1,21 @@
+{
+  "name": "elastic-connectors-sync-jobs",
+  "index_template": {
+    "index_patterns": [
+      ".elastic-connectors-sync-jobs-v1"
+    ],
+    "composed_of": [
+      "elastic-connectors-settings",
+      "elastic-connectors-sync-jobs-mappings"
+    ],
+    "priority": 100,
+    "version": 3,
+    "_meta": {
+      "description": "Built-in template for elastic-connectors-sync-jobs",
+      "managed": true
+    },
+    "allow_auto_create": true,
+    "created_date_millis": 1786555715941,
+    "modified_date_millis": 1786555715941
+  }
+}

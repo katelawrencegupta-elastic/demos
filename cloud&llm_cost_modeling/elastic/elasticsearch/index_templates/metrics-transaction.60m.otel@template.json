@@ -1,0 +1,64 @@
+{
+  "name": "metrics-transaction.60m.otel@template",
+  "index_template": {
+    "index_patterns": [
+      "metrics-transaction.60m.otel-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "properties": {
+          "metricset": {
+            "properties": {
+              "name": {
+                "type": "constant_keyword",
+                "value": "transaction"
+              },
+              "interval": {
+                "type": "constant_keyword",
+                "value": "60m"
+              }
+            }
+          },
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "metrics"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "otel@mappings",
+      "otel@settings",
+      "metrics-otel@mappings",
+      "semconv-resource-to-ecs@mappings",
+      "metrics@custom",
+      "metrics-otel@custom",
+      "metrics-60m.otel@custom",
+      "ecs-tsdb@mappings"
+    ],
+    "priority": 130,
+    "version": 19,
+    "_meta": {
+      "description": "aggregated APM metrics template installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "metrics-otel@custom",
+      "metrics-60m.otel@custom"
+    ],
+    "created_date_millis": 1786555716145,
+    "modified_date_millis": 1786555716145
+  }
+}

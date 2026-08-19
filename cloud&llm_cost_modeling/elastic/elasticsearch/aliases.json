@@ -1,0 +1,56 @@
+{
+  "security_solution-awsinspector.vulnerability_latest-v2": {
+    "aliases": {
+      "security_solution-awsinspector.vulnerability_latest": {}
+    }
+  },
+  "security_solution-aws.misconfiguration_latest-v3": {
+    "aliases": {
+      "security_solution-aws.misconfiguration_latest": {}
+    }
+  },
+  ".slo-observability.sli-v3.6": {
+    "aliases": {}
+  },
+  ".cases-activity": {
+    "aliases": {}
+  },
+  ".apm-source-map": {
+    "aliases": {}
+  },
+  ".slo-observability.composite-summary-v1": {
+    "aliases": {}
+  },
+  ".cases": {
+    "aliases": {}
+  },
+  ".transform-notifications-000002": {
+    "aliases": {
+      ".transform-notifications-read": {
+        "is_hidden": true
+      },
+      ".transform-notifications-write": {
+        "is_hidden": true
+      }
+    }
+  },
+  "security_solution-awsconfig.misconfiguration_latest-v1": {
+    "aliases": {
+      "security_solution-awsconfig.misconfiguration_latest": {}
+    }
+  },
+  ".slo-observability.summary-v3.6.temp": {
+    "aliases": {}
+  },
+  ".slo-observability.summary-v3.6": {
+    "aliases": {}
+  },
+  ".cases-attachments": {
+    "aliases": {}
+  },
+  "metrics-aws_billing.cur-default": {
+    "aliases": {
+      "aws_billing.cur_latest": {}
+    }
+  }
+}

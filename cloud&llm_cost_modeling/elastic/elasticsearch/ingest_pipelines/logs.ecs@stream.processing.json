@@ -1,0 +1,35 @@
+{
+  "name": "logs.ecs@stream.processing",
+  "_meta": {
+    "description": "Default pipeline for the logs.ecs stream",
+    "managed": true
+  },
+  "created_date_millis": 1786555748655,
+  "processors": [
+    {
+      "set": {
+        "description": "If '@timestamp' is missing, set it with the ingest timestamp",
+        "override": false,
+        "field": "@timestamp",
+        "copy_from": "_ingest.timestamp"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx[\"stream.name\"] = params.field",
+        "lang": "painless",
+        "params": {
+          "field": "logs.ecs"
+        }
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs.ecs@stream.reroutes",
+        "ignore_missing_pipeline": true
+      }
+    }
+  ],
+  "version": 1,
+  "modified_date_millis": 1786555748655
+}

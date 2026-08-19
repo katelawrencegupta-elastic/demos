@@ -1,0 +1,177 @@
+{
+  "name": "metrics-gcp_vertexai.metrics-1.5.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643498448,
+  "description": "Pipeline for parsing GCP Vertex AI metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp_vertexai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643498448,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.token_count.value",
+        "target_field": "gcp.vertexai.publisher.online_serving.token_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.model_invocation_count.value",
+        "target_field": "gcp.vertexai.publisher.online_serving.model_invocation_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.character_count.value",
+        "target_field": "gcp.vertexai.publisher.online_serving.character_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.model_invocation_latencies.value.histogram",
+        "target_field": "gcp.vertexai.publisher.online_serving.model_invocation_latencies"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.consumed_throughput.value",
+        "target_field": "gcp.vertexai.publisher.online_serving.consumed_throughput"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.publisher.online_serving.first_token_latencies.value.histogram",
+        "target_field": "gcp.vertexai.publisher.online_serving.first_token_latencies"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.error_count.value",
+        "target_field": "gcp.vertexai.prediction.online.error_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.response_count.value",
+        "target_field": "gcp.vertexai.prediction.online.response_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.prediction_count.value",
+        "target_field": "gcp.vertexai.prediction.online.prediction_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.cpu.utilization.value",
+        "target_field": "gcp.vertexai.prediction.online.cpu.utilization"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.memory.bytes_used.value",
+        "target_field": "gcp.vertexai.prediction.online.memory.bytes_used"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.network.received_bytes_count.value",
+        "target_field": "gcp.vertexai.prediction.online.network.received_bytes_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.network.sent_bytes_count.value",
+        "target_field": "gcp.vertexai.prediction.online.network.sent_bytes_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.replicas.value",
+        "target_field": "gcp.vertexai.prediction.online.replicas"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.target_replicas.value",
+        "target_field": "gcp.vertexai.prediction.online.target_replicas"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.prediction.online.prediction_latencies.value.histogram",
+        "target_field": "gcp.vertexai.prediction.online.prediction_latencies"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp_vertexai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp_vertexai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp_vertexai.metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp_vertexai.metrics` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "name": "logs-azure.firewall_logs-1.38.1-azure-shared-pipeline",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408243,
+  "description": "Pipeline for parsing Azure shared log fields.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408243,
+  "processors": [
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "azure"
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "NAMESPACE": ".+",
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+          "GROUPID": ".+",
+          "RULE": ".+",
+          "PROVIDERNAME": ".+"
+        },
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/namespaces/%{NAMESPACE:azure.resource.namespace}/authorizationRules/%{RULE:azure.resource.authorization_rule}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+          "GROUPID": ".+",
+          "PROVIDERNAME": "([A-Za-z])\\w+.([A-Za-z])\\w+/([A-Za-z])\\w+.",
+          "NAME": "((?!AUTHORIZATIONRULES).)*$"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+          "GROUPID": ".+",
+          "PROVIDERNAME": "([A-Za-z])\\w+.([A-Za-z])\\w+\\/([A-Za-z][^\\/])\\w+",
+          "NAME": ".+"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}/providers/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "PROVIDER": ".+"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/providers/%{PROVIDER:azure.resource.provider}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "PROVIDERNAME": "([A-Za-z])\\w+.([A-Za-z])\\w+\\/([A-Za-z][^\\/])\\w+",
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/providers/%{PROVIDERNAME:azure.resource.provider}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+          "GROUPID": ".+"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}/resourceGroups/%{GROUPID:azure.resource.group}"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "azure.resource_id",
+        "pattern_definitions": {
+          "SUBID": "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}"
+        },
+        "if": "ctx.azure?.subscription_id == null",
+        "patterns": [
+          "(?i)/subscriptions/%{SUBID:azure.subscription_id}"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.resource_id",
+        "target_field": "azure.resource.id"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "event.outcome",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "cloud.account.id",
+        "copy_from": "azure.subscription_id"
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "metrics-system.process-2.22.3",
+  "description": "Pipeline for system.process events.",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591739,
+  "processors": [
+    {
+      "rename": {
+        "ignore_failure": true,
+        "description": "Rename process.ppid from Agent 7.x to process.parent.pid.",
+        "field": "process.ppid",
+        "target_field": "process.parent.pid"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-system.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `system` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-system.process@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `system.process` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591739
+}

@@ -1,0 +1,1056 @@
+{
+  "id": "gcp-f40ee870-5e4a-11ea-a4f6-717338406083",
+  "data": {
+    "description": "Overview of GCP Compute Metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-gcp-default"
+    ],
+    "title": "[Metrics GCP] Compute Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "gcp.compute"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 17,
+          "w": 10,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Instance uptime",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metric": {
+            "format": {
+              "type": "percent",
+              "decimals": 3,
+              "compact": false
+            },
+            "label": "Average uptime",
+            "operation": "formula",
+            "formula": "average(gcp.compute.instance.uptime.sec) / 60",
+            "size": "m",
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "b69df245-6997-42df-885c-bd8016441252",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 17,
+          "w": 38,
+          "x": 10,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "CPU utilization",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "field": "gcp.compute.instance.cpu.usage.pct",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "92d93a4c-b2ba-458d-b039-c04e7656cee9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 17
+        },
+        "config": {
+          "type": "xy",
+          "title": "Read I/O",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "field": "gcp.compute.instance.disk.read_ops_count.value",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b1d6a796-bc2a-44aa-94f6-943ed3704767",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "Network sent bytes",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "field": "gcp.compute.instance.network.egress.bytes",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "563d6ecb-7738-41fd-b776-142d50d2f89f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 17
+        },
+        "config": {
+          "type": "xy",
+          "title": "Write I/O",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "field": "gcp.compute.instance.disk.write_ops_count.value",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b2c09b58-255f-4e48-a264-92c54b9eb2be",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 47
+        },
+        "config": {
+          "type": "xy",
+          "title": "Firewall dropped bytes",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "field": "gcp.compute.firewall.dropped.bytes",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "475657b7-b814-45f6-b97a-5219c9c4e2d8",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "Network received bytes",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "field": "gcp.compute.instance.network.ingress.bytes",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "63061b07-e650-4ffa-b152-462aa06d4749",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 47
+        },
+        "config": {
+          "type": "xy",
+          "title": "Firewall dropped packets",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": false
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": true
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_horizontal",
+              "y": [
+                {
+                  "field": "gcp.compute.firewall.dropped_packets_count.value",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "fields": [
+                  "cloud.instance.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d628fe7d-e2a8-47c4-9abb-c5d61c0a966d",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "e3ec704a-158f-40bf-aefa-bab59331183f",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "cloud.account.id",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.account.id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:39.499Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:41.192Z",
+    "version": "WzE4NCwxXQ=="
+  }
+}

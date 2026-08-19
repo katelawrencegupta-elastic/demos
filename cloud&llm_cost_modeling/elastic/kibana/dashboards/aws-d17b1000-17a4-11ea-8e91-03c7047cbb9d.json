@@ -1,0 +1,1153 @@
+{
+  "id": "aws-d17b1000-17a4-11ea-8e91-03c7047cbb9d",
+  "data": {
+    "description": "Overview of AWS SNS Metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default"
+    ],
+    "title": "[Metrics AWS] SNS Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.sns"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 10,
+          "w": 48,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Messages and Notifications",
+          "legend": {
+            "visibility": "visible",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Messages Published",
+                  "field": "aws.sns.metrics.NumberOfMessagesPublished.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Notifications Delivered",
+                  "field": "aws.sns.metrics.NumberOfNotificationsDelivered.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Notifications Failed",
+                  "field": "aws.sns.metrics.NumberOfNotificationsFailed.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#ff5858"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "76943d00-5a41-49e4-a1c9-26313ba5e90c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 10
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Publish Size",
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Publish Size",
+                  "field": "aws.sns.metrics.PublishSize.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "93edb3f8-6c8a-41c9-977b-78bfc65c285f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 16,
+          "y": 10
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Notifications Filtered Out",
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Notifications Filtered Out",
+                  "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "82368db1-42fc-432d-9383-227b89e5b972",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 32,
+          "y": 10
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Notifications Filtered Out Invalid Attributes",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Notifications Filtered Out Invalid Attributes",
+                  "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "54752b49-48e1-4b16-b943-6be1f28539b8",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 20
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Notifications Filtered Out No Message Attributes",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Notifications Filtered Out No Message Attributes",
+                  "field": "aws.sns.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "492a4179-60b0-4e17-9518-c0b127711dff",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 16,
+          "y": 20
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Notifications Redriven To DLQ",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Notifications Redriven To DLQ",
+                  "field": "aws.sns.metrics.NumberOfNotificationsRedrivenToDlq.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "615d9634-44ea-4d95-bf6f-1590c3640c81",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 32,
+          "y": 20
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS Notifications Failed to Redrive to DLQ",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Notifications Failed To Redrive To DLQ",
+                  "field": "aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "35aae70b-bf14-431e-97e3-2b22e5c570fe",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 30
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS SMS Success Rate",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "SMS Success Rate",
+                  "field": "aws.sns.metrics.SMSSuccessRate.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "43d5b23b-44c4-425f-854e-50885216dcc8",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 16,
+          "x": 16,
+          "y": 30
+        },
+        "config": {
+          "type": "xy",
+          "title": "SNS SMS Month To Date Spent USD",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "SMS Month To Date Spent USD",
+                  "field": "aws.sns.metrics.SMSMonthToDateSpentUSD.sum",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "5m",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "338ee85a-3526-469a-83d7-50b6bd37d55d",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "6fb4e592-76b9-465e-a20e-e8b1d58a6055",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "cloud.region",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.region",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "b9750065-ce71-4a0e-ac21-9649ff65afbd",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Topic Name",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "aws.dimensions.TopicName",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:21.831Z",
+    "version": "WzExNiwxXQ=="
+  }
+}

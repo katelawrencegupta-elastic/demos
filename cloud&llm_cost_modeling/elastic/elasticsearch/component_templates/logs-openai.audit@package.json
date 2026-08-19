@@ -1,0 +1,207 @@
+{
+  "name": "logs-openai.audit@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-openai.audit-2.4.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "observer": {
+            "properties": {
+              "product": {
+                "type": "constant_keyword",
+                "value": "OpenAI"
+              },
+              "vendor": {
+                "type": "constant_keyword",
+                "value": "OpenAI"
+              }
+            }
+          },
+          "openai": {
+            "properties": {
+              "audit": {
+                "properties": {
+                  "actor": {
+                    "properties": {
+                      "api_key": {
+                        "properties": {
+                          "service_account": {
+                            "properties": {
+                              "id": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "user": {
+                            "properties": {
+                              "id": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "email": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "session": {
+                        "properties": {
+                          "ip_address_details": {
+                            "properties": {
+                              "country": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "city": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "latitude": {
+                                "type": "double"
+                              },
+                              "region": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "asn": {
+                                "type": "long"
+                              },
+                              "longitude": {
+                                "type": "double"
+                              },
+                              "region_code": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "ip_address": {
+                            "type": "ip"
+                          },
+                          "ja4": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "ja3": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "user": {
+                            "properties": {
+                              "id": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "email": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "user_agent": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "effective_at": {
+                    "type": "date"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "object": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "openai"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "openai.audit"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

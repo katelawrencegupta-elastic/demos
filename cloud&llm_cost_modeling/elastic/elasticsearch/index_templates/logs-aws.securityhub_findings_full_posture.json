@@ -1,0 +1,50 @@
+{
+  "name": "logs-aws.securityhub_findings_full_posture",
+  "index_template": {
+    "index_patterns": [
+      "logs-aws.securityhub_findings_full_posture-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "aws"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-aws.securityhub_findings_full_posture@package",
+      "logs@custom",
+      "aws@custom",
+      "logs-aws.securityhub_findings_full_posture@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "aws@custom",
+      "logs-aws.securityhub_findings_full_posture@custom"
+    ],
+    "created_date_millis": 1786557381496,
+    "modified_date_millis": 1786557381496
+  }
+}

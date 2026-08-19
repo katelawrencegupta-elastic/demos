@@ -1,0 +1,277 @@
+{
+  "name": "metrics-gcp.loadbalancing_metrics-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557401716,
+  "description": "Pipeline for parsing GCP Loadbalancing metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557401716,
+  "processors": [
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "gcp.labels"
+        ],
+        "target_field": "gcp.labels_fingerprint"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.backend_request.bytes",
+        "target_field": "gcp.loadbalancing_metrics.https.backend_request.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.backend_request.count",
+        "target_field": "gcp.loadbalancing_metrics.https.backend_request.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.backend_response.bytes",
+        "target_field": "gcp.loadbalancing_metrics.https.backend_response.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.request.bytes",
+        "target_field": "gcp.loadbalancing_metrics.https.request.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.request.count",
+        "target_field": "gcp.loadbalancing_metrics.https.request.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.response.bytes",
+        "target_field": "gcp.loadbalancing_metrics.https.response.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.external.egress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.l3.external.egress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.external.egress_packets.count",
+        "target_field": "gcp.loadbalancing_metrics.l3.external.egress_packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.external.ingress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.l3.external.ingress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.external.ingress_packets.count",
+        "target_field": "gcp.loadbalancing_metrics.l3.external.ingress_packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.internal.egress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.l3.internal.egress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.internal.egress_packets.count",
+        "target_field": "gcp.loadbalancing_metrics.l3.internal.egress_packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.internal.ingress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.l3.internal.ingress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.internal.ingress_packets.count",
+        "target_field": "gcp.loadbalancing_metrics.l3.internal.ingress_packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.closed_connections.value",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.closed_connections.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.egress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.egress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.ingress.bytes",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.ingress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.new_connections.value",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.new_connections.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.open_connections.value",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.open_connections.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.backend_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.backend_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.external.regional.backend_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.external.regional.backend_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.external.regional.total_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.external.regional.total_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.frontend_tcp_rtt.value",
+        "target_field": "gcp.loadbalancing_metrics.https.frontend_tcp_rtt.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.internal.backend_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.internal.backend_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.internal.total_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.internal.total_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.https.total_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.https.total_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.external.rtt_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.l3.external.rtt_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.l3.internal.rtt_latencies.value",
+        "target_field": "gcp.loadbalancing_metrics.l3.internal.rtt_latencies.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.tcp_ssl_proxy.frontend_tcp_rtt.value",
+        "target_field": "gcp.loadbalancing_metrics.tcp_ssl_proxy.frontend_tcp_rtt.value"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.loadbalancing_metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.loadbalancing_metrics` dataset"
+      }
+    }
+  ]
+}

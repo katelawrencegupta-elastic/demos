@@ -1,0 +1,108 @@
+{
+  "name": ".rule-events",
+  "index_template": {
+    "index_patterns": [
+      ".rule-events*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "lifecycle": {
+            "prefer_ilm": "false"
+          },
+          "mapping": {
+            "total_fields": {
+              "limit": "2500",
+              "ignore_dynamic_beyond_limit": "true"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "severity": {
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "data": {
+            "type": "flattened"
+          },
+          "group_hash": {
+            "type": "keyword"
+          },
+          "scheduled_timestamp": {
+            "type": "date"
+          },
+          "rule": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "version": {
+                "type": "long"
+              }
+            }
+          },
+          "episode": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "status_count": {
+                "type": "long"
+              },
+              "status": {
+                "type": "keyword"
+              }
+            }
+          },
+          "source": {
+            "type": "keyword"
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "kibana": {
+            "properties": {
+              "space_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "space_id": {
+            "type": "keyword"
+          },
+          "status": {
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {},
+      "lifecycle": {
+        "enabled": true
+      }
+    },
+    "composed_of": [],
+    "priority": 9223372036854775807,
+    "_meta": {
+      "description": ".rule-events index template",
+      "userAgent": "@kbn/data-streams",
+      "previousVersions": [],
+      "version": 5,
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555731748,
+    "modified_date_millis": 1786555731748
+  }
+}

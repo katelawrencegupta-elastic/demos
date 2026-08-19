@@ -1,0 +1,416 @@
+{
+  "id": "aws-131a1550-5a0b-11ed-a807-bd2da8f2e79b",
+  "data": {
+    "description": "Overview of AWS Inspector Findings logs.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default",
+      "security-solution-default"
+    ],
+    "title": "[Logs AWS] Inspector Findings Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.inspector"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 4
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Findings by Status [Logs Inspector]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Status",
+              "fields": [
+                "aws.inspector.status"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "2c9f6be4-d000-4aae-a20e-3276e296a95a",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 4
+        },
+        "config": {
+          "type": "legacy_metric",
+          "title": "Total Findings Count [Logs Inspector]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metric": {
+            "label": "Total Findings",
+            "empty_as_null": true,
+            "operation": "count",
+            "size": "m",
+            "color": {
+              "type": "auto"
+            }
+          },
+          "hide_title": false
+        },
+        "id": "e0d79f79-7160-4106-980b-9bfbbd384a48",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 19
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Findings by Type [Logs Inspector]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "xl",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Type",
+              "fields": [
+                "aws.inspector.type"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "736a3ccc-8ced-4619-a703-b646564b3849",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 19
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Findings by Network Protocol [Logs Inspector]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Network Protocol",
+              "fields": [
+                "network.transport"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6c7ebad2-7916-4969-b4fe-8f26dc3655d9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 34
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Findings Title with Highest Inspector Score [Logs Inspector]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Inspector Score",
+              "field": "aws.inspector.inspector_score",
+              "operation": "max",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Title",
+              "fields": [
+                "vulnerability.title"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b7c5bf1e-b774-455f-8fbc-07e2e31f092e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 34
+        },
+        "config": {
+          "description": "",
+          "title": "Findings Essential Details [Logs Inspector]",
+          "ref_id": "aws-b789513e-47bd-4d48-bc66-7713bebfc313",
+          "overrides": {}
+        },
+        "id": "7d8c7665-cc3d-4767-ab31-9b50a0e046a2",
+        "type": "discover_session"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "5de52701-f68f-43d6-b708-9ee6215f945a",
+        "width": "large",
+        "grow": true,
+        "config": {
+          "title": "AWS Inspector Findings Severity",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "aws.inspector.severity",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:22.416Z",
+    "version": "WzEzOCwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 13,
+            "markdown": "**Inspector Findings Overview Dashboard** | [Inspector Severity Dashboard](#/dashboard/aws-60881ab0-63e0-11ed-be08-4b4db5223139) | [Inspector Vulnerabilities Dashboard](#/dashboard/aws-383d4630-63df-11ed-be08-4b4db5223139) | [Inspector EC2 and ECR Overview Dashboard](#/dashboard/aws-63984b70-63e1-11ed-be08-4b4db5223139)  ",
+            "openLinksInNewTab": true
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Dashboards [Logs Inspector]"
+      }
+    }
+  ]
+}

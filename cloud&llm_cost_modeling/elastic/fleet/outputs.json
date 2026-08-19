@@ -1,0 +1,59 @@
+[
+  {
+    "id": "es-default-output",
+    "allow_edit": [
+      "is_default",
+      "is_default_monitoring",
+      "shipper",
+      "config_yaml",
+      "preset",
+      "write_to_logs_streams"
+    ],
+    "hosts": [
+      "https://bb1595f2cee44b7cb6dc8c572977d973.es.us-central1.gcp.elastic.cloud:443"
+    ],
+    "is_default": true,
+    "is_default_monitoring": true,
+    "name": "Default output",
+    "type": "elasticsearch",
+    "is_preconfigured": true,
+    "config_yaml": null,
+    "ca_sha256": null,
+    "ca_trusted_fingerprint": null,
+    "preset": "balanced"
+  },
+  {
+    "id": "es-default-output-internal",
+    "allow_edit": [],
+    "hosts": [
+      "https://bb1595f2cee44b7cb6dc8c572977d973.es.us-central1.gcp.internal.elastic.cloud:443"
+    ],
+    "is_default": false,
+    "is_default_monitoring": false,
+    "is_internal": true,
+    "name": "Default output (Internal)",
+    "type": "elasticsearch",
+    "is_preconfigured": true,
+    "config_yaml": null,
+    "ca_sha256": null,
+    "ca_trusted_fingerprint": null,
+    "preset": "balanced"
+  },
+  {
+    "id": "es-managed-bulk-agentless-output-internal",
+    "allow_edit": [],
+    "hosts": [
+      "https://bb1595f2cee44b7cb6dc8c572977d973.ingest.us-central1.gcp.internal.elastic.cloud:443/_es"
+    ],
+    "is_default": false,
+    "is_default_monitoring": false,
+    "is_internal": true,
+    "name": "Bulk output for managed integrations (Internal)",
+    "type": "elasticsearch",
+    "is_preconfigured": true,
+    "config_yaml": null,
+    "ca_sha256": null,
+    "ca_trusted_fingerprint": null,
+    "preset": "balanced"
+  }
+]

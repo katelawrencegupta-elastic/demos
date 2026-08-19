@@ -1,0 +1,132 @@
+{
+  "name": "logs-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "sort": {
+            "field": [
+              "resource.attributes.host.name",
+              "@timestamp"
+            ],
+            "order": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "observed_timestamp": {
+            "type": "date_nanos"
+          },
+          "event.severity": {
+            "path": "severity_number",
+            "type": "alias"
+          },
+          "trace_id": {
+            "type": "keyword"
+          },
+          "http.request.body.bytes": {
+            "path": "attributes.http.request.body.size",
+            "type": "alias"
+          },
+          "span_id": {
+            "type": "keyword"
+          },
+          "severity_text": {
+            "type": "keyword"
+          },
+          "error.exception.type": {
+            "path": "attributes.exception.type",
+            "type": "alias"
+          },
+          "span.id": {
+            "path": "span_id",
+            "type": "alias"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "structured": {
+                "type": "flattened"
+              },
+              "text": {
+                "type": "match_only_text"
+              }
+            }
+          },
+          "message": {
+            "path": "body.text",
+            "type": "alias"
+          },
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "logs"
+          },
+          "http.response.body.bytes": {
+            "path": "attributes.http.response.body.size",
+            "type": "alias"
+          },
+          "trace.id": {
+            "path": "trace_id",
+            "type": "alias"
+          },
+          "severity_number": {
+            "type": "byte"
+          },
+          "log.level": {
+            "path": "severity_text",
+            "type": "alias"
+          },
+          "event_name": {
+            "type": "keyword"
+          },
+          "attributes": {
+            "dynamic": true,
+            "type": "passthrough",
+            "priority": 20,
+            "properties": {
+              "http.response.body.size": {
+                "type": "long"
+              },
+              "exception.type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "exception.message": {
+                "type": "match_only_text"
+              },
+              "http.request.body.size": {
+                "type": "long"
+              },
+              "exception.stacktrace": {
+                "type": "wildcard",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              }
+            }
+          },
+          "error.stack_trace": {
+            "path": "attributes.exception.stacktrace",
+            "type": "alias"
+          },
+          "error.exception.message": {
+            "path": "attributes.exception.message",
+            "type": "alias"
+          }
+        }
+      }
+    },
+    "version": 19,
+    "_meta": {
+      "description": "Default mappings for OpenTelemetry logs index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

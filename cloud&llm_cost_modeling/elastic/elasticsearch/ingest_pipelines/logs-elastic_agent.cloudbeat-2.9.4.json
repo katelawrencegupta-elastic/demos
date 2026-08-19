@@ -1,0 +1,42 @@
+{
+  "name": "logs-elastic_agent.cloudbeat-2.9.4",
+  "_meta": {
+    "package": {
+      "name": "elastic_agent"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591763,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `elastic_agent` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent.cloudbeat@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `elastic_agent.cloudbeat` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591763
+}

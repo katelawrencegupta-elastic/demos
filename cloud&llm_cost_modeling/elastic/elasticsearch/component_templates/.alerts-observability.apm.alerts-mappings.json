@@ -1,0 +1,152 @@
+{
+  "name": ".alerts-observability.apm.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "dynamic_templates": [
+          {
+            "strings_as_keywords": {
+              "path_match": "kibana.alert.grouping.*",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "container": {
+            "properties": {
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "anomaly": {
+            "properties": {
+              "detector_type": {
+                "type": "keyword"
+              },
+              "timestamp": {
+                "type": "date"
+              }
+            }
+          },
+          "service": {
+            "properties": {
+              "environment": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "language": {
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "evaluation": {
+                    "properties": {
+                      "time_range": {
+                        "type": "date_range"
+                      },
+                      "values": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "threshold": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "value": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      }
+                    }
+                  },
+                  "context": {
+                    "type": "object"
+                  },
+                  "grouping": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "group": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "properties": {
+              "grouping_key": {
+                "type": "keyword"
+              },
+              "grouping_name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "processor": {
+            "properties": {
+              "event": {
+                "type": "keyword"
+              }
+            }
+          },
+          "transaction": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "labels": {
+            "dynamic": true,
+            "type": "object"
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

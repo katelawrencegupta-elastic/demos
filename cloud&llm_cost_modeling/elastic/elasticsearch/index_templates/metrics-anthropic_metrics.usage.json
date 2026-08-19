@@ -1,0 +1,49 @@
+{
+  "name": "metrics-anthropic_metrics.usage",
+  "index_template": {
+    "index_patterns": [
+      "metrics-anthropic_metrics.usage-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "anthropic_metrics"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@settings",
+      "metrics-anthropic_metrics.usage@package",
+      "metrics@custom",
+      "anthropic_metrics@custom",
+      "metrics-anthropic_metrics.usage@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "anthropic_metrics"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "anthropic_metrics@custom",
+      "metrics-anthropic_metrics.usage@custom"
+    ],
+    "created_date_millis": 1786643480553,
+    "modified_date_millis": 1786643480553
+  }
+}

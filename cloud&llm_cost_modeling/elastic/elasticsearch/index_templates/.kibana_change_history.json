@@ -1,0 +1,132 @@
+{
+  "name": ".kibana_change_history",
+  "index_template": {
+    "index_patterns": [
+      ".kibana_change_history*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true"
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "metadata": {
+            "type": "flattened"
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "service": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "module": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "action": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "dataset": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "kibana": {
+            "properties": {
+              "space_ids": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "user": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "span": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "object": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "sequence": {
+                "type": "long"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "tags": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true
+      }
+    },
+    "composed_of": [],
+    "priority": 100,
+    "_meta": {
+      "userAgent": "@kbn/data-streams",
+      "previousVersions": [],
+      "version": 3,
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555731782,
+    "modified_date_millis": 1786555731782
+  }
+}

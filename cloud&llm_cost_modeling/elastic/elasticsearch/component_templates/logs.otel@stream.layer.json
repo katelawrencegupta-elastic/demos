@@ -1,0 +1,126 @@
+{
+  "name": "logs.otel@stream.layer",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "codec": "best_compression",
+          "mapping": {
+            "total_fields": {
+              "ignore_dynamic_beyond_limit": "true"
+            },
+            "ignore_malformed": "true"
+          },
+          "sort": {
+            "field": [
+              "resource.attributes.host.name",
+              "@timestamp"
+            ],
+            "order": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "trace_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "scope.name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "resource": {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "passthrough",
+                "priority": 40,
+                "properties": {
+                  "service.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "host.name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "span_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "body.text": {
+            "type": "match_only_text"
+          },
+          "severity_text": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "span.id": {
+            "path": "span_id",
+            "type": "alias"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "structured": {
+                "type": "passthrough",
+                "priority": 10
+              }
+            }
+          },
+          "message": {
+            "path": "body.text",
+            "type": "alias"
+          },
+          "trace.id": {
+            "path": "trace_id",
+            "type": "alias"
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "passthrough",
+                "priority": 30
+              }
+            }
+          },
+          "severity_number": {
+            "type": "long"
+          },
+          "log.level": {
+            "path": "severity_text",
+            "type": "alias"
+          },
+          "event_name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "attributes": {
+            "type": "passthrough",
+            "priority": 20
+          }
+        }
+      }
+    },
+    "version": 1,
+    "_meta": {
+      "description": "Default settings for the logs.otel stream",
+      "managed": true
+    }
+  }
+}

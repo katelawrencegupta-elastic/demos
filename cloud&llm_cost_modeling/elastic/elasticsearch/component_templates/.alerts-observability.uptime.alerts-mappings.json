@@ -1,0 +1,220 @@
+{
+  "name": ".alerts-observability.uptime.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "dynamic_templates": [
+          {
+            "strings_as_keywords": {
+              "path_match": "kibana.alert.grouping.*",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "agent": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "anomaly": {
+            "properties": {
+              "bucket_span": {
+                "properties": {
+                  "minutes": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "start": {
+                "type": "date"
+              }
+            }
+          },
+          "monitor": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              },
+              "state": {
+                "properties": {
+                  "id": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "type": {
+                "type": "keyword"
+              },
+              "failed_step_info": {
+                "type": "text"
+              },
+              "tags": {
+                "type": "keyword"
+              }
+            }
+          },
+          "error": {
+            "properties": {
+              "stack_trace": {
+                "type": "wildcard"
+              },
+              "message": {
+                "type": "text"
+              }
+            }
+          },
+          "url": {
+            "properties": {
+              "full": {
+                "type": "keyword"
+              }
+            }
+          },
+          "labels": {
+            "type": "object"
+          },
+          "observer": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "configId": {
+            "type": "keyword"
+          },
+          "service": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "location": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "tls": {
+            "properties": {
+              "server": {
+                "properties": {
+                  "x509": {
+                    "properties": {
+                      "not_after": {
+                        "type": "date"
+                      },
+                      "subject": {
+                        "properties": {
+                          "common_name": {
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "not_before": {
+                        "type": "date"
+                      },
+                      "issuer": {
+                        "properties": {
+                          "common_name": {
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "hash": {
+                    "properties": {
+                      "sha256": {
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "evaluation": {
+                    "properties": {
+                      "time_range": {
+                        "type": "date_range"
+                      },
+                      "values": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "threshold": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "value": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      }
+                    }
+                  },
+                  "context": {
+                    "type": "object"
+                  },
+                  "grouping": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "group": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

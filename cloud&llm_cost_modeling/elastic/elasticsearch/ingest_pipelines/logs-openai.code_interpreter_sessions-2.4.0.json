@@ -1,0 +1,158 @@
+{
+  "name": "logs-openai.code_interpreter_sessions-2.4.0",
+  "on_failure": [
+    {
+      "append": {
+        "tag": "append_error_message",
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}'\nwith tag '{{{ _ingest.on_failure_processor_tag }}}'\nin pipeline '{{{ _ingest.on_failure_pipeline }}}'\nfailed with message '{{{ _ingest.on_failure_message }}}'\n"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643468277,
+  "description": "Pipeline for code_interpreter_sessions usage.",
+  "_meta": {
+    "package": {
+      "name": "openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643468277,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "9.3.0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.created",
+        "copy_from": "@timestamp"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "metric"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "openai.code_interpreter_sessions.results",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "openai.code_interpreter_sessions.results",
+        "target_field": "openai.code_interpreter_sessions"
+      }
+    },
+    {
+      "remove": {
+        "field": "openai.code_interpreter_sessions.results",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "openai.code_interpreter_sessions.project_id",
+        "target_field": "openai.base.project_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "openai.code_interpreter_sessions.object",
+        "target_field": "openai.base.usage_object_type"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "UNIX"
+        ],
+        "field": "openai.code_interpreter_sessions.start_time",
+        "target_field": "openai.base.start_time"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "UNIX"
+        ],
+        "field": "openai.code_interpreter_sessions.end_time",
+        "target_field": "openai.base.end_time"
+      }
+    },
+    {
+      "set": {
+        "field": "@timestamp",
+        "copy_from": "openai.base.start_time"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "openai.code_interpreter_sessions.start_time",
+          "openai.code_interpreter_sessions.end_time"
+        ],
+        "ignore_failure": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `openai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-openai.code_interpreter_sessions@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `openai.code_interpreter_sessions` dataset"
+      }
+    }
+  ]
+}

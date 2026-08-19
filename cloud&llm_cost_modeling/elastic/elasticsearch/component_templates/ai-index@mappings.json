@@ -1,0 +1,60 @@
+{
+  "name": "ai-index@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "type": "date"
+          },
+          "references": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "keyword"
+              }
+            }
+          },
+          "description": {
+            "type": "text",
+            "fields": {
+              "semantic": {
+                "type": "semantic_text"
+              }
+            }
+          },
+          "attributes": {
+            "type": "flattened"
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "text",
+            "fields": {
+              "semantic": {
+                "type": "semantic_text"
+              }
+            }
+          },
+          "content": {
+            "type": "text",
+            "fields": {
+              "semantic": {
+                "type": "semantic_text"
+              }
+            }
+          },
+          "tags": {
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "version": 2,
+    "_meta": {
+      "description": "Template mappings applied by default to AI indices.",
+      "managed": true
+    }
+  }
+}

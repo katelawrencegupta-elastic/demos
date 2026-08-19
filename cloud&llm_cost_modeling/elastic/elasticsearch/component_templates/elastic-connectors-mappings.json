@@ -1,0 +1,320 @@
+{
+  "name": "elastic-connectors-mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "_meta": {
+          "pipeline": {
+            "default_name": "search-default-ingestion",
+            "default_extract_binary_content": true,
+            "default_run_ml_inference": true,
+            "default_reduce_whitespace": true
+          },
+          "version": 3
+        },
+        "dynamic": "false",
+        "properties": {
+          "last_seen": {
+            "type": "date"
+          },
+          "configuration": {
+            "type": "object"
+          },
+          "description": {
+            "type": "text"
+          },
+          "language": {
+            "type": "keyword"
+          },
+          "error": {
+            "type": "keyword"
+          },
+          "sync_cursor": {
+            "type": "object"
+          },
+          "features": {
+            "properties": {
+              "incremental_sync": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "filtering_rules": {
+                "type": "boolean"
+              },
+              "sync_rules": {
+                "properties": {
+                  "advanced": {
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "basic": {
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "filtering_advanced_config": {
+                "type": "boolean"
+              }
+            }
+          },
+          "scheduling": {
+            "properties": {
+              "access_control": {
+                "properties": {
+                  "interval": {
+                    "type": "text"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "incremental": {
+                "properties": {
+                  "interval": {
+                    "type": "text"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "full": {
+                "properties": {
+                  "interval": {
+                    "type": "text"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "last_access_control_sync_scheduled_at": {
+            "type": "date"
+          },
+          "last_synced": {
+            "type": "date"
+          },
+          "filtering": {
+            "properties": {
+              "domain": {
+                "type": "keyword"
+              },
+              "draft": {
+                "properties": {
+                  "advanced_snippet": {
+                    "properties": {
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "value": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "rules": {
+                    "properties": {
+                      "field": {
+                        "type": "keyword"
+                      },
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "rule": {
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      },
+                      "order": {
+                        "type": "short"
+                      },
+                      "policy": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "validation": {
+                    "properties": {
+                      "state": {
+                        "type": "keyword"
+                      },
+                      "errors": {
+                        "properties": {
+                          "ids": {
+                            "type": "keyword"
+                          },
+                          "messages": {
+                            "type": "text"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "active": {
+                "properties": {
+                  "advanced_snippet": {
+                    "properties": {
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "value": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "rules": {
+                    "properties": {
+                      "field": {
+                        "type": "keyword"
+                      },
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "rule": {
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      },
+                      "order": {
+                        "type": "short"
+                      },
+                      "policy": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "validation": {
+                    "properties": {
+                      "state": {
+                        "type": "keyword"
+                      },
+                      "errors": {
+                        "properties": {
+                          "ids": {
+                            "type": "keyword"
+                          },
+                          "messages": {
+                            "type": "text"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "index_name": {
+            "type": "keyword"
+          },
+          "last_sync_scheduled_at": {
+            "type": "date"
+          },
+          "is_native": {
+            "type": "boolean"
+          },
+          "last_deleted_document_count": {
+            "type": "long"
+          },
+          "last_access_control_sync_error": {
+            "type": "keyword"
+          },
+          "custom_scheduling": {
+            "type": "object"
+          },
+          "last_sync_status": {
+            "type": "keyword"
+          },
+          "api_key_id": {
+            "type": "keyword"
+          },
+          "last_incremental_sync_scheduled_at": {
+            "type": "date"
+          },
+          "pipeline": {
+            "properties": {
+              "reduce_whitespace": {
+                "type": "boolean"
+              },
+              "extract_binary_content": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "run_ml_inference": {
+                "type": "boolean"
+              }
+            }
+          },
+          "last_indexed_document_count": {
+            "type": "long"
+          },
+          "service_type": {
+            "type": "keyword"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "last_access_control_sync_status": {
+            "type": "keyword"
+          },
+          "last_sync_error": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "sync_now": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {
+        ".elastic-connectors": {}
+      }
+    },
+    "version": 3,
+    "_meta": {
+      "description": "Built-in mappings applied by default to elastic-connectors indices",
+      "managed": true
+    }
+  }
+}

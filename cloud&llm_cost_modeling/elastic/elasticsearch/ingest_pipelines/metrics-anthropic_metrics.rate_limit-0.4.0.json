@@ -1,0 +1,204 @@
+{
+  "name": "metrics-anthropic_metrics.rate_limit-0.4.0",
+  "on_failure": [
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_to_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643480266,
+  "description": "Pipeline for parsing Anthropic organization rate limit configuration events.",
+  "_meta": {
+    "package": {
+      "name": "anthropic_metrics"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643480266,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "9.3.0"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the fields added by Agentless as metadata, as they can collide with ECS fields.",
+        "tag": "remove_agentless_tags",
+        "field": [
+          "organization",
+          "division",
+          "team"
+        ],
+        "if": "ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String"
+      }
+    },
+    {
+      "terminate": {
+        "description": "error message set and no data to process.",
+        "tag": "data_collection_error",
+        "if": "ctx.error?.message != null && ctx.message == null && ctx.event?.original == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "parse_json",
+        "field": "event.original",
+        "target_field": "json",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_type",
+        "field": "json.type",
+        "target_field": "anthropic.rate_limit.type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_group_type",
+        "field": "json.group_type",
+        "target_field": "anthropic.rate_limit.group_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_models",
+        "field": "json.models",
+        "target_field": "anthropic.rate_limit.models",
+        "if": "ctx.json?.models != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_limits",
+        "field": "json.limits",
+        "target_field": "anthropic.rate_limit.limits"
+      }
+    },
+    {
+      "script": {
+        "tag": "flatten_limits",
+        "source": "for (limit in ctx.anthropic.rate_limit.limits) {\n  ctx.anthropic.rate_limit[limit.type] = limit.value;\n}",
+        "lang": "painless",
+        "if": "ctx.anthropic?.rate_limit?.limits != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_timestamp_to_ingest_time",
+        "field": "@timestamp",
+        "copy_from": "_ingest.timestamp"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_event_category_configuration",
+        "field": "event.category",
+        "value": "configuration"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_event_type_info",
+        "field": "event.type",
+        "value": "info"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json",
+        "field": "json"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_preserve_original_event_tag",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-anthropic_metrics.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `anthropic_metrics` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-anthropic_metrics.rate_limit@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `anthropic_metrics.rate_limit` dataset"
+      }
+    }
+  ]
+}

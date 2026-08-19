@@ -1,0 +1,854 @@
+{
+  "name": "logs-azure.aadgraphactivitylogs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408245,
+  "description": "Pipeline for parsing azure AAD Graph activity logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408245,
+  "processors": [
+    {
+      "set": {
+        "tag": "set-ecs_version",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_kind",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append-event_type",
+        "field": "event.type",
+        "value": "access"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-azure",
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename-message",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove-message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "json-event_original",
+        "field": "event.original",
+        "target_field": "azure.aadgraphactivitylogs"
+      }
+    },
+    {
+      "script": {
+        "description": "Convert Azure JSON keys to snake case.",
+        "tag": "azure-json-keys-to-snake-case",
+        "source": "Map keysToSnakeCase(Map m) {\n  def regex = /_?([a-z])([A-Z]+)/;\n  def out = [:];\n\n  for (entry in m.entrySet()) {\n    def k = entry.getKey();\n    def v = entry.getValue();\n\n    if (v instanceof Map) {\n      v = keysToSnakeCase(v);\n    } else if (v instanceof List) {\n      for (int i = 0; i < v.size(); i++) {\n        def item = v.get(i);\n        if (item instanceof Map) {\n          v.set(i, keysToSnakeCase(item));\n        }\n      }\n    }\n\n    k = regex.matcher(k).replaceAll('$1_$2').toLowerCase();\n    out.put(k, v);\n  }\n\n  return out;\n}\n\nctx.azure['aadgraphactivitylogs'] = keysToSnakeCase(ctx.azure.aadgraphactivitylogs);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-udi_required_fields",
+        "field": [
+          "azure.aadgraphactivitylogs.properties.__udi_required_fields_event_time",
+          "azure.aadgraphactivitylogs.properties.__udi_required_fields_region_scope",
+          "azure.aadgraphactivitylogs.properties.__udi_required_fields_tenant_id",
+          "azure.aadgraphactivitylogs.properties.__udi_required_fields_unique_id"
+        ]
+      }
+    },
+    {
+      "date": {
+        "tag": "date-timestamp_from_time_generated",
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.aadgraphactivitylogs.properties.time_generated",
+        "target_field": "@timestamp",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.time_generated != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_issued_at",
+        "field": "azure.aadgraphactivitylogs.properties.issued_at",
+        "target_field": "azure.aadgraphactivitylogs.properties.token_issued_at"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "M/d/yyyy h:mm:ss a",
+          "ISO8601"
+        ],
+        "field": "azure.aadgraphactivitylogs.properties.token_issued_at",
+        "target_field": "azure.aadgraphactivitylogs.properties.token_issued_at",
+        "tag": "date-token_issued_at",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.token_issued_at != null"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_missing": true,
+              "on_failure": [
+                {
+                  "append": {
+                    "field": "error.message",
+                    "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                  }
+                }
+              ],
+              "tag": "rename-properties_caller_ip_address",
+              "field": "azure.aadgraphactivitylogs.properties.caller_ip_address",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.aadgraphactivitylogs.properties.caller_ip_address",
+        "target_field": "source.ip",
+        "ignore_missing": true,
+        "tag": "convert-properties_caller_ip_address",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-properties_caller_ip_address",
+        "field": "azure.aadgraphactivitylogs.properties.caller_ip_address",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-client_ip",
+        "field": "client.ip",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_service_id",
+        "field": "service.id",
+        "copy_from": "azure.aadgraphactivitylogs.properties.service_principal_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_id_from_service_principal_id",
+        "field": "user.id",
+        "copy_from": "azure.aadgraphactivitylogs.properties.service_principal_id",
+        "if": "ctx.user?.id == null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_device_id",
+        "field": "device.id",
+        "copy_from": "azure.aadgraphactivitylogs.properties.device_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_session_id",
+        "field": "session.id",
+        "copy_from": "azure.aadgraphactivitylogs.properties.session_id"
+      }
+    },
+    {
+      "append": {
+        "tag": "append-related_ip",
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "azure.aadgraphactivitylogs.duration_ms",
+        "target_field": "event.duration",
+        "tag": "convert-duration_ms",
+        "type": "long",
+        "if": "ctx.azure?.aadgraphactivitylogs?.duration_ms != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "azure.aadgraphactivitylogs.properties.duration_ms",
+        "target_field": "event.duration",
+        "tag": "convert-properties-duration_ms",
+        "type": "long",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.duration_ms != null && ctx.event?.duration == null"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {\n  ctx.event.duration = ctx.event.duration * 1000000;\n}\n",
+        "tag": "script-duration",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-duration_ms",
+        "field": [
+          "azure.aadgraphactivitylogs.duration_ms",
+          "azure.aadgraphactivitylogs.properties.duration_ms"
+        ],
+        "if": "ctx.event?.duration != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-location",
+        "field": "azure.aadgraphactivitylogs.location",
+        "target_field": "destination.geo.region_name"
+      }
+    },
+    {
+      "rename": {
+        "tag": "rename-properties-location",
+        "field": "azure.aadgraphactivitylogs.properties.location",
+        "target_field": "destination.geo.region_name",
+        "if": "ctx.destination?.geo?.region_name == null && ctx.azure?.aadgraphactivitylogs?.properties?.location != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-location",
+        "field": [
+          "azure.aadgraphactivitylogs.location",
+          "azure.aadgraphactivitylogs.properties.location"
+        ],
+        "if": "ctx.destination?.geo?.region_name != null"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "azure.aadgraphactivitylogs.operation_name",
+        "target_field": "event.action",
+        "ignore_missing": true,
+        "tag": "convert-operation_name",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-tenant_id",
+        "field": "azure.aadgraphactivitylogs.tenant_id",
+        "target_field": "azure.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_tenant_id",
+        "field": "azure.aadgraphactivitylogs.properties.tenant_id",
+        "target_field": "azure.tenant_id",
+        "if": "ctx.azure?.tenant_id == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-tenant_id",
+        "field": [
+          "azure.aadgraphactivitylogs.tenant_id",
+          "azure.aadgraphactivitylogs.properties.tenant_id"
+        ],
+        "if": "ctx.azure?.tenant_id != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_request_id",
+        "field": "azure.aadgraphactivitylogs.properties.request_id",
+        "target_field": "http.request.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_http_method",
+        "field": "azure.aadgraphactivitylogs.properties.http_method",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "uri_parts": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "uri_parts-properties-request_uri",
+        "field": "azure.aadgraphactivitylogs.properties.request_uri",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.request_uri != null",
+        "keep_original": true
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-properties_request_uri",
+        "field": "azure.aadgraphactivitylogs.properties.request_uri",
+        "if": "ctx.url?.original != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_response_bytes",
+        "field": "azure.aadgraphactivitylogs.properties.response_size_bytes",
+        "target_field": "http.response.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename-properties_http_status_code",
+        "field": "azure.aadgraphactivitylogs.properties.http_status_code",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "gsub": {
+        "field": "azure.aadgraphactivitylogs.properties.roles",
+        "pattern": "^[\\s,]+|[\\s,]+$",
+        "ignore_missing": true,
+        "tag": "gsub-properties_roles",
+        "replacement": "",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.roles != null && ctx.azure.aadgraphactivitylogs.properties.roles != ''"
+      }
+    },
+    {
+      "split": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "split-properties_roles",
+        "field": "azure.aadgraphactivitylogs.properties.roles",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.roles != null && ctx.azure.aadgraphactivitylogs.properties.roles != ''",
+        "separator": "\\s*,\\s*"
+      }
+    },
+    {
+      "split": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "split-properties_scopes",
+        "field": "azure.aadgraphactivitylogs.properties.scopes",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.scopes != null && ctx.azure.aadgraphactivitylogs.properties.scopes != ''",
+        "separator": " "
+      }
+    },
+    {
+      "gsub": {
+        "field": "azure.aadgraphactivitylogs.properties.wids",
+        "pattern": "^[\\s,]+|[\\s,]+$",
+        "ignore_missing": true,
+        "tag": "gsub-properties_wids",
+        "replacement": "",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.wids != null && ctx.azure.aadgraphactivitylogs.properties.wids != ''"
+      }
+    },
+    {
+      "split": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "split-properties_wids",
+        "field": "azure.aadgraphactivitylogs.properties.wids",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.wids != null && ctx.azure.aadgraphactivitylogs.properties.wids != ''",
+        "separator": "\\s*,\\s*"
+      }
+    },
+    {
+      "user_agent": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "user_agent-properties_user_agent",
+        "field": "azure.aadgraphactivitylogs.properties.user_agent",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.user_agent != null && ctx.azure.aadgraphactivitylogs.properties.user_agent != ''"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-properties_user_agent",
+        "field": "azure.aadgraphactivitylogs.properties.user_agent",
+        "if": "ctx.user_agent != null"
+      }
+    },
+    {
+      "rename": {
+        "tag": "rename-properties_user_id",
+        "field": "azure.aadgraphactivitylogs.properties.user_id",
+        "target_field": "user.id",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.user_id != null && ctx.azure.aadgraphactivitylogs.properties.user_id != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-client_user_id",
+        "field": "client.user.id",
+        "value": "{{user.id}}"
+      }
+    },
+    {
+      "append": {
+        "tag": "append-related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{user.id}}",
+        "if": "ctx.user?.id != null"
+      }
+    },
+    {
+      "rename": {
+        "tag": "rename-properties_billed_size",
+        "field": "azure.aadgraphactivitylogs.properties._billed_size",
+        "target_field": "azure.aadgraphactivitylogs.properties.billed_size",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?._billed_size != null"
+      }
+    },
+    {
+      "rename": {
+        "tag": "rename-properties_is_billable",
+        "field": "azure.aadgraphactivitylogs.properties._is_billable",
+        "target_field": "azure.aadgraphactivitylogs.properties.is_billable",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?._is_billable != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "convert-properties_is_billable",
+        "field": "azure.aadgraphactivitylogs.properties.is_billable",
+        "type": "boolean"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "convert-properties_client_auth_method",
+        "field": "azure.aadgraphactivitylogs.properties.client_auth_method",
+        "type": "integer"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.aadgraphactivitylogs.properties.time_generated",
+        "target_field": "azure.aadgraphactivitylogs.properties.time_generated",
+        "tag": "date-properties_time_generated",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.time_generated != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_category",
+        "field": "event.category",
+        "value": [
+          "iam",
+          "web"
+        ]
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_type-info",
+        "field": "event.type",
+        "value": [
+          "access",
+          "info"
+        ],
+        "if": "ctx.http?.request?.method == null || ctx.http.request.method == 'GET' || ctx.http.request.method == 'HEAD'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_type-change",
+        "field": "event.type",
+        "value": [
+          "access",
+          "change"
+        ],
+        "if": "ctx.http?.request?.method == 'POST' || ctx.http?.request?.method == 'PATCH' || ctx.http?.request?.method == 'PUT'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_type-deletion",
+        "field": "event.type",
+        "value": [
+          "access",
+          "deletion"
+        ],
+        "if": "ctx.http?.request?.method == 'DELETE'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_outcome-success",
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx.http?.response?.status_code != null && ctx.http.response.status_code >= 200 && ctx.http.response.status_code < 300"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_outcome-failure",
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+      }
+    },
+    {
+      "set": {
+        "tag": "set-event_outcome-unknown",
+        "field": "event.outcome",
+        "value": "unknown",
+        "if": "ctx.http?.response?.status_code != null && ctx.http.response.status_code >= 300 && ctx.http.response.status_code < 400"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-event_id",
+        "field": "event.id",
+        "copy_from": "http.request.id"
+      }
+    },
+    {
+      "append": {
+        "tag": "append-related_user-app_id",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{azure.aadgraphactivitylogs.properties.app_id}}}",
+        "if": "ctx.azure?.aadgraphactivitylogs?.properties?.app_id != null && ctx.azure.aadgraphactivitylogs.properties.app_id != ''"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Derive event.action from HTTP method + directory collection in the request URI. Examples: GET /v2/{tid}/users -> users-read, GET /v2/{tid}/directoryRoles -> directory-roles-read, PATCH /v2/{tid}/applications/{id} -> applications-update, POST /v2/{tid}/$batch -> batch-execute. Leaves the prior event.action (operation_name) in place if the URI doesn't match the expected shape.",
+        "tag": "derive-event_action",
+        "source": "String path = ctx.url?.path;\nString method = ctx.http?.request?.method;\nif (path == null || method == null) { return; }\nString[] parts = path.splitOnToken('/');\n// Observed AAD Graph request URI shapes:\n//   /v2/{tid-or-myorganization}/{collection}/...  -> collection at parts[3]\n//   /{tid-or-myorganization}/$batch (or other)    -> collection at parts[2]\nif (parts.length < 3) { return; }\nString collection;\nif (parts.length >= 4 && parts[1] == 'v2') {\n  collection = parts[3];\n} else {\n  collection = parts[2];\n}\nif (collection == null || collection.isEmpty()) { return; }\nif (collection.startsWith('$')) { collection = collection.substring(1); }\n// CamelCase -> hyphen-lower (servicePrincipals -> service-principals)\nStringBuilder hyphenated = new StringBuilder();\nfor (int i = 0; i < collection.length(); i++) {\n  char c = collection.charAt(i);\n  if (i > 0 && Character.isUpperCase(c) && !Character.isUpperCase(collection.charAt(i - 1))) {\n    hyphenated.append('-');\n  }\n  hyphenated.append(Character.toLowerCase(c));\n}\nString verb;\nif (method == 'GET' || method == 'HEAD') { verb = 'read'; }\nelse if (method == 'POST') { verb = 'execute'; }\nelse if (method == 'PATCH' || method == 'PUT') { verb = 'update'; }\nelse if (method == 'DELETE') { verb = 'delete'; }\nelse { verb = method.toLowerCase(); }\nctx.event.action = hyphenated.toString() + '-' + verb;\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.aadgraphactivitylogs-1.38.1-azure-shared-pipeline",
+        "tag": "pipeline-azure-shared-pipeline"
+      }
+    },
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "tag": "fingerprint-id",
+        "fields": [
+          "url.original",
+          "http.request.id",
+          "azure.tenant_id",
+          "azure.aadgraphactivitylogs.properties.time_generated"
+        ],
+        "target_field": "_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-cloud_account_id",
+        "field": "cloud.account.id",
+        "value": "{{azure.tenant_id}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-cloud_region",
+        "field": "cloud.region",
+        "value": "{{destination.geo.region_name}}"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set-cloud_service_name",
+        "field": "cloud.service.name",
+        "value": "Azure AD Graph"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "client.ip",
+        "target_field": "client.geo"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "client.ip",
+        "target_field": "client.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "client.as.asn",
+        "target_field": "client.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "client.as.organization_name",
+        "target_field": "client.as.organization.name"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "tag": "script_to_drop_null_values",
+        "source": "boolean drop(Object o) {\n  if (o == null || o == '') {\n    return true;\n  } else if (o instanceof Map) {\n    ((Map) o).values().removeIf(v -> drop(v));\n    return (((Map) o).size() == 0);\n  } else if (o instanceof List) {\n    ((List) o).removeIf(v -> drop(v));\n    return (((List) o).length == 0);\n  }\n  return false;\n}\ndrop(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error",
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.aadgraphactivitylogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.aadgraphactivitylogs` dataset"
+      }
+    }
+  ]
+}

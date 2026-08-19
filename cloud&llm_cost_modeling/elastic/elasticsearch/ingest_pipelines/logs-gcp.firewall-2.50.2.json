@@ -1,0 +1,685 @@
+{
+  "name": "logs-gcp.firewall-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557400029,
+  "description": "Pipeline for Google Cloud Firewall Logs",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557400029,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "community_id": {
+        "destination_ip": "json.jsonPayload.connection.dest_ip",
+        "destination_port": "json.jsonPayload.connection.dest_port",
+        "iana_number": "json.jsonPayload.connection.protocol",
+        "source_ip": "json.jsonPayload.connection.src_ip",
+        "source_port": "json.jsonPayload.connection.src_port"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": "network"
+      }
+    },
+    {
+      "set": {
+        "field": "event.action",
+        "value": "firewall-rule"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "log.logger",
+        "copy_from": "json.logName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "network.name",
+        "copy_from": "json.resource.labels.subnetwork_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "event.id",
+        "copy_from": "json.insertId"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "json.jsonPayload.disposition",
+        "if": "ctx?.json?.jsonPayload?.disposition != null"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "{{json.jsonPayload.disposition}}",
+        "if": "ctx?.json?.jsonPayload?.disposition != null"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "connection"
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "inbound",
+        "if": "ctx?.json?.jsonPayload?.rule_details?.direction == \"INGRESS\""
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "outbound",
+        "if": "ctx?.json?.jsonPayload?.rule_details?.direction == \"EGRESS\""
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "unknown",
+        "if": "ctx?.network?.direction == null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_vpc",
+        "copy_from": "json.jsonPayload.vpc",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_instance",
+        "copy_from": "json.jsonPayload.instance",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_location",
+        "copy_from": "json.jsonPayload.location",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_vpc",
+        "copy_from": "json.jsonPayload.remote_vpc",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_instance",
+        "copy_from": "json.jsonPayload.remote_instance",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_location",
+        "copy_from": "json.jsonPayload.remote_location",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_vpc",
+        "copy_from": "json.jsonPayload.vpc",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_instance",
+        "copy_from": "json.jsonPayload.instance",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.dest_location",
+        "copy_from": "json.jsonPayload.location",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_vpc",
+        "copy_from": "json.jsonPayload.remote_vpc",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_instance",
+        "copy_from": "json.jsonPayload.remote_instance",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "_jsonPayload.src_location",
+        "copy_from": "json.jsonPayload.remote_location",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "network.iana_number",
+        "copy_from": "json.jsonPayload.connection.protocol"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "network.iana_number",
+        "type": "string"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "def iana_number = ctx.network.iana_number;\nif (iana_number == '0') {\n    ctx.network.transport = 'hopopt';\n} else if (iana_number == '1') {\n    ctx.network.transport = 'icmp';\n} else if (iana_number == '2') {\n    ctx.network.transport = 'igmp';\n} else if (iana_number == '6') {\n    ctx.network.transport = 'tcp';\n} else if (iana_number == '8') {\n    ctx.network.transport = 'egp';\n} else if (iana_number == '17') {\n    ctx.network.transport = 'udp';\n} else if (iana_number == '47') {\n    ctx.network.transport = 'gre';\n} else if (iana_number == '50') {\n    ctx.network.transport = 'esp';\n} else if (iana_number == '58') {\n    ctx.network.transport = 'ipv6-icmp';\n} else if (iana_number == '112') {\n    ctx.network.transport = 'vrrp';\n} else if (iana_number == '132') {\n    ctx.network.transport = 'sctp';\n}\n",
+        "lang": "painless",
+        "if": "ctx?.network?.iana_number != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.address",
+        "copy_from": "json.jsonPayload.connection.dest_ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.port",
+        "copy_from": "json.jsonPayload.connection.dest_port"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.address",
+        "copy_from": "json.jsonPayload.connection.src_ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.port",
+        "copy_from": "json.jsonPayload.connection.src_port"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_instance.vm_name",
+        "target_field": "source.domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_instance.vm_name",
+        "target_field": "destination.domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_location.asn",
+        "target_field": "destination.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_location.continent",
+        "target_field": "destination.geo.continent_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_location.country",
+        "target_field": "destination.geo.country_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_location.region",
+        "target_field": "destination.geo.region_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_location.city",
+        "target_field": "destination.geo.city_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_location.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_location.continent",
+        "target_field": "source.geo.continent_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_location.country",
+        "target_field": "source.geo.country_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_location.region",
+        "target_field": "source.geo.region_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_location.city",
+        "target_field": "source.geo.city_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_instance",
+        "target_field": "gcp.destination.instance"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.dest_vpc",
+        "target_field": "gcp.destination.vpc"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_instance",
+        "target_field": "gcp.source.instance"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "_jsonPayload.src_vpc",
+        "target_field": "gcp.source.vpc"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.rule_details.reference",
+        "target_field": "rule.name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.ip",
+        "value": "{{source.address}}",
+        "if": "ctx?.source?.address != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.ip",
+        "value": "{{destination.address}}",
+        "if": "ctx?.destination?.address != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.vm_name",
+        "target_field": "cloud.instance.name",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.region",
+        "target_field": "cloud.region",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.zone",
+        "target_field": "cloud.availability_zone",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.source.vpc.subnetwork_name",
+        "target_field": "network.name",
+        "ignore_missing": true,
+        "type": "string",
+        "if": "ctx?.network?.direction == \"outbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.vm_name",
+        "target_field": "cloud.instance.name",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.region",
+        "target_field": "cloud.region",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.zone",
+        "target_field": "cloud.availability_zone",
+        "type": "string",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.destination.vpc.subnetwork_name",
+        "target_field": "network.name",
+        "ignore_missing": true,
+        "type": "string",
+        "if": "ctx?.network?.direction == \"inbound\""
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "internal",
+        "if": "ctx?.gcp?.source?.instance == ctx?.gcp?.destination?.instance"
+      }
+    },
+    {
+      "set": {
+        "field": "network.type",
+        "value": "ipv4",
+        "if": "ctx?.source?.ip != null && ctx?.source?.ip.contains(\".\")"
+      }
+    },
+    {
+      "set": {
+        "field": "network.type",
+        "value": "ipv6",
+        "if": "ctx?.source?.ip != null && !ctx?.source?.ip.contains(\".\")"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.firewall.rule_details",
+        "copy_from": "json.jsonPayload.rule_details"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx?.source?.ip != null && ctx?.source?.ip != \"\""
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{destination.ip}}",
+        "if": "ctx?.destination?.ip != null && ctx?.destination?.ip != \"\""
+      }
+    },
+    {
+      "rename": {
+        "field": "json",
+        "target_field": "gcp.firewall.flattened",
+        "if": "ctx.json != null && ctx._conf?.keep_json == true"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.firewall.connection",
+          "gcp.firewall.dest_location",
+          "gcp.firewall.disposition",
+          "gcp.firewall.src_location",
+          "_conf",
+          "json",
+          "_jsonPayload"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.firewall@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.firewall` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "metrics@tsdb-settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "total_fields": {
+              "ignore_dynamic_beyond_limit": "true"
+            }
+          }
+        }
+      }
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default settings for the metrics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

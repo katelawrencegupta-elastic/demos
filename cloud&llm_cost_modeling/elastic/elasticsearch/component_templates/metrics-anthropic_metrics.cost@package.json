@@ -1,0 +1,119 @@
+{
+  "name": "metrics-anthropic_metrics.cost@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-anthropic_metrics.cost-0.4.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "anthropic": {
+            "properties": {
+              "cost": {
+                "properties": {
+                  "workspace_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "amount": {
+                    "type": "double"
+                  },
+                  "cost_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "bucket_start_time": {
+                    "type": "date"
+                  },
+                  "description": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_tier": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "currency": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "token_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "context_window": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "bucket_end_time": {
+                    "type": "date"
+                  },
+                  "inference_geo": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "anthropic_metrics"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "anthropic_metrics.cost"
+              }
+            }
+          }
+        },
+        "subobjects": false
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "anthropic_metrics"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

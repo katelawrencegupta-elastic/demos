@@ -1,0 +1,53 @@
+{
+  "name": "logs-apm.error@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "error.log.stacktrace": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "http.request.headers": {
+            "type": "flattened"
+          },
+          "log.level": {
+            "type": "keyword"
+          },
+          "http.response.headers": {
+            "type": "flattened"
+          },
+          "http.request.cookies": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "http.request.body": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "error.grouping_name": {
+            "type": "keyword",
+            "script": "def logMessage = params['_source'].error?.log?.message;\nif (logMessage != null && logMessage != \"\") {\n  emit(logMessage);\n  return;\n}\ndef exception = params['_source'].error?.exception;\nif (exception != null && exception.isEmpty() == false) {\n  def exceptionMessage = exception instanceof Map ? exception?.message : exception[0]?.message;\n  if (exceptionMessage instanceof List) {\n    exceptionMessage = exceptionMessage[0]\n  }\n  if (exceptionMessage != null && exceptionMessage != \"\") {\n    emit(exceptionMessage);\n  }\n}\n"
+          },
+          "error.exception.stacktrace": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "error.custom": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "error.exception.attributes": {
+            "dynamic": false,
+            "type": "object"
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for logs-apm.error-* data streams",
+      "managed": true
+    }
+  }
+}

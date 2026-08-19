@@ -1,0 +1,746 @@
+{
+  "id": "azure_openai-83bbaa98-7f44-4785-8774-15e0de9f74fa",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-azure_openai-default"
+    ],
+    "time_range": {
+      "from": "2026-07-14T00:00:00.000Z",
+      "to": "2026-08-18T00:00:00.000Z"
+    },
+    "title": "[Azure OpenAI] PTU Deployments",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "x": 0,
+          "y": 4,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Time to first response - by model",
+          "description": "Recommended latency (responsiveness) measure for streaming requests. Applies to PTU and PTU-managed deployments. Calculated as time taken for the first response to appear after a user sends a prompt",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.open_ai.time_to_response.avg :*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "azure.dimensions.model_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "duration",
+                    "from": "ms",
+                    "to": "ms",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Response time",
+                  "field": "azure.open_ai.time_to_response.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "2029ff81-b23d-48cd-a794-4c49e9dac0f1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 4,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Active tokens - by model",
+          "description": "Total tokens minus cached tokens over a period of time. Applies to PTU and PTU-managed deployments.",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.open_ai.active_tokens.total : *"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "azure.dimensions.model_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Active tokens",
+                  "field": "azure.open_ai.active_tokens.total",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "79c64e30-f756-4675-adcd-5cf888b4761b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 19,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Provisioned utilization - by model",
+          "description": "Utilization % for a provisoned-managed deployment, calculated as (PTUs consumed / PTUs deployed) x 100. When utilization is greater than or equal to 100%, calls are throttled and error code 429 returned.",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.open_ai.provisioned_managed_utilization_v2.avg : *"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "azure.dimensions.model_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": true
+                  },
+                  "label": "Provisioned utilization",
+                  "operation": "formula",
+                  "formula": "max(azure.open_ai.provisioned_managed_utilization_v2.avg)/100",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "706a4123-5b19-42d1-b592-2cd4078cc4e6",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 19,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Token cache match rate - by model",
+          "description": "Percentage of the prompt tokens hit the cache, avaiable for PTU-managed.",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.open_ai.time_to_response.avg :*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "azure.dimensions.model_name"
+                ],
+                "limit": 5,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": true
+                  },
+                  "label": "Context token cache match rate",
+                  "operation": "formula",
+                  "formula": "average(azure.open_ai.context_tokens_cache_match_rate.avg)/100",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "2ba5afe6-09ae-4ef1-a7d4-c4835e278c61",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 4
+        },
+        "config": {
+          "description": "",
+          "hide_title": true,
+          "title": "Azure OpenAI Link",
+          "links": [
+            {
+              "label": "Azure OpenAI Overview",
+              "type": "dashboardLink",
+              "destination": "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "Azure OpenAI PTU Deployments",
+              "type": "dashboardLink",
+              "destination": "azure_openai-83bbaa98-7f44-4785-8774-15e0de9f74fa",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "Azure OpenAI Billing",
+              "type": "dashboardLink",
+              "destination": "azure_openai-f5bbc591-5e6b-4af7-b6c5-b02065a06455",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "Azure OpenAI Content Filtering Overview",
+              "type": "dashboardLink",
+              "destination": "azure_openai-8b09a72a-8317-4ec5-aafe-4b7d3833dcc0",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            }
+          ],
+          "layout": "horizontal"
+        },
+        "id": "9180a016-bd31-4279-bd7d-1871ca9d0179",
+        "type": "links"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "3fa1d11e-46f8-46eb-9c82-08ce1bd6a375",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Subscriptions",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "azure.subscription_id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "29d3a7ca-c5b1-48d0-bb85-91207e57bf40",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Resource Groups",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "azure.resource.group",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "73dd7eee-c674-4431-ad46-5dac3d6496aa",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Resource Name",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "azure.resource.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-13T17:51:25.861Z",
+    "managed": true,
+    "updated_at": "2026-08-17T20:16:09.429Z",
+    "version": "WzUzMywxXQ=="
+  }
+}

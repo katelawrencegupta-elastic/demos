@@ -1,0 +1,321 @@
+{
+  "name": "logs-aws.elb_logs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.elb_logs-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "s3": {
+                "properties": {
+                  "bucket": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "object": {
+                    "properties": {
+                      "key": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "elb": {
+                "properties": {
+                  "incoming_tls_alert": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "listener": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ssl_cipher": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "error": {
+                    "properties": {
+                      "reason": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "connection_time": {
+                    "properties": {
+                      "ms": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "target_port": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "leaf_client_cert_serial_number": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "classification_reason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "leaf_client_cert_not_before": {
+                    "type": "date"
+                  },
+                  "tls_connection_creation_time": {
+                    "type": "date"
+                  },
+                  "tls_handshake_time": {
+                    "properties": {
+                      "ms": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "backend": {
+                    "properties": {
+                      "port": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "ip": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "http": {
+                        "properties": {
+                          "response": {
+                            "properties": {
+                              "status_code": {
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "target_group": {
+                    "properties": {
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "alpn_client_preference_list": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "alpn_fe_protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "backend_processing_time": {
+                    "properties": {
+                      "sec": {
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "ssl_protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "chosen_cert": {
+                    "properties": {
+                      "serial": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "trace_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "matched_rule_priority": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "leaf_client_cert_not_after": {
+                    "type": "date"
+                  },
+                  "classification": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tls_handshake_latency": {
+                    "type": "long"
+                  },
+                  "request_processing_time": {
+                    "properties": {
+                      "sec": {
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "response_processing_time": {
+                    "properties": {
+                      "sec": {
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "tls_named_group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "alpn_be_protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "target_status_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "leaf_client_cert_subject": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tls_verify_status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tls_error_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "redirect_url": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action_executed": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "metrics-prometheus@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "total_fields": {
+              "limit": "10000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "counter": {
+              "path_match": [
+                "metrics.*_sum",
+                "metrics.*_count",
+                "metrics.*_total",
+                "metrics.*_bucket"
+              ],
+              "mapping": {
+                "time_series_metric": "counter",
+                "type": "double"
+              }
+            }
+          },
+          {
+            "gauge": {
+              "path_match": [
+                "metrics.*"
+              ],
+              "mapping": {
+                "time_series_metric": "gauge",
+                "type": "double"
+              }
+            }
+          }
+        ],
+        "date_detection": false,
+        "properties": {
+          "@timestamp": {
+            "type": "date"
+          },
+          "data_stream.namespace": {
+            "type": "constant_keyword"
+          },
+          "data_stream.dataset": {
+            "type": "constant_keyword"
+          },
+          "metrics": {
+            "type": "passthrough",
+            "priority": 20
+          },
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "metrics"
+          },
+          "labels": {
+            "time_series_dimension": true,
+            "type": "passthrough",
+            "priority": 10
+          }
+        }
+      }
+    },
+    "version": 3,
+    "_meta": {
+      "description": "Default mappings for Prometheus metrics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

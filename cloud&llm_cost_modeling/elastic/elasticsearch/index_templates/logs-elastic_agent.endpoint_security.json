@@ -1,0 +1,50 @@
+{
+  "name": "logs-elastic_agent.endpoint_security",
+  "index_template": {
+    "index_patterns": [
+      "logs-elastic_agent.endpoint_security-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "elastic_agent"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-elastic_agent.endpoint_security@package",
+      "logs@custom",
+      "elastic_agent@custom",
+      "logs-elastic_agent.endpoint_security@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "elastic_agent"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "elastic_agent@custom",
+      "logs-elastic_agent.endpoint_security@custom"
+    ],
+    "created_date_millis": 1786558590203,
+    "modified_date_millis": 1786558590203
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "taken_at": "2026-08-18T19:00:39.095855+00:00",
+  "finished_at": "2026-08-18T19:01:15.470924+00:00",
+  "elasticsearch": {
+    "version": "9.6.0",
+    "build_flavor": "serverless"
+  },
+  "kibana_url_host": "klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud",
+  "counts": {
+    "es.alias_indices": 13,
+    "es.component_templates": 243,
+    "es.data_streams": 32,
+    "es.index_templates": 245,
+    "es.inference_endpoints": 79,
+    "es.ingest_pipelines": 210,
+    "es.trained_models": 1,
+    "es.transforms": 4,
+    "fleet.agent_policies": 1,
+    "fleet.outputs": 3,
+    "fleet.package_policies": 1,
+    "fleet.packages": 15,
+    "kibana.connectors": 31,
+    "kibana.dashboards": 142,
+    "kibana.data_views": 5,
+    "kibana.rules": 10,
+    "kibana.saved_objects_export_lines": 238,
+    "kibana.so.alert": 10,
+    "kibana.so.config": 1,
+    "kibana.so.dashboard": 142,
+    "kibana.so.index-pattern": 5,
+    "kibana.so.map": 1,
+    "kibana.so.search": 62,
+    "kibana.so.tag": 16,
+    "kibana.spaces": 1
+  },
+  "notes": [
+    "Document data is not included.",
+    "API keys, enrollment tokens, and secret fields are redacted.",
+    "Inference endpoint service_settings are omitted.",
+    "kibana/saved_objects.ndjson can be imported via POST /api/saved_objects/_import."
+  ]
+}

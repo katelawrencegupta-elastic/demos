@@ -1,0 +1,80 @@
+{
+  "name": "logs-aws.cloudfront_logs-7.1.1-pipeline_process_ip",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557379003,
+  "description": "Pipeline for triggering the grok processor and helper scripts to effectively parse and append individual ipv6/v4 addresses.",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557379003,
+  "processors": [
+    {
+      "grok": {
+        "ignore_failure": true,
+        "on_failure": [
+          {
+            "set": {
+              "tag": "set__tmp_invalid_ip_bee79126",
+              "field": "_tmp.invalid_ip",
+              "value": "{{_ingest._value}}"
+            }
+          },
+          {
+            "append": {
+              "tag": "append_error_message_5cc5cb03",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "_ingest._value",
+        "patterns": [
+          "^%{IPV4:_tmp.valid_ip}$",
+          "^%{IPV6:_tmp.valid_ip}$",
+          "^%{IPV6NOCOMPRESS:_tmp.valid_ip}$",
+          "^\\[%{IPV6:_tmp.valid_ip}\\]$"
+        ],
+        "ignore_missing": true,
+        "tag": "grok_parse_x_forwarded_for_ipv4_and_ipv6_addresses",
+        "pattern_definitions": {
+          "IPV6NOCOMPRESS": "([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}"
+        }
+      }
+    },
+    {
+      "append": {
+        "tag": "append_network_forwarded_ip_aa3cb3ed",
+        "field": "network.forwarded_ip",
+        "allow_duplicates": false,
+        "value": "{{_tmp.valid_ip}}",
+        "if": "ctx._tmp.valid_ip != null && ctx._tmp.valid_ip != \"\""
+      }
+    },
+    {
+      "append": {
+        "tag": "append__tmp_invalid_ips_86b45edc",
+        "field": "_tmp.invalid_ips",
+        "allow_duplicates": false,
+        "value": "{{_tmp.invalid_ip}}",
+        "if": "ctx._tmp.invalid_ip != null && ctx._tmp.invalid_ip != \"\""
+      }
+    }
+  ]
+}

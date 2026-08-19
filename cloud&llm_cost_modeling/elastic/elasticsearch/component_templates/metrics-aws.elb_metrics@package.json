@@ -1,0 +1,658 @@
+{
+  "name": "metrics-aws.elb_metrics@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws.elb_metrics-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "networkelb": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "HealthyHostCount": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TCP_ELB_Reset_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ActiveFlowCount": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "ActiveFlowCount_TCP": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "ActiveFlowCount_UDP": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "TCP_Client_Reset_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NewFlowCount_TLS": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ProcessedBytes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ActiveFlowCount_TLS": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "ProcessedBytes_TLS": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TCP_Target_Reset_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "UnHealthyHostCount": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ClientTLSNegotiationErrorCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NewFlowCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ConsumedLCUs": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "TargetTLSNegotiationErrorCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "metrics_names_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "elb": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "HealthyHostCount": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_Backend_5XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SpilloverCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "BackendConnectionErrors": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SurgeQueueLength": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "EstimatedALBConsumedLCUs": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "EstimatedALBActiveConnectionCount": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "RequestCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "Latency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "UnHealthyHostCount": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_5XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_4XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_Backend_4XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "EstimatedProcessedBytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "HTTPCode_Backend_3XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_Backend_2XX": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "EstimatedALBNewConnectionCount": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudwatch": {
+                "properties": {
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "applicationelb": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "HTTPCode_ELB_503_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTP_Fixed_Response_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTP_Redirect_Url_Limit_Exceeded_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "IPv6ProcessedBytes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "RejectedConnectionCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_5XX_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_502_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "RequestCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ProcessedBytes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTP_Redirect_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "IPv6RequestCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TargetResponseTime": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ClientTLSNegotiationErrorCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_4XX_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_504_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "NewConnectionCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "RuleEvaluations": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_3XX_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ConsumedLCUs": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "ActiveConnectionCount": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HTTPCode_ELB_500_Count": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "dimensions": {
+                "properties": {
+                  "LoadBalancerName": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "TargetGroup": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "AvailabilityZone": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "LoadBalancer": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "tags": {
+                "type": "flattened"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

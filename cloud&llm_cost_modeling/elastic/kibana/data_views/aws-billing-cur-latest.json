@@ -1,0 +1,2496 @@
+{
+  "data_view": {
+    "id": "aws-billing-cur-latest",
+    "version": "WzU0MiwxXQ==",
+    "title": "aws_billing.cur_latest",
+    "timeFieldName": "@timestamp",
+    "sourceFilters": [],
+    "fieldFormats": {},
+    "runtimeFieldMap": {},
+    "fieldAttrs": {},
+    "allowNoIndex": true,
+    "name": "AWS CUR latest",
+    "allowHidden": false,
+    "fields": {
+      "@timestamp": {
+        "count": 0,
+        "name": "@timestamp",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "_id": {
+        "count": 0,
+        "name": "_id",
+        "type": "string",
+        "esTypes": [
+          "_id"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_ignored": {
+        "count": 0,
+        "name": "_ignored",
+        "type": "string",
+        "esTypes": [
+          "_ignored"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_index": {
+        "count": 0,
+        "name": "_index",
+        "type": "string",
+        "esTypes": [
+          "_index"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_score": {
+        "count": 0,
+        "name": "_score",
+        "type": "number",
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "_source": {
+        "count": 0,
+        "name": "_source",
+        "type": "_source",
+        "esTypes": [
+          "_source"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "_source"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.id": {
+        "count": 0,
+        "name": "agent.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.name": {
+        "count": 0,
+        "name": "agent.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.name.text": {
+        "count": 0,
+        "name": "agent.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "agent.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.type": {
+        "count": 0,
+        "name": "agent.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.version": {
+        "count": 0,
+        "name": "agent.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.cloudwatch.message": {
+        "count": 0,
+        "name": "aws.cloudwatch.message",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.bucket.arn": {
+        "count": 0,
+        "name": "aws.s3.bucket.arn",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.bucket.name": {
+        "count": 0,
+        "name": "aws.s3.bucket.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.object.key": {
+        "count": 0,
+        "name": "aws.s3.object.key",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_period_end_date": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_period_end_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_period_start_date": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_period_start_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.invoice_id": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.invoice_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.invoicing_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.invoicing_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.payer_account_id": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.payer_account_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.payer_account_name": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.payer_account_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.type": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bundled_discount": {
+        "count": 0,
+        "name": "aws_billing.cur.bundled_discount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost.amortized_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.cost.amortized_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost.net_amortized_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.cost.net_amortized_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost_category": {
+        "count": 0,
+        "name": "aws_billing.cur.cost_category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.identity.line_item_id": {
+        "count": 0,
+        "name": "aws_billing.cur.identity.line_item_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.identity.time_interval": {
+        "count": 0,
+        "name": "aws_billing.cur.identity.time_interval",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.availability_zone": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.availability_zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.blended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.blended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.blended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.blended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.currency_code": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.currency_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.description": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.description",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.legal_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.legal_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.net_unblended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.net_unblended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.net_unblended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.net_unblended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.normalization_factor": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.normalization_factor",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.normalized_usage_amount": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.normalized_usage_amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.operation": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.operation",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.product_code": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.product_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.resource_id": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.resource_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.tax_type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.tax_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_cost_str": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_cost_str",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_account_id": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_account_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_account_name": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_account_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_amount": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_end_date": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_end_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_start_date": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_start_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.currency": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.currency",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.lease_contract_length": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.lease_contract_length",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.offering_class": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.offering_class",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.public_on_demand_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.public_on_demand_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.public_on_demand_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.public_on_demand_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.purchase_option": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.purchase_option",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.rate_code": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.rate_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.rate_id": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.rate_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.term": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.term",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.unit": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.comment": {
+        "count": 0,
+        "name": "aws_billing.cur.product.comment",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.family": {
+        "count": 0,
+        "name": "aws_billing.cur.product.family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.fee_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.fee_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.fee_description": {
+        "count": 0,
+        "name": "aws_billing.cur.product.fee_description",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instance_family": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instance_family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instance_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instance_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instancesku": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instancesku",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.operation": {
+        "count": 0,
+        "name": "aws_billing.cur.product.operation",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.pricing_unit": {
+        "count": 0,
+        "name": "aws_billing.cur.product.pricing_unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.product": {
+        "count": 0,
+        "name": "aws_billing.cur.product.product",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.servicecode": {
+        "count": 0,
+        "name": "aws_billing.cur.product.servicecode",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.sku": {
+        "count": 0,
+        "name": "aws_billing.cur.product.sku",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.usagetype": {
+        "count": 0,
+        "name": "aws_billing.cur.product.usagetype",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.a_r_n": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.a_r_n",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.amortized_upfront_cost_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.amortized_upfront_cost_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.availability_zone": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.availability_zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.end_time": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.modification_status": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.modification_status",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_amortized_upfront_cost_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_amortized_upfront_cost_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_recurring_fee_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_recurring_fee_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_unused_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_unused_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_unused_recurring_fee": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_unused_recurring_fee",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_upfront_value": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_upfront_value",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.normalized_units_per_reservation": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.normalized_units_per_reservation",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.number_of_reservations": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.number_of_reservations",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.recurring_fee_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.recurring_fee_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.start_time": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.subscription_id": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.subscription_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.total_reserved_normalized_units": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.total_reserved_normalized_units",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.total_reserved_units": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.total_reserved_units",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.units_per_reservation": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.units_per_reservation",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_normalized_unit_quantity": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_normalized_unit_quantity",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_quantity": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_quantity",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_recurring_fee": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_recurring_fee",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.upfront_value": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.upfront_value",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.resource.tags": {
+        "count": 0,
+        "name": "aws_billing.cur.resource.tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.resource_tags": {
+        "count": 0,
+        "name": "aws_billing.cur.resource_tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.a_r_n": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.a_r_n",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.amortized_upfront_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.amortized_upfront_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.end_time": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.instance_type_family": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.instance_type_family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_amortized_upfront_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_amortized_upfront_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_recurring_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_recurring_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.offering_type": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.offering_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.payment_option": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.payment_option",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.purchase_term": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.purchase_term",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.rate": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.recurring_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.recurring_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.region": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.start_time": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.total_commitment_to_date": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.total_commitment_to_date",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.used_commitment": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.used_commitment",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.total_discount": {
+        "count": 0,
+        "name": "aws_billing.cur.total_discount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.id": {
+        "count": 0,
+        "name": "cloud.account.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.name": {
+        "count": 0,
+        "name": "cloud.account.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.name.text": {
+        "count": 0,
+        "name": "cloud.account.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "cloud.account.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.provider": {
+        "count": 0,
+        "name": "cloud.provider",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.region": {
+        "count": 0,
+        "name": "cloud.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.dataset": {
+        "count": 0,
+        "name": "data_stream.dataset",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.namespace": {
+        "count": 0,
+        "name": "data_stream.namespace",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.type": {
+        "count": 0,
+        "name": "data_stream.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "ecs.version": {
+        "count": 0,
+        "name": "ecs.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "error.message": {
+        "count": 0,
+        "name": "error.message",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.category": {
+        "count": 0,
+        "name": "event.category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.dataset": {
+        "count": 0,
+        "name": "event.dataset",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.duration": {
+        "count": 0,
+        "name": "event.duration",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "event.ingested": {
+        "count": 0,
+        "name": "event.ingested",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "event.kind": {
+        "count": 0,
+        "name": "event.kind",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.module": {
+        "count": 0,
+        "name": "event.module",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "log.offset": {
+        "count": 0,
+        "name": "log.offset",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.name": {
+        "count": 0,
+        "name": "metricset.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.name.text": {
+        "count": 0,
+        "name": "metricset.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "metricset.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.period": {
+        "count": 0,
+        "name": "metricset.period",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "service.type": {
+        "count": 0,
+        "name": "service.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "tags": {
+        "count": 0,
+        "name": "tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      }
+    },
+    "namespaces": [
+      "default"
+    ]
+  }
+}

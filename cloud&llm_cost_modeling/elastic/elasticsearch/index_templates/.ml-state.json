@@ -1,0 +1,34 @@
+{
+  "name": ".ml-state",
+  "index_template": {
+    "index_patterns": [
+      ".ml-state*",
+      ".reindexed-v7-ml-state*",
+      ".reindexed-v8-ml-state*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "version": "10000008"
+        },
+        "enabled": false
+      },
+      "aliases": {}
+    },
+    "composed_of": [],
+    "priority": 2147483647,
+    "version": 10000008,
+    "_meta": {
+      "description": "index template for ML state indices",
+      "managed": true
+    },
+    "created_date_millis": 1786555715011,
+    "modified_date_millis": 1786555715011
+  }
+}

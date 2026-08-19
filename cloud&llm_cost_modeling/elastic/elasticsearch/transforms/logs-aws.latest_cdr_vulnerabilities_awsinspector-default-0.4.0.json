@@ -1,0 +1,89 @@
+{
+  "id": "logs-aws.latest_cdr_vulnerabilities_awsinspector-default-0.4.0",
+  "authorization": {
+    "service_account": "elastic/kibana"
+  },
+  "version": "10.0.0",
+  "create_time": 1786557384665,
+  "source": {
+    "index": [
+      "logs-aws.inspector-*"
+    ],
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "match": {
+              "aws.inspector.type": "PACKAGE_VULNERABILITY"
+            }
+          },
+          {
+            "range": {
+              "@timestamp": {
+                "gte": "now-90d"
+              }
+            }
+          }
+        ],
+        "must_not": [
+          {
+            "exists": {
+              "field": "error.message"
+            }
+          },
+          {
+            "terms": {
+              "_tier": [
+                "data_frozen",
+                "data_cold"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "dest": {
+    "index": "security_solution-awsinspector.vulnerability_latest-v2",
+    "aliases": [
+      {
+        "alias": "security_solution-awsinspector.vulnerability_latest",
+        "move_on_creation": true
+      }
+    ]
+  },
+  "frequency": "5m",
+  "sync": {
+    "time": {
+      "field": "event.ingested",
+      "delay": "60s"
+    }
+  },
+  "latest": {
+    "unique_key": [
+      "aws.inspector.transform_unique_id",
+      "data_stream.namespace"
+    ],
+    "sort": "@timestamp"
+  },
+  "description": "Latest Vulnerabilities Findings from Amazon Inspector.",
+  "settings": {
+    "unattended": true
+  },
+  "_meta": {
+    "managed": true,
+    "fleet_transform_version": "0.4.0",
+    "managed_by": "fleet",
+    "package": {
+      "name": "aws"
+    },
+    "installed_by": "719348788",
+    "run_as_kibana_system": true
+  },
+  "retention_policy": {
+    "time": {
+      "field": "@timestamp",
+      "max_age": "90d"
+    }
+  }
+}

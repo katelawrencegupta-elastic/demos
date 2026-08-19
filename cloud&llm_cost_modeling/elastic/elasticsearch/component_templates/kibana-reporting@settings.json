@@ -1,0 +1,13 @@
+{
+  "name": "kibana-reporting@settings",
+  "component_template": {
+    "template": {
+      "settings": {}
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default kibana reporting settings installed by elasticsearch",
+      "managed": true
+    }
+  }
+}

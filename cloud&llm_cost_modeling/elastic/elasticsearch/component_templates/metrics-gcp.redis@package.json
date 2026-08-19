@@ -1,0 +1,590 @@
+{
+  "name": "metrics-gcp.redis@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-gcp.redis-2.50.2",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "gcp.labels.user.*": {
+              "path_match": "gcp.labels.user.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metadata.*": {
+              "path_match": "gcp.labels.metadata.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metrics.*": {
+              "path_match": "gcp.labels.metrics.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.system.*": {
+              "path_match": "gcp.labels.system.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.resource.*": {
+              "path_match": "gcp.labels.resource.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*.*",
+              "mapping": {
+                "type": "double"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*.*": {
+              "path_match": "gcp.metrics.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*": {
+              "path_match": "gcp.metrics.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "instance": {
+                "properties": {
+                  "name": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "machine": {
+                "properties": {
+                  "type": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "labels_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "metrics": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "redis": {
+                "properties": {
+                  "replication": {
+                    "properties": {
+                      "role": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "type": "long"
+                      },
+                      "offset_diff": {
+                        "properties": {
+                          "bytes": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "master_repl_offset": {
+                        "properties": {
+                          "bytes": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "master": {
+                        "properties": {
+                          "slaves": {
+                            "properties": {
+                              "lag": {
+                                "properties": {
+                                  "sec": {
+                                    "time_series_metric": "gauge",
+                                    "meta": {
+                                      "unit": "s"
+                                    },
+                                    "type": "long"
+                                  }
+                                }
+                              },
+                              "offset": {
+                                "properties": {
+                                  "bytes": {
+                                    "time_series_metric": "gauge",
+                                    "meta": {
+                                      "unit": "byte"
+                                    },
+                                    "type": "long"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "keyspace": {
+                    "properties": {
+                      "keys": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "keys_with_expiration": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "avg_ttl": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "server": {
+                    "properties": {
+                      "uptime": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "clients": {
+                    "properties": {
+                      "connected": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "blocked": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "stats": {
+                    "properties": {
+                      "cache_hit_ratio": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "type": "double"
+                      },
+                      "cpu_utilization": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "memory": {
+                        "properties": {
+                          "system_memory_usage_ratio": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          },
+                          "maxmemory": {
+                            "properties": {
+                              "mb": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "m"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "system_memory_overload_duration": {
+                            "properties": {
+                              "us": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "micros"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "usage": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "usage_ratio": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "expired_keys": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "keyspace_hits": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "reject_connections": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "network_traffic": {
+                        "properties": {
+                          "bytes": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "keyspace_misses": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "evicted_keys": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "connections": {
+                        "properties": {
+                          "total": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pubsub": {
+                        "properties": {
+                          "channels": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "patterns": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "persistence": {
+                    "properties": {
+                      "rdb": {
+                        "properties": {
+                          "bgsave_in_progress": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "commands": {
+                    "properties": {
+                      "usec_per_call": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "calls": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "total_time": {
+                        "properties": {
+                          "us": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "micros"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "labels": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "system": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "resource": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "metrics": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "user": {
+                    "dynamic": true,
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "gcp"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "gcp.redis"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

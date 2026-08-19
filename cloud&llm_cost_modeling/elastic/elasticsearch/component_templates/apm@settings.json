@@ -1,0 +1,31 @@
+{
+  "name": "apm@settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "total_fields": {
+              "ignore_dynamic_beyond_limit": "true"
+            },
+            "ignore_malformed": "true"
+          },
+          "sort": {
+            "field": "@timestamp",
+            "order": "desc"
+          }
+        }
+      },
+      "data_stream_options": {
+        "failure_store": {
+          "enabled": true
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default settings for all APM data streams",
+      "managed": true
+    }
+  }
+}

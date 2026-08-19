@@ -1,0 +1,50 @@
+{
+  "name": "logs-gcp_vertexai.auditlogs",
+  "index_template": {
+    "index_patterns": [
+      "logs-gcp_vertexai.auditlogs-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "gcp_vertexai"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-gcp_vertexai.auditlogs@package",
+      "logs@custom",
+      "gcp_vertexai@custom",
+      "logs-gcp_vertexai.auditlogs@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "gcp_vertexai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "gcp_vertexai@custom",
+      "logs-gcp_vertexai.auditlogs@custom"
+    ],
+    "created_date_millis": 1786643498668,
+    "modified_date_millis": 1786643498668
+  }
+}

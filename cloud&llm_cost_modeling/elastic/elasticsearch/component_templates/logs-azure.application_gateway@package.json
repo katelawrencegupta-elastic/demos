@@ -1,0 +1,141 @@
+{
+  "name": "logs-azure.application_gateway@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure.application_gateway-1.38.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "azure"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "azure.application_gateway"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "tenant_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "authorization_rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "correlation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "application_gateway": {
+                "properties": {
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "transaction_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "hostname": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "instance_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "policy": {
+                    "properties": {
+                      "scope": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "scope_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

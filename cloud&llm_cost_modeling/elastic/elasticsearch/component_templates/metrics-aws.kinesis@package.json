@@ -1,0 +1,367 @@
+{
+  "name": "metrics-aws.kinesis@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws.kinesis-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "metrics_names_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "cloudwatch": {
+                "properties": {
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "kinesis": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "GetRecords_Success": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "IncomingBytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecord_Bytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "GetRecords_IteratorAgeMilliseconds": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_SuccessfulRecords": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SubscribeToShardEvent_MillisBehindLatest": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "PutRecord_Latency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_TotalRecords": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "IncomingRecords": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_ThrottledRecords": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "WriteProvisionedThroughputExceeded": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "GetRecords_Bytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_Bytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "SubscribeToShard_RateExceeded": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SubscribeToShardEvent_Success": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ReadProvisionedThroughputExceeded": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "GetRecords_Latency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_Latency": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_FailedRecords": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SubscribeToShardEvent_Records": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SubscribeToShard_Success": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "GetRecords_Records": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "PutRecord_Success": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "PutRecords_Success": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "SubscribeToShardEvent_Bytes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "dimensions": {
+                "properties": {
+                  "StreamName": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "tags": {
+                "type": "flattened"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

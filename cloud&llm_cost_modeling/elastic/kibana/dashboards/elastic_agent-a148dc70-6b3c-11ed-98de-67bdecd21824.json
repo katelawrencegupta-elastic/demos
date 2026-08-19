@@ -1,0 +1,1756 @@
+{
+  "id": "elastic_agent-a148dc70-6b3c-11ed-98de-67bdecd21824",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-elastic_agent-default"
+    ],
+    "title": "[Elastic Agent] Overview",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 14,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "hide_title": true,
+          "title": "Navigation",
+          "links": [
+            {
+              "label": "Overview",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a148dc70-6b3c-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Concerning Agents",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Agent Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f47f18cc-9c7d-4278-b2ea-a6dee816d395",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Integrations",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Input Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a8192f90-cd3f-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "7ec831d9-fe10-44ae-8859-ac8ed50ef16f",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 15,
+          "x": 8,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Current Active Agents",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "bec05483-0da0-488c-a774-1e885749202a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "icon": {
+              "name": "compute",
+              "alignment": "right"
+            },
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Total Agents",
+              "field": "agent.id",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Agents Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "d9875e32-dd5f-4084-81c5-262f7bd0ccba",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 6,
+          "x": 23,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Current Active Agents",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "host.os.type",
+                "negate": true,
+                "operator": "is_one_of",
+                "value": [
+                  "macos",
+                  "windows"
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "bec05483-0da0-488c-a774-1e885749202a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "icon": {
+              "name": "compute",
+              "alignment": "right"
+            },
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Linux",
+              "field": "agent.id",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Agents Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "59a52026-1b41-4eb7-a089-8f8033bcd1d2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 6,
+          "x": 29,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Current Active Agents",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "host.os.type",
+                "operator": "is",
+                "value": "macos"
+              }
+            },
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "bec05483-0da0-488c-a774-1e885749202a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "icon": {
+              "name": "compute",
+              "alignment": "right"
+            },
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "macOS",
+              "field": "agent.id",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Agents Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "6008b7a6-0742-4475-be23-090bfa72bede",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 6,
+          "x": 35,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Current Active Agents",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "host.os.type",
+                "operator": "is",
+                "value": "windows"
+              }
+            },
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "bec05483-0da0-488c-a774-1e885749202a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "icon": {
+              "name": "compute",
+              "alignment": "right"
+            },
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Windows",
+              "field": "agent.id",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Agents Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "10e927b9-aef1-4f6e-b038-b9e25a9845b4",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 8,
+          "x": 8,
+          "y": 7
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "14c02c70-221d-4895-b1d8-7b656c8c02da",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Logs Datasets",
+              "filter": {
+                "language": "kql",
+                "expression": ""
+              },
+              "field": "data_stream.dataset",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "106d153c-b2ce-497f-92a2-a6e37f3fee48",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 8,
+          "x": 16,
+          "y": 7
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "cfd46d2f-3aaf-4f42-9310-07acf5560938",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "cfd46d2f-3aaf-4f42-9310-07acf5560938",
+              "type": "condition",
+              "condition": {
+                "field": "elastic_agent.id",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_spec",
+            "name": "logs-*,metrics-*",
+            "index_pattern": "logs-*,metrics-*",
+            "time_field": "@timestamp"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Incoming Log Rate",
+              "operation": "formula",
+              "formula": "count(data_stream.dataset, kql='')",
+              "time_scale": "s",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "7ef26208-03ac-47c3-84c4-178469ff3851",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 8,
+          "w": 24,
+          "x": 24,
+          "y": 7
+        },
+        "config": {
+          "type": "xy",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Events",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": true
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "label": "Logs",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "NOT data_stream.dataset: elastic_agent*"
+                  },
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "label": "Metrics",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "NOT data_stream.dataset: elastic_agent*"
+                  },
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Time",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Metrics (Yesterday)",
+                  "time_shift": "1d",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "NOT data_stream.dataset: elastic_agent*"
+                  },
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Time",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Logs (Yesterday)",
+                  "time_shift": "1d",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "NOT data_stream.dataset: elastic_agent*"
+                  },
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "798b0b73-690b-4915-b9c7-7e264d38d516",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 8,
+          "x": 8,
+          "y": 11
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "add95576-94f4-4d82-9e9c-d0e8e3eb7d55",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Metrics Datasets",
+              "filter": {
+                "language": "kql",
+                "expression": ""
+              },
+              "field": "data_stream.dataset",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "c9d8e1de-db77-4654-bdcd-719646709f1c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 8,
+          "x": 16,
+          "y": 11
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "cfd46d2f-3aaf-4f42-9310-07acf5560938",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "cfd46d2f-3aaf-4f42-9310-07acf5560938",
+              "type": "condition",
+              "condition": {
+                "field": "elastic_agent.id",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_spec",
+            "name": "logs-*,metrics-*",
+            "index_pattern": "logs-*,metrics-*",
+            "time_field": "@timestamp"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Incoming Metric Rate",
+              "filter": {
+                "language": "kql",
+                "expression": ""
+              },
+              "time_scale": "s",
+              "field": "data_stream.dataset",
+              "empty_as_null": true,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "f83b8268-38f9-4e9c-9c6c-359d9380bbad",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 17,
+          "w": 24,
+          "x": 8,
+          "y": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Most Active Datasets",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "192018e7-0ba9-4d08-8edb-8d3a71291d54",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Events",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Logs",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Datasets",
+                "fields": [
+                  "data_stream.dataset"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Metrics",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Datasets",
+                "fields": [
+                  "data_stream.dataset"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false,
+          "drilldowns": [
+            {
+              "use_filters": false,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "9ea33099-240d-4f37-b154-216aaccb6f4a",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 17,
+          "w": 16,
+          "x": 32,
+          "y": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Most Active Namespaces",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "6065d0fd-730c-4da5-a61e-54640fd138fa",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "8676ca2c-11d5-46aa-8406-2fd76d7498cc",
+              "type": "condition",
+              "condition": {
+                "field": "elastic_agent.id",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "Namespace",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Events",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Logs",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Namespaces",
+                "fields": [
+                  "data_stream.namespace"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Metrics",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Namespaces",
+                "fields": [
+                  "data_stream.namespace"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false,
+          "drilldowns": [
+            {
+              "use_filters": false,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "4b2eb770-f32f-4fc5-85bc-0c7e3e6be84e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 40,
+          "x": 8,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Most Active Agents",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "66f6fe71-d693-4a98-83d3-0907a883b3a6",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 2,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "xl"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Events",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "data_stream.dataset"
+                ],
+                "limit": 30,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Logs",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Agents",
+                "fields": [
+                  "agent.name"
+                ],
+                "limit": 20,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "data_stream.dataset"
+                ],
+                "limit": 30,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Metrics",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Top Agents",
+                "fields": [
+                  "agent.name"
+                ],
+                "limit": 20,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false,
+          "drilldowns": [
+            {
+              "use_filters": false,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "label": "View Integrations Dashboard",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "9c40e327-ae2f-4480-a027-d25fae36a8d0",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "9b87225b-2e22-4928-99aa-7317b14f1455",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Platform",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "host.os.type",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "0262f5fe-fa83-4019-8777-32805030980c",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Namespace",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "data_stream.namespace",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.890Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.183Z",
+    "version": "WzM3NiwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Overview**\n\nThis dashboard gives an overview of the current overall state and health of all Agents and their related enabled Integrations.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "hide_title": true
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "## Integration Volume",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        }
+      }
+    }
+  ]
+}

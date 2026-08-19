@@ -1,0 +1,648 @@
+{
+  "name": "logs-gcp.vpcflow-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557401717,
+  "description": "Pipeline for Google Cloud VPC Flow Logs",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557401717,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "community_id": {
+        "destination_ip": "json.jsonPayload.connection.dest_ip",
+        "destination_port": "json.jsonPayload.connection.dest_port",
+        "iana_number": "json.jsonPayload.connection.protocol",
+        "source_ip": "json.jsonPayload.connection.src_ip",
+        "source_port": "json.jsonPayload.connection.src_port"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": "network"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "connection"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "event.id",
+        "copy_from": "json.insertId"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "log.logger",
+        "copy_from": "json.logName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.address",
+        "copy_from": "json.jsonPayload.connection.dest_ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.port",
+        "copy_from": "json.jsonPayload.connection.dest_port"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "network.iana_number",
+        "copy_from": "json.jsonPayload.connection.protocol"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.address",
+        "copy_from": "json.jsonPayload.connection.src_ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.port",
+        "copy_from": "json.jsonPayload.connection.src_port"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.domain",
+        "copy_from": "json.jsonPayload.src_instance.vm_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.domain",
+        "copy_from": "json.jsonPayload.dest_instance.vm_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.bytes",
+        "copy_from": "json.jsonPayload.bytes_sent"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.packets",
+        "copy_from": "json.jsonPayload.packets_sent"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "event.start",
+        "copy_from": "json.jsonPayload.start_time"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "event.end",
+        "copy_from": "json.jsonPayload.end_time"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.as.number",
+        "copy_from": "json.jsonPayload.dest_location.asn"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.geo.continent_name",
+        "copy_from": "json.jsonPayload.dest_location.continent"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.geo.country_name",
+        "copy_from": "json.jsonPayload.dest_location.country"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.geo.region_name",
+        "copy_from": "json.jsonPayload.dest_location.region"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.geo.city_name",
+        "copy_from": "json.jsonPayload.dest_location.city"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.as.number",
+        "copy_from": "json.jsonPayload.src_location.asn"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.geo.continent_name",
+        "copy_from": "json.jsonPayload.src_location.continent"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.geo.country_name",
+        "copy_from": "json.jsonPayload.src_location.country"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.geo.region_name",
+        "copy_from": "json.jsonPayload.src_location.region"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.geo.city_name",
+        "copy_from": "json.jsonPayload.src_location.city"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.destination.instance",
+        "copy_from": "json.jsonPayload.dest_instance"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.destination.vpc",
+        "copy_from": "json.jsonPayload.dest_vpc"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.source.instance",
+        "copy_from": "json.jsonPayload.src_instance"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.source.vpc",
+        "copy_from": "json.jsonPayload.src_vpc"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.rtt_msec",
+        "target_field": "json.jsonPayload.rtt.ms",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload",
+        "target_field": "gcp.vpcflow"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "source.bytes",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "source.packets",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "network.iana_number",
+        "type": "string"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "def iana_number = ctx.network.iana_number;\nif (iana_number == '0') {\n    ctx.network.transport = 'hopopt';\n} else if (iana_number == '1') {\n    ctx.network.transport = 'icmp';\n} else if (iana_number == '2') {\n    ctx.network.transport = 'igmp';\n} else if (iana_number == '6') {\n    ctx.network.transport = 'tcp';\n} else if (iana_number == '8') {\n    ctx.network.transport = 'egp';\n} else if (iana_number == '17') {\n    ctx.network.transport = 'udp';\n} else if (iana_number == '47') {\n    ctx.network.transport = 'gre';\n} else if (iana_number == '50') {\n    ctx.network.transport = 'esp';\n} else if (iana_number == '58') {\n    ctx.network.transport = 'ipv6-icmp';\n} else if (iana_number == '112') {\n    ctx.network.transport = 'vrrp';\n} else if (iana_number == '132') {\n    ctx.network.transport = 'sctp';\n}\n",
+        "lang": "painless",
+        "if": "ctx?.network?.iana_number != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.ip",
+        "copy_from": "source.address",
+        "if": "ctx.source?.address != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.ip",
+        "copy_from": "destination.address",
+        "if": "ctx.destination?.address != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"DEST\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.vm_name",
+        "target_field": "cloud.instance.name",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"DEST\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.region",
+        "target_field": "cloud.region",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"DEST\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.source.instance.zone",
+        "target_field": "cloud.availability_zone",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"DEST\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.source.vpc.subnetwork_name",
+        "target_field": "network.name",
+        "ignore_missing": true,
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"DEST\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"SRC\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.vm_name",
+        "target_field": "cloud.instance.name",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"SRC\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.region",
+        "target_field": "cloud.region",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"SRC\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "gcp.destination.instance.zone",
+        "target_field": "cloud.availability_zone",
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"SRC\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.destination.vpc.subnetwork_name",
+        "target_field": "network.name",
+        "ignore_missing": true,
+        "type": "string",
+        "if": "ctx?.gcp?.vpcflow?.reporter == \"SRC\""
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "source.bytes",
+        "type": "long",
+        "target_field": "network.bytes"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "source.packets",
+        "type": "long",
+        "target_field": "network.packets"
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "internal",
+        "if": "ctx?.gcp?.source?.instance != null && ctx?.gcp?.destination?.instance != null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "outbound",
+        "if": "ctx?.gcp?.source?.instance != null && ctx?.gcp?.destination?.instance == null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "inbound",
+        "if": "ctx?.gcp?.source?.instance == null && ctx?.gcp?.destination?.instance != null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.direction",
+        "value": "unknown",
+        "if": "ctx?.network?.direction == null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.type",
+        "value": "ipv4",
+        "if": "ctx?.source?.ip != null && ctx?.source?.ip.contains(\".\")"
+      }
+    },
+    {
+      "set": {
+        "field": "network.type",
+        "value": "ipv6",
+        "if": "ctx?.source?.ip != null && !ctx?.source?.ip.contains(\".\")"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx?.source?.ip != null && ctx?.source?.ip != \"\""
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{destination.ip}}",
+        "if": "ctx?.destination?.ip != null && ctx?.destination?.ip != \"\""
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "field": "json",
+        "target_field": "gcp.vpcflow.flattened",
+        "if": "ctx.json != null && ctx._conf?.keep_json == true"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.destination.instance.vm_name",
+          "gcp.source.instance.vm_name",
+          "gcp.vpcflow.bytes_sent",
+          "gcp.vpcflow.connection",
+          "gcp.vpcflow.connection.dest_ip",
+          "gcp.vpcflow.connection.dest_port",
+          "gcp.vpcflow.connection.protocol",
+          "gcp.vpcflow.connection.src_ip",
+          "gcp.vpcflow.connection.src_port",
+          "gcp.vpcflow.dest_instance",
+          "gcp.vpcflow.dest_instance.vm_name",
+          "gcp.vpcflow.dest_location",
+          "gcp.vpcflow.dest_location.asn",
+          "gcp.vpcflow.dest_location.city",
+          "gcp.vpcflow.dest_location.continent",
+          "gcp.vpcflow.dest_location.country",
+          "gcp.vpcflow.dest_location.region",
+          "gcp.vpcflow.dest_vpc",
+          "gcp.vpcflow.end_time",
+          "gcp.vpcflow.packets_sent",
+          "gcp.vpcflow.rtt_msec",
+          "gcp.vpcflow.src_instance",
+          "gcp.vpcflow.src_instance.vm_name",
+          "gcp.vpcflow.src_location",
+          "gcp.vpcflow.src_location.asn",
+          "gcp.vpcflow.src_location.city",
+          "gcp.vpcflow.src_location.continent",
+          "gcp.vpcflow.src_location.country",
+          "gcp.vpcflow.src_location.region",
+          "gcp.vpcflow.src_vpc",
+          "gcp.vpcflow.start_time",
+          "_conf",
+          "json"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.vpcflow@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.vpcflow` dataset"
+      }
+    }
+  ]
+}

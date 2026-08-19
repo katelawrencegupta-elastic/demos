@@ -1,0 +1,255 @@
+{
+  "name": "logs-azure.firewall_logs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure.firewall_logs-1.38.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "geo": {
+            "properties": {
+              "continent_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "region_iso_code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "city_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_iso_code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "location": {
+                "type": "geo_point"
+              },
+              "region_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "dns": {
+            "properties": {
+              "header_flags": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "azure"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "azure.firewall_logs"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "tenant_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "firewall": {
+                "properties": {
+                  "rule_collection": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "response_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "is_tls_inspected": {
+                    "type": "boolean"
+                  },
+                  "target_url": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "is_explicit_proxy_request": {
+                    "type": "boolean"
+                  },
+                  "rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "dnssec_bool_flag": {
+                    "type": "boolean"
+                  },
+                  "icmp": {
+                    "properties": {
+                      "request": {
+                        "properties": {
+                          "code": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "response_size": {
+                    "type": "long"
+                  },
+                  "duration": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action_reason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "web_category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_size": {
+                    "type": "long"
+                  },
+                  "policy": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "rule_collection_group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "edns0_buffer_size": {
+                    "type": "long"
+                  },
+                  "request_duration_secs": {
+                    "type": "double"
+                  },
+                  "fqdn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "event_original_uid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "identity_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "response_flags": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "dnssec_buffer_size": {
+                    "type": "long"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "dnssec_ok_bit": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "authorization_rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "correlation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

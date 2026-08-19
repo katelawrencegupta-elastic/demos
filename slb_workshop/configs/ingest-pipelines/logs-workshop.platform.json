@@ -84,6 +84,13 @@
         "value": "event",
         "override": false
       }
+    },
+    {
+      "pipeline": {
+        "name": "logs-workshop.host-geoip",
+        "ignore_missing_pipeline": true,
+        "description": "GeoIP lookup from host.ip into host.geo"
+      }
     }
   ],
   "on_failure": [

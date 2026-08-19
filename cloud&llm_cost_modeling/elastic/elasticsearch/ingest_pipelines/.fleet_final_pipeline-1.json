@@ -1,0 +1,110 @@
+{
+  "name": ".fleet_final_pipeline-1",
+  "on_failure": [
+    {
+      "remove": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "_security"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": [
+          "failed in Fleet agent final_pipeline: {{ _ingest.on_failure_message }}"
+        ]
+      }
+    }
+  ],
+  "modified_date_millis": 1786555751525,
+  "_meta": {
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "description": "Final pipeline for processing all incoming Fleet Agent documents.\n",
+  "created_date_millis": 1786555751525,
+  "processors": [
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Add time when event was ingested (and remove sub-seconds to improve storage efficiency)",
+        "tag": "truncate-subseconds-event-ingested",
+        "source": "if (ctx?.event == null) {\n  ctx.event = [:];\n}\n\nctx.event.ingested = metadata().now.withNano(0).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);"
+      }
+    },
+    {
+      "remove": {
+        "description": "Remove any pre-existing untrusted values.",
+        "ignore_missing": true,
+        "field": [
+          "event.agent_id_status",
+          "_security"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "ignore_failure": true,
+        "description": "Remove event.original unless the preserve_original_event tag is set",
+        "ignore_missing": true,
+        "field": "event.original",
+        "if": "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      }
+    },
+    {
+      "set_security_user": {
+        "field": "_security",
+        "properties": [
+          "authentication_type",
+          "username",
+          "realm",
+          "api_key"
+        ]
+      }
+    },
+    {
+      "script": {
+        "description": "Add event.agent_id_status based on the API key metadata and the agent.id contained in the event.\n",
+        "tag": "agent-id-status",
+        "source": "boolean is_user_trusted(def ctx, def users) {\n  if (ctx?._security?.username == null) {\n    return false;\n  }\n\n  def user = null;\n  for (def item : users) {\n    if (item?.username == ctx._security.username) {\n      user = item;\n      break;\n    }\n  }\n\n  if (user == null || user?.realm == null || ctx?._security?.realm?.name == null) {\n    return false;\n  }\n\n  if (ctx._security.realm.name != user.realm) {\n    return false;\n  }\n\n  return true;\n}\n\nString verified(def ctx, def params) {\n  // No agent.id field to validate.\n  if (ctx?.agent?.id == null) {\n    return \"missing\";\n  }\n\n  // Some datasets are written by Kibana rather than agents.\n  // Kibana is trusted to accurately report agent.id for these datasets.\n  if (ctx?._security?.authentication_type != null\n      && params?.kibana_user_allowed_datasets != null\n      && params.kibana_user_allowed_datasets.contains(ctx?.data_stream?.dataset)\n      && is_user_trusted(ctx, params.kibana_trusted_users)) {\n    return \"verified\";\n  }\n\n  // Check auth metadata from API key.\n  if (ctx?._security?.authentication_type == null\n      // Agents only use API keys.\n      || ctx._security.authentication_type != 'API_KEY'\n      // Verify the API key owner before trusting any metadata it contains.\n      || !is_user_trusted(ctx, params.trusted_users)\n      // Verify the API key has metadata indicating the assigned agent ID.\n      || ctx?._security?.api_key?.metadata?.agent_id == null) {\n    return \"auth_metadata_missing\";\n  }\n\n  // The API key can only be used represent the agent.id it was issued to.\n  if (ctx._security.api_key.metadata.agent_id != ctx.agent.id) {\n    // Potential masquerade attempt.\n    return \"mismatch\";\n  }\n\n  return \"verified\";\n}\n\nif (ctx?.event == null) {\n  ctx.event = [:];\n}\n\nctx.event.agent_id_status = verified(ctx, params);",
+        "params": {
+          "trusted_users": [
+            {
+              "realm": "_service_account",
+              "username": "elastic/fleet-server"
+            },
+            {
+              "realm": "found",
+              "username": "cloud-internal-agent-server"
+            },
+            {
+              "realm": "reserved",
+              "username": "elastic"
+            }
+          ],
+          "kibana_trusted_users": [
+            {
+              "realm": "_service_account",
+              "username": "elastic/kibana"
+            },
+            {
+              "realm": "reserved",
+              "username": "kibana_system"
+            }
+          ],
+          "kibana_user_allowed_datasets": [
+            "elastic_agent.status_change"
+          ]
+        }
+      }
+    },
+    {
+      "remove": {
+        "field": "_security",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "version": 5
+}

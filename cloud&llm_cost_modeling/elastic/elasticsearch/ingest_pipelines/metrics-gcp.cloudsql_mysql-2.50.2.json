@@ -1,0 +1,354 @@
+{
+  "name": "metrics-gcp.cloudsql_mysql-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557400027,
+  "description": "Pipeline for parsing GCP CloudSQL MySQL metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557400027,
+  "processors": [
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "gcp.labels"
+        ],
+        "target_field": "gcp.labels_fingerprint"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop if database is not MySQL.",
+        "if": "ctx?.gcp?.labels?.cloudsql?.name != 'mysql'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.auto_failover_request_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.auto_failover_request.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.available_for_failover.value",
+        "target_field": "gcp.cloudsql_mysql.database.available_for_failover"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.reserved_cores.value",
+        "target_field": "gcp.cloudsql_mysql.database.cpu.reserved_cores.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.usage_time.value",
+        "target_field": "gcp.cloudsql_mysql.database.cpu.usage_time.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.utilization.value",
+        "target_field": "gcp.cloudsql_mysql.database.cpu.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.bytes_used.value",
+        "target_field": "gcp.cloudsql_mysql.database.disk.bytes_used.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.quota.value",
+        "target_field": "gcp.cloudsql_mysql.database.disk.quota.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.read_ops_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.disk.read_ops.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.utilization.value",
+        "target_field": "gcp.cloudsql_mysql.database.disk.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.write_ops_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.disk.write_ops.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.instance_state.value",
+        "target_field": "gcp.cloudsql_mysql.database.instance_state"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.quota.value",
+        "target_field": "gcp.cloudsql_mysql.database.memory.quota.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.total_usage.value",
+        "target_field": "gcp.cloudsql_mysql.database.memory.total_usage.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.usage.value",
+        "target_field": "gcp.cloudsql_mysql.database.memory.usage.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.utilization.value",
+        "target_field": "gcp.cloudsql_mysql.database.memory.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_buffer_pool_pages_dirty.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_buffer_pool_pages_dirty.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_buffer_pool_pages_free.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_buffer_pool_pages_free.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_buffer_pool_pages_total.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_buffer_pool_pages_total.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_data_fsyncs.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_data_fsyncs.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_os_log_fsyncs.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_os_log_fsyncs.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_pages_read.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_pages_read.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.innodb_pages_written.value",
+        "target_field": "gcp.cloudsql_mysql.database.innodb_pages_written.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.queries.value",
+        "target_field": "gcp.cloudsql_mysql.database.queries.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.questions.value",
+        "target_field": "gcp.cloudsql_mysql.database.questions.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.received_bytes_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.received_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.last_io_errno.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.last_io_errno"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.last_sql_errno.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.last_sql_errno"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.seconds_behind_master.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.seconds_behind_master.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.slave_io_running.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.slave_io_running"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.slave_io_running_state.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.slave_io_running_state"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.slave_sql_running.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.slave_sql_running"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.replication.slave_sql_running_state.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.slave_sql_running_state"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.mysql.sent_bytes_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.sent_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.connections.value",
+        "target_field": "gcp.cloudsql_mysql.database.network.connections.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.received_bytes_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.network.received_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.sent_bytes_count.value",
+        "target_field": "gcp.cloudsql_mysql.database.network.sent_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.replication.network_lag.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.network_lag.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.replication.replica_lag.value",
+        "target_field": "gcp.cloudsql_mysql.database.replication.replica_lag.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.up.value",
+        "target_field": "gcp.cloudsql_mysql.database.up"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.uptime.value",
+        "target_field": "gcp.cloudsql_mysql.database.uptime.sec"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.cloudsql_mysql@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.cloudsql_mysql` dataset"
+      }
+    }
+  ]
+}

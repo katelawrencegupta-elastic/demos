@@ -1,0 +1,295 @@
+{
+  "name": "logs-aws.lambda_logs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.lambda_logs-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "lambda": {
+                "properties": {
+                  "cold_start_int": {
+                    "type": "float"
+                  },
+                  "extension": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "state": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "events": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "runtime_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "runtime_version_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "log_extension": {
+                    "properties": {
+                      "types": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "state": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "error": {
+                    "properties": {
+                      "location": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "stack_trace": {
+                        "type": "text"
+                      },
+                      "message": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "event_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "initialization_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "aws_request_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "phase": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "spans": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "start": {
+                        "type": "date"
+                      },
+                      "durationMs": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "trace_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tracing": {
+                    "properties": {
+                      "xray_trace_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "span_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "segment_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "sampled": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "message": {
+                    "type": "flattened"
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "users": {
+                    "type": "flattened"
+                  },
+                  "cold_start": {
+                    "type": "boolean"
+                  },
+                  "instance_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "correlation_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "execution_environment": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "metrics": {
+                    "properties": {
+                      "duration_ms": {
+                        "type": "long"
+                      },
+                      "max_memory_used_mb": {
+                        "type": "long"
+                      },
+                      "billed_duration_ms": {
+                        "type": "long"
+                      },
+                      "produced_bytes": {
+                        "type": "long"
+                      },
+                      "dropped_records": {
+                        "type": "long"
+                      },
+                      "dropped_bytes": {
+                        "type": "long"
+                      },
+                      "memory_size_mb": {
+                        "type": "long"
+                      },
+                      "init_duration_ms": {
+                        "type": "long"
+                      },
+                      "instance_max_memory": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "request_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "log_stream_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "cloudwatch": {
+                "properties": {
+                  "log_group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ingestion_time": {
+                    "type": "date"
+                  },
+                  "log_stream": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

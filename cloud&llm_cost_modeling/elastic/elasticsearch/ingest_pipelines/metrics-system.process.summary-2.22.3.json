@@ -1,0 +1,42 @@
+{
+  "name": "metrics-system.process.summary-2.22.3",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591739,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-system.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `system` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-system.process.summary@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `system.process.summary` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591739
+}

@@ -1,0 +1,169 @@
+{
+  "name": "metrics-aws_bedrock.guardrails-1.6.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643491929,
+  "description": "Pipeline for Amazon Bedrock guardrail metrics",
+  "_meta": {
+    "package": {
+      "name": "aws_bedrock"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643491929,
+  "processors": [
+    {
+      "dot_expander": {
+        "field": "*",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "cloud.account.name",
+        "copy_from": "cloud.account.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.guardrails.metrics",
+        "target_field": "aws_bedrock.guardrails"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.Invocations.sum",
+        "target_field": "aws_bedrock.guardrails.invocations"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.InvocationClientErrors.sum",
+        "target_field": "aws_bedrock.guardrails.invocation_client_errors"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.InvocationServerErrors.sum",
+        "target_field": "aws_bedrock.guardrails.invocation_server_errors"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.InvocationThrottles.sum",
+        "target_field": "aws_bedrock.guardrails.invocation_throttles"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.TextUnitCount.sum",
+        "target_field": "aws_bedrock.guardrails.text_unit_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.InvocationsIntervened.sum",
+        "target_field": "aws_bedrock.guardrails.invocations_intervened"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.guardrails.InvocationLatency.avg",
+        "target_field": "aws_bedrock.guardrails.invocation_latency"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.Operation",
+        "target_field": "aws_bedrock.guardrails.operation"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.GuardrailContentSource",
+        "target_field": "aws_bedrock.guardrails.guardrail_content_source"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.GuardrailPolicyType",
+        "target_field": "aws_bedrock.guardrails.guardrail_policy_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.GuardrailArn",
+        "target_field": "aws_bedrock.guardrails.guardrail_arn"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws.dimensions.GuardrailVersion",
+        "target_field": "aws_bedrock.guardrails.guardrail_version"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws_bedrock.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws_bedrock` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws_bedrock.guardrails@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws_bedrock.guardrails` dataset"
+      }
+    }
+  ]
+}

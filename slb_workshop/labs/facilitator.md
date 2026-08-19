@@ -14,6 +14,8 @@ Participants can:
 
 ## Timing
 
+**45-minute lecture** (diagram on screen, no labs): [talk-track-45.md](talk-track-45.md) — open 3 / path through Elastic 18 / Fleet vs EDOT 14 / missed items 7 / close 3. Never cut stages 4–7, EDOT ≠ APM Server OTLP, or “switching is not free.”
+
 | Block | Classroom (60 min) | Hands-on (90 min) |
 |---|---|---|
 | Control surfaces (streams/templates/pipelines/tiers) | 15 min | Lab 1, 35 min |

@@ -1,0 +1,53 @@
+{
+  "name": "metrics-gcp.cloudsql_sqlserver",
+  "index_template": {
+    "index_patterns": [
+      "metrics-gcp.cloudsql_sqlserver-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "gcp"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-gcp.cloudsql_sqlserver@package",
+      "metrics@custom",
+      "gcp@custom",
+      "metrics-gcp.cloudsql_sqlserver@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "gcp@custom",
+      "metrics-gcp.cloudsql_sqlserver@custom"
+    ],
+    "created_date_millis": 1786557400965,
+    "modified_date_millis": 1786557400965
+  }
+}

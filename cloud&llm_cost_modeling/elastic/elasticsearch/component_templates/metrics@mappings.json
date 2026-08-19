@@ -1,0 +1,71 @@
+{
+  "name": "metrics@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "long_metrics": {
+              "mapping": {
+                "index": false,
+                "type": "long"
+              },
+              "match_mapping_type": "long"
+            }
+          },
+          {
+            "float_metrics": {
+              "mapping": {
+                "index": false,
+                "type": "float"
+              },
+              "match_mapping_type": "double"
+            }
+          },
+          {
+            "double_metrics": {
+              "mapping": {
+                "index": false,
+                "type": "double"
+              }
+            }
+          },
+          {
+            "histogram_metrics": {
+              "mapping": {
+                "type": "histogram"
+              }
+            }
+          },
+          {
+            "summary_metrics": {
+              "mapping": {
+                "metrics": [
+                  "sum",
+                  "value_count"
+                ],
+                "type": "aggregate_metric_double",
+                "default_metric": "value_count"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "data_stream": {
+            "properties": {
+              "type": {
+                "type": "constant_keyword",
+                "value": "metrics"
+              }
+            }
+          }
+        }
+      }
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default mappings for the metrics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "logs-elasticsearch.querylog@settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "sort": {
+            "field": [
+              "@timestamp"
+            ],
+            "order": [
+              "desc"
+            ]
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "2d"
+      },
+      "data_stream_options": {
+        "failure_store": {
+          "enabled": true,
+          "lifecycle": {
+            "enabled": true,
+            "data_retention": "7d"
+          }
+        }
+      }
+    },
+    "version": 8,
+    "_meta": {
+      "description": "Default settings for the Elasticsearch query logs index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

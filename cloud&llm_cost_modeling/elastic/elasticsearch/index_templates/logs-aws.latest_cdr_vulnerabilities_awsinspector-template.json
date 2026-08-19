@@ -1,0 +1,37 @@
+{
+  "name": "logs-aws.latest_cdr_vulnerabilities_awsinspector-template",
+  "index_template": {
+    "index_patterns": [
+      "security_solution-awsinspector.vulnerability_latest-v2"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "ignore_malformed": "true"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "logs-aws.latest_cdr_vulnerabilities_awsinspector-template@package",
+      "aws@custom",
+      "logs-aws.latest_cdr_vulnerabilities_awsinspector-template@custom",
+      "ecs@mappings"
+    ],
+    "priority": 250,
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "ignore_missing_component_templates": [
+      "aws@custom",
+      "logs-aws.latest_cdr_vulnerabilities_awsinspector-template@custom"
+    ],
+    "created_date_millis": 1786557384437,
+    "modified_date_millis": 1786557384437
+  }
+}

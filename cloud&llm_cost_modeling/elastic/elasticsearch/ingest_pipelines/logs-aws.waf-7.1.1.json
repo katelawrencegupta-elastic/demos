@@ -1,0 +1,618 @@
+{
+  "name": "logs-aws.waf-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378998,
+  "description": "Pipeline for WAF logs",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378998,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version_0f7334bb",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_category_d1482d04",
+        "field": "event.category",
+        "value": [
+          "web",
+          "network"
+        ]
+      }
+    },
+    {
+      "append": {
+        "tag": "append_event_type_8860cef4",
+        "field": "event.type",
+        "value": [
+          "access"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original_c74b1d7e",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message_2ee3a7d4",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "json_event_original_to_json_5e54dc16",
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "tag": "date_json_timestamp_to_timestamp_56edca7f",
+        "formats": [
+          "UNIX_MS"
+        ],
+        "field": "json.timestamp",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_clientIp_to_source_ip_d91520cd",
+        "field": "json.httpRequest.clientIp",
+        "target_field": "source.ip"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_to_source_geo_da2e41b2",
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_country_to_source_geo_country_iso_code_e529e510",
+        "field": "json.httpRequest.country",
+        "target_field": "source.geo.country_iso_code",
+        "if": "ctx.source?.geo?.country_iso_code == null"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.as",
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_to_source_as_28d69883",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_asn_to_source_as_number_a917047d",
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_ClientASN_to_source_as_number_ca8c111f",
+        "field": "json.ClientASN",
+        "target_field": "source.as.number",
+        "if": "ctx?.source?.as?.number == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_organization_name_to_source_as_organization_name_f1362d0b",
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_1aa4965d",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.captchaResponse.responseCode",
+        "target_field": "aws.waf.captcha_response.response_code",
+        "ignore_missing": true,
+        "tag": "convert_captchaResponse_responseCode_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_42eab77f",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX_MS"
+        ],
+        "field": "json.captchaResponse.solveTimestamp",
+        "target_field": "aws.waf.captcha_response.solve_timestamp",
+        "tag": "date_captchaResponse_solveTimestamp",
+        "if": "ctx.json?.captchaResponse?.solveTimestamp != null && ctx.json.captchaResponse.solveTimestamp != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_captchaResponse_failureReason_to_captcha_response_failure_reason",
+        "field": "json.captchaResponse.failureReason",
+        "target_field": "aws.waf.captcha_response.failure_reason"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_162ae230",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.challengeResponse.responseCode",
+        "target_field": "aws.waf.challenge_response.response_code",
+        "ignore_missing": true,
+        "tag": "convert_challengeResponse_responseCode_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_25c78f2c",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX_MS"
+        ],
+        "field": "json.challengeResponse.solveTimestamp",
+        "target_field": "aws.waf.challenge_response.solve_timestamp",
+        "tag": "date_challengeResponse_solveTimestamp",
+        "if": "ctx.json?.challengeResponse?.solveTimestamp != null && ctx.json.challengeResponse.solveTimestamp != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_challengeResponse_failureReason_to_challenge_response_failure_reason",
+        "field": "json.challengeResponse.failureReason",
+        "target_field": "aws.waf.challenge_response.failure_reason"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "tag": "convert_format_version_to_string",
+        "field": "json.formatVersion",
+        "target_field": "aws.waf.format_version",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_httpRequest_fragment_to_url_fragment",
+        "field": "json.httpRequest.fragment",
+        "target_field": "url.fragment"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_httpRequest_host_to_url_registered_domain",
+        "field": "json.httpRequest.host",
+        "target_field": "url.registered_domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_requestId_to_http_request_id_9f01188d",
+        "field": "json.httpRequest.requestId",
+        "target_field": "http.request.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_httpRequest_scheme_to_url_scheme",
+        "field": "json.httpRequest.scheme",
+        "target_field": "url.scheme"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_6edc1635",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.requestBodySize",
+        "target_field": "aws.waf.request_body_size",
+        "ignore_missing": true,
+        "tag": "convert_requestBodySize_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_b1dcefda",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.requestBodySizeInspectedByWAF",
+        "target_field": "aws.waf.request_body_size_inspected_by_waf",
+        "ignore_missing": true,
+        "tag": "convert_requestBodySizeInspectedByWAF_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_e983b3a7",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.responseCodeSent",
+        "target_field": "aws.waf.response_code_sent",
+        "ignore_missing": true,
+        "tag": "convert_responseCodeSent_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_httpMethod_to_http_request_method_36be9aa0",
+        "field": "json.httpRequest.httpMethod",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{network.protocol}/%{http.version}",
+        "ignore_failure": true,
+        "tag": "dissect_json_httpRequest_httpVersion_3eaa461f",
+        "field": "json.httpRequest.httpVersion"
+      }
+    },
+    {
+      "lowercase": {
+        "ignore_missing": true,
+        "tag": "lowercase_network_protocol_49872259",
+        "field": "network.protocol"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_network_transport_be847bd4",
+        "field": "network.transport",
+        "value": "tcp",
+        "if": "ctx?.network?.protocol != null && ctx?.network?.protocol == 'http'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_args_to_url_query_f317ee93",
+        "field": "json.httpRequest.args",
+        "target_field": "url.query"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpRequest_uri_to_url_path_efbbbc4d",
+        "field": "json.httpRequest.uri",
+        "target_field": "url.path"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ja3Fingerprint_to_tls_client_ja3",
+        "field": "json.ja3Fingerprint",
+        "target_field": "tls.client.ja3"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ja4Fingerprint_to_ja4_fingerprint",
+        "field": "json.ja4Fingerprint",
+        "target_field": "aws.waf.ja4_fingerprint"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_labels_to_aws_waf_labels",
+        "field": "json.labels",
+        "target_field": "aws.waf.labels"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_oversizeFields_to_aws_waf_oversize_fields",
+        "field": "json.oversizeFields",
+        "target_field": "aws.waf.oversize_fields"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_terminatingRuleMatchDetails_to_aws_waf_terminating_rule_match_details_c9c5dba2",
+        "field": "json.terminatingRuleMatchDetails",
+        "target_field": "aws.waf.terminating_rule_match_details"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_ruleGroupList_to_aws_waf_rule_group_list_b00ab221",
+        "field": "json.ruleGroupList",
+        "target_field": "aws.waf.rule_group_list"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_rateBasedRuleList_to_aws_waf_rate_based_rule_list_d273b998",
+        "field": "json.rateBasedRuleList",
+        "target_field": "aws.waf.rate_based_rule_list"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_nonTerminatingMatchingRules_to_aws_waf_non_terminating_matching_rules_9e63f656",
+        "field": "json.nonTerminatingMatchingRules",
+        "target_field": "aws.waf.non_terminating_matching_rules"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "tag": "script_cb4c8e3d",
+        "source": "if (ctx.json.httpRequest.headers != null) {\n  ctx.aws.waf.request = new HashMap();\n  ctx.aws.waf.request.headers = new HashMap();\n  for (def i = 0; i < ctx.json.httpRequest.headers.length; i++) {\n    ctx.aws.waf.request.headers[ctx.json.httpRequest.headers[i].name] = ctx.json.httpRequest.headers[i].value;\n  }\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_6eaadeb6",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "description": "Script to map requestHeadersInserted name to requestHeadersInserted value.",
+        "tag": "script_request_headers_inserted",
+        "source": "ctx.aws.waf.request_headers_inserted = new HashMap(); for (def i = 0; i < ctx.json.requestHeadersInserted.length; i++) {\n  ctx.aws.waf.request_headers_inserted[ctx.json.requestHeadersInserted[i].name] = ctx.json.requestHeadersInserted[i].value;\n}",
+        "lang": "painless",
+        "if": "ctx.json?.requestHeadersInserted != null && ctx.aws?.waf != null && ctx.json.requestHeadersInserted instanceof List"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_action_to_event_action_6ebb0784",
+        "field": "json.action",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_related_ip_d7aecc5f",
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_provider_208bdd6b",
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind_de80643c",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_event_type_7c253a3f",
+        "field": "event.type",
+        "value": "allowed",
+        "if": "ctx.event.action == \"ALLOW\""
+      }
+    },
+    {
+      "append": {
+        "tag": "append_event_type_c102eb1c",
+        "field": "event.type",
+        "value": "denied",
+        "if": "ctx.event.action == \"BLOCK\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_webaclId_to_aws_waf_arn_50c9c659",
+        "field": "json.webaclId",
+        "target_field": "aws.waf.arn"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "arn:%{}:%{cloud.service.name}:%{cloud.region}:%{cloud.account.id}:%{aws.waf.id}",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "dissect_aws_waf_arn_751ee2c3",
+        "field": "aws.waf.arn"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_terminatingRuleId_to_rule_id_9b482d48",
+        "field": "json.terminatingRuleId",
+        "target_field": "rule.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_terminatingRuleType_to_rule_ruleset_d7b5d1b8",
+        "field": "json.terminatingRuleType",
+        "target_field": "rule.ruleset"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpSourceName_to_aws_waf_source_name_0d5e84e3",
+        "field": "json.httpSourceName",
+        "target_field": "aws.waf.source.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_httpSourceId_to_aws_waf_source_id_ab7d1b3f",
+        "field": "json.httpSourceId",
+        "target_field": "aws.waf.source.id"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_29cdffdc",
+        "field": "json"
+      }
+    },
+    {
+      "script": {
+        "description": "This script processor iterates over the whole document to remove fields with null values.",
+        "tag": "script_63b36254",
+        "source": "void handleMap(Map map) {\n    for (def x : map.values()) {\n        if (x instanceof Map) {\n            handleMap(x);\n        } else if (x instanceof List) {\n            handleList(x);\n        }\n    }\n    map.values().removeIf(v -> v == null || v == \"\" || v == \"-\" || ((v instanceof List || v instanceof Map) && v.isEmpty()));\n}\nvoid handleList(List list) {\n    for (def x : list) {\n        if (x instanceof Map) {\n            handleMap(x);\n        } else if (x instanceof List) {\n            handleList(x);\n        }\n    }\n}\nhandleMap(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.waf@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.waf` dataset"
+      }
+    }
+  ]
+}

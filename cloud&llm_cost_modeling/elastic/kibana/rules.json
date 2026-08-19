@@ -1,0 +1,527 @@
+[
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-excessive-restarts",
+    "enabled": false,
+    "name": "[Elastic Agent] Excessive restarts",
+    "tags": [
+      "Elastic Agent"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM logs-elastic_agent-*\n| WHERE message like \"Starting*elastic-agent*\"\n| STATS restart_count = count(*) BY host.name, bucket(@timestamp,5 minute)\n| WHERE restart_count > 10\n| STATS MAX(restart_count) BY host.name"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.004Z",
+    "updated_at": "2026-08-12T18:16:35.004Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.004Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-cpu-usage-spike-rule",
+    "enabled": false,
+    "name": "[Elastic Agent] CPU usage spike",
+    "tags": [
+      "Elastic Agent",
+      "Resource Consumption"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 7,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM metrics-system*\n| WHERE TO_LOWER(process.executable) LIKE \"*elastic*agent*\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS cpu_process_pct = MAX(system.process.cpu.total.norm.pct) * 100\n    BY elastic_agent.id, process.name,\n      time_bucket = BUCKET(@timestamp, 1 minute)\n// Count the 1 minute timebuckets that are above 80% by process and agent\n| WHERE cpu_process_pct >= 80\n| STATS count_above_threshold = COUNT(*)\n    BY elastic_agent.id, process.name\n// Alert if there are 5 or more occurences\n| WHERE count_above_threshold >= 5"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.000Z",
+    "updated_at": "2026-08-12T18:16:35.000Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.000Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-offline-status",
+    "enabled": false,
+    "name": "[Elastic Agent] Offline status",
+    "tags": [
+      "Elastic Agent"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM logs-elastic_agent.status_change-default\n| WHERE data_stream.dataset == \"elastic_agent.status_change\" and agentless == false and health_status == \"offline\""
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.013Z",
+    "updated_at": "2026-08-12T18:16:35.013Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.013Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-dropped-events",
+    "enabled": false,
+    "name": "[Elastic Agent] Dropped events",
+    "tags": [
+      "Elastic Agent",
+      "Pipeline and Queues"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 3,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM metrics-elastic_agent.*beat-*\n| WHERE data_stream.dataset LIKE \"elastic_agent.*beat\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS \n  events_dropped_max = max(to_long(beat.stats.libbeat.pipeline.events.dropped)),\n  events_dropped_min = min(to_long(beat.stats.libbeat.pipeline.events.dropped)), \n  pipeline_acked_max = max(to_long(beat.stats.libbeat.pipeline.queue.acked)), \n  pipeline_acked_min = min(to_long(beat.stats.libbeat.pipeline.queue.acked)) \n  BY time_bucket = DATE_TRUNC(1 minute, @timestamp), elastic_agent.id, component.id\n| EVAL \n  events_dropped = events_dropped_max - events_dropped_min, \n  events_acked = pipeline_acked_max - pipeline_acked_min\n| EVAL drop_pct = CASE(\n  events_acked > 0, events_dropped / events_acked, \n  0\n)\n| WHERE drop_pct >= 0.05\n| STATS MAX(drop_pct) BY elastic_agent.id, component.id"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.015Z",
+    "updated_at": "2026-08-12T18:16:35.015Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.015Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-output-errors",
+    "enabled": false,
+    "name": "[Elastic Agent] Output errors",
+    "tags": [
+      "Elastic Agent",
+      "Pipeline and Queues"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 3,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM metrics-elastic_agent.*beat-*\n| WHERE data_stream.dataset LIKE \"elastic_agent.*beat\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS \n    max_errors = MAX(TO_LONG(beat.stats.libbeat.output.write.errors)),\n    min_errors = MIN(TO_LONG(beat.stats.libbeat.output.write.errors))  \n    BY time_bucket = DATE_TRUNC(1 minute, @timestamp), elastic_agent.id, component.id\n| EVAL errors_count = max_errors - min_errors \n| WHERE errors_count > 5 \n| STATS MAX(errors_count) BY elastic_agent.id, component.id"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.016Z",
+    "updated_at": "2026-08-12T18:16:35.016Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.016Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-unenrolled-status",
+    "enabled": false,
+    "name": "[Elastic Agent] Unenrolled status",
+    "tags": [
+      "Elastic Agent"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM logs-elastic_agent.status_change-default\n| WHERE data_stream.dataset == \"elastic_agent.status_change\" and agentless == false and health_status == \"unenrolled\""
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.017Z",
+    "updated_at": "2026-08-12T18:16:35.017Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.017Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-excessive-memory-usage-rule",
+    "enabled": false,
+    "name": "[Elastic Agent] Excessive memory usage",
+    "tags": [
+      "Elastic Agent",
+      "Resource Consumption"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM metrics-system*\n| WHERE TO_LOWER(process.executable) LIKE \"*elastic*agent*\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS max_memory_per_process = MAX(system.process.memory.rss.pct * 100) BY agent.id, process.name\n| STATS total_memory_usage = SUM(max_memory_per_process) BY agent.id\n| WHERE total_memory_usage > 50"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.019Z",
+    "updated_at": "2026-08-12T18:16:35.019Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.019Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-uninstalled-status",
+    "enabled": false,
+    "name": "[Elastic Agent] Uninstalled status",
+    "tags": [
+      "Elastic Agent"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM logs-elastic_agent.status_change-default\n| WHERE data_stream.dataset == \"elastic_agent.status_change\" and agentless == false and health_status == \"uninstalled\""
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.020Z",
+    "updated_at": "2026-08-12T18:16:35.020Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.020Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-unhealthy-status",
+    "enabled": false,
+    "name": "[Elastic Agent] Unhealthy status",
+    "tags": [
+      "Elastic Agent"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 5,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM logs-elastic_agent.status_change-default\n| WHERE data_stream.dataset == \"elastic_agent.status_change\" and agentless == false and health_status == \"unhealthy\""
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.022Z",
+    "updated_at": "2026-08-12T18:16:35.022Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.022Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  },
+  {
+    "id": "fleet-default-elastic_agent-elastic-agent-high-pipeline-queue",
+    "enabled": false,
+    "name": "[Elastic Agent] High pipeline queue",
+    "tags": [
+      "Elastic Agent",
+      "Pipeline and Queues"
+    ],
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "schedule": {
+      "interval": "1m"
+    },
+    "actions": [],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeWindowSize": 1,
+      "timeWindowUnit": "m",
+      "threshold": [
+        0
+      ],
+      "thresholdComparator": ">",
+      "size": 100,
+      "esqlQuery": {
+        "esql": "FROM metrics-elastic_agent.*beat-*\n| WHERE data_stream.dataset LIKE \"elastic_agent.*beat\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS pipeline_queue_pct = MAX(beat.stats.libbeat.pipeline.queue.filled.pct) * 100 BY elastic_agent.id, component.id\n| WHERE pipeline_queue_pct >= 90"
+      },
+      "aggType": "count",
+      "groupBy": "row",
+      "termSize": 5,
+      "sourceFields": [],
+      "timeField": "@timestamp",
+      "excludeHitsFromPreviousRun": true
+    },
+    "created_by": "719348788",
+    "updated_by": "719348788",
+    "created_at": "2026-08-12T18:16:35.023Z",
+    "updated_at": "2026-08-12T18:16:35.023Z",
+    "api_key_owner": null,
+    "api_key_created_by_user": null,
+    "throttle": null,
+    "mute_all": false,
+    "notify_when": null,
+    "muted_alert_ids": [],
+    "execution_status": {
+      "status": "pending",
+      "last_execution_date": "2026-08-12T18:16:35.023Z"
+    },
+    "revision": 0,
+    "running": false,
+    "alert_delay": {
+      "active": 1
+    }
+  }
+]

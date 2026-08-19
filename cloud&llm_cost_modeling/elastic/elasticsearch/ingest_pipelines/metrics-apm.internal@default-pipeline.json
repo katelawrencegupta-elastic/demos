@@ -1,0 +1,50 @@
+{
+  "name": "metrics-apm.internal@default-pipeline",
+  "modified_date_millis": 1786555720158,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in default ingest pipeline for metrics-apm.internal-* data streams.\n\nThis pipeline exists purely for routing, which cannot be\nperformed in a final pipeline, and for invoking user-defined\ncustom pipelines. All built-in processing occurs in the final\npipelines.\n",
+  "created_date_millis": 1786555720158,
+  "processors": [
+    {
+      "set": {
+        "override": false,
+        "field": "metricset.interval",
+        "if": "ctx.metricset?.name == 'transaction' || ctx.metricset?.name == 'service_destination'",
+        "value": "1m"
+      }
+    },
+    {
+      "reroute": {
+        "if": "ctx.metricset?.name == 'transaction'",
+        "dataset": "apm.transaction.1m"
+      }
+    },
+    {
+      "reroute": {
+        "if": "ctx.metricset?.name == 'service_destination'",
+        "dataset": "apm.service_destination.1m"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-apm.internal@custom",
+        "ignore_missing_pipeline": true
+      }
+    }
+  ],
+  "version": 103
+}

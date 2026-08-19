@@ -1,0 +1,17 @@
+{
+  "name": "elastic-connectors-sync-jobs-settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true"
+        }
+      }
+    },
+    "version": 3,
+    "_meta": {
+      "description": "Built-in settings applied by default to connector management indices",
+      "managed": true
+    }
+  }
+}

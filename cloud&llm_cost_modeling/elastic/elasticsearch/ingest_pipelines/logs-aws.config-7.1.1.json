@@ -1,0 +1,718 @@
+{
+  "name": "logs-aws.config-7.1.1",
+  "on_failure": [
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_to_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378547,
+  "description": "Pipeline for processing aws config logs.",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378547,
+  "processors": [
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the fields added by Agentless as metadata, as they can collide with ECS fields.",
+        "tag": "remove_agentless_tags",
+        "field": [
+          "organization",
+          "division",
+          "team"
+        ],
+        "if": "ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "8.17.0"
+      }
+    },
+    {
+      "terminate": {
+        "description": "error message set and no data to process.",
+        "tag": "data_collection_error",
+        "if": "ctx.error?.message != null && ctx.message == null && ctx.event?.original == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_cea45f41",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "json_event_original",
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_provider",
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_observer_vendor",
+        "field": "observer.vendor",
+        "value": "AWS Config"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_to_event_category",
+        "field": "event.category",
+        "value": "configuration"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_to_event_type",
+        "field": "event.type",
+        "value": "info"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_Annotation",
+        "field": "json.Annotation",
+        "target_field": "aws.config.annotation"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{}:%{}:%{}:%{}:%{cloud.account.id}:%{}",
+        "ignore_failure": true,
+        "tag": "dissect_ConfigRuleInfo_ConfigRuleArn",
+        "field": "json.ConfigRuleInfo.ConfigRuleArn"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_cloud_account_name_from_cloud_account_id",
+        "field": "cloud.account.name",
+        "copy_from": "cloud.account.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_ConfigRuleArn",
+        "field": "json.ConfigRuleInfo.ConfigRuleArn",
+        "target_field": "aws.config.rule_info.config_rule_arn"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_rule_reference_from_config_config_rule_info_config_rule_arn",
+        "field": "rule.reference",
+        "copy_from": "aws.config.rule_info.config_rule_arn"
+      }
+    },
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "tag": "fingerprint_rule_uuid",
+        "fields": [
+          "rule.reference"
+        ],
+        "target_field": "rule.uuid"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_ConfigRuleId",
+        "field": "json.ConfigRuleInfo.ConfigRuleId",
+        "target_field": "aws.config.rule_info.config_rule_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_rule_id_from_config_config_rule_info_config_rule_id",
+        "field": "rule.id",
+        "copy_from": "aws.config.rule_info.config_rule_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_ConfigRuleName",
+        "field": "json.ConfigRuleInfo.ConfigRuleName",
+        "target_field": "aws.config.rule_info.config_rule_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_rule_name_from_config_config_rule_info_config_rule_name",
+        "field": "rule.name",
+        "copy_from": "aws.config.rule_info.config_rule_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_ConfigRuleState",
+        "field": "json.ConfigRuleInfo.ConfigRuleState",
+        "target_field": "aws.config.rule_info.config_rule_state"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_related_user_3621e5fc",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{json.ConfigRuleInfo.CreatedBy}}}",
+        "if": "ctx.json?.ConfigRuleInfo?.CreatedBy !=null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_CreatedBy",
+        "field": "json.ConfigRuleInfo.CreatedBy",
+        "target_field": "aws.config.rule_info.created_by"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Description",
+        "field": "json.ConfigRuleInfo.Description",
+        "target_field": "aws.config.rule_info.description"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_rule_description_from_aws_config_config_rule_info_description",
+        "field": "rule.description",
+        "copy_from": "aws.config.rule_info.description"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_message_from_aws_config_config_rule_info_description",
+        "field": "message",
+        "copy_from": "aws.config.rule_info.description"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_ConfigRuleInfo_EvaluationModes_304c981e",
+        "field": "json.ConfigRuleInfo.EvaluationModes",
+        "if": "ctx.json?.ConfigRuleInfo?.EvaluationModes instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_ConfigRuleInfo_EvaluationModes_Mode",
+            "field": "_ingest._value.Mode",
+            "target_field": "_ingest._value.mode"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_EvaluationModes",
+        "field": "json.ConfigRuleInfo.EvaluationModes",
+        "target_field": "aws.config.rule_info.evaluation_modes"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_baa553ee",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "json_ConfigRuleInfo_InputParameters",
+        "field": "json.ConfigRuleInfo.InputParameters",
+        "target_field": "aws.config.rule_info.input_parameters",
+        "if": "ctx.json?.ConfigRuleInfo?.InputParameters != null && ctx.json.ConfigRuleInfo.InputParameters != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_MaximumExecutionFrequency",
+        "field": "json.ConfigRuleInfo.MaximumExecutionFrequency",
+        "target_field": "aws.config.rule_info.maximum_execution_frequency"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Scope_ComplianceResourceId",
+        "field": "json.ConfigRuleInfo.Scope.ComplianceResourceId",
+        "target_field": "aws.config.rule_info.scope.compliance_resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Scope_ComplianceResourceTypes",
+        "field": "json.ConfigRuleInfo.Scope.ComplianceResourceTypes",
+        "target_field": "aws.config.rule_info.scope.compliance_resource_types"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Scope_TagKey",
+        "field": "json.ConfigRuleInfo.Scope.TagKey",
+        "target_field": "aws.config.rule_info.scope.tag_key"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_9a2af158",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.ConfigRuleInfo.Source.CustomPolicyDetails.EnableDebugLogDelivery",
+        "target_field": "aws.config.rule_info.source.custom_policy_details.enable_debug_log_delivery",
+        "ignore_missing": true,
+        "tag": "convert_ConfigRuleInfo_Source_CustomPolicyDetails_EnableDebugLogDelivery_to_boolean",
+        "type": "boolean"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Source_CustomPolicyDetails_PolicyRuntime",
+        "field": "json.ConfigRuleInfo.Source.CustomPolicyDetails.PolicyRuntime",
+        "target_field": "aws.config.rule_info.source.custom_policy_details.policy_runtime"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Source_CustomPolicyDetails_PolicyText",
+        "field": "json.ConfigRuleInfo.Source.CustomPolicyDetails.PolicyText",
+        "target_field": "aws.config.rule_info.source.custom_policy_details.policy_text"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Source_Owner",
+        "field": "json.ConfigRuleInfo.Source.Owner",
+        "target_field": "aws.config.rule_info.source.owner"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_ConfigRuleInfo_Source_SourceDetails_d391333b",
+        "field": "json.ConfigRuleInfo.Source.SourceDetails",
+        "if": "ctx.json?.ConfigRuleInfo?.Source?.SourceDetails instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_ConfigRuleInfo_Source_SourceDetails_EventSource",
+            "field": "_ingest._value.EventSource",
+            "target_field": "_ingest._value.event_source"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_ConfigRuleInfo_Source_SourceDetails_34d6947d",
+        "field": "json.ConfigRuleInfo.Source.SourceDetails",
+        "if": "ctx.json?.ConfigRuleInfo?.Source?.SourceDetails instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_ConfigRuleInfo_Source_SourceDetails_MaximumExecutionFrequency",
+            "field": "_ingest._value.MaximumExecutionFrequency",
+            "target_field": "_ingest._value.maximum_execution_frequency"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_ConfigRuleInfo_Source_SourceDetails_d1c5db73",
+        "field": "json.ConfigRuleInfo.Source.SourceDetails",
+        "if": "ctx.json?.ConfigRuleInfo?.Source?.SourceDetails instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_ConfigRuleInfo_Source_SourceDetails_MessageType",
+            "field": "_ingest._value.MessageType",
+            "target_field": "_ingest._value.message_type"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Source_SourceDetails",
+        "field": "json.ConfigRuleInfo.Source.SourceDetails",
+        "target_field": "aws.config.rule_info.source.source_details"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Source_SourceIdentifier",
+        "field": "json.ConfigRuleInfo.Source.SourceIdentifier",
+        "target_field": "aws.config.rule_info.source.source_identifier"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_bb64b97f",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX_MS",
+          "UNIX"
+        ],
+        "field": "json.ConfigRuleInvokedTime",
+        "target_field": "aws.config.config_rule_invoked_time",
+        "tag": "date_ConfigRuleInvokedTime",
+        "if": "ctx.json?.ConfigRuleInvokedTime != null && ctx.json.ConfigRuleInvokedTime != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_EvaluationResultIdentifier_EvaluationResultQualifier_ConfigRuleName",
+        "field": "json.EvaluationResultIdentifier.EvaluationResultQualifier.ConfigRuleName",
+        "target_field": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.config_rule_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_EvaluationResultIdentifier_EvaluationResultQualifier_EvaluationMode",
+        "field": "json.EvaluationResultIdentifier.EvaluationResultQualifier.EvaluationMode",
+        "target_field": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.evaluation_mode"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_6f824f1c",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX_MS",
+          "UNIX"
+        ],
+        "field": "json.EvaluationResultIdentifier.OrderingTimestamp",
+        "target_field": "aws.config.evaluation_result_identifier.ordering_timestamp",
+        "tag": "date_EvaluationResultIdentifier_OrderingTimestamp",
+        "if": "ctx.json?.EvaluationResultIdentifier?.OrderingTimestamp != null && ctx.json.EvaluationResultIdentifier.OrderingTimestamp != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_event_created_from_config_evaluation_result_identifier_ordering_timestamp",
+        "field": "event.created",
+        "copy_from": "aws.config.evaluation_result_identifier.ordering_timestamp"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_EvaluationResultIdentifier_ResourceEvaluationId",
+        "field": "json.EvaluationResultIdentifier.ResourceEvaluationId",
+        "target_field": "aws.config.evaluation_result_identifier.resource_evaluation_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_event_id_from_config_evaluation_result_identifier_resource_evaluation_id",
+        "field": "event.id",
+        "copy_from": "aws.config.evaluation_result_identifier.resource_evaluation_id"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_8f8c1e7b",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "UNIX_MS",
+          "UNIX"
+        ],
+        "field": "json.ResultRecordedTime",
+        "target_field": "aws.config.result_recorded_time",
+        "tag": "date_ResultRecordedTime",
+        "if": "ctx.json?.ResultRecordedTime != null && ctx.json.ResultRecordedTime != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ResultToken",
+        "field": "json.ResultToken",
+        "target_field": "aws.config.result_token"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_EvaluationResultIdentifier_EvaluationResultQualifier_ResourceId",
+        "field": "json.EvaluationResultIdentifier.EvaluationResultQualifier.ResourceId",
+        "target_field": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.resource_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_resource_id_from_config_evaluation_result_identifier_evaluation_result_qualifier_resource_id",
+        "field": "resource.id",
+        "copy_from": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_EvaluationResultIdentifier_EvaluationResultQualifier_ResourceType",
+        "field": "json.EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType",
+        "target_field": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.resource_type"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_resource_type_from_config_evaluation_result_identifier_evaluation_result_qualifier_resource_type",
+        "field": "resource.type",
+        "copy_from": "aws.config.evaluation_result_identifier.evaluation_result_qualifier.resource_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ComplianceType",
+        "field": "json.ComplianceType",
+        "target_field": "aws.config.compliance_type"
+      }
+    },
+    {
+      "script": {
+        "description": "set event.outcome and result.evaluation from compliance_type",
+        "tag": "set_event_outcome_and_result_evaluation_from_aws_config_compliance_type",
+        "source": "if (ctx.aws.config.compliance_type == 'NON_COMPLIANT') {\n  ctx.event.outcome = 'failure';\n} else if (ctx.aws.config.compliance_type == 'COMPLIANT') {\n  ctx.event.outcome = 'success';\n} else {\n  ctx.event.outcome = 'unknown';\n}",
+        "lang": "painless",
+        "if": "ctx.aws?.config?.compliance_type instanceof String"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_result_evaluation_passed",
+        "field": "result.evaluation",
+        "value": "passed",
+        "if": "ctx.aws?.config?.compliance_type == 'COMPLIANT'"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_result_evaluation_failed",
+        "field": "result.evaluation",
+        "value": "failed",
+        "if": "ctx.aws?.config?.compliance_type == 'NON_COMPLIANT'"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_result_evaluation_unknown",
+        "field": "result.evaluation",
+        "value": "unknown",
+        "if": "ctx.result?.evaluation == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ConfigRuleInfo_Scope_TagValue",
+        "field": "json.ConfigRuleInfo.Scope.TagValue",
+        "target_field": "aws.config.rule_info.scope.tag_value"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_rule_tags_from_config_config_rule_info_scope_tag_value",
+        "field": "rule.tags",
+        "copy_from": "aws.config.rule_info.scope.tag_value"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_custom_duplicate_fields",
+        "field": [
+          "aws.config.evaluation_result_identifier.ordering_timestamp",
+          "aws.config.evaluation_result_identifier.resource_evaluation_id",
+          "aws.config.rule_info.config_rule_arn",
+          "aws.config.rule_info.config_rule_id",
+          "aws.config.rule_info.config_rule_name",
+          "aws.config.rule_info.description"
+        ],
+        "if": "ctx.tags == null || !ctx.tags.contains('preserve_duplicate_custom_fields')"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json",
+        "field": "json"
+      }
+    },
+    {
+      "script": {
+        "description": "This script processor iterates over the whole document to remove fields with null values.",
+        "tag": "script_to_drop_null_values",
+        "source": "void handleMap(Map map) {\n  map.values().removeIf(v -> {\n    if (v instanceof Map) {\n        handleMap(v);\n    } else if (v instanceof List) {\n        handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nvoid handleList(List list) {\n  list.removeIf(v -> {\n    if (v instanceof Map) {\n        handleMap(v);\n    } else if (v instanceof List) {\n        handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nhandleMap(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_into_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_tags_9fe66b2c",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.config@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.config` dataset"
+      }
+    }
+  ]
+}

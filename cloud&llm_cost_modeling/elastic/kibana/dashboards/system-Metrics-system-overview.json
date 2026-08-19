@@ -1,0 +1,925 @@
+{
+  "id": "system-Metrics-system-overview",
+  "data": {
+    "description": "Overview of system metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-system-default"
+    ],
+    "title": "[Metrics System] Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is_one_of",
+          "value": [
+            "system.process",
+            "system.fsstat",
+            "system.cpu",
+            "system.memory",
+            "system.network"
+          ]
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 0,
+          "y": 5
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "percent",
+                "decimals": 2,
+                "compact": true
+              },
+              "label": "Memory used",
+              "filter": {
+                "language": "kql",
+                "expression": "system.memory.actual.used.pct: *"
+              },
+              "field": "system.memory.actual.used.pct",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "color": {
+                "type": "dynamic",
+                "range": "percentage",
+                "steps": [
+                  {
+                    "lt": 70,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 70,
+                    "lt": 85,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 85,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "background_chart": {
+                "type": "bar",
+                "max_value": {
+                  "operation": "static_value",
+                  "value": 1
+                }
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "aa7fddcf-8146-4d85-b3d7-d37a99a5ff32",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 9,
+          "y": 5
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "percent",
+                "decimals": 2,
+                "compact": true
+              },
+              "label": "CPU used",
+              "filter": {
+                "language": "kql",
+                "expression": "system.cpu.total.norm.pct: *"
+              },
+              "field": "system.cpu.total.norm.pct",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "color": {
+                "type": "dynamic",
+                "range": "percentage",
+                "steps": [
+                  {
+                    "lt": 70,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 70,
+                    "lt": 85,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 85,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "background_chart": {
+                "type": "bar",
+                "max_value": {
+                  "operation": "static_value",
+                  "value": 1
+                }
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "9fc7a050-de1b-495b-8ca7-2a852ed5a28c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 21,
+          "w": 30,
+          "x": 18,
+          "y": 5
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top Hosts by CPU",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "91f312ca-9d5c-4b33-ac61-9f5405d1f393",
+              "type": "group",
+              "group": {
+                "operator": "or",
+                "conditions": [
+                  {
+                    "field": "system.cpu.total.norm.pct",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "system.memory.actual.used.pct",
+                    "operator": "exists"
+                  }
+                ]
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_spec",
+            "name": "Ad-hoc",
+            "index_pattern": "metrics-*",
+            "time_field": "@timestamp",
+            "allow_hidden_indices": false
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "percent",
+                "decimals": 2,
+                "compact": false
+              },
+              "label": "CPU usage",
+              "reduced_time_range": "15m",
+              "filter": {
+                "language": "kql",
+                "expression": "\"system.cpu.total.norm.pct\": *"
+              },
+              "field": "system.cpu.total.norm.pct",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "apply_color_to": "background",
+              "visible": true,
+              "color": {
+                "type": "dynamic",
+                "range": "absolute",
+                "steps": [
+                  {
+                    "gte": 0,
+                    "lt": 0.7,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 0.7,
+                    "lt": 0.85,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 0.85,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "alignment": "right"
+            },
+            {
+              "format": {
+                "type": "percent",
+                "decimals": 2,
+                "compact": false
+              },
+              "label": "Memory usage",
+              "reduced_time_range": "15m",
+              "filter": {
+                "language": "kql",
+                "expression": "\"system.memory.actual.used.pct\": *"
+              },
+              "field": "system.memory.actual.used.pct",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "apply_color_to": "background",
+              "visible": true,
+              "color": {
+                "type": "dynamic",
+                "range": "absolute",
+                "steps": [
+                  {
+                    "gte": 0,
+                    "lt": 0.7,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 0.7,
+                    "lt": 0.85,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 0.85,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Host",
+              "fields": [
+                "host.name"
+              ],
+              "limit": 1000,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": true,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "system-79ffd6e0-faa0-11e6-947f-177f697178b8",
+              "label": "Host Overview",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "234c40f8-f787-49a9-b1d3-1d3340e0ebaa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 0,
+          "y": 12
+        },
+        "config": {
+          "type": "metric",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Hosts",
+              "operation": "formula",
+              "formula": "unique_count(host.name)",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "f95d2a8f-0ec2-4252-b3e8-8771b9165241",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 9,
+          "y": 12
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "percent",
+                "decimals": 2,
+                "compact": true
+              },
+              "label": "Disk used",
+              "operation": "formula",
+              "formula": "last_value(system.fsstat.total_size.used)/last_value(system.fsstat.total_size.total) ",
+              "type": "primary",
+              "color": {
+                "type": "dynamic",
+                "range": "percentage",
+                "steps": [
+                  {
+                    "lt": 70,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 70,
+                    "lt": 85,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 85,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "background_chart": {
+                "type": "bar",
+                "max_value": {
+                  "operation": "static_value",
+                  "value": 1
+                }
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "4a59a56e-e5fd-4ff3-b2f0-8a1c07be572b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 0,
+          "y": 19
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            },
+            "secondary": {
+              "label": {
+                "visible": true,
+                "placement": "before"
+              },
+              "value": {
+                "alignment": "right"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 2
+              },
+              "label": "Inbound traffic per second",
+              "operation": "formula",
+              "formula": "(max(system.network.in.bytes, reducedTimeRange='30s') - min(system.network.in.bytes, reducedTimeRange='30s')) / 30",
+              "type": "primary",
+              "subtitle": "(Over the previous 30 seconds)",
+              "color": {
+                "type": "auto"
+              }
+            },
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 2
+              },
+              "label": "Total transferred",
+              "operation": "formula",
+              "formula": "max(system.network.in.bytes) - min(system.network.in.bytes)",
+              "type": "secondary",
+              "color": {
+                "type": "none"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "4fdb14ab-c349-489b-afc1-55603ddb52f3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 7,
+          "w": 9,
+          "x": 9,
+          "y": 19
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            },
+            "secondary": {
+              "label": {
+                "visible": true,
+                "placement": "before"
+              },
+              "value": {
+                "alignment": "right"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 2
+              },
+              "label": "Outbound traffic per second",
+              "operation": "formula",
+              "formula": "(max(system.network.out.bytes, reducedTimeRange='30s') - min(system.network.out.bytes, reducedTimeRange='30s')) / 30",
+              "type": "primary",
+              "subtitle": "(Over the previous 30 seconds)",
+              "color": {
+                "type": "auto"
+              }
+            },
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 2
+              },
+              "label": "Total transferred",
+              "operation": "formula",
+              "formula": "max(system.network.out.bytes) - min(system.network.out.bytes)",
+              "type": "secondary",
+              "color": {
+                "type": "none"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "fe4dd8cc-1c8d-4b88-8db3-4a286b33984f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 48,
+          "x": 0,
+          "y": 26
+        },
+        "config": {
+          "type": "heatmap",
+          "legend": {
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right",
+            "size": "auto"
+          },
+          "title": "Top hosts by CPU usage over time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "system.cpu"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "labels": {
+                "visible": true,
+                "orientation": "horizontal"
+              },
+              "scale": "ordinal"
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "labels": {
+                "visible": true
+              }
+            }
+          },
+          "x": {
+            "operation": "date_histogram",
+            "field": "@timestamp",
+            "suggested_interval": "auto",
+            "use_original_time_range": false,
+            "include_empty_rows": true,
+            "drop_partial_intervals": false
+          },
+          "y": {
+            "operation": "terms",
+            "label": "Hosts",
+            "fields": [
+              "host.name"
+            ],
+            "limit": 20,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          },
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "cells": {
+              "labels": {
+                "visible": false
+              }
+            }
+          },
+          "metric": {
+            "format": {
+              "type": "percent",
+              "decimals": 0,
+              "compact": false
+            },
+            "label": "CPU Usage",
+            "field": "system.cpu.user.norm.pct",
+            "operation": "average",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "gte": 0,
+                  "lt": 0.7,
+                  "color": "#d9dada"
+                },
+                {
+                  "gte": 0.7,
+                  "lt": 0.85,
+                  "color": "#d6bf57"
+                },
+                {
+                  "gte": 0.85,
+                  "color": "#cc5642"
+                }
+              ]
+            }
+          },
+          "hide_title": false,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "system-79ffd6e0-faa0-11e6-947f-177f697178b8",
+              "label": "Host Overview",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "e6f8fdab-5f7e-42b1-9093-36c017e0d26d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 48,
+          "x": 0,
+          "y": 41
+        },
+        "config": {
+          "type": "heatmap",
+          "legend": {
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right",
+            "size": "auto"
+          },
+          "title": "Top hosts by memory usage over time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "system.memory"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "labels": {
+                "visible": true,
+                "orientation": "horizontal"
+              },
+              "scale": "ordinal"
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "labels": {
+                "visible": true
+              }
+            }
+          },
+          "x": {
+            "operation": "date_histogram",
+            "field": "@timestamp",
+            "suggested_interval": "auto",
+            "use_original_time_range": false,
+            "include_empty_rows": true,
+            "drop_partial_intervals": false
+          },
+          "y": {
+            "operation": "terms",
+            "label": "Hosts",
+            "fields": [
+              "host.name"
+            ],
+            "limit": 20,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "alphabetical",
+              "direction": "asc"
+            }
+          },
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "cells": {
+              "labels": {
+                "visible": false
+              }
+            }
+          },
+          "metric": {
+            "format": {
+              "type": "percent",
+              "decimals": 0,
+              "compact": false
+            },
+            "label": "Memory Usage",
+            "operation": "formula",
+            "formula": "average(system.memory.actual.used.pct)",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "gte": 0,
+                  "lt": 0.7,
+                  "color": "#d9dada"
+                },
+                {
+                  "gte": 0.7,
+                  "lt": 0.85,
+                  "color": "#d6bf57"
+                },
+                {
+                  "gte": 0.85,
+                  "color": "#cc5642"
+                }
+              ]
+            }
+          },
+          "hide_title": false,
+          "drilldowns": [
+            {
+              "use_filters": true,
+              "use_time_range": true,
+              "open_in_new_tab": false,
+              "dashboard_id": "system-79ffd6e0-faa0-11e6-947f-177f697178b8",
+              "label": "Host Overview",
+              "trigger": "on_apply_filter",
+              "type": "dashboard_drilldown"
+            }
+          ]
+        },
+        "id": "e6f6cabf-ecec-482f-b7b5-634e323e9a15",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.940Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.190Z",
+    "version": "WzMyMiwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "# System overview\n\nTo view host details, select a host from the list below by clicking the respective label.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "System Navigation",
+        "hide_title": true
+      }
+    }
+  ]
+}

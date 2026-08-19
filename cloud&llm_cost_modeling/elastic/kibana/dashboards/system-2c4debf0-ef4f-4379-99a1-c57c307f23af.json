@@ -1,0 +1,767 @@
+{
+  "id": "system-2c4debf0-ef4f-4379-99a1-c57c307f23af",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-system-default"
+    ],
+    "title": "[Logs System Windows Security] Logon Activity",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "system.security"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 15,
+          "w": 18,
+          "x": 12,
+          "y": 0
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Account Name by Logons of Group Membership [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4627"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Account Name",
+              "fields": [
+                "user.target.name"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "5b47ff7f-3f29-4f6c-b7bb-99dddbb2115a",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 18,
+          "x": 30,
+          "y": 0
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Users With Locked Workstation [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4800"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Account Name",
+              "fields": [
+                "user.target.name"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "112f7518-2660-4ae0-ab75-8d3ef80c87fb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "title": "Table of Contents",
+          "links": [
+            {
+              "label": "Logon Activity",
+              "type": "dashboardLink",
+              "destination": "system-2c4debf0-ef4f-4379-99a1-c57c307f23af",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "Directory & Account Monitoring",
+              "type": "dashboardLink",
+              "destination": "system-3c46ecdb-0a41-4be3-907e-722de8edac12",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "System & Process Activity",
+              "type": "dashboardLink",
+              "destination": "system-0e70e1bd-9a57-4f17-9d96-cc97e3d3a4f9",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "Policy & Object Monitoring",
+              "type": "dashboardLink",
+              "destination": "system-db94459a-7232-4d1b-aa0c-b80dece8bc3a",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "2cc86ba4-b15f-46a8-b426-a82ed3c7a3e0",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 37
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Account Domain With Locked Workstation [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4800"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Target User Domain",
+              "fields": [
+                "user.target.domain"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "3d09d29b-9b1d-4a6f-a2c3-2f4f1fc049d1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 37
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Security ID With Locked Workstation [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4800"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Target User SID",
+              "fields": [
+                "user.id"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "38371138-d5ca-4507-8a52-ecd722a5a064",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 52
+        },
+        "config": {
+          "type": "pie",
+          "title": "Group Membership Information Events by Logon Type [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4627"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "LogonType",
+              "fields": [
+                "winlog.logon.type"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "eui_amsterdam_color_blind",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "5be93de3-49dd-4bca-9481-1b0ab45836eb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 52
+        },
+        "config": {
+          "type": "pie",
+          "title": "Filtered Events by Trust Direction [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4675"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "l",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Trust Direction",
+              "fields": [
+                "winlog.trustDirection"
+              ],
+              "limit": 5,
+              "increase_accuracy": false,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "eui_amsterdam_color_blind",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "5c1d2d20-1946-40cb-8078-4f3c1a25ad9c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 22,
+          "w": 36,
+          "x": 12,
+          "y": 15
+        },
+        "config": {
+          "description": "",
+          "title": "Group Membership by User [Logs System Windows Security]",
+          "ref_id": "system-f6dbb7a7-25a5-4d42-9e64-8cb6cd9e173c",
+          "overrides": {}
+        },
+        "id": "d6c77d99-7454-499d-a5d3-561e601351e8",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 67
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Account Domains With Unlocked Workstations [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4801"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Target User Domains",
+              "fields": [
+                "user.domain"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "ba59dfe7-0a83-4fd7-9016-f8fb1941fd74",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 67
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Users With Unlocked Workstations [Logs System Windows Security]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "event.code",
+                "operator": "is",
+                "value": "4801"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Target Usernames",
+              "fields": [
+                "user.name"
+              ],
+              "limit": 10,
+              "increase_accuracy": true,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "297fec75-5e9a-4657-b281-e830ca40d82c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 48,
+          "x": 0,
+          "y": 82
+        },
+        "config": {
+          "description": "",
+          "title": "Essential Trust Filtering Details [Logs System Windows Security]",
+          "ref_id": "system-f6a50ac5-d9cd-469c-8169-0d4fc5c0bef5",
+          "overrides": {}
+        },
+        "id": "9d6d15a6-abc0-4108-8f7c-c579578023c6",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 48,
+          "x": 0,
+          "y": 97
+        },
+        "config": {
+          "description": "",
+          "title": "Workstation Unlock Essential Details [Logs System Windows Security]",
+          "ref_id": "system-e629186d-6a2a-4469-a060-bac42926f5d3",
+          "overrides": {}
+        },
+        "id": "2a8cdd2e-5bd3-4346-808a-2af212decb1b",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 48,
+          "x": 0,
+          "y": 112
+        },
+        "config": {
+          "description": "",
+          "title": "Screen Saver Essential Details [Logs System Windows Security]",
+          "ref_id": "system-ac59de7d-ca7d-4182-a3ec-d9a4ab69713d",
+          "overrides": {}
+        },
+        "id": "f4f9dbf2-7ed5-440a-8661-a85b3f00a16b",
+        "type": "discover_session"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.940Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.190Z",
+    "version": "WzMxNiwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "This dashboard is designed to provide focused visibility into logon and logoff activities using the Security data stream.\n\nIt highlights the top 10 group membership logons by account name, visualizes group membership events by logon type and user, and presents detailed insights into trust direction filtering. The dashboard also tracks workstation lock events across users, security IDs, and account domains to support monitoring of authentication patterns and identification of unusual behavior.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Overview"
+      }
+    }
+  ]
+}

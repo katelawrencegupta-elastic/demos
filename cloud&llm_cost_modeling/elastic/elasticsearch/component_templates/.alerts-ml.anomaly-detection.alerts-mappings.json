@@ -1,0 +1,117 @@
+{
+  "name": ".alerts-ml.anomaly-detection.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "anomaly_score": {
+                    "type": "double"
+                  },
+                  "job_id": {
+                    "type": "keyword"
+                  },
+                  "top_records": {
+                    "dynamic": false,
+                    "type": "object",
+                    "properties": {
+                      "actual": {
+                        "type": "double"
+                      },
+                      "partition_field_name": {
+                        "type": "keyword"
+                      },
+                      "partition_field_value": {
+                        "type": "keyword"
+                      },
+                      "by_field_name": {
+                        "type": "keyword"
+                      },
+                      "is_interim": {
+                        "type": "boolean"
+                      },
+                      "detector_index": {
+                        "type": "integer"
+                      },
+                      "field_name": {
+                        "type": "keyword"
+                      },
+                      "over_field_name": {
+                        "type": "keyword"
+                      },
+                      "by_field_value": {
+                        "type": "keyword"
+                      },
+                      "initial_record_score": {
+                        "type": "double"
+                      },
+                      "job_id": {
+                        "type": "keyword"
+                      },
+                      "function": {
+                        "type": "keyword"
+                      },
+                      "typical": {
+                        "type": "double"
+                      },
+                      "record_score": {
+                        "type": "double"
+                      },
+                      "over_field_value": {
+                        "type": "keyword"
+                      },
+                      "timestamp": {
+                        "type": "date"
+                      }
+                    }
+                  },
+                  "top_influencers": {
+                    "dynamic": false,
+                    "type": "object",
+                    "properties": {
+                      "initial_influencer_score": {
+                        "type": "double"
+                      },
+                      "job_id": {
+                        "type": "keyword"
+                      },
+                      "influencer_field_name": {
+                        "type": "keyword"
+                      },
+                      "influencer_field_value": {
+                        "type": "keyword"
+                      },
+                      "is_interim": {
+                        "type": "boolean"
+                      },
+                      "influencer_score": {
+                        "type": "double"
+                      },
+                      "timestamp": {
+                        "type": "date"
+                      }
+                    }
+                  },
+                  "is_interim": {
+                    "type": "boolean"
+                  },
+                  "anomaly_timestamp": {
+                    "type": "date"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

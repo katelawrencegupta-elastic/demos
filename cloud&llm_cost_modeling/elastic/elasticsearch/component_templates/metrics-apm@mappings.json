@@ -1,0 +1,23 @@
+{
+  "name": "metrics-apm@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "processor.event": {
+            "type": "constant_keyword",
+            "value": "metric"
+          },
+          "system.process.cpu.start_time": {
+            "type": "date"
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for metrics-apm.* data streams",
+      "managed": true
+    }
+  }
+}

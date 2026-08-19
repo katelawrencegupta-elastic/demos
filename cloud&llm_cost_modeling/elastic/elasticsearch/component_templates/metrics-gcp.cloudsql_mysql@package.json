@@ -1,0 +1,601 @@
+{
+  "name": "metrics-gcp.cloudsql_mysql@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-gcp.cloudsql_mysql-2.50.2",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "gcp.labels.user.*": {
+              "path_match": "gcp.labels.user.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metadata.*": {
+              "path_match": "gcp.labels.metadata.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.metrics.*": {
+              "path_match": "gcp.labels.metrics.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.system.*": {
+              "path_match": "gcp.labels.system.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.labels.resource.*": {
+              "path_match": "gcp.labels.resource.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*.*",
+              "mapping": {
+                "type": "double"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "gcp.metrics.*.*.*": {
+              "path_match": "gcp.metrics.*.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*.*": {
+              "path_match": "gcp.metrics.*.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "gcp.metrics.*": {
+              "path_match": "gcp.metrics.*",
+              "mapping": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "labels_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "metrics": {
+                "dynamic": true,
+                "type": "object"
+              },
+              "cloudsql_mysql": {
+                "properties": {
+                  "database": {
+                    "properties": {
+                      "received_bytes": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "replication": {
+                        "properties": {
+                          "last_sql_errno": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "network_lag": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "s"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "last_io_errno": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "replica_lag": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "s"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "slave_io_running": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "slave_io_running_state": {
+                            "type": "boolean"
+                          },
+                          "seconds_behind_master": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "s"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "slave_sql_running_state": {
+                            "type": "boolean"
+                          },
+                          "slave_sql_running": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "memory": {
+                        "properties": {
+                          "quota": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "total_usage": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "usage": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "percent"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "innodb_buffer_pool_pages_free": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "innodb_data_fsyncs": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "questions": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "cpu": {
+                        "properties": {
+                          "usage_time": {
+                            "properties": {
+                              "sec": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "s"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "percent"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "reserved_cores": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "innodb_pages_read": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "innodb_buffer_pool_pages_total": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "queries": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "innodb_pages_written": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "sent_bytes": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "network": {
+                        "properties": {
+                          "received_bytes": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "connections": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "sent_bytes": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "uptime": {
+                        "properties": {
+                          "sec": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "s"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "innodb_os_log_fsyncs": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "disk": {
+                        "properties": {
+                          "write_ops": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "bytes_used": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "read_ops": {
+                            "properties": {
+                              "count": {
+                                "time_series_metric": "gauge",
+                                "meta": {},
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "quota": {
+                            "properties": {
+                              "bytes": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "utilization": {
+                            "properties": {
+                              "pct": {
+                                "time_series_metric": "gauge",
+                                "meta": {
+                                  "unit": "percent"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "instance_state": {
+                        "type": "boolean"
+                      },
+                      "innodb_buffer_pool_pages_dirty": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "up": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "type": "long"
+                      },
+                      "available_for_failover": {
+                        "time_series_metric": "gauge",
+                        "meta": {},
+                        "type": "long"
+                      },
+                      "auto_failover_request": {
+                        "properties": {
+                          "count": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "labels": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "system": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "resource": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "metrics": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "user": {
+                    "dynamic": true,
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "gcp"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "gcp.cloudsql_mysql"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

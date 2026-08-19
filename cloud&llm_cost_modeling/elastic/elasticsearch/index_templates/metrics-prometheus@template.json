@@ -1,0 +1,39 @@
+{
+  "name": "metrics-prometheus@template",
+  "index_template": {
+    "index_patterns": [
+      "metrics-*.prometheus-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-prometheus@mappings",
+      "metrics-prometheus@settings",
+      "metrics@custom",
+      "metrics-prometheus@custom"
+    ],
+    "priority": 140,
+    "version": 3,
+    "_meta": {
+      "description": "Default Prometheus metrics template installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "metrics-prometheus@custom"
+    ],
+    "created_date_millis": 1786555715928,
+    "modified_date_millis": 1786555715928
+  }
+}

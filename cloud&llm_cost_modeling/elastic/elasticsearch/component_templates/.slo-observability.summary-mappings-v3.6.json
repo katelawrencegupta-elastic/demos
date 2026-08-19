@@ -1,0 +1,231 @@
+{
+  "name": ".slo-observability.summary-mappings-v3.6",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "summaryUpdatedAt": {
+            "format": "date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "goodEvents": {
+            "type": "long"
+          },
+          "errorBudgetEstimated": {
+            "type": "boolean"
+          },
+          "totalEvents": {
+            "type": "long"
+          },
+          "errorBudgetRemaining": {
+            "type": "double"
+          },
+          "fiveMinuteBurnRate": {
+            "properties": {
+              "goodEvents": {
+                "type": "long"
+              },
+              "totalEvents": {
+                "type": "long"
+              },
+              "value": {
+                "type": "double"
+              }
+            }
+          },
+          "monitor": {
+            "properties": {
+              "config_id": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "errorBudgetConsumed": {
+            "type": "double"
+          },
+          "isTempDoc": {
+            "type": "boolean"
+          },
+          "latestSliTimestamp": {
+            "format": "date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "observer": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "spaceId": {
+            "type": "keyword"
+          },
+          "service": {
+            "properties": {
+              "environment": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "oneHourBurnRate": {
+            "properties": {
+              "goodEvents": {
+                "type": "long"
+              },
+              "totalEvents": {
+                "type": "long"
+              },
+              "value": {
+                "type": "double"
+              }
+            }
+          },
+          "slo": {
+            "properties": {
+              "indicator": {
+                "dynamic": false,
+                "properties": {
+                  "type": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "timeWindow": {
+                "properties": {
+                  "duration": {
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "updatedBy": {
+                "type": "keyword"
+              },
+              "description": {
+                "type": "text"
+              },
+              "groupBy": {
+                "type": "keyword"
+              },
+              "revision": {
+                "type": "long"
+              },
+              "tags": {
+                "type": "keyword"
+              },
+              "objective": {
+                "properties": {
+                  "timesliceWindow": {
+                    "type": "keyword"
+                  },
+                  "timesliceTarget": {
+                    "type": "double"
+                  },
+                  "target": {
+                    "type": "double"
+                  }
+                }
+              },
+              "createdAt": {
+                "format": "date_optional_time||epoch_millis",
+                "type": "date"
+              },
+              "instanceId": {
+                "type": "keyword",
+                "fields": {
+                  "text": {
+                    "type": "text"
+                  }
+                }
+              },
+              "groupings": {
+                "type": "flattened"
+              },
+              "createdBy": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "id": {
+                "ignore_above": 256,
+                "type": "keyword"
+              },
+              "budgetingMethod": {
+                "type": "keyword"
+              },
+              "updatedAt": {
+                "format": "date_optional_time||epoch_millis",
+                "type": "date"
+              }
+            }
+          },
+          "oneDayBurnRate": {
+            "properties": {
+              "goodEvents": {
+                "type": "long"
+              },
+              "totalEvents": {
+                "type": "long"
+              },
+              "value": {
+                "type": "double"
+              }
+            }
+          },
+          "errorBudgetInitial": {
+            "type": "double"
+          },
+          "transaction": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "sliValue": {
+            "type": "double"
+          },
+          "statusCode": {
+            "type": "byte"
+          },
+          "status": {
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "_meta": {
+      "description": "SLO summary mappings template",
+      "managed_by": "observability",
+      "version": 3.6,
+      "managed": true
+    }
+  }
+}

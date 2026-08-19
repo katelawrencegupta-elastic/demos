@@ -1,0 +1,371 @@
+{
+  "name": "logs-aws.elb_logs-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378992,
+  "description": "Pipeline for ELB logs",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378992,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version_0f7334bb",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original_c74b1d7e",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message_2ee3a7d4",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "grok": {
+        "tag": "grok_event_original_e92d64ff",
+        "field": "event.original",
+        "pattern_definitions": {
+          "ELBV2LOGVERSION": "%{NOTSPACE}",
+          "ELBNAME": "%{NOTSPACE:aws.elb.name}",
+          "ELBPROCESSINGTIME": "(?:-1|%{NUMBER:aws.elb.request_processing_time.sec:float}) (?:-1|%{NUMBER:aws.elb.backend_processing_time.sec:float}) (?:-1|%{NUMBER:aws.elb.response_processing_time.sec:float})",
+          "ELBHTTPLOG": "%{ELBCOMMON} %{NUMBER:http.response.status_code:long} (?:-|%{NUMBER:aws.elb.backend.http.response.status_code:long}) %{NUMBER:http.request.body.bytes:long} %{NUMBER:http.response.body.bytes:long} \\\"(?:-|%{WORD:http.request.method}) (?:-|%{DATA:_tmp.uri_orig})(?: (?:-|HTTP/%{NOTSPACE:http.version}))?\\\" \\\"%{DATA:_tmp.user_agent}\\\" %{ELBSSL}",
+          "ELBBACKEND": "(?:-|%{IP:aws.elb.backend.ip}:%{POSINT:aws.elb.backend.port})",
+          "ELBTIMESTAMP": "%{TIMESTAMP_ISO8601:_tmp.timestamp}",
+          "ELBSSL": "(?:-|%{NOTSPACE:aws.elb.ssl_cipher}) (?:-|%{NOTSPACE:aws.elb.ssl_protocol})",
+          "ELBTCPLOG": "%{ELBCOMMON} - - %{NUMBER:source.bytes:long} %{NUMBER:destination.bytes:long} \\\"- - - \\\" \\\"-\\\" %{ELBSSL}",
+          "ELBCOMMON": "%{ELBTIMESTAMP} %{ELBNAME} %{ELBSOURCE} %{ELBBACKEND} %{ELBPROCESSINGTIME}",
+          "ELBV2TYPE": "%{WORD:aws.elb.type}",
+          "ELBSOURCE": "%{IP:source.address}:%{POSINT:source.port:long}"
+        },
+        "patterns": [
+          "%{ELBHTTPLOG}",
+          "%{ELBTCPLOG}",
+          "%{ELBV2TYPE} %{ELBHTTPLOG} %{NOTSPACE:aws.elb.target_group.arn} \\\"%{DATA:aws.elb.trace_id}\\\" \\\"(?:-|%{DATA:destination.domain})\\\" \\\"(?:-|%{DATA:aws.elb.chosen_cert.arn})\\\" (?:-1|%{NUMBER:aws.elb.matched_rule_priority}) %{TIMESTAMP_ISO8601:event.start} \\\"(?:-|%{DATA:_tmp.actions_executed})\\\" \\\"(?:-|%{DATA:aws.elb.redirect_url})\\\" \\\"(?:-|%{DATA:aws.elb.error.reason})\\\"( \\\"(?:-|%{DATA:_tmp.target_port})\\\")?( \\\"(?:-|%{DATA:_tmp.target_status_code})\\\")?( \\\"(?:-|%{DATA:aws.elb.classification})\\\")?( \\\"(?:-|%{DATA:aws.elb.classification_reason})\\\")?",
+          "%{ELBV2TYPE} %{ELBV2LOGVERSION} %{ELBTIMESTAMP} %{ELBNAME} %{NOTSPACE:aws.elb.listener} %{ELBSOURCE} %{ELBBACKEND} (?:-|%{NUMBER:aws.elb.connection_time.ms:float}) (?:-|%{NUMBER:aws.elb.tls_handshake_time.ms:float}) %{NUMBER:source.bytes:long} %{NUMBER:destination.bytes:long} (?:-|%{NUMBER:aws.elb.incoming_tls_alert}) (?:-|%{NOTSPACE:aws.elb.chosen_cert.arn}) (?:-|%{NOTSPACE:aws.elb.chosen_cert.serial}) %{ELBSSL} (?:-|%{NOTSPACE:aws.elb.ssl_named_group}) (?:-|%{NOTSPACE:destination.domain}) (?:-|%{NOTSPACE:aws.elb.alpn_fe_protocol}) (?:-|%{NOTSPACE:aws.elb.alpn_be_protocol}) (?:-|\\\\?\\\"%{DATA:aws.elb.alpn_client_preference_list}\\\\?\\\") (?:%{TIMESTAMP_ISO8601:aws.elb.tls_connection_creation_time_str}|-)",
+          "%{ELBTIMESTAMP} %{IP:client.ip} %{NUMBER:client.port:long} %{NOTSPACE:aws.elb.listener} (?:-|%{NOTSPACE:aws.elb.ssl_protocol}) (?:-|%{NOTSPACE:aws.elb.ssl_cipher}) (?:-|%{NUMBER:aws.elb.tls_handshake_latency:float}) \"%{DATA:aws.elb.leaf_client_cert_subject}\" (?:-|NotBefore=%{TIMESTAMP_ISO8601:aws.elb.leaf_client_cert_not_before_str};NotAfter=%{TIMESTAMP_ISO8601:aws.elb.leaf_client_cert_not_after_str}) (?:-|%{NOTSPACE:aws.elb.leaf_client_cert_serial_number}) (%{WORD:aws.elb.tls_verify_status})?(?::%{NOTSPACE:aws.elb.tls_error_code})?"
+        ]
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind_de80643c",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_provider_208bdd6b",
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_aws_elb_protocol_b784f9b5",
+        "field": "aws.elb.protocol",
+        "if": "ctx.http != null",
+        "value": "http"
+      }
+    },
+    {
+      "uri_parts": {
+        "ignore_failure": true,
+        "tag": "uri_parts__tmp_uri_orig_1f81b122",
+        "field": "_tmp.uri_orig",
+        "if": "ctx?._tmp?.uri_orig != null"
+      }
+    },
+    {
+      "user_agent": {
+        "ignore_missing": true,
+        "tag": "user_agent__tmp_user_agent_fa8e1ed4",
+        "field": "_tmp.user_agent",
+        "if": "ctx?._tmp?.user_agent != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_category_4d0fc261",
+        "field": "event.category",
+        "if": "ctx.http != null",
+        "value": [
+          "web"
+        ]
+      }
+    },
+    {
+      "set": {
+        "tag": "set_aws_elb_protocol_8b498026",
+        "field": "aws.elb.protocol",
+        "value": "tcp",
+        "if": "ctx.http == null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_category_41205ee5",
+        "field": "event.category",
+        "value": [
+          "network"
+        ],
+        "if": "ctx.http == null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_outcome_7c17c411",
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_outcome_712a938b",
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_trace_id_53565e4a",
+        "field": "trace.id",
+        "value": "{{aws.elb.trace_id}}",
+        "if": "ctx?.aws?.elb?.trace_id != null"
+      }
+    },
+    {
+      "split": {
+        "ignore_missing": true,
+        "tag": "split__tmp_actions_executed_to_aws_elb_action_executed_2b54cfea",
+        "field": "_tmp.actions_executed",
+        "target_field": "aws.elb.action_executed",
+        "separator": ","
+      }
+    },
+    {
+      "split": {
+        "ignore_missing": true,
+        "tag": "split__tmp_target_port_to_aws_elb_target_port_13b05dad",
+        "field": "_tmp.target_port",
+        "target_field": "aws.elb.target_port",
+        "separator": " "
+      }
+    },
+    {
+      "split": {
+        "ignore_missing": true,
+        "tag": "split__tmp_target_status_code_to_aws_elb_target_status_code_8b9f803b",
+        "field": "_tmp.target_status_code",
+        "target_field": "aws.elb.target_status_code",
+        "separator": " "
+      }
+    },
+    {
+      "date": {
+        "tag": "date__tmp_timestamp_41d263a1",
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "_tmp.timestamp"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_end_e0a643f5",
+        "field": "event.end",
+        "value": "{{ @timestamp }}"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "tag": "convert_source_address_to_source_ip_0a89ba51",
+        "field": "source.address",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "tag": "convert_source_port_361b30ff",
+        "field": "source.port",
+        "type": "long"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_to_source_geo_da2e41b2",
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.as",
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "tag": "geoip_source_ip_to_source_as_28d69883",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_asn_to_source_as_number_a917047d",
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_organization_name_to_source_as_organization_name_f1362d0b",
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_tls_cipher_1573a52b",
+        "field": "tls.cipher",
+        "value": "{{aws.elb.ssl_cipher}}",
+        "if": "ctx.aws?.elb?.ssl_cipher != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "script_f4b0bf28",
+        "source": "def parts = ctx.aws.elb.ssl_protocol.splitOnToken(\"v\"); if (parts.length != 2) {\n  return;\n} if (parts[1].contains(\".\")) {\n  ctx.tls.version = parts[1];\n} else {\n  ctx.tls.version = parts[1].substring(0,1) + \".\" + parts[1].substring(1);\n} ctx.tls.version_protocol = parts[0].toLowerCase();",
+        "lang": "painless",
+        "if": "ctx.aws?.elb?.ssl_protocol != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_3f4f84fc",
+        "field": [
+          "_tmp"
+        ]
+      }
+    },
+    {
+      "date": {
+        "tag": "date_aws_elb_tls_connection_creation_time_str_to_aws_elb_tls_connection_creation_time_468c578f",
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "aws.elb.tls_connection_creation_time_str",
+        "target_field": "aws.elb.tls_connection_creation_time",
+        "if": "ctx.aws?.elb?.tls_connection_creation_time_str != null && ctx.aws?.elb?.tls_connection_creation_time_str != '-' && ctx.aws?.elb?.tls_connection_creation_time_str != ''"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_aws_elb_tls_connection_creation_time_str_e3adb590",
+        "field": "aws.elb.tls_connection_creation_time_str"
+      }
+    },
+    {
+      "date": {
+        "tag": "date_aws_elb_leaf_client_cert_not_after_str_to_aws_elb_leaf_client_cert_not_after_6477be93",
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "aws.elb.leaf_client_cert_not_after_str",
+        "target_field": "aws.elb.leaf_client_cert_not_after",
+        "if": "ctx.aws?.elb?.leaf_client_cert_not_after_str != null && ctx.aws?.elb?.leaf_client_cert_not_after_str != '-' && ctx.aws?.elb?.leaf_client_cert_not_after_str != ''"
+      }
+    },
+    {
+      "date": {
+        "tag": "date_aws_elb_leaf_client_cert_not_before_str_to_aws_elb_leaf_client_cert_not_before_dad4c6c0",
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "aws.elb.leaf_client_cert_not_before_str",
+        "target_field": "aws.elb.leaf_client_cert_not_before",
+        "if": "ctx.aws?.elb?.leaf_client_cert_not_before_str != null && ctx.aws?.elb?.leaf_client_cert_not_before_str != '-' && ctx.aws?.elb?.leaf_client_cert_not_before_str != ''"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_d2e67527",
+        "field": [
+          "aws.elb.leaf_client_cert_not_after_str",
+          "aws.elb.leaf_client_cert_not_before_str"
+        ]
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.elb_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.elb_logs` dataset"
+      }
+    }
+  ]
+}

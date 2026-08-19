@@ -1,0 +1,155 @@
+{
+  "name": "metrics-aws.sqs-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378997,
+  "description": "Pipeline for SQS metrics",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378997,
+  "processors": [
+    {
+      "dot_expander": {
+        "ignore_failure": true,
+        "tag": "dot_expander_*_c2762c23",
+        "field": "*"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_cloud_account_name_20733914",
+        "override": false,
+        "field": "cloud.account.name",
+        "copy_from": "cloud.account.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_ApproximateAgeOfOldestMessage_max_to_aws_sqs_oldest_message_age_sec_c95b50a9",
+        "field": "aws.sqs.metrics.ApproximateAgeOfOldestMessage.max",
+        "target_field": "aws.sqs.oldest_message_age.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_ApproximateNumberOfMessagesDelayed_avg_to_aws_sqs_messages_delayed_ca6073c1",
+        "field": "aws.sqs.metrics.ApproximateNumberOfMessagesDelayed.avg",
+        "target_field": "aws.sqs.messages.delayed"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_ApproximateNumberOfMessagesNotVisible_avg_to_aws_sqs_messages_not_visible_8a0a8f4e",
+        "field": "aws.sqs.metrics.ApproximateNumberOfMessagesNotVisible.avg",
+        "target_field": "aws.sqs.messages.not_visible"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_ApproximateNumberOfMessagesVisible_avg_to_aws_sqs_messages_visible_1942dde5",
+        "field": "aws.sqs.metrics.ApproximateNumberOfMessagesVisible.avg",
+        "target_field": "aws.sqs.messages.visible"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_NumberOfMessagesDeleted_sum_to_aws_sqs_messages_deleted_853d108e",
+        "field": "aws.sqs.metrics.NumberOfMessagesDeleted.sum",
+        "target_field": "aws.sqs.messages.deleted"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_NumberOfMessagesReceived_sum_to_aws_sqs_messages_received_2f8e5010",
+        "field": "aws.sqs.metrics.NumberOfMessagesReceived.sum",
+        "target_field": "aws.sqs.messages.received"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_NumberOfMessagesSent_sum_to_aws_sqs_messages_sent_64cf391a",
+        "field": "aws.sqs.metrics.NumberOfMessagesSent.sum",
+        "target_field": "aws.sqs.messages.sent"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_NumberOfEmptyReceives_sum_to_aws_sqs_empty_receives_0684a641",
+        "field": "aws.sqs.metrics.NumberOfEmptyReceives.sum",
+        "target_field": "aws.sqs.empty_receives"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_aws_sqs_metrics_SentMessageSize_avg_to_aws_sqs_sent_message_size_bytes_dd16fb4e",
+        "field": "aws.sqs.metrics.SentMessageSize.avg",
+        "target_field": "aws.sqs.sent_message_size.bytes"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_8f371c74",
+        "field": [
+          "aws.sqs.metrics"
+        ],
+        "if": "ctx.agent?.type != \"firehose\""
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.sqs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.sqs` dataset"
+      }
+    }
+  ]
+}

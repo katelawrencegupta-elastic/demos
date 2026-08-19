@@ -1,0 +1,17 @@
+{
+  "name": "metrics-prometheus@settings",
+  "component_template": {
+    "template": {
+      "data_stream_options": {
+        "failure_store": {
+          "enabled": true
+        }
+      }
+    },
+    "version": 3,
+    "_meta": {
+      "description": "Default settings for Prometheus metrics data streams",
+      "managed": true
+    }
+  }
+}

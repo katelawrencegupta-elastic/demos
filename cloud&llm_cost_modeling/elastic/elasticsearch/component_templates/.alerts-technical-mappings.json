@@ -1,0 +1,343 @@
+{
+  "name": ".alerts-technical-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "ecs": {
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              },
+              "dataset": {
+                "type": "keyword"
+              }
+            }
+          },
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "workflow_status": {
+                    "type": "keyword"
+                  },
+                  "reason": {
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "match_only_text"
+                      }
+                    }
+                  },
+                  "instance": {
+                    "properties": {
+                      "id": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "severity_improving": {
+                    "type": "boolean"
+                  },
+                  "workflow_tags": {
+                    "type": "keyword"
+                  },
+                  "rule": {
+                    "properties": {
+                      "note": {
+                        "type": "keyword"
+                      },
+                      "references": {
+                        "type": "keyword"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "description": {
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "type": "keyword"
+                      },
+                      "uuid": {
+                        "type": "keyword"
+                      },
+                      "enabled": {
+                        "type": "keyword"
+                      },
+                      "rule_name_override": {
+                        "type": "keyword"
+                      },
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "from": {
+                        "type": "keyword"
+                      },
+                      "consumer": {
+                        "type": "keyword"
+                      },
+                      "execution": {
+                        "properties": {
+                          "type": {
+                            "type": "keyword"
+                          },
+                          "uuid": {
+                            "type": "keyword"
+                          },
+                          "timestamp": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "author": {
+                        "type": "keyword"
+                      },
+                      "created_by": {
+                        "type": "keyword"
+                      },
+                      "version": {
+                        "type": "keyword"
+                      },
+                      "rule_type_id": {
+                        "type": "keyword"
+                      },
+                      "revision": {
+                        "type": "long"
+                      },
+                      "tags": {
+                        "type": "keyword"
+                      },
+                      "rule_id": {
+                        "type": "keyword"
+                      },
+                      "license": {
+                        "type": "keyword"
+                      },
+                      "name": {
+                        "type": "keyword"
+                      },
+                      "updated_by": {
+                        "type": "keyword"
+                      },
+                      "producer": {
+                        "type": "keyword"
+                      },
+                      "interval": {
+                        "type": "keyword"
+                      },
+                      "to": {
+                        "type": "keyword"
+                      },
+                      "category": {
+                        "type": "keyword"
+                      },
+                      "parameters": {
+                        "ignore_above": 4096,
+                        "type": "flattened"
+                      }
+                    }
+                  },
+                  "flapping_history": {
+                    "type": "boolean"
+                  },
+                  "snoozed": {
+                    "type": "boolean"
+                  },
+                  "uuid": {
+                    "type": "keyword"
+                  },
+                  "action_group": {
+                    "type": "keyword"
+                  },
+                  "duration": {
+                    "properties": {
+                      "us": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "maintenance_window_names": {
+                    "type": "keyword"
+                  },
+                  "updated_at": {
+                    "type": "date"
+                  },
+                  "workflow_status_updated_at": {
+                    "type": "date"
+                  },
+                  "time_range": {
+                    "format": "epoch_millis||strict_date_optional_time",
+                    "type": "date_range"
+                  },
+                  "suppression": {
+                    "properties": {
+                      "terms": {
+                        "properties": {
+                          "field": {
+                            "type": "keyword"
+                          },
+                          "value": {
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "start": {
+                        "type": "date"
+                      },
+                      "end": {
+                        "type": "date"
+                      },
+                      "docs_count": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "end": {
+                    "type": "date"
+                  },
+                  "flapping": {
+                    "type": "boolean"
+                  },
+                  "workflow_user": {
+                    "type": "keyword"
+                  },
+                  "muted": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "keyword"
+                  },
+                  "workflow_assignee_ids": {
+                    "type": "keyword"
+                  },
+                  "case_ids": {
+                    "type": "keyword"
+                  },
+                  "risk_score": {
+                    "type": "float"
+                  },
+                  "start": {
+                    "type": "date"
+                  },
+                  "consecutive_matches": {
+                    "type": "long"
+                  },
+                  "pending_recovered_count": {
+                    "type": "long"
+                  },
+                  "url": {
+                    "ignore_above": 2048,
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "workflow_reason": {
+                    "type": "keyword"
+                  },
+                  "intended_timestamp": {
+                    "type": "date"
+                  },
+                  "scheduled_action": {
+                    "properties": {
+                      "date": {
+                        "type": "keyword"
+                      },
+                      "group": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "previous_action_group": {
+                    "type": "keyword"
+                  },
+                  "last_detected": {
+                    "type": "date"
+                  },
+                  "maintenance_window_ids": {
+                    "type": "keyword"
+                  },
+                  "system_status": {
+                    "type": "keyword"
+                  },
+                  "updated_by": {
+                    "properties": {
+                      "user": {
+                        "properties": {
+                          "name": {
+                            "type": "keyword"
+                          },
+                          "id": {
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "index_pattern": {
+                    "type": "keyword"
+                  },
+                  "status": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "space_ids": {
+                "type": "keyword"
+              },
+              "cps_scope": {
+                "properties": {
+                  "expression": {
+                    "type": "keyword"
+                  },
+                  "linked_projects": {
+                    "type": "flattened"
+                  }
+                }
+              },
+              "version": {
+                "type": "version"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "original": {
+                "ignore_above": 32766,
+                "type": "keyword"
+              },
+              "kind": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "action": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "tags": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}

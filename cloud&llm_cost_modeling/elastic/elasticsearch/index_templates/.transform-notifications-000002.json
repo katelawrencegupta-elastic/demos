@@ -1,0 +1,57 @@
+{
+  "name": ".transform-notifications-000002",
+  "index_template": {
+    "index_patterns": [
+      ".transform-notifications-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "version": "8.11.0",
+          "managed_index_mappings_version": 4
+        },
+        "dynamic": "false",
+        "properties": {
+          "transform_id": {
+            "type": "keyword"
+          },
+          "level": {
+            "type": "keyword"
+          },
+          "message": {
+            "type": "text",
+            "fields": {
+              "raw": {
+                "type": "keyword",
+                "ignore_above": 1024
+              }
+            }
+          },
+          "timestamp": {
+            "type": "date"
+          },
+          "node_name": {
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {
+        ".transform-notifications-read": {
+          "is_hidden": true
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 9223372036854775807,
+    "version": 10000099,
+    "created_date_millis": 1786557387309,
+    "modified_date_millis": 1786557387309
+  }
+}

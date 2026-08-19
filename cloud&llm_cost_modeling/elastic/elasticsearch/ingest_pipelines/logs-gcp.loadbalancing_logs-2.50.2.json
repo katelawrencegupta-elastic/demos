@@ -1,0 +1,411 @@
+{
+  "name": "logs-gcp.loadbalancing_logs-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557401715,
+  "description": "Pipeline for Google Cloud DNS logs",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557401715,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "allow_duplicates": false,
+        "value": [
+          "network"
+        ]
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "allow_duplicates": false,
+        "value": [
+          "info"
+        ]
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.receiveTimestamp",
+        "target_field": "event.created",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.logName",
+        "target_field": "log.logger"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "event.id",
+        "copy_from": "json.insertId"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "json.resource.labels.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "json.resource.labels.zone",
+        "target_field": "cloud.region",
+        "type": "string"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.remoteIp",
+        "patterns": [
+          "^%{IP:source.address}(:%{POSINT:source.port:long})?$"
+        ]
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "source.address",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.requestMethod",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.requestSize",
+        "target_field": "http.request.bytes",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.responseSize",
+        "target_field": "http.response.bytes",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.status",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{network.protocol}/%{http.version}",
+        "ignore_failure": true,
+        "field": "json.httpRequest.protocol",
+        "if": "ctx.json?.httpRequest?.protocol != null"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "network.protocol",
+        "ignore_missing": true
+      }
+    },
+    {
+      "user_agent": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.userAgent",
+        "target_field": "user_agent"
+      }
+    },
+    {
+      "uri_parts": {
+        "field": "json.httpRequest.requestUrl",
+        "target_field": "url",
+        "if": "ctx.json?.httpRequest?.requestUrl != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.referer",
+        "target_field": "http.request.referrer"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.serverIp",
+        "patterns": [
+          "^%{IP:destination.nat.ip}(:%{POSINT:destination.nat.port:long})?$"
+        ]
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "destination.address",
+        "copy_from": "url.domain"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "destination.port",
+        "copy_from": "url.port"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "url.domain",
+              "target_field": "destination.domain"
+            }
+          }
+        ],
+        "field": "destination.address",
+        "target_field": "destination.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.severity",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.cacheId",
+        "target_field": "gcp.load_balancer.cache_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.statusDetails",
+        "target_field": "gcp.load_balancer.status_details"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.cacheHit",
+        "target_field": "gcp.load_balancer.cache_hit"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.httpRequest.cacheLookup",
+        "target_field": "gcp.load_balancer.cache_lookup"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resource.labels.url_map_name",
+        "target_field": "gcp.load_balancer.url_map_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resource.labels.forwarding_rule_name",
+        "target_field": "gcp.load_balancer.forwarding_rule_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resource.labels.target_proxy_name",
+        "target_field": "gcp.load_balancer.target_proxy_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resource.labels.backend_service_name",
+        "target_field": "gcp.load_balancer.backend_service_name"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx?.source?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{destination.ip}}",
+        "if": "ctx?.destination?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{destination.nat.ip}}",
+        "if": "ctx?.destination?.nat?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "value": "{{destination.domain}}",
+        "if": "ctx?.destination?.domain != null"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "json"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.loadbalancing_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.loadbalancing_logs` dataset"
+      }
+    }
+  ]
+}

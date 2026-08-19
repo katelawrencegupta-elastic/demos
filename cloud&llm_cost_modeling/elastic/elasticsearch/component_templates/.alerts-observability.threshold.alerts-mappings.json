@@ -1,0 +1,73 @@
+{
+  "name": ".alerts-observability.threshold.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "dynamic_templates": [
+          {
+            "strings_as_keywords": {
+              "path_match": "kibana.alert.grouping.*",
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "evaluation": {
+                    "properties": {
+                      "time_range": {
+                        "type": "date_range"
+                      },
+                      "values": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "threshold": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      },
+                      "value": {
+                        "scaling_factor": 100,
+                        "type": "scaled_float"
+                      }
+                    }
+                  },
+                  "context": {
+                    "type": "object"
+                  },
+                  "grouping": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "group": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "keyword"
+                      },
+                      "value": {
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

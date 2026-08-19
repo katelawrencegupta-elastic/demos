@@ -1,0 +1,19 @@
+{
+  "data_view": {
+    "id": "monitoring-beats",
+    "version": "WzQ4OSwxXQ==",
+    "title": ".monitoring-beats-*",
+    "timeFieldName": "@timestamp",
+    "sourceFilters": [],
+    "fieldFormats": {},
+    "runtimeFieldMap": {},
+    "fieldAttrs": {},
+    "allowNoIndex": false,
+    "name": "Beats Monitoring",
+    "allowHidden": true,
+    "fields": {},
+    "namespaces": [
+      "default"
+    ]
+  }
+}

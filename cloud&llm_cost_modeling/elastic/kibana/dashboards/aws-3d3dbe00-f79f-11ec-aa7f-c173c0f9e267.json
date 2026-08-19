@@ -1,0 +1,1233 @@
+{
+  "id": "aws-3d3dbe00-f79f-11ec-aa7f-c173c0f9e267",
+  "data": {
+    "description": "Overview of AWS Security Hub Findings Action",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default",
+      "security-solution-default"
+    ],
+    "title": "[Logs AWS] Security Hub CSPM Findings Action",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.securityhub_findings"
+        }
+      }
+    ],
+    "query": {
+      "expression": "data_stream.dataset : \"aws.securityhub_findings\"",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 45
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by Action Type [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Action Type",
+              "fields": [
+                "event.action"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "ea83392c-bf61-452b-a925-da53a605f15e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 45
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by Network Connection Direction [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Network Connection Direction",
+              "fields": [
+                "aws.securityhub_findings.action.network_connection.direction"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "058d0f04-1686-4516-80f2-1a83851ea96e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 60
+        },
+        "config": {
+          "type": "xy",
+          "title": "Distribution of Events by AWS API Call Action Service Name [Logs AWS]",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "AWS API Call Service Name ",
+                "fields": [
+                  "aws.securityhub_findings.action.aws_api_call.service.name"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ]
+        },
+        "id": "bd8c282c-17ad-4104-8fec-bb9581748919",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 60
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by DNS Request Blocked [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "DNS Request Blocked",
+              "fields": [
+                "aws.securityhub_findings.action.dns_request.blocked"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "54045abd-664a-46da-8e75-c1b52460eda3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 75
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by Port Probe Blocked [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Port Probe Blocked",
+              "fields": [
+                "aws.securityhub_findings.action.port_probe.blocked"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "1a7df8c6-6da8-451d-a2cf-36cadce30b36",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 75
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by Network Connection Action Blocked [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Network Connection Action Blocked",
+              "fields": [
+                "aws.securityhub_findings.action.network_connection.blocked"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "ec4c18fe-7102-4ce9-92ad-810a834e3e63",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 90
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by AWS API Call Caller Type [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "AWS API Call Caller Type",
+              "fields": [
+                "aws.securityhub_findings.action.aws_api_call.caller.type"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "a0109b78-7c58-4956-8d61-12fa00bd53f7",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 24,
+          "y": 90
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 DNS Request Domain [Logs AWS]",
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Request Domain",
+              "fields": [
+                "aws.securityhub_findings.action.dns_request.domain"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "46b72e3d-9471-4b3c-8509-bdd8fb4c989c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 24,
+          "x": 0,
+          "y": 105
+        },
+        "config": {
+          "type": "pie",
+          "title": "Distribution of Events by DNS Request Protocol [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : \"aws.securityhub_findings\""
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "auto",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "DNS Request Protocol",
+              "fields": [
+                "aws.securityhub_findings.action.dns_request.protocol"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "dc7a8f88-82e6-4fdd-a567-1feae710b3aa",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:22.419Z",
+    "version": "WzE0MSwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "[Findings and Insights Overview](#/dashboard/aws-cc571400-dc61-11ec-a6e3-1bc5ab0aa1b4) | [Findings Malware, Threat Intelligence Indicator and Network Path Overview](#/dashboard/aws-8fcf4c20-f7a3-11ec-aa7f-c173c0f9e267) | [Summary Dashboard](#/dashboard/aws-c9f103d0-5f63-11ed-bd69-473ce047ef30)",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "type": "visualization",
+        "title": "Dashboards [Logs AWS]",
+        "hide_title": false
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: map. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "map",
+      "panel_config": {
+        "attributes": {
+          "title": "AWS API Call by Countries [Logs AWS]",
+          "layers": [
+            {
+              "alpha": 1,
+              "id": "01ebeac6-0c24-44c1-a59f-774292776002",
+              "includeInFitToBounds": true,
+              "label": null,
+              "maxZoom": 24,
+              "minZoom": 0,
+              "sourceDescriptor": {
+                "isAutoSelect": true,
+                "lightModeDefault": "road_map",
+                "type": "EMS_TMS"
+              },
+              "style": {
+                "type": "TILE"
+              },
+              "type": "EMS_VECTOR_TILE",
+              "visible": true
+            },
+            {
+              "alpha": 0.75,
+              "id": "eaf2779b-e6e6-40d9-89d4-b3f04f536a25",
+              "includeInFitToBounds": true,
+              "joins": [
+                {
+                  "leftField": "iso2",
+                  "right": {
+                    "applyForceRefresh": true,
+                    "applyGlobalQuery": true,
+                    "applyGlobalTime": true,
+                    "id": "39ac4104-7e4f-47fa-a965-035f9ea2d076",
+                    "indexPatternTitle": "logs-*",
+                    "metrics": [
+                      {
+                        "type": "count"
+                      }
+                    ],
+                    "term": "aws.securityhub_findings.action.aws_api_call.remote_ip.country.code",
+                    "type": "ES_TERM_SOURCE",
+                    "indexPatternId": "logs-*"
+                  }
+                }
+              ],
+              "label": null,
+              "maxZoom": 24,
+              "minZoom": 0,
+              "sourceDescriptor": {
+                "id": "world_countries",
+                "tooltipProperties": [
+                  "iso2"
+                ],
+                "type": "EMS_FILE"
+              },
+              "style": {
+                "isTimeAware": true,
+                "properties": {
+                  "fillColor": {
+                    "options": {
+                      "color": "Yellow to Red",
+                      "colorCategory": "palette_0",
+                      "field": {
+                        "name": "__kbnjoin__count__39ac4104-7e4f-47fa-a965-035f9ea2d076",
+                        "origin": "join"
+                      },
+                      "fieldMetaOptions": {
+                        "isEnabled": true,
+                        "sigma": 3
+                      },
+                      "type": "ORDINAL"
+                    },
+                    "type": "DYNAMIC"
+                  },
+                  "icon": {
+                    "options": {
+                      "value": "marker"
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconOrientation": {
+                    "options": {
+                      "orientation": 0
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconSize": {
+                    "options": {
+                      "size": 6
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderColor": {
+                    "options": {
+                      "color": "#FFFFFF"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderSize": {
+                    "options": {
+                      "size": "SMALL"
+                    }
+                  },
+                  "labelColor": {
+                    "options": {
+                      "color": "#000000"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelSize": {
+                    "options": {
+                      "size": 14
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelText": {
+                    "options": {
+                      "field": {
+                        "name": "__kbnjoin__count__39ac4104-7e4f-47fa-a965-035f9ea2d076",
+                        "origin": "join"
+                      }
+                    },
+                    "type": "DYNAMIC"
+                  },
+                  "lineColor": {
+                    "options": {
+                      "color": "#3d3d3d"
+                    },
+                    "type": "STATIC"
+                  },
+                  "lineWidth": {
+                    "options": {
+                      "size": 1
+                    },
+                    "type": "STATIC"
+                  },
+                  "symbolizeAs": {
+                    "options": {
+                      "value": "circle"
+                    }
+                  }
+                },
+                "type": "VECTOR"
+              },
+              "type": "GEOJSON_VECTOR",
+              "visible": true
+            }
+          ],
+          "center": {
+            "lat": 19.94277,
+            "lon": 0
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": "data_stream.dataset : \"aws.securityhub_findings\" "
+          },
+          "settings": {
+            "autoFitToDataBounds": false,
+            "backgroundColor": "#ffffff",
+            "browserLocation": {
+              "zoom": 2
+            },
+            "disableInteractive": false,
+            "disableTooltipControl": false,
+            "fixedLocation": {
+              "lat": 0,
+              "lon": 0,
+              "zoom": 2
+            },
+            "hideLayerControl": false,
+            "hideToolbarOverlay": false,
+            "hideViewControl": false,
+            "initialLocation": "LAST_SAVED_LOCATION",
+            "maxZoom": 24,
+            "minZoom": 0,
+            "showScaleControl": false,
+            "showSpatialFilters": true,
+            "showTimesliderToggleButton": true,
+            "spatialFiltersAlpa": 0.3,
+            "spatialFiltersFillColor": "#DA8B45",
+            "spatialFiltersLineColor": "#DA8B45"
+          },
+          "zoom": 1.06,
+          "refreshInterval": {
+            "pause": true,
+            "value": 0
+          },
+          "timeFilters": {
+            "from": "now-7d/d",
+            "to": "now"
+          },
+          "isLayerTOCOpen": false,
+          "openTOCDetails": []
+        },
+        "hiddenLayers": [],
+        "isLayerTOCOpen": false,
+        "mapBuffer": {
+          "maxLat": 66.51326,
+          "maxLon": 180,
+          "minLat": -66.51326,
+          "minLon": -180
+        },
+        "mapCenter": {
+          "lat": 19.94277,
+          "lon": 0,
+          "zoom": 1.06
+        },
+        "openTOCDetails": [],
+        "type": "map"
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: map. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "map",
+      "panel_config": {
+        "attributes": {
+          "title": "Network Connection by Countries [Logs AWS]",
+          "layers": [
+            {
+              "alpha": 1,
+              "id": "08cfbaf0-8c92-472f-9728-8bce4e663334",
+              "includeInFitToBounds": true,
+              "label": null,
+              "maxZoom": 24,
+              "minZoom": 0,
+              "sourceDescriptor": {
+                "isAutoSelect": true,
+                "lightModeDefault": "road_map",
+                "type": "EMS_TMS"
+              },
+              "style": {
+                "type": "TILE"
+              },
+              "type": "EMS_VECTOR_TILE",
+              "visible": true
+            },
+            {
+              "alpha": 0.75,
+              "id": "f158a7b9-474b-4846-8b59-bbfea4728396",
+              "includeInFitToBounds": true,
+              "joins": [
+                {
+                  "leftField": "iso2",
+                  "right": {
+                    "applyForceRefresh": true,
+                    "applyGlobalQuery": true,
+                    "applyGlobalTime": true,
+                    "id": "8c509e4c-57b1-4bde-9617-b0159ece3c86",
+                    "indexPatternTitle": "logs-*",
+                    "metrics": [
+                      {
+                        "type": "count"
+                      }
+                    ],
+                    "term": "aws.securityhub_findings.action.network_connection.remote_ip.country.code",
+                    "type": "ES_TERM_SOURCE",
+                    "indexPatternId": "logs-*"
+                  }
+                }
+              ],
+              "label": null,
+              "maxZoom": 24,
+              "minZoom": 0,
+              "sourceDescriptor": {
+                "id": "world_countries",
+                "tooltipProperties": [
+                  "iso2"
+                ],
+                "type": "EMS_FILE"
+              },
+              "style": {
+                "isTimeAware": true,
+                "properties": {
+                  "fillColor": {
+                    "options": {
+                      "color": "Yellow to Red",
+                      "colorCategory": "palette_0",
+                      "field": {
+                        "name": "__kbnjoin__count__8c509e4c-57b1-4bde-9617-b0159ece3c86",
+                        "origin": "join"
+                      },
+                      "fieldMetaOptions": {
+                        "isEnabled": true,
+                        "sigma": 3
+                      },
+                      "type": "ORDINAL"
+                    },
+                    "type": "DYNAMIC"
+                  },
+                  "icon": {
+                    "options": {
+                      "value": "marker"
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconOrientation": {
+                    "options": {
+                      "orientation": 0
+                    },
+                    "type": "STATIC"
+                  },
+                  "iconSize": {
+                    "options": {
+                      "size": 6
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderColor": {
+                    "options": {
+                      "color": "#FFFFFF"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelBorderSize": {
+                    "options": {
+                      "size": "SMALL"
+                    }
+                  },
+                  "labelColor": {
+                    "options": {
+                      "color": "#000000"
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelSize": {
+                    "options": {
+                      "size": 14
+                    },
+                    "type": "STATIC"
+                  },
+                  "labelText": {
+                    "options": {
+                      "field": {
+                        "name": "__kbnjoin__count__8c509e4c-57b1-4bde-9617-b0159ece3c86",
+                        "origin": "join"
+                      }
+                    },
+                    "type": "DYNAMIC"
+                  },
+                  "lineColor": {
+                    "options": {
+                      "color": "#3d3d3d"
+                    },
+                    "type": "STATIC"
+                  },
+                  "lineWidth": {
+                    "options": {
+                      "size": 1
+                    },
+                    "type": "STATIC"
+                  },
+                  "symbolizeAs": {
+                    "options": {
+                      "value": "circle"
+                    }
+                  }
+                },
+                "type": "VECTOR"
+              },
+              "type": "GEOJSON_VECTOR",
+              "visible": true
+            }
+          ],
+          "center": {
+            "lat": 14.52408,
+            "lon": 13.80026
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": "data_stream.dataset : \"aws.securityhub_findings\" "
+          },
+          "settings": {
+            "autoFitToDataBounds": false,
+            "backgroundColor": "#ffffff",
+            "browserLocation": {
+              "zoom": 2
+            },
+            "disableInteractive": false,
+            "disableTooltipControl": false,
+            "fixedLocation": {
+              "lat": 0,
+              "lon": 0,
+              "zoom": 2
+            },
+            "hideLayerControl": false,
+            "hideToolbarOverlay": false,
+            "hideViewControl": false,
+            "initialLocation": "LAST_SAVED_LOCATION",
+            "maxZoom": 24,
+            "minZoom": 0,
+            "showScaleControl": false,
+            "showSpatialFilters": true,
+            "showTimesliderToggleButton": true,
+            "spatialFiltersAlpa": 0.3,
+            "spatialFiltersFillColor": "#DA8B45",
+            "spatialFiltersLineColor": "#DA8B45"
+          },
+          "zoom": 1.33,
+          "refreshInterval": {
+            "pause": true,
+            "value": 0
+          },
+          "timeFilters": {
+            "from": "now-7d/d",
+            "to": "now"
+          },
+          "isLayerTOCOpen": true,
+          "openTOCDetails": []
+        },
+        "hiddenLayers": [],
+        "isLayerTOCOpen": true,
+        "mapBuffer": {
+          "maxLat": 85.05113,
+          "maxLon": 360,
+          "minLat": -66.51326,
+          "minLon": -360
+        },
+        "mapCenter": {
+          "lat": 19.94277,
+          "lon": 0,
+          "zoom": 1.06
+        },
+        "openTOCDetails": [],
+        "type": "map"
+      }
+    }
+  ]
+}

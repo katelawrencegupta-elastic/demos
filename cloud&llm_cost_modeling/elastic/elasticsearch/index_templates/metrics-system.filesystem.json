@@ -1,0 +1,53 @@
+{
+  "name": "metrics-system.filesystem",
+  "index_template": {
+    "index_patterns": [
+      "metrics-system.filesystem-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "system"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-system.filesystem@package",
+      "metrics@custom",
+      "system@custom",
+      "metrics-system.filesystem@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "system"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "system@custom",
+      "metrics-system.filesystem@custom"
+    ],
+    "created_date_millis": 1786558590460,
+    "modified_date_millis": 1786558590460
+  }
+}

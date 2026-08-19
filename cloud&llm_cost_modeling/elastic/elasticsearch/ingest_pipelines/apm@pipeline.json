@@ -1,0 +1,44 @@
+{
+  "name": "apm@pipeline",
+  "modified_date_millis": 1786555716897,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in ingest pipeline for all APM data streams.\n",
+  "created_date_millis": 1786555716897,
+  "processors": [
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "process.ppid",
+        "target_field": "process.parent.pid"
+      }
+    },
+    {
+      "geoip": {
+        "on_failure": [
+          {
+            "remove": {
+              "field": "client.ip"
+            }
+          }
+        ],
+        "download_database_on_pipeline_creation": false,
+        "field": "client.ip",
+        "target_field": "client.geo",
+        "database_file": "GeoLite2-City.mmdb",
+        "ignore_missing": true
+      }
+    },
+    {
+      "user_agent": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "user_agent.original",
+        "target_field": "user_agent"
+      }
+    }
+  ],
+  "version": 103
+}

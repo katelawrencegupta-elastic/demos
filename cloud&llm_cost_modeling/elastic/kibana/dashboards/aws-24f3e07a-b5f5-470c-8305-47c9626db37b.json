@@ -1,0 +1,1519 @@
+{
+  "id": "aws-24f3e07a-b5f5-470c-8305-47c9626db37b",
+  "data": {
+    "description": "Overview of AWS ALB Metrics",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default"
+    ],
+    "title": "[Metrics AWS] ALB Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "metrics-*",
+        "label": "ALB Metrics Filter",
+        "type": "group",
+        "group": {
+          "operator": "and",
+          "conditions": [
+            {
+              "field": "data_stream.dataset",
+              "operator": "is",
+              "value": "aws.elb_metrics"
+            },
+            {
+              "field": "aws.cloudwatch.namespace",
+              "operator": "is",
+              "value": "AWS/ApplicationELB"
+            }
+          ]
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 5,
+          "w": 6,
+          "x": 0,
+          "y": 4
+        },
+        "config": {
+          "type": "metric",
+          "title": "Healthy Host Count",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": " ",
+              "field": "aws.applicationelb.metrics.HealthyHostCount.max",
+              "operation": "max",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "09abf309-5056-45e1-9907-3ac778f1da66",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 19,
+          "x": 6,
+          "y": 4
+        },
+        "config": {
+          "type": "xy",
+          "title": "Total Request",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Number of Request ",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Request Count",
+                  "field": "aws.applicationelb.metrics.RequestCount.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b9b31a0a-4cde-4395-aff5-9f885835b520",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 23,
+          "x": 25,
+          "y": 4
+        },
+        "config": {
+          "type": "xy",
+          "title": "New Connections",
+          "description": "Number of new TCP connections established from clients to the load balancer and from the load balancer to targets.",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Number of Connections",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "New TCP Connection",
+                  "field": "aws.applicationelb.metrics.NewConnectionCount.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d2a1ec39-b08a-4daf-85a3-2496fe19cf5b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 5,
+          "w": 6,
+          "x": 0,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "title": "Unhealthy Host Count",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": " ",
+              "field": "aws.applicationelb.metrics.UnHealthyHostCount.max",
+              "operation": "max",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "560dc4ed-912f-441e-a136-39305402f33d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 48,
+          "x": 0,
+          "y": 14
+        },
+        "config": {
+          "type": "xy",
+          "title": "Active Connections",
+          "description": "",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Number of Connections",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Load Balancer Name",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Active Connection Count",
+                  "field": "aws.applicationelb.metrics.ActiveConnectionCount.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "463bccbb-aba2-4781-a30e-c1d2b581c872",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 48,
+          "x": 0,
+          "y": 26
+        },
+        "config": {
+          "type": "xy",
+          "title": "HTTP 5XX Count",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "HTTP 5XX Count",
+                  "field": "aws.applicationelb.metrics.HTTPCode_ELB_5XX_Count.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6c51191f-82cb-4718-89a5-4e1a629263db",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 23,
+          "x": 0,
+          "y": 37
+        },
+        "config": {
+          "type": "xy",
+          "title": "HTTP 4XX Count",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "4XX count",
+                  "field": "aws.applicationelb.metrics.HTTPCode_ELB_4XX_Count.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "7d1c7eb8-d95b-411d-a8b9-7705ce2438fa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 25,
+          "x": 23,
+          "y": 37
+        },
+        "config": {
+          "type": "xy",
+          "title": "HTTP 3XX Count",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "3XX Count",
+                  "field": "aws.applicationelb.metrics.HTTPCode_ELB_3XX_Count.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "c41226ed-17ee-40bc-81c7-38b2755c1734",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 23,
+          "x": 0,
+          "y": 48
+        },
+        "config": {
+          "type": "xy",
+          "title": "HTTP Redirects Analytics",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Number of Redirects ",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "HTTP Redirect Count sum",
+                  "field": "aws.applicationelb.metrics.HTTP_Redirect_Count.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "25fa3ea2-6c9d-47c3-86d6-9b9e9f0d6459",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 25,
+          "x": 23,
+          "y": 48
+        },
+        "config": {
+          "type": "xy",
+          "title": "Client TLS Negotiation Error",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Number of Errors ",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_default",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Client TLS Negotiation Error Count",
+                  "field": "aws.applicationelb.metrics.ClientTLSNegotiationErrorCount.sum",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "f9e71057-f71c-42a7-a176-8bff8a2dd9e8",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 23,
+          "x": 0,
+          "y": 60
+        },
+        "config": {
+          "type": "xy",
+          "title": "Response Time Analytic",
+          "description": "The time elapsed after the request leaves the load balancer until the target starts to send the response headers.",
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Avg Response Time",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "aws.dimensions.LoadBalancer"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": " Target Response Time",
+                  "field": "aws.applicationelb.metrics.TargetResponseTime.avg",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "timestamp",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": true
+              }
+            }
+          ]
+        },
+        "id": "00b8e0e4-46f3-42b4-af35-cbce8e43faed",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "a1d319b3-1748-417c-bef1-45c61bcf806c",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Cloud Region",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "cloud.region",
+          "exclude": false,
+          "exists_selected": true,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "14b6bb5f-33c3-4ab3-a4ce-e70aaad5c5ea",
+        "width": "medium",
+        "grow": false,
+        "config": {
+          "title": "Load Balancer",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "aws.dimensions.LoadBalancer",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:21.831Z",
+    "version": "Wzc2LDFd"
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "description": "",
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "[AWS Load Balancer Overview](#/view/aws-58e41f29-9b73-4ba9-b5f1-3e7b8ac1924b)\n\n",
+            "openLinksInNewTab": true
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "AWS Load Balancer Dashboards"
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "description": "",
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 11,
+            "markdown": "This dashboard contains Application Load Balancer that helps manage and distribute web traffic to different servers or services. By analyzing incoming traffic, it can route requests based on specific rules, such as URL paths or HTTP methods, allowing for more efficient handling of complex applications.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Information"
+      }
+    }
+  ]
+}

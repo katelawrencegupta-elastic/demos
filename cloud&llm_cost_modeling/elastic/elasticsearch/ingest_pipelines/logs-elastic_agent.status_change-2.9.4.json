@@ -1,0 +1,67 @@
+{
+  "name": "logs-elastic_agent.status_change-2.9.4",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591767,
+  "description": "Pipeline for Elastic Agent status change logs.",
+  "_meta": {
+    "package": {
+      "name": "elastic_agent"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591767,
+  "processors": [
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Derive health_status from status field",
+        "tag": "script_derive_health_status",
+        "source": "String status = ctx.status;\nString healthStatus;\n\nif (status == 'online') {\n  healthStatus = 'healthy';\n} else if (status == 'error' || status == 'degraded') {\n  healthStatus = 'unhealthy';\n} else if (status == 'updating' || status == 'enrolling' || status == 'unenrolling') {\n  healthStatus = 'updating';\n} else {\n  healthStatus = status;\n}\n\nctx.health_status = healthStatus;\n",
+        "lang": "painless",
+        "if": "ctx.status != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `elastic_agent` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent.status_change@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `elastic_agent.status_change` dataset"
+      }
+    }
+  ]
+}

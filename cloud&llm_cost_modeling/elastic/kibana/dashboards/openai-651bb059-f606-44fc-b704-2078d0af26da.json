@@ -1,0 +1,2713 @@
+{
+  "id": "openai-651bb059-f606-44fc-b704-2078d0af26da",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-openai-default"
+    ],
+    "time_range": {
+      "from": "2026-07-14T00:00:00.000Z",
+      "to": "2026-08-18T00:00:00.000Z"
+    },
+    "title": "[Metrics OpenAI] OpenAI Usage Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is_one_of",
+          "value": [
+            "openai.audio_speeches",
+            "openai.audio_transcriptions",
+            "openai.code_interpreter_sessions",
+            "openai.completions",
+            "openai.embeddings",
+            "openai.images",
+            "openai.moderations",
+            "openai.rate_limits",
+            "openai.vector_stores"
+          ]
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "Visualizes the overall request volume. Vector stores and code interpreter sessions are excluded from this chart and other charts that mention invocations, as they lack fields to determine the invocation count.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Total invocations",
+              "field": "openai.base.num_model_requests",
+              "empty_as_null": true,
+              "operation": "sum",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#B9A888"
+              }
+            }
+          ]
+        },
+        "id": "6b8df1c3-71b6-4eea-a46b-6b6f18a57813",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 0,
+          "w": 24,
+          "h": 12
+        },
+        "config": {
+          "type": "pie",
+          "title": "Model usage",
+          "description": "Visualizes request volume (%) by model",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "xl",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 1
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            },
+            "donut_hole": "m"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "field": "openai.base.num_model_requests",
+              "empty_as_null": true,
+              "operation": "sum",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "fields": [
+                "openai.base.model"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "eui_amsterdam_color_blind",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "205453c1-c54d-4bab-9b84-d9ba4d6392ee",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 18,
+          "y": 6,
+          "w": 6,
+          "h": 6
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "Visualizes overall token usage, showing sum of input (including embedding and moderation), audio input, audio output and output tokens.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Total tokens",
+              "operation": "formula",
+              "formula": "sum(openai.embeddings.input_tokens) + sum(openai.completions.input_tokens) + sum(openai.moderations.input_tokens) + sum(openai.completions.output_tokens) + sum(openai.completions.input_audio_tokens) + sum(openai.completions.output_audio_tokens)",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#CA8EAE"
+              }
+            }
+          ]
+        },
+        "id": "5b610f23-eb15-4899-9017-d4b1d59a3d1d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 12,
+          "w": 24,
+          "h": 14
+        },
+        "config": {
+          "type": "xy",
+          "title": "Top 10 usage object types",
+          "description": "Visualization shows the top 10 object types across various data streams where the \"num_model_requests\" field is present. Vector store and code interpreter sessions are excluded from this chart since they do not contain this field.",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is_one_of",
+                "value": [
+                  "openai.code_interpreter_sessions",
+                  "openai.vector_stores"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right",
+            "size": "xl"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Object type",
+                "fields": [
+                  "openai.base.usage_object_type"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Invocations",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.base.num_model_requests",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "id": "59bd0e61-a192-4fa5-83b3-fadb09034595",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 12,
+          "w": 24,
+          "h": 14
+        },
+        "config": {
+          "type": "xy",
+          "title": "Overall invocation rate - by model",
+          "description": "Visualizes request volume over time by model",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right",
+            "size": "xl"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Invocations",
+                  "field": "openai.base.num_model_requests",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "deee2c2d-dec3-490f-9ae8-fd531f7e7740",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 26,
+          "w": 15,
+          "h": 13
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Project IDs",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Invocations",
+              "field": "openai.base.num_model_requests",
+              "empty_as_null": true,
+              "operation": "sum",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Project ID",
+              "fields": [
+                "openai.base.project_id"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "332c7547-2799-4d0c-9f47-1724cb9ddbac",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 15,
+          "y": 26,
+          "w": 18,
+          "h": 13
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 API Key IDs",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Invocations",
+              "field": "openai.base.num_model_requests",
+              "empty_as_null": true,
+              "operation": "sum",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "API Key ID",
+              "fields": [
+                "openai.base.api_key_id"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "61333273-e218-46e0-be13-ba846651e379",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 33,
+          "y": 26,
+          "w": 15,
+          "h": 13
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 User IDs",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "label": "Invocations",
+              "field": "openai.base.num_model_requests",
+              "empty_as_null": true,
+              "operation": "sum",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "User ID",
+              "fields": [
+                "openai.base.user_id"
+              ],
+              "limit": 10,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "4ae3623c-7487-47bb-bef7-546975800d9c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 42,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Token usage - by type",
+          "description": "Visualizes token usage over time, showing input, audio input (including embedding and moderation), cached input, audio output and output tokens to highlight trends in model activity.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is_one_of",
+                "value": [
+                  "openai.completions",
+                  "openai.embeddings",
+                  "openai.moderations"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "total"
+            ],
+            "series_header": {
+              "visible": false
+            },
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right",
+            "size": "xl"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Tokens",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": false
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": true
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input audio tokens",
+                  "field": "openai.completions.input_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input cached tokens",
+                  "field": "openai.completions.input_cached_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens",
+                  "field": "openai.completions.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output audio tokens",
+                  "field": "openai.completions.output_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output tokens",
+                  "field": "openai.completions.output_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (embeddings)",
+                  "field": "openai.embeddings.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (moderations)",
+                  "field": "openai.moderations.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "534fb208-2ddf-462f-9cde-333d7fe99379",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 42,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Overall token usage - by type",
+          "description": "Visualizes overall token usage, showing input (including embedding and moderation), audio input, cached input, audio output and output tokens to highlight the distribution ratio.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is_one_of",
+                "value": [
+                  "openai.completions",
+                  "openai.embeddings",
+                  "openai.moderations"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right",
+            "size": "xl"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "Token type",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Tokens",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": false
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": true
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input audio tokens",
+                  "field": "openai.completions.input_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input cached tokens",
+                  "field": "openai.completions.input_cached_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens",
+                  "field": "openai.completions.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output audio tokens",
+                  "field": "openai.completions.output_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output tokens",
+                  "field": "openai.completions.output_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (embeddings)",
+                  "field": "openai.embeddings.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (moderations)",
+                  "field": "openai.moderations.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "id": "48da5048-3631-4baf-a1ed-d984745f78d2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 57,
+          "w": 48,
+          "h": 16
+        },
+        "config": {
+          "type": "xy",
+          "title": "Token usage - by model",
+          "description": "Visualizes token usage over time and grouped by model, showing input (including embedding and moderation), audio input, cached input, audio output and output tokens to highlight trends in model activity.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is_one_of",
+                "value": [
+                  "openai.completions",
+                  "openai.embeddings",
+                  "openai.moderations"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "total"
+            ],
+            "series_header": {
+              "visible": false
+            },
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Tokens",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": false
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input audio tokens",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.completions\" "
+                  },
+                  "field": "openai.completions.input_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input cached tokens",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.completions\" "
+                  },
+                  "field": "openai.completions.input_cached_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.completions\" "
+                  },
+                  "field": "openai.completions.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output audio tokens",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.completions\" "
+                  },
+                  "field": "openai.completions.output_audio_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Output tokens",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.completions\" "
+                  },
+                  "field": "openai.completions.output_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (embeddings)",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.embeddings\" "
+                  },
+                  "field": "openai.embeddings.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Input tokens (moderations)",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "data_stream.dataset : \"openai.moderations\" "
+                  },
+                  "field": "openai.moderations.input_tokens",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "e0e9b1fc-ae73-4cf7-8f73-90baf8337f15",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 76,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Invocation rate - by model",
+          "description": "Visualizes request volume over time by model",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "27dea502-7bcb-466b-8d50-4dea78307b9b",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.images"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Invocations",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.base.num_model_requests",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "d7884746-198f-450b-90e4-6204de7c1634",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 76,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Images generated - by dimension",
+          "description": "Visualizes images generated over time and broken down by dimension of the generated image.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.images"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Images",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.images.size"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.images.images",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "843baace-4ec5-4254-9e7f-39f7c7ea6d73",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 94,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Invocation rate - by model",
+          "description": "Visualizes request volume over time by model",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "1e0f9983-9110-4925-a91c-e17b3dd5d87d",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.audio_transcriptions"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Invocations",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.base.num_model_requests",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "e6502014-2b10-45a2-8cc1-05f21556eb8e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 94,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Transcribed seconds - by model",
+          "description": "Visualizes transcribed seconds over time, broken down by audio models.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "788b915a-9a0c-46ea-a4ca-d24b6393c356",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.audio_transcriptions"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Transcribed seconds",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.audio_transcriptions.seconds",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "42f5b7f5-a9e2-42ab-91b0-f094bf6355a1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 112,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Invocation rate - by model",
+          "description": "Visualizes request volume over time by model",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "473ddac7-366a-4baf-bb6e-7e1c68a290c6",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.audio_speeches"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Invocations",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.base.num_model_requests",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "189f3a33-8ec3-4f8b-b65b-f84edfa63ad0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 24,
+          "y": 112,
+          "w": 24,
+          "h": 15
+        },
+        "config": {
+          "type": "xy",
+          "title": "Characters synthesized - by model",
+          "description": "Visualizes characters synthesized over time, broken down by tts models.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "9e78dce0-718f-41c9-95ae-c030b9acd33a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "openai.audio_speeches"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "openai.base.model"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Characters synthesized",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "openai.audio_speeches.characters",
+                  "empty_as_null": true,
+                  "operation": "sum",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "5263c7c4-ddee-4f8b-b474-7c7c25cc8b3e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 127,
+          "w": 48,
+          "h": 12
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Rate limit headroom",
+          "description": "Peak 1-minute usage vs. configured rate limits, per project and model. Utilization is usage / limit. Requires bucket_width: 1m; wider buckets will understate the 1-minute peak.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "esql",
+            "query": "FROM logs-openai.*\n| WHERE data_stream.dataset IN (\"openai.rate_limits\", \"openai.completions\", \"openai.embeddings\", \"openai.moderations\", \"openai.audio_speeches\", \"openai.audio_transcriptions\", \"openai.images\")\n| EVAL project_id = COALESCE(openai.rate_limits.project_id, openai.base.project_id)\n// Normalize dated model snapshots (e.g. gpt-image-1-2025-04-23, omni-moderation-2024-09-26)\n// to their base family by stripping a trailing -YYYY-MM-DD. OpenAI's usage API reports per\n// dated snapshot, while rate_limits often lists only the base name, so without this the usage\n// row finds no matching limit and is dropped from the headroom join.\n| EVAL model = REPLACE(COALESCE(openai.rate_limits.model, openai.base.model), \"-[0-9]{4}-[0-9]{2}-[0-9]{2}$\", \"\")\n// Every usage stream carries num_model_requests (RPM), but only completions/embeddings/moderations\n// carry tokens and only the images stream carries an image count. usage_tokens and usage_images are\n// normalized and COALESCEd to 0, so each stream contributes only to the dimensions it reports without\n// inflating the others, and the panel still resolves when a usage stream has no data.\n| EVAL usage_tokens = COALESCE(openai.base.usage_tokens, 0)\n| EVAL usage_images = COALESCE(openai.base.usage_images, 0)\n| STATS\n    tpm_used_minute = SUM(usage_tokens),\n    rpm_used_minute = SUM(openai.base.num_model_requests),\n    ipm_used_minute = SUM(usage_images),\n    tpm_limit = MAX(openai.rate_limits.max_tokens_per_1_minute),\n    rpm_limit = MAX(openai.rate_limits.max_requests_per_1_minute),\n    ipm_limit = MAX(openai.rate_limits.max_images_per_1_minute)\n  BY project_id, model, minute = BUCKET(@timestamp, 1 minute)\n| STATS\n    tpm_used = MAX(tpm_used_minute), rpm_used = MAX(rpm_used_minute), ipm_used = MAX(ipm_used_minute),\n    tpm_limit = MAX(tpm_limit), rpm_limit = MAX(rpm_limit), ipm_limit = MAX(ipm_limit)\n  BY project_id, model\n| WHERE tpm_limit IS NOT NULL OR rpm_limit IS NOT NULL OR ipm_limit IS NOT NULL\n// TO_DOUBLE avoids integer division (otherwise utilization is always 0 until usage exceeds the limit)\n| EVAL tpm_utilization = CASE(tpm_limit > 0, TO_DOUBLE(tpm_used) / tpm_limit, null)\n| EVAL rpm_utilization = CASE(rpm_limit > 0, TO_DOUBLE(rpm_used) / rpm_limit, null)\n| EVAL ipm_utilization = CASE(ipm_limit > 0, TO_DOUBLE(ipm_used) / ipm_limit, null)\n// Push models with no usage (infinite headroom, not actionable) to the bottom,\n// then rank by TPM utilization first (the dimension the headroom alert tracks),\n// with RPM and image utilization, then absolute tokens, as tie-breakers.\n| EVAL has_usage = CASE(COALESCE(tpm_used, 0) > 0 OR COALESCE(rpm_used, 0) > 0 OR COALESCE(ipm_used, 0) > 0, 1, 0)\n| SORT has_usage DESC, COALESCE(tpm_utilization, -1) DESC, COALESCE(rpm_utilization, -1) DESC, COALESCE(ipm_utilization, -1) DESC, tpm_used DESC\n| KEEP project_id, model, rpm_used, rpm_limit, rpm_utilization, tpm_used, tpm_limit, tpm_utilization, ipm_used, ipm_limit, ipm_utilization\n| LIMIT 100"
+          },
+          "metrics": [
+            {
+              "column": "rpm_used",
+              "label": "RPM used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "rpm_limit",
+              "label": "RPM limit",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "rpm_utilization",
+              "label": "RPM utilization",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_used",
+              "label": "TPM used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_limit",
+              "label": "TPM limit",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_utilization",
+              "label": "TPM utilization",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_used",
+              "label": "Images used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_limit",
+              "label": "Images limit",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_utilization",
+              "label": "Images utilization",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "column": "project_id",
+              "label": "Project ID",
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "column": "model",
+              "label": "Model",
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "6ae47bf0-c265-4809-87bc-8e410535dc7c",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "x": 0,
+          "y": 139,
+          "w": 48,
+          "h": 12
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Rate limit headroom - by model (org-wide)",
+          "description": "Org-wide rollup of peak 1-minute usage by model across all active projects. Usage is summed across projects; the limit columns are a synthetic aggregate (sum of per-project limits) and are NOT a real throttle boundary - OpenAI enforces limits per project - so utilization is indicative only. Requires bucket_width: 1m; wider buckets will understate the 1-minute peak.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "esql",
+            "query": "FROM logs-openai.*\n| WHERE data_stream.dataset IN (\"openai.rate_limits\", \"openai.completions\", \"openai.embeddings\", \"openai.moderations\", \"openai.audio_speeches\", \"openai.audio_transcriptions\", \"openai.images\")\n| EVAL project_id = COALESCE(openai.rate_limits.project_id, openai.base.project_id)\n// Normalize dated model snapshots (e.g. gpt-image-1-2025-04-23, omni-moderation-2024-09-26)\n// to their base family by stripping a trailing -YYYY-MM-DD. OpenAI's usage API reports per\n// dated snapshot, while rate_limits often lists only the base name, so without this the usage\n// row finds no matching limit and is dropped from the headroom join.\n| EVAL model = REPLACE(COALESCE(openai.rate_limits.model, openai.base.model), \"-[0-9]{4}-[0-9]{2}-[0-9]{2}$\", \"\")\n// Org-wide rollup by model across projects. Limits are first stabilized per project/model as the\n// MAX snapshot over the look-back window, then summed across projects into a synthetic aggregate\n// capacity -- stabilizing before the cross-project sum keeps the denominator independent of which\n// minute each project's rate_limits snapshot happened to land in. Usage is each project's peak\n// minute, summed across projects. This is NOT a real org throttle boundary (OpenAI enforces limits\n// per project), so the aggregate utilization here is indicative, not an exact throttle distance.\n| EVAL usage_tokens = COALESCE(openai.base.usage_tokens, 0)\n| EVAL usage_images = COALESCE(openai.base.usage_images, 0)\n| STATS\n    tpm_used_minute = SUM(usage_tokens),\n    rpm_used_minute = SUM(openai.base.num_model_requests),\n    ipm_used_minute = SUM(usage_images),\n    tpm_limit = MAX(openai.rate_limits.max_tokens_per_1_minute),\n    rpm_limit = MAX(openai.rate_limits.max_requests_per_1_minute),\n    ipm_limit = MAX(openai.rate_limits.max_images_per_1_minute)\n  BY project_id, model, minute = BUCKET(@timestamp, 1 minute)\n| STATS\n    tpm_used = MAX(tpm_used_minute), rpm_used = MAX(rpm_used_minute), ipm_used = MAX(ipm_used_minute),\n    tpm_limit = MAX(tpm_limit), rpm_limit = MAX(rpm_limit), ipm_limit = MAX(ipm_limit)\n  BY project_id, model\n| STATS\n    tpm_used = SUM(tpm_used), rpm_used = SUM(rpm_used), ipm_used = SUM(ipm_used),\n    tpm_limit = SUM(tpm_limit), rpm_limit = SUM(rpm_limit), ipm_limit = SUM(ipm_limit)\n  BY model\n| WHERE tpm_limit IS NOT NULL OR rpm_limit IS NOT NULL OR ipm_limit IS NOT NULL\n// TO_DOUBLE avoids integer division (otherwise utilization is always 0 until usage exceeds the limit)\n| EVAL tpm_utilization = CASE(tpm_limit > 0, TO_DOUBLE(tpm_used) / tpm_limit, null)\n| EVAL rpm_utilization = CASE(rpm_limit > 0, TO_DOUBLE(rpm_used) / rpm_limit, null)\n| EVAL ipm_utilization = CASE(ipm_limit > 0, TO_DOUBLE(ipm_used) / ipm_limit, null)\n// Push models with no usage (infinite headroom, not actionable) to the bottom,\n// then rank by TPM utilization first (the dimension the headroom alert tracks),\n// with RPM and image utilization, then absolute tokens, as tie-breakers.\n| EVAL has_usage = CASE(COALESCE(tpm_used, 0) > 0 OR COALESCE(rpm_used, 0) > 0 OR COALESCE(ipm_used, 0) > 0, 1, 0)\n| SORT has_usage DESC, COALESCE(tpm_utilization, -1) DESC, COALESCE(rpm_utilization, -1) DESC, COALESCE(ipm_utilization, -1) DESC, tpm_used DESC\n| KEEP model, rpm_used, rpm_limit, rpm_utilization, tpm_used, tpm_limit, tpm_utilization, ipm_used, ipm_limit, ipm_utilization\n| LIMIT 100"
+          },
+          "metrics": [
+            {
+              "column": "rpm_used",
+              "label": "RPM used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "rpm_limit",
+              "label": "RPM limit (aggregate)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "rpm_utilization",
+              "label": "RPM utilization (approx.)",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_used",
+              "label": "TPM used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_limit",
+              "label": "TPM limit (aggregate)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "tpm_utilization",
+              "label": "TPM utilization (approx.)",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_used",
+              "label": "Images used (peak)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_limit",
+              "label": "Images limit (aggregate)",
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "column": "ipm_utilization",
+              "label": "Images utilization (approx.)",
+              "format": {
+                "type": "percent",
+                "decimals": 1,
+                "compact": false
+              },
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "column": "model",
+              "label": "Model",
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "f7351fee-5c28-40ec-ba72-f10078f93457",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-13T17:51:07.523Z",
+    "managed": true,
+    "updated_at": "2026-08-17T20:17:53.317Z",
+    "version": "WzUzNiwxXQ=="
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "agentless@settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true"
+        }
+      }
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default settings for the agentless index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,1172 @@
+{
+  "id": "azure-87095750-f05a-11e9-90ec-112a988266d5",
+  "data": {
+    "description": "This dashboard shows expanded user activity in Azure cloud.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-azure-default"
+    ],
+    "title": "[Logs Azure] User Activity",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "azure.activitylogs"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 19,
+          "w": 13,
+          "x": 11,
+          "y": 0
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Caller IP",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "custom",
+                  "max_lines": 3
+                },
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            },
+            "paging": 10
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Caller IP",
+              "fields": [
+                "source.ip"
+              ],
+              "limit": 100,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Country",
+              "fields": [
+                "geo.country_name"
+              ],
+              "limit": 100,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Email",
+              "fields": [
+                "azure.activitylogs.identity.claims_initiated_by_user.name"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "alphabetical",
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "5774219c-fb45-4480-bdfb-75a69bdc2cfe",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 0
+        },
+        "config": {
+          "type": "xy",
+          "title": "User Activity Overview",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.event_category",
+                "operator": "is",
+                "value": "Administrative"
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": true
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar",
+              "y": [
+                {
+                  "label": "Actions",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "@timestamp",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "97001cce-7254-443e-a12f-69b13fbd4811",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 11,
+          "x": 0,
+          "y": 4
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Users List",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "custom",
+                  "max_lines": 3
+                },
+                "value": {
+                  "type": "custom",
+                  "lines": 1
+                }
+              }
+            },
+            "paging": 10
+          },
+          "metrics": [
+            {
+              "label": "IPs",
+              "field": "source.ip",
+              "empty_as_null": true,
+              "operation": "unique_count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            },
+            {
+              "label": "Actions",
+              "empty_as_null": true,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Email",
+              "fields": [
+                "azure.activitylogs.identity.claims_initiated_by_user.name"
+              ],
+              "limit": 20,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 1,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Name",
+              "fields": [
+                "azure.activitylogs.identity.claims_initiated_by_user.fullname"
+              ],
+              "limit": 5,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 1,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d4d708e1-d179-4688-8005-54e2162a82d2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 24,
+          "x": 24,
+          "y": 9
+        },
+        "config": {
+          "type": "xy",
+          "title": "Authorization Activity User",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "hidden",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "azure.activitylogs.operation_name : *LISTKEYS*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "area",
+              "y": [
+                {
+                  "label": "Success",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "azure.activitylogs.result_type : \"Success\""
+                  },
+                  "field": "@timestamp",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Fail",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "azure.activitylogs.result_type : \"Fail\""
+                  },
+                  "field": "@timestamp",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "static",
+                    "color": "#d36086"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "73dbda75-6315-4152-824d-9536650af773",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 24,
+          "x": 0,
+          "y": 19
+        },
+        "config": {
+          "type": "xy",
+          "title": "Top Resource Groups",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "hidden",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": false
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "angled"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal",
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Resource Groups",
+                "fields": [
+                  "azure.resource.group"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "2fa13b32-c544-45f7-9132-620d09d121eb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 24,
+          "x": 24,
+          "y": 19
+        },
+        "config": {
+          "type": "pie",
+          "title": "Resource Type Breakdown",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "size": "auto",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": false
+            }
+          },
+          "metrics": [
+            {
+              "label": "Count",
+              "empty_as_null": true,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "azure.resource.provider: Descending",
+              "fields": [
+                "azure.resource.provider"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "LEGACY_PALETTE_kibana_palette",
+                "mapping": []
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "84583e62-1aad-4f03-a25a-c4f9eaace8c0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 24,
+          "x": 0,
+          "y": 33
+        },
+        "config": {
+          "type": "xy",
+          "title": "Resource Creations ",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": false
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "angled"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Creations",
+                "fields": [
+                  "azure.activitylogs.identity.authorization.action"
+                ],
+                "limit": 15,
+                "includes": {
+                  "values": [
+                    ".*write"
+                  ],
+                  "as_regex": true
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_kibana_palette",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Resource type",
+                "fields": [
+                  "azure.resource.provider"
+                ],
+                "limit": 15,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "1a6dce1d-d039-4d18-87c7-1b700da676c2",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 13,
+          "w": 24,
+          "x": 24,
+          "y": 33
+        },
+        "config": {
+          "type": "xy",
+          "title": "Resource Deletions",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "auto"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Count",
+                "visible": true
+              },
+              "ticks": {
+                "visible": false
+              },
+              "grid": {
+                "visible": false
+              },
+              "labels": {
+                "orientation": "angled"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_horizontal",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Deletions",
+                "fields": [
+                  "azure.activitylogs.identity.authorization.action"
+                ],
+                "limit": 15,
+                "includes": {
+                  "values": [
+                    ".*delete"
+                  ],
+                  "as_regex": true
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "LEGACY_PALETTE_kibana_palette",
+                  "mapping": []
+                }
+              },
+              "y": [
+                {
+                  "label": "Count",
+                  "empty_as_null": true,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "terms",
+                "label": "Resource type",
+                "fields": [
+                  "azure.resource.provider"
+                ],
+                "limit": 15,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                }
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "8fddd3bb-c1e6-4533-b075-1ab7361b3af0",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "705596b5-db2e-4c45-875d-95d98bfb7ee8",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Subscription",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "azure.subscription_id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "0e37b08b-1efb-4ee3-9708-575ca3ac8af9",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "User email",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "azure.activitylogs.identity.claims_initiated_by_user.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:46.871Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:48.454Z",
+    "version": "WzIyMywxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 10,
+            "markdown": "### Azure Monitoring\n\n[Overview](#/dashboard/azure-41e84340-ec20-11e9-90ec-112a988266d5) | [**Users**](#/dashboard/azure-87095750-f05a-11e9-90ec-112a988266d5) | [Alerts](#/dashboard/azure-0f559cc0-f0d5-11e9-90ec-112a988266d5) ",
+            "openLinksInNewTab": false
+          },
+          "title": "Navigation Users [Logs Azure]",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Navigation Users"
+      }
+    }
+  ]
+}

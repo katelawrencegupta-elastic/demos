@@ -19,6 +19,10 @@ from client import (  # noqa: E402
     DATA_VIEW_ID,
     DATA_VIEW_NAME,
     DATA_VIEW_TITLE,
+    METRICS_DASHBOARD_ID,
+    METRICS_DASHBOARD_TITLE,
+    TRACES_DASHBOARD_ID,
+    TRACES_DASHBOARD_TITLE,
     kibana_request,
     kibana_url,
 )
@@ -86,6 +90,12 @@ def main() -> None:
 
     compare = upsert_dashboard(COMPARE_DASHBOARD_ID, "dashboard-agents-vs-edot.json")
     _print_dashboard(compare, COMPARE_DASHBOARD_ID, COMPARE_DASHBOARD_TITLE)
+
+    metrics = upsert_dashboard(METRICS_DASHBOARD_ID, "dashboard-metrics.json")
+    _print_dashboard(metrics, METRICS_DASHBOARD_ID, METRICS_DASHBOARD_TITLE)
+
+    traces = upsert_dashboard(TRACES_DASHBOARD_ID, "dashboard-traces.json")
+    _print_dashboard(traces, TRACES_DASHBOARD_ID, TRACES_DASHBOARD_TITLE)
 
 
 if __name__ == "__main__":

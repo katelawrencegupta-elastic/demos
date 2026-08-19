@@ -1,0 +1,53 @@
+{
+  "name": "metrics-aws_bedrock.guardrails",
+  "index_template": {
+    "index_patterns": [
+      "metrics-aws_bedrock.guardrails-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "aws_bedrock"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-aws_bedrock.guardrails@package",
+      "metrics@custom",
+      "aws_bedrock@custom",
+      "metrics-aws_bedrock.guardrails@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "aws_bedrock"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "aws_bedrock@custom",
+      "metrics-aws_bedrock.guardrails@custom"
+    ],
+    "created_date_millis": 1786643492733,
+    "modified_date_millis": 1786643492733
+  }
+}

@@ -1,0 +1,408 @@
+{
+  "name": "logs-azure.signinlogs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure.signinlogs-1.38.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "geo": {
+            "properties": {
+              "continent_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "city_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_iso_code": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "country_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "location": {
+                "type": "geo_point"
+              },
+              "region_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "related": {
+            "properties": {
+              "entity": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "azure"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "azure.signinlogs"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "tenant_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "signinlogs": {
+                "properties": {
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tenant_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_description": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "identity": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "caller_ip_address": {
+                    "type": "ip"
+                  },
+                  "result_signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "properties": {
+                    "properties": {
+                      "risk_level_aggregated": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_tenant_restricted": {
+                        "type": "boolean"
+                      },
+                      "risk_event_types": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authentication_requirement_policies": {
+                        "type": "flattened"
+                      },
+                      "sso_extension_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_app_used": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_tenant_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "applied_conditional_access_policies": {
+                        "type": "flattened"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "risk_level_during_signin": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authentication_protocol": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "token_issuer_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "original_request_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "conditional_access_status": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authentication_details": {
+                        "type": "flattened"
+                      },
+                      "authentication_requirement": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "app_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "network_location_details": {
+                        "type": "flattened"
+                      },
+                      "service_principal_credential_key_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "risk_event_types_v2": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_interactive": {
+                        "type": "boolean"
+                      },
+                      "flagged_for_review": {
+                        "type": "boolean"
+                      },
+                      "service_principal_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "app_display_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "home_tenant_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authentication_processing_details": {
+                        "type": "flattened"
+                      },
+                      "device_detail": {
+                        "properties": {
+                          "device_id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "browser": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "operating_system": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "is_compliant": {
+                            "type": "boolean"
+                          },
+                          "trust_type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "display_name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "is_managed": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "risk_detail": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "autonomous_system_number": {
+                        "type": "long"
+                      },
+                      "token_issuer_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_display_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "risk_state": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "incoming_token_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "cross_tenant_access_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_principal_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "processing_time_ms": {
+                        "type": "float"
+                      },
+                      "user_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "correlation_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "service_principal_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_display_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "unique_token_identifier": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "status": {
+                        "properties": {
+                          "error_code": {
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "authorization_rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "correlation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,1027 @@
+{
+  "name": "logs-anthropic.audit@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-anthropic.audit-1.1.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "source": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "continent_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "region_iso_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "city_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "country_iso_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "country_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "location": {
+                    "type": "geo_point"
+                  },
+                  "region_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "as": {
+                "properties": {
+                  "number": {
+                    "type": "long"
+                  },
+                  "organization": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword",
+                        "fields": {
+                          "text": {
+                            "type": "match_only_text"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "ip": {
+                "type": "ip"
+              }
+            }
+          },
+          "error": {
+            "properties": {
+              "message": {
+                "type": "match_only_text"
+              }
+            }
+          },
+          "url": {
+            "properties": {
+              "path": {
+                "ignore_above": 1024,
+                "type": "wildcard"
+              },
+              "original": {
+                "ignore_above": 1024,
+                "type": "wildcard",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              },
+              "scheme": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "domain": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "query": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "full": {
+                "ignore_above": 1024,
+                "type": "wildcard",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              }
+            }
+          },
+          "tags": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "file": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "ecs": {
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "related": {
+            "properties": {
+              "hosts": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "ip": {
+                "type": "ip"
+              },
+              "user": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "organization": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "anthropic": {
+            "properties": {
+              "audit": {
+                "properties": {
+                  "marketplace_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_collection_method": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_artifact_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model_group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "to_email_count": {
+                    "type": "long"
+                  },
+                  "metadata": {
+                    "type": "flattened"
+                  },
+                  "artifact_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "baa_content_hash": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "magic_link_toggled": {
+                    "type": "boolean"
+                  },
+                  "preview_only": {
+                    "type": "boolean"
+                  },
+                  "organization_uuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "setting_metadata": {
+                    "type": "flattened"
+                  },
+                  "mfa_method": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "integration_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_signing_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "workspace_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "access_level": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "approved": {
+                    "type": "boolean"
+                  },
+                  "token_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "token_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "compliance_api_logging_enabled": {
+                    "type": "boolean"
+                  },
+                  "key_backing_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "repository_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "algorithm": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "extension_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "audience": {
+                    "type": "flattened"
+                  },
+                  "key_group_identifier": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "setup_guide_content_hash": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "entity_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "api_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "spend_limit_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "command_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "seat_count": {
+                    "type": "long"
+                  },
+                  "mcp_server_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "config_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "spend_limit_increase_request_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "domain": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_file_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ghe_configuration_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resync_uuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "plugin_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "integration_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "invited_role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "installation_preference": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "cc_email_count": {
+                    "type": "long"
+                  },
+                  "op_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "api_key_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "is_enabled": {
+                    "type": "boolean"
+                  },
+                  "lti_platform_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "lti_platform_issuer": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "magic_link_enabled": {
+                    "type": "boolean"
+                  },
+                  "scans_cancelled": {
+                    "type": "long"
+                  },
+                  "connection_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "decision": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_artifact_version_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "command_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "session_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "plugin_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "consent_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "current_value": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "actor": {
+                    "properties": {
+                      "idp_connection_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "admin_api_key_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "workos_event_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "directory_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "api_key_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "entity_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resolved_count": {
+                    "type": "long"
+                  },
+                  "webhook_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "connection_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "added_seats": {
+                    "type": "long"
+                  },
+                  "primary_email_set": {
+                    "type": "boolean"
+                  },
+                  "skill_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resource_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "skill_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "scopes": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_plan": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "signing_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "limit_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "target_amount": {
+                    "type": "long"
+                  },
+                  "environment_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "limit_action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "member_ids": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_published_artifact_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "principal_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "previous_owner_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "billing_name_updated": {
+                    "type": "boolean"
+                  },
+                  "threshold_amount": {
+                    "type": "long"
+                  },
+                  "role_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "per_review_limit_usd": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "old_plan": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "cli_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "alerted_roles": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "limiter_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "invite_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "previous_role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "alert_emails": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "sync_destinations": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resource_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "settings_uuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "trigger_mode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "cadence": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "key_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "role_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "auth_method": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "shipping_name_updated": {
+                    "type": "boolean"
+                  },
+                  "github_webhook_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "idp_saml_config_updated": {
+                    "type": "boolean"
+                  },
+                  "org_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "file_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "baa_version_label": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "consent_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "scan_project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "federation_rule_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "federation_issuer_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "plan_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "billing_interval": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_quantity": {
+                    "type": "long"
+                  },
+                  "shipping_address_updated": {
+                    "type": "boolean"
+                  },
+                  "title": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "updates": {
+                    "type": "flattened"
+                  },
+                  "claude_project_document_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "old_signing_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "share_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_limit_usd": {
+                    "type": "long"
+                  },
+                  "mcp_server_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "to_date": {
+                    "type": "date"
+                  },
+                  "previous_version": {
+                    "type": "long"
+                  },
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "max_permission": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ignore": {
+                    "type": "boolean"
+                  },
+                  "item_allocations": {
+                    "type": "flattened"
+                  },
+                  "repo_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "principal_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "repo_owner": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "value": {
+                    "type": "long"
+                  },
+                  "new_owner_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "billing_address_updated": {
+                    "type": "boolean"
+                  },
+                  "tool_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "amount": {
+                    "type": "long"
+                  },
+                  "from_date": {
+                    "type": "date"
+                  },
+                  "compliance_api_enabled": {
+                    "type": "boolean"
+                  },
+                  "previous_value": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "target_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "current_version": {
+                    "type": "long"
+                  },
+                  "target_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "is_service_created": {
+                    "type": "boolean"
+                  },
+                  "claude_chat_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "claude_chat_snapshot_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "current_role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "previous_mode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "taint": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_body": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "previous_quantity": {
+                    "type": "long"
+                  },
+                  "group_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "new_mode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "admin_api_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "folder_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "limit_usd": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          },
+          "http": {
+            "properties": {
+              "request": {
+                "properties": {
+                  "method": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "response": {
+                "properties": {
+                  "status_code": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "reason": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "original": {
+                "index": false,
+                "type": "keyword",
+                "doc_values": false
+              },
+              "kind": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "module": {
+                "type": "constant_keyword",
+                "value": "anthropic"
+              },
+              "action": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "category": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "anthropic.audit"
+              },
+              "outcome": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "user": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "email": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "target": {
+                "properties": {
+                  "roles": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "email": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "user_agent": {
+            "properties": {
+              "original": {
+                "ignore_above": 1024,
+                "type": "keyword",
+                "fields": {
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              },
+              "os": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "match_only_text"
+                      }
+                    }
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "device": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "anthropic"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

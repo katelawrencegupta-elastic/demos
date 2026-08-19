@@ -1,0 +1,1864 @@
+{
+  "id": "elastic_agent-ddcc3240-6081-11f0-89d2-bb7ceae5af7f",
+  "data": {
+    "description": "",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-elastic_agent-default"
+    ],
+    "title": "[Elastic Agent] Google Cloud Storage Input Metrics",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 14,
+          "w": 7,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "hide_title": true,
+          "title": "Navigation",
+          "links": [
+            {
+              "label": "Overview",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a148dc70-6b3c-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Concerning Agents",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Agent Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f47f18cc-9c7d-4278-b2ea-a6dee816d395",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Integrations",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Input Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a8192f90-cd3f-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "03d1bd4a-8e9f-4201-bde8-8a89dcb92b49",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 24,
+          "w": 7,
+          "x": 0,
+          "y": 14
+        },
+        "config": {
+          "hide_title": false,
+          "title": "Inputs",
+          "links": [
+            {
+              "label": "Azure Blob Storage",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-3718c2f0-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Azure Eventhub",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0f79f070-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "CEL",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f16b4870-9811-11ee-80a4-550241a842c0",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "CloudWatch",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a7b5e7a0-cd44-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Entity Analytics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-02117980-6082-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "ETW",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f704cce0-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Filestream",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ea44c820-95cb-11ee-b517-0550321b54cc",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "GCP Pub/Sub",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ea7a59e0-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Google Cloud Storage",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-ddcc3240-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "HTTP Endpoint",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-7986a100-9817-11ee-80a4-550241a842c0",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "HTTP JSON",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-92846340-95ab-11ee-8ec1-093013efb0e3",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Lumberjack",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-077f7390-6087-11f0-b451-cd284a6efe62",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "S3",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-77cdb1c0-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Streaming",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-b7719f90-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "TCP",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-7d110ba0-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "UDP",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-87ad4330-cd45-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Unified Logs",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-9eab2fa0-5e7c-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Unix",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-86203230-6081-11f0-89d2-bb7ceae5af7f",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Winlog",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1badd650-d136-11ed-b85f-4be0157fc90c",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "03d1bd4a-8e9f-4201-bde8-8a89dcb92b49-inputs",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 7,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Errors",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.errors_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "b3e1d26b-499a-48e2-b464-f755b1a3d4c3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 14,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Decode Errors",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.decode_errors_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "62fab767-b630-4c60-b1e4-d2c915f37df0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 21,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Failed Jobs",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_failed_jobs_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "16166e6f-fff2-43f1-9a36-557eb134483e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 28,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Expired Failed Jobs",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_expired_failed_jobs_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "207b984b-daba-4f2c-a78f-d47584302321",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 35,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 0
+              },
+              "label": "Bytes Processed",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_bytes_processed_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "9e1e1055-edbb-40bd-8408-092605334fbb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 6,
+          "x": 42,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Events Created",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_events_created_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "74e26cd1-5ec7-4d6a-b692-cb953c333281",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 9,
+          "x": 7,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Objects Listed",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_objects_listed_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "961279a2-ee35-4804-98b5-d0195d017297",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 9,
+          "x": 16,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Objects Requested",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_objects_requested_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "4909423a-6e1b-490b-84dd-42f5d0395f91",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 9,
+          "x": 25,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Objects Published",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_objects_published_total)",
+              "type": "primary",
+              "subtitle": "Since last restart",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "08178633-48d0-40d5-a8ea-7e9497fe2a5b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 34,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Objects Tracked",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_objects_tracked_gauge)",
+              "type": "primary",
+              "subtitle": "Last value",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "e94766bd-8745-4a0d-a26b-4141d71768f4",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 41,
+          "y": 6
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e1320433-7767-4032-a6e6-69174703629a",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Objects In Flight",
+              "operation": "formula",
+              "formula": "last_value(filebeat_input.gcs_objects_inflight_gauge)",
+              "type": "primary",
+              "subtitle": "Last value",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "360f0e85-e625-4f4f-8918-ecfa0b017cd0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 41,
+          "x": 7,
+          "y": 12
+        },
+        "config": {
+          "type": "data_table",
+          "title": "URL (Last Value)",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "metrics": [
+            {
+              "label": "URL (Last Value)",
+              "filter": {
+                "language": "kql",
+                "expression": "\"filebeat_input.url\": *"
+              },
+              "field": "filebeat_input.url",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "left"
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "9c9edef1-10ba-46c9-bf0f-4fc3bd4d410e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 14,
+          "x": 7,
+          "y": 16
+        },
+        "config": {
+          "type": "xy",
+          "title": "Jobs Scheduled After Validation",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "85726769-4d8f-4225-a5be-259ada6ca046",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "inside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            }
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Jobs",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Mean",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_jobs_scheduled_after_validation.histogram.mean)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_jobs_scheduled_after_validation.histogram.p99)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "22c2e30f-e525-44e7-a55e-81a640f0d1bd",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 13,
+          "x": 21,
+          "y": 16
+        },
+        "config": {
+          "type": "xy",
+          "title": "Object Size",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "85726769-4d8f-4225-a5be-259ada6ca046",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "inside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            }
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Size",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 0
+                  },
+                  "label": "Mean",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_object_size_in_bytes.histogram.mean)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 0
+                  },
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_object_size_in_bytes.histogram.p99)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b391d772-22c6-4a72-a285-ab6fe3e9c7ed",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 14,
+          "x": 34,
+          "y": 16
+        },
+        "config": {
+          "type": "xy",
+          "title": "Event per Object",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "85726769-4d8f-4225-a5be-259ada6ca046",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "inside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            }
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Events",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Mean",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_events_per_object.histogram.mean)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_events_per_object.histogram.p99)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b6031371-56fc-4183-9cab-df9868901d79",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 21,
+          "x": 7,
+          "y": 28
+        },
+        "config": {
+          "type": "xy",
+          "title": "Object Processing Time",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "85726769-4d8f-4225-a5be-259ada6ca046",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "inside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            }
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Time in Milliseconds",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "label": "Mean",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_object_processing_time.histogram.mean)/1000000",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.gcs_object_processing_time.histogram.p99)/1000000",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "c7e6708c-3d9b-47ad-bf59-fc7b0aea107f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 20,
+          "x": 28,
+          "y": 28
+        },
+        "config": {
+          "type": "xy",
+          "title": "Source Lag Time",
+          "description": "Histogram of the time between the source (Updated) timestamp and the time the object was read.",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "85726769-4d8f-4225-a5be-259ada6ca046",
+              "type": "condition",
+              "condition": {
+                "field": "filebeat_input.input",
+                "operator": "is",
+                "value": "gcs"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "inside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            }
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Time in Milliseconds",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Mean",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.source_lag_time.histogram.mean)/1000000",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "99th Percentile",
+                  "operation": "formula",
+                  "formula": "median(filebeat_input.source_lag_time.histogram.p99)/1000000",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": " ",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "9e564cb9-8aef-4627-9e0d-03d9194d7c2b",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "a53b9457-c9e8-4f8b-b112-0804e639889d",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Agent Name",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "agent.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "4c298463-b7a5-4e36-9259-852bf2251a49",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Input ID",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "filebeat_input.id",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "wildcard",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.890Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.183Z",
+    "version": "WzM4MCwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Overview**\n\nThis dashboards is used to monitor and troubleshoot ingest performance from integrations.  \n\n**For the best experience, filter on the specific Agent of interest and its related Input ID to visualize the metrics correctly.**\n\n**This dashboard requires that \"Collect Agent Metrics\" are configured on the relevant Elastic Agent policy.**",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "hide_title": true
+      }
+    }
+  ]
+}

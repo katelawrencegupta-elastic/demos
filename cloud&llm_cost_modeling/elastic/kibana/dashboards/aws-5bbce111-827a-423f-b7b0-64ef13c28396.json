@@ -1,0 +1,660 @@
+{
+  "id": "aws-5bbce111-827a-423f-b7b0-64ef13c28396",
+  "data": {
+    "description": "Overview of Config Findings.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "refresh_interval": {
+      "pause": true,
+      "value": 60000
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default"
+    ],
+    "time_range": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "title": "[Logs AWS] Config",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.config"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 11,
+          "w": 9,
+          "x": 39,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Total Active Rules [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Active Rules",
+              "field": "rule.uuid",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "7edcdad0-e26b-4e1e-90c6-5fdc409784a9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 9,
+          "x": 30,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Total Resource Evalutions [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Resources",
+              "field": "resource.id",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#6092C0"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "233484fe-7de1-45bc-a223-1892195615ce",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 9,
+          "x": 21,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Total Non-Compliant Resources [Logs AWS]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "logs-*",
+              "type": "condition",
+              "condition": {
+                "field": "result.evaluation",
+                "operator": "is",
+                "value": "NON_COMPLIANT"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Non-Compliant Resources",
+              "empty_as_null": false,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#CC5642"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "8f34e93d-7551-4fef-9b73-d95e60d60597",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 11,
+          "w": 9,
+          "x": 12,
+          "y": 0
+        },
+        "config": {
+          "type": "metric",
+          "title": "Total Compliant Resources [Logs AWS]",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "48c08233-c2d5-4383-86cc-e5ef30d79bb7",
+              "type": "condition",
+              "condition": {
+                "field": "result.evaluation",
+                "operator": "is",
+                "value": "COMPLIANT"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Total Compliant Resources",
+              "empty_as_null": false,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#54B399"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "a0c00725-95af-46e5-ba60-8bbd5716f113",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 15,
+          "w": 36,
+          "x": 12,
+          "y": 11
+        },
+        "config": {
+          "type": "xy",
+          "title": "Resources Evaluation over Time [Logs AWS]",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": false
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Count",
+                  "empty_as_null": false,
+                  "operation": "count",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "label": "Config Rule Invoked Time",
+                "field": "aws.config.config_rule_invoked_time",
+                "suggested_interval": "d",
+                "use_original_time_range": true,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ]
+        },
+        "id": "7a9e042e-b539-47ec-90b2-c9bd4fed1df1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 15,
+          "x": 0,
+          "y": 26
+        },
+        "config": {
+          "type": "pie",
+          "title": "Resources by Compliance Type [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "legend": {
+            "nested": false,
+            "truncate_after_lines": 1,
+            "visibility": "visible",
+            "position": "right"
+          },
+          "styling": {
+            "values": {
+              "visible": true,
+              "mode": "percentage",
+              "percent_decimals": 2
+            },
+            "labels": {
+              "visible": true,
+              "position": "outside"
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Count",
+              "empty_as_null": false,
+              "operation": "count",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "group_by": [
+            {
+              "operation": "terms",
+              "label": "Compliance Type",
+              "fields": [
+                "result.evaluation"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "color": {
+                "mode": "categorical",
+                "palette": "eui_amsterdam_color_blind",
+                "mapping": []
+              }
+            }
+          ]
+        },
+        "id": "5f474e90-bf85-47ab-84ba-efc9c05caaf5",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 22,
+          "w": 48,
+          "x": 0,
+          "y": 42
+        },
+        "config": {
+          "description": "",
+          "title": "Resources Essential Details [Logs AWS]",
+          "ref_id": "aws-17869325-12bc-4aa7-b3c0-be47a448472f",
+          "overrides": {}
+        },
+        "id": "beba8dd3-cc18-4c46-9317-4a89eafbc0fe",
+        "type": "discover_session"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 17,
+          "x": 15,
+          "y": 26
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Resources by Config Rules [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Number of Rules",
+              "field": "rule.uuid",
+              "empty_as_null": false,
+              "operation": "unique_count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Resources ID",
+              "fields": [
+                "resource.id"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "width": 248.33333333333337,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            },
+            {
+              "operation": "terms",
+              "label": "Resources Type",
+              "fields": [
+                "resource.type"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "8b381dab-a710-4533-83ed-2ac992502ba9",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 16,
+          "x": 32,
+          "y": 26
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Top 10 Config Rules by Resources [Logs AWS]",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Number of Resources",
+              "field": "resource.id",
+              "empty_as_null": false,
+              "operation": "count",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Rule Name",
+              "fields": [
+                "rule.name"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ]
+        },
+        "id": "c7817d63-7ad9-470f-ace4-9b81b2e90eba",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:21.831Z",
+    "version": "WzkyLDFd"
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Overview**\n\nThis dashboard provides an overview of AWS Config rule evaluations, enabling security and compliance teams to monitor resource configurations across their AWS environment. It highlights the most active and non-compliant rules, helping teams quickly identify potential misconfigurations and prioritize remediation efforts.\n\nVisualizations display key metrics such as total compliant and non-compliant resources, active rules, and total resources. Additional charts show resource compliance trends over time and breakdowns by rule name and compliance type. A detailed table of essential resource information supports deeper analysis and efficient response to configuration issues.\n\n[**Integrations Page**](/app/integrations/detail/aws/overview?integration=config)\n",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "Table of Contents"
+      }
+    }
+  ]
+}

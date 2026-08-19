@@ -1,0 +1,64 @@
+{
+  "name": ".slo-observability.health-v3.6@template",
+  "index_template": {
+    "index_patterns": [
+      ".slo-observability.health-v3.6"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "spaceId": {
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "scanId": {
+            "type": "keyword"
+          },
+          "slo": {
+            "properties": {
+              "id": {
+                "type": "keyword"
+              },
+              "revision": {
+                "type": "integer"
+              }
+            }
+          },
+          "health": {
+            "properties": {
+              "isProblematic": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "7d"
+      }
+    },
+    "composed_of": [],
+    "priority": 500,
+    "_meta": {
+      "description": "Index template for SLO health datastream",
+      "managed_by": "observability",
+      "version": 3.6,
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555755010,
+    "modified_date_millis": 1786555755010
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": ".anthropic-claude-5-opus-chat_completion",
+  "name": "Anthropic Claude Opus 5",
+  "config": {
+    "provider": "elastic",
+    "taskType": "chat_completion",
+    "inferenceId": ".anthropic-claude-5-opus-chat_completion",
+    "providerConfig": {
+      "model_id": "anthropic-claude-5-opus"
+    }
+  },
+  "connector_type_id": ".inference",
+  "is_preconfigured": true,
+  "is_deprecated": false,
+  "referenced_by_count": 0,
+  "is_system_action": false,
+  "is_connector_type_deprecated": true,
+  "auth_mode": "shared"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "ai-index-ds",
+  "index_template": {
+    "index_patterns": [
+      "ai-index-ds-*"
+    ],
+    "composed_of": [
+      "ai-index@mappings",
+      "ai-index@ds-settings",
+      "ai-index@custom"
+    ],
+    "priority": 500,
+    "version": 2,
+    "_meta": {
+      "description": "Template applied by default to data stream backed AI indices.",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "ai-index@custom"
+    ],
+    "created_date_millis": 1786555715923,
+    "modified_date_millis": 1786631516953
+  }
+}

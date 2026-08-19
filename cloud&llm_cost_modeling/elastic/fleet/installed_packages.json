@@ -1,0 +1,703 @@
+[
+  {
+    "name": "anthropic",
+    "title": "Anthropic",
+    "version": "1.1.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-anthropic.audit-*",
+        "title": "audit"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "anthropic_metrics",
+    "title": "Anthropic Metrics",
+    "version": "0.4.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "metrics-anthropic_metrics.cost-*",
+        "title": "cost"
+      },
+      {
+        "name": "metrics-anthropic_metrics.rate_limit-*",
+        "title": "rate_limit"
+      },
+      {
+        "name": "metrics-anthropic_metrics.usage-*",
+        "title": "usage"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "apm",
+    "title": "Elastic APM",
+    "version": "9.6.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [],
+    "installationInfo": null
+  },
+  {
+    "name": "aws",
+    "title": "AWS",
+    "version": "7.1.1",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-aws.apigateway_logs-*",
+        "title": "apigateway_logs"
+      },
+      {
+        "name": "metrics-aws.apigateway_metrics-*",
+        "title": "apigateway_metrics"
+      },
+      {
+        "name": "metrics-aws.awshealth-*",
+        "title": "awshealth"
+      },
+      {
+        "name": "metrics-aws.billing-*",
+        "title": "billing"
+      },
+      {
+        "name": "logs-aws.cloudfront_logs-*",
+        "title": "cloudfront_logs"
+      },
+      {
+        "name": "logs-aws.cloudtrail-*",
+        "title": "cloudtrail"
+      },
+      {
+        "name": "logs-aws.cloudwatch_logs-*",
+        "title": "cloudwatch_logs"
+      },
+      {
+        "name": "metrics-aws.cloudwatch_metrics-*",
+        "title": "cloudwatch_metrics"
+      },
+      {
+        "name": "logs-aws.config-*",
+        "title": "config"
+      },
+      {
+        "name": "metrics-aws.dynamodb-*",
+        "title": "dynamodb"
+      },
+      {
+        "name": "metrics-aws.ebs-*",
+        "title": "ebs"
+      },
+      {
+        "name": "logs-aws.ec2_logs-*",
+        "title": "ec2_logs"
+      },
+      {
+        "name": "metrics-aws.ec2_metrics-*",
+        "title": "ec2_metrics"
+      },
+      {
+        "name": "metrics-aws.ecs_metrics-*",
+        "title": "ecs_metrics"
+      },
+      {
+        "name": "logs-aws.elb_logs-*",
+        "title": "elb_logs"
+      },
+      {
+        "name": "metrics-aws.elb_metrics-*",
+        "title": "elb_metrics"
+      },
+      {
+        "name": "logs-aws.emr_logs-*",
+        "title": "emr_logs"
+      },
+      {
+        "name": "metrics-aws.emr_metrics-*",
+        "title": "emr_metrics"
+      },
+      {
+        "name": "logs-aws.firewall_logs-*",
+        "title": "firewall_logs"
+      },
+      {
+        "name": "metrics-aws.firewall_metrics-*",
+        "title": "firewall_metrics"
+      },
+      {
+        "name": "logs-aws.guardduty-*",
+        "title": "guardduty"
+      },
+      {
+        "name": "logs-aws.inspector-*",
+        "title": "inspector"
+      },
+      {
+        "name": "metrics-aws.kafka_metrics-*",
+        "title": "kafka_metrics"
+      },
+      {
+        "name": "metrics-aws.kinesis-*",
+        "title": "kinesis"
+      },
+      {
+        "name": "metrics-aws.lambda-*",
+        "title": "lambda"
+      },
+      {
+        "name": "logs-aws.lambda_logs-*",
+        "title": "lambda_logs"
+      },
+      {
+        "name": "metrics-aws.natgateway-*",
+        "title": "natgateway"
+      },
+      {
+        "name": "metrics-aws.rds-*",
+        "title": "rds"
+      },
+      {
+        "name": "metrics-aws.redshift-*",
+        "title": "redshift"
+      },
+      {
+        "name": "logs-aws.route53_public_logs-*",
+        "title": "route53_public_logs"
+      },
+      {
+        "name": "logs-aws.route53_resolver_logs-*",
+        "title": "route53_resolver_logs"
+      },
+      {
+        "name": "metrics-aws.s3_daily_storage-*",
+        "title": "s3_daily_storage"
+      },
+      {
+        "name": "metrics-aws.s3_request-*",
+        "title": "s3_request"
+      },
+      {
+        "name": "metrics-aws.s3_storage_lens-*",
+        "title": "s3_storage_lens"
+      },
+      {
+        "name": "logs-aws.s3access-*",
+        "title": "s3access"
+      },
+      {
+        "name": "logs-aws.securityhub_findings-*",
+        "title": "securityhub_findings"
+      },
+      {
+        "name": "logs-aws.securityhub_findings_full_posture-*",
+        "title": "securityhub_findings_full_posture"
+      },
+      {
+        "name": "logs-aws.securityhub_insights-*",
+        "title": "securityhub_insights"
+      },
+      {
+        "name": "metrics-aws.sns-*",
+        "title": "sns"
+      },
+      {
+        "name": "metrics-aws.sqs-*",
+        "title": "sqs"
+      },
+      {
+        "name": "metrics-aws.transitgateway-*",
+        "title": "transitgateway"
+      },
+      {
+        "name": "metrics-aws.usage-*",
+        "title": "usage"
+      },
+      {
+        "name": "logs-aws.vpcflow-*",
+        "title": "vpcflow"
+      },
+      {
+        "name": "metrics-aws.vpn-*",
+        "title": "vpn"
+      },
+      {
+        "name": "logs-aws.waf-*",
+        "title": "waf"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "aws_bedrock",
+    "title": "Amazon Bedrock",
+    "version": "1.6.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "metrics-aws_bedrock.guardrails-*",
+        "title": "guardrails"
+      },
+      {
+        "name": "logs-aws_bedrock.invocation-*",
+        "title": "invocation"
+      },
+      {
+        "name": "metrics-aws_bedrock.runtime-*",
+        "title": "runtime"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "aws_billing",
+    "title": "AWS Cost and Usage Report (CUR 2.0)",
+    "version": "0.2.1",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "metrics-aws_billing.cur-*",
+        "title": "cur"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "azure",
+    "title": "Azure Logs",
+    "version": "1.38.1",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-azure.aadgraphactivitylogs-*",
+        "title": "aadgraphactivitylogs"
+      },
+      {
+        "name": "logs-azure.activitylogs-*",
+        "title": "activitylogs"
+      },
+      {
+        "name": "logs-azure.application_gateway-*",
+        "title": "application_gateway"
+      },
+      {
+        "name": "logs-azure.auditlogs-*",
+        "title": "auditlogs"
+      },
+      {
+        "name": "logs-azure.eventhub-*",
+        "title": "eventhub"
+      },
+      {
+        "name": "logs-azure.events-*",
+        "title": "events"
+      },
+      {
+        "name": "logs-azure.firewall_logs-*",
+        "title": "firewall_logs"
+      },
+      {
+        "name": "logs-azure.graphactivitylogs-*",
+        "title": "graphactivitylogs"
+      },
+      {
+        "name": "logs-azure.identity_protection-*",
+        "title": "identity_protection"
+      },
+      {
+        "name": "logs-azure.platformlogs-*",
+        "title": "platformlogs"
+      },
+      {
+        "name": "logs-azure.provisioning-*",
+        "title": "provisioning"
+      },
+      {
+        "name": "logs-azure.signinlogs-*",
+        "title": "signinlogs"
+      },
+      {
+        "name": "logs-azure.springcloudlogs-*",
+        "title": "springcloudlogs"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "azure_billing",
+    "title": "Azure Billing Metrics",
+    "version": "1.12.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "metrics-azure.billing-*",
+        "title": "billing"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "azure_openai",
+    "title": "Azure OpenAI",
+    "version": "1.14.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-azure_openai.logs-*",
+        "title": "logs"
+      },
+      {
+        "name": "metrics-azure.open_ai-*",
+        "title": "metrics"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "elastic_agent",
+    "title": "Elastic Agent",
+    "version": "2.9.4",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-elastic_agent.apm_server-*",
+        "title": "apm_server_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.apm_server-*",
+        "title": "apm_server_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.auditbeat-*",
+        "title": "auditbeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.auditbeat-*",
+        "title": "auditbeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.cloud_defend-*",
+        "title": "cloud_defend_logs"
+      },
+      {
+        "name": "logs-elastic_agent.cloudbeat-*",
+        "title": "cloudbeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.cloudbeat-*",
+        "title": "cloudbeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent-*",
+        "title": "elastic_agent_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.elastic_agent-*",
+        "title": "elastic_agent_metrics"
+      },
+      {
+        "name": "metrics-elastic_agent.endpoint_security-*",
+        "title": "endpoint_security_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.endpoint_security-*",
+        "title": "endpoint_sercurity_logs"
+      },
+      {
+        "name": "logs-elastic_agent.filebeat_input-*",
+        "title": "filebeat_input_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.filebeat_input-*",
+        "title": "filebeat_input_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.filebeat-*",
+        "title": "filebeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.filebeat-*",
+        "title": "filebeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.fleet_server-*",
+        "title": "fleet_server_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.fleet_server-*",
+        "title": "fleet_server_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.heartbeat-*",
+        "title": "heartbeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.heartbeat-*",
+        "title": "heartbeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.metricbeat-*",
+        "title": "metricbeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.metricbeat-*",
+        "title": "metricbeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.osquerybeat-*",
+        "title": "osquerybeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.osquerybeat-*",
+        "title": "osquerybeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.packetbeat-*",
+        "title": "packetbeat_logs"
+      },
+      {
+        "name": "metrics-elastic_agent.packetbeat-*",
+        "title": "packetbeat_metrics"
+      },
+      {
+        "name": "logs-elastic_agent.pf_elastic_collector-*",
+        "title": "pf_elastic_collector"
+      },
+      {
+        "name": "logs-elastic_agent.pf_elastic_symbolizer-*",
+        "title": "pf_elastic_symbolizer"
+      },
+      {
+        "name": "logs-elastic_agent.pf_host_agent-*",
+        "title": "pf_host_agent_logs"
+      },
+      {
+        "name": "logs-elastic_agent.status_change-*",
+        "title": "status_change_logs"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "fleet_server",
+    "title": "Fleet Server",
+    "version": "1.6.1",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "metrics-fleet_server.agent_status-*",
+        "title": "agent_status_metrics"
+      },
+      {
+        "name": "metrics-fleet_server.agent_versions-*",
+        "title": "agent_versions_metrics"
+      },
+      {
+        "name": "logs-fleet_server.output_health-*",
+        "title": "output_health_logs"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "gcp",
+    "title": "Google Cloud Platform",
+    "version": "2.50.2",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-gcp.audit-*",
+        "title": "audit"
+      },
+      {
+        "name": "metrics-gcp.billing-*",
+        "title": "billing"
+      },
+      {
+        "name": "metrics-gcp.cloudrun_metrics-*",
+        "title": "cloudrun_metrics"
+      },
+      {
+        "name": "metrics-gcp.cloudsql_mysql-*",
+        "title": "cloudsql_mysql"
+      },
+      {
+        "name": "metrics-gcp.cloudsql_postgresql-*",
+        "title": "cloudsql_postgresql"
+      },
+      {
+        "name": "metrics-gcp.cloudsql_sqlserver-*",
+        "title": "cloudsql_sqlserver"
+      },
+      {
+        "name": "metrics-gcp.compute-*",
+        "title": "compute"
+      },
+      {
+        "name": "metrics-gcp.dataproc-*",
+        "title": "dataproc"
+      },
+      {
+        "name": "logs-gcp.dns-*",
+        "title": "dns"
+      },
+      {
+        "name": "metrics-gcp.firestore-*",
+        "title": "firestore"
+      },
+      {
+        "name": "logs-gcp.firewall-*",
+        "title": "firewall"
+      },
+      {
+        "name": "metrics-gcp.gke-*",
+        "title": "gke"
+      },
+      {
+        "name": "logs-gcp.loadbalancing_logs-*",
+        "title": "loadbalancing_logs"
+      },
+      {
+        "name": "metrics-gcp.loadbalancing_metrics-*",
+        "title": "loadbalancing_metrics"
+      },
+      {
+        "name": "metrics-gcp.pubsub-*",
+        "title": "pubsub"
+      },
+      {
+        "name": "metrics-gcp.redis-*",
+        "title": "redis"
+      },
+      {
+        "name": "metrics-gcp.storage-*",
+        "title": "storage"
+      },
+      {
+        "name": "logs-gcp.vpcflow-*",
+        "title": "vpcflow"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "gcp_vertexai",
+    "title": "GCP Vertex AI",
+    "version": "1.5.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-gcp_vertexai.auditlogs-*",
+        "title": "auditlogs"
+      },
+      {
+        "name": "metrics-gcp_vertexai.metrics-*",
+        "title": "metrics"
+      },
+      {
+        "name": "logs-gcp_vertexai.prompt_response_logs-*",
+        "title": "prompt_response_logs"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "openai",
+    "title": "OpenAI",
+    "version": "2.4.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "logs-openai.audio_speeches-*",
+        "title": "audio_speeches"
+      },
+      {
+        "name": "logs-openai.audio_transcriptions-*",
+        "title": "audio_transcriptions"
+      },
+      {
+        "name": "logs-openai.audit-*",
+        "title": "audit"
+      },
+      {
+        "name": "logs-openai.code_interpreter_sessions-*",
+        "title": "code_interpreter_sessions"
+      },
+      {
+        "name": "logs-openai.completions-*",
+        "title": "completions"
+      },
+      {
+        "name": "logs-openai.embeddings-*",
+        "title": "embeddings"
+      },
+      {
+        "name": "logs-openai.images-*",
+        "title": "images"
+      },
+      {
+        "name": "logs-openai.moderations-*",
+        "title": "moderations"
+      },
+      {
+        "name": "logs-openai.rate_limits-*",
+        "title": "rate_limits"
+      },
+      {
+        "name": "logs-openai.vector_stores-*",
+        "title": "vector_stores"
+      }
+    ],
+    "installationInfo": null
+  },
+  {
+    "name": "synthetics",
+    "title": "Elastic Synthetics",
+    "version": "1.9.0",
+    "status": "installed",
+    "type": null,
+    "dataStreams": [
+      {
+        "name": "synthetics-browser-*",
+        "title": "browser"
+      },
+      {
+        "name": "synthetics-browser.network-*",
+        "title": "browser_network"
+      },
+      {
+        "name": "synthetics-browser.screenshot-*",
+        "title": "browser_screenshot"
+      },
+      {
+        "name": "synthetics-http-*",
+        "title": "http"
+      },
+      {
+        "name": "synthetics-icmp-*",
+        "title": "icmp"
+      },
+      {
+        "name": "synthetics-tcp-*",
+        "title": "tcp"
+      }
+    ],
+    "installationInfo": null
+  }
+]

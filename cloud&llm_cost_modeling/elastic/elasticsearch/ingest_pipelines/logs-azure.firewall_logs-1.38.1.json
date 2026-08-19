@@ -1,0 +1,804 @@
+{
+  "name": "logs-azure.firewall_logs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "json",
+          "_conf",
+          "message"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ],
+  "modified_date_millis": 1786557408243,
+  "description": "Pipeline for processing Azure firewall logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557408243,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.category",
+        "value": [
+          "network"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.type",
+        "value": [
+          "connection"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "json.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "json.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.DestinationIp",
+        "target_field": "destination.ip"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.DestinationPort",
+        "target_field": "destination.port"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.Policy",
+        "target_field": "azure.firewall.policy"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.Protocol",
+        "target_field": "azure.firewall.protocol"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.Rule",
+        "target_field": "rule.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.RuleCollection",
+        "target_field": "rule.ruleset"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.RuleCollectionGroup",
+        "target_field": "azure.firewall.rule_collection_group"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.SourceIp",
+        "target_field": "source.ip"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.SourcePort",
+        "target_field": "source.port"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_destination_nat_ip_from_properties_translated_ip",
+        "field": "destination.nat.ip",
+        "copy_from": "json.properties.TranslatedIp"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_destination_nat_port_from_properties_translated_port",
+        "field": "destination.nat.port",
+        "copy_from": "json.properties.TranslatedPort"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.Action",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ActionReason",
+        "target_field": "event.reason"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.Fqdn",
+        "target_field": "destination.domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.IsExplicitProxyRequest",
+        "target_field": "azure.firewall.is_explicit_proxy_request"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.IsTlsInspected",
+        "target_field": "azure.firewall.is_tls_inspected"
+      }
+    },
+    {
+      "uri_parts": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.properties.TargetUrl",
+        "target_field": "url",
+        "keep_original": true,
+        "tag": "uri_parts_targeturl",
+        "if": "ctx.json?.properties?.TargetUrl != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "json.properties.TargetUrl",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.WebCategory",
+        "target_field": "azure.firewall.web_category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.DnssecOkBit",
+        "target_field": "azure.firewall.dnssec_ok_bit"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.EDNS0BufferSize",
+        "target_field": "azure.firewall.edns0_buffer_size"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ErrorMessage",
+        "target_field": "error.message"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.properties.ErrorNumber",
+        "target_field": "error.id",
+        "type": "string",
+        "if": "ctx.json?.properties?.ErrorNumber != \"\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.QueryClass",
+        "target_field": "dns.question.class"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.properties.QueryId",
+        "target_field": "dns.id",
+        "type": "string",
+        "if": "ctx.json?.properties?.QueryId != \"\""
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.QueryName",
+        "target_field": "dns.question.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.QueryType",
+        "target_field": "dns.question.type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.RequestDurationSecs",
+        "target_field": "azure.firewall.request_duration_secs"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.RequestSize",
+        "target_field": "azure.firewall.request_size"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ResponseCode",
+        "target_field": "dns.response_code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ResponseFlags",
+        "target_field": "dns.header_flags"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.properties.ResponseSize",
+        "target_field": "azure.firewall.response_size"
+      }
+    },
+    {
+      "grok": {
+        "field": "json.properties.msg",
+        "if": "ctx?.json?.operationName == 'AzureFirewallNetworkRuleLog' || ctx?.json?.operationName == 'AzureFirewallNatRuleLog'",
+        "patterns": [
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. $",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. Policy: %{DATA:azure.firewall.policy}. Rule Collection Group: %{DATA:azure.firewall.rule_collection_group}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} Type=%{DATA:azure.firewall.icmp.request.code} request from %{IPORHOST:source.address} to %{IPORHOST:destination.address}. Action: %{DATA:azure.firewall.action}. $",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long} was DNAT'ed to %{IP:destination.nat.ip}:%{NUMBER:destination.nat.port:long}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long} was DNAT'ed to %{IP:destination.nat.ip}:%{NUMBER:destination.nat.port:long}. Policy: %{DATA:azure.firewall.policy}. Rule Collection Group: %{DATA:azure.firewall.rule_collection_group}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long} was DNAT'ed to %{IP:destination.nat.ip}:%{NUMBER:destination.nat.port:long}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:(%{NUMBER:source.port:long})? to %{IPORHOST:destination.address}:(%{NUMBER:destination.port:long})?. Action: %{DATA:azure.firewall.action}. Signature: %{DATA:rule.id}. IDS: %{DATA:rule.name}. Priority: %{NUMBER:event.risk_score:long}. Classification: %{DATA:rule.category}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Url: %{HOSTNAME:url.original}. Action: %{DATA:azure.firewall.action}. ThreatIntel: %{DATA:rule.name}$"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "json.properties.msg",
+        "if": "ctx.json?.operationName == 'AzureFirewallThreatIntelLog'",
+        "patterns": [
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. ThreatIntel: %{DATA:rule.name}$"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "json.properties.msg",
+        "if": "ctx?.json?.operationName == 'AzureFirewallApplicationRuleLog'",
+        "patterns": [
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. Policy: %{DATA:azure.firewall.policy}. Rule Collection Group: %{DATA:azure.firewall.rule_collection_group}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}. Web Category: %{DATA:rule.category}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Url: %{DATA:url.original}. Action: %{DATA:azure.firewall.action}. Policy: %{DATA:azure.firewall.policy}. Rule Collection Group: %{DATA:azure.firewall.rule_collection_group}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Url: %{DATA:url.original}. Action: %{DATA:azure.firewall.action}. %{DATA:event.reason}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. Rule Collection: %{DATA:rule.ruleset}. Rule: %{DATA:rule.name}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long} to %{IPORHOST:destination.address}:%{NUMBER:destination.port:long}. Action: %{DATA:azure.firewall.action}. %{DATA:event.reason}$",
+          "^%{DATA:azure.firewall.proto} request from %{IPORHOST:source.address}:%{NUMBER:source.port:long}. Action: %{DATA:azure.firewall.action}. Reason: %{DATA:event.reason}$"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "json.properties.msg",
+        "if": "ctx?.json?.operationName == 'AzureFirewallDnsProxyLog'",
+        "patterns": [
+          "^DNS Request: %{IPORHOST:source.address}:%{NUMBER:source.port:long} - %{DATA:azure.firewall.event_original_uid} %{DATA:dns.question.type} %{DATA:dns.question.class} %{DATA:dns.question.name}. %{DATA:network.transport} %{NUMBER:source.bytes:long} %{DATA:azure.firewall.dnssec_bool_flag:boolean} %{NUMBER:azure.firewall.dnssec_buffer_size:long} %{DATA:dns.response_code} %{DATA:dns.header_flags} %{NUMBER:destination.bytes:long} %{DATA:azure.firewall.duration}$"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "json.event.alert.action",
+        "value": "denied",
+        "if": "ctx.azure?.firewall?.action == 'Deny'"
+      }
+    },
+    {
+      "set": {
+        "field": "json.event.alert.action",
+        "value": "allowed",
+        "if": "ctx.azure?.firewall?.action == 'Allow'"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": "{{json.event.alert.action}}",
+        "if": "ctx.json?.event?.alert?.action != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_allowed_into_event_type",
+        "field": "event.type",
+        "allow_duplicates": false,
+        "value": "allowed",
+        "if": "ctx.event?.action?.equalsIgnoreCase('Allow') == true"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_denied_into_event_type",
+        "field": "event.type",
+        "allow_duplicates": false,
+        "value": "denied",
+        "if": "ctx.event?.action?.equalsIgnoreCase('Deny') == true"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "source.address",
+        "patterns": [
+          "%{IP:source.ip}",
+          "%{HOSTNAME:source.domain}"
+        ]
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_source_address_from_source_ip",
+        "field": "source.address",
+        "copy_from": "source.ip",
+        "if": "ctx.source?.address == null"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "destination.address",
+        "patterns": [
+          "%{IP:destination.ip}",
+          "%{HOSTNAME:destination.domain}"
+        ]
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_destination_address_from_destination_ip",
+        "field": "destination.address",
+        "copy_from": "destination.ip",
+        "if": "ctx.destination?.address == null"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "if": "ctx?.source?.ip != null",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "if": "ctx?.destination?.ip != null",
+        "value": "{{destination.ip}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "if": "ctx?.destination?.nat?.ip != null",
+        "value": "{{destination.nat.ip}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "if": "ctx?.source?.domain != null",
+        "value": "{{source.domain}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "if": "ctx?.destination?.domain != null",
+        "value": "{{destination.domain}}"
+      }
+    },
+    {
+      "append": {
+        "ignore_failure": true,
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "if": "ctx?.dns?.question?.name != null",
+        "value": "{{dns.question.name}}"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "azure.firewall.proto",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "field": "network.transport",
+        "value": "{{azure.firewall.proto}}",
+        "if": "ctx?.azure?.firewall?.proto != null && ['udp', 'tcp', 'icmp'].contains(ctx.azure.firewall.proto)"
+      }
+    },
+    {
+      "set": {
+        "field": "network.protocol",
+        "value": "{{azure.firewall.proto}}",
+        "if": "ctx?.network?.transport == null"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "azure.firewall.proto"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "azure.firewall.protocol",
+        "if": "ctx.azure?.firewall?.protocol != null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.transport",
+        "value": "{{azure.firewall.protocol}}",
+        "if": "ctx.azure?.firewall?.protocol != null && ['udp', 'tcp', 'icmp'].contains(ctx.azure.firewall.protocol) && ctx.json?.category != null && ['AZFWDnsQuery', 'AZFWApplicationRule', 'AZFWNetworkRule', 'AZFWNatRule'].contains(ctx.json.category)"
+      }
+    },
+    {
+      "set": {
+        "field": "network.protocol",
+        "value": "{{azure.firewall.protocol}}",
+        "if": "ctx.network?.transport == null && ctx.json?.category != null && ['AZFWDnsQuery', 'AZFWApplicationRule', 'AZFWNetworkRule', 'AZFWNatRule'].contains(ctx.json.category)"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "azure.firewall.protocol"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "def transport = ctx.network.transport;\nif (transport == 'udp') {\n    ctx.network.iana_number = '17';\n} else if (transport == 'tcp') {\n    ctx.network.iana_number = '6';\n}\n",
+        "lang": "painless",
+        "if": "ctx?.network?.transport != null"
+      }
+    },
+    {
+      "uppercase": {
+        "field": "dns.header_flags",
+        "ignore_missing": true
+      }
+    },
+    {
+      "split": {
+        "ignore_missing": true,
+        "field": "dns.header_flags",
+        "separator": ","
+      }
+    },
+    {
+      "set": {
+        "field": "dns.type",
+        "value": "query",
+        "if": "ctx.json?.category == 'AZFWDnsQuery'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.category",
+        "target_field": "azure.firewall.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.operationName",
+        "target_field": "azure.firewall.operation_name"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.type",
+        "value": "firewall"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.vendor",
+        "value": "Azure"
+      }
+    },
+    {
+      "set": {
+        "field": "observer.product",
+        "value": "Network Firewall"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "json",
+          "azure.firewall.proto"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.firewall_logs-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "observer.name",
+        "copy_from": "azure.resource.name"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "source": "boolean dropEmptyFields(Object object) {\n  if (object == null || object == \"\") {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(value -> dropEmptyFields(value));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(value -> dropEmptyFields(value));\n    return (((List) object).length == 0);\n  }\n  return false;\n}\ndropEmptyFields(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.firewall_logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.firewall_logs` dataset"
+      }
+    }
+  ]
+}

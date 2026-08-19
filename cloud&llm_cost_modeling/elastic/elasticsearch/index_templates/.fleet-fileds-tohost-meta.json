@@ -1,0 +1,79 @@
+{
+  "name": ".fleet-fileds-tohost-meta",
+  "index_template": {
+    "index_patterns": [
+      ".fleet-fileds-tohost-meta-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "version": "1"
+        },
+        "dynamic": false,
+        "properties": {
+          "@timestamp": {
+            "type": "date"
+          },
+          "namespaces": {
+            "type": "keyword"
+          },
+          "agent_id": {
+            "type": "keyword"
+          },
+          "action_id": {
+            "type": "keyword"
+          },
+          "source": {
+            "type": "keyword"
+          },
+          "file": {
+            "properties": {
+              "Status": {
+                "type": "keyword"
+              },
+              "ChunkSize": {
+                "type": "integer"
+              },
+              "Compression": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "Meta": {
+                "properties": {
+                  "target_agents": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "90d"
+      }
+    },
+    "composed_of": [],
+    "priority": 200,
+    "version": 1,
+    "_meta": {
+      "description": "fleet file delivery index template",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555715133,
+    "modified_date_millis": 1786555715133
+  }
+}

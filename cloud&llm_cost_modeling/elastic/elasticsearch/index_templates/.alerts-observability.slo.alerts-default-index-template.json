@@ -1,0 +1,53 @@
+{
+  "name": ".alerts-observability.slo.alerts-default-index-template",
+  "index_template": {
+    "index_patterns": [
+      ".alerts-observability.slo.alerts-default"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1",
+          "mapping": {
+            "total_fields": {
+              "limit": "2800",
+              "ignore_dynamic_beyond_limit": "true"
+            },
+            "ignore_malformed": "true"
+          }
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "managed": true,
+          "namespace": "default",
+          "kibana": {
+            "version": "9.6.0"
+          }
+        },
+        "dynamic": false
+      }
+    },
+    "composed_of": [
+      ".alerts-ecs-mappings",
+      ".alerts-observability.slo.alerts-mappings",
+      ".alerts-legacy-alert-mappings",
+      ".alerts-framework-mappings"
+    ],
+    "priority": 7,
+    "_meta": {
+      "namespace": "default",
+      "kibana": {
+        "version": "9.6.0"
+      },
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": true,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555733305,
+    "modified_date_millis": 1786555733305
+  }
+}

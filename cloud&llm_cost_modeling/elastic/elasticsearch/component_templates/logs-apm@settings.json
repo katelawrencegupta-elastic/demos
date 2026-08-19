@@ -1,0 +1,18 @@
+{
+  "name": "logs-apm@settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "standard",
+          "codec": "best_compression"
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default settings for logs-apm.* data streams",
+      "managed": true
+    }
+  }
+}

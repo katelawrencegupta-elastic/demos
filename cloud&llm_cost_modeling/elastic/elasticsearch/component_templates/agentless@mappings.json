@@ -1,0 +1,24 @@
+{
+  "name": "agentless@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "updated_at": {
+            "format": "strict_date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "v": {
+            "type": "object",
+            "enabled": false
+          }
+        }
+      }
+    },
+    "version": 23,
+    "_meta": {
+      "description": "default mappings for the agentless index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

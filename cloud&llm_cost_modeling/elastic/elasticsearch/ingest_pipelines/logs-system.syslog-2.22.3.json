@@ -1,0 +1,87 @@
+{
+  "name": "logs-system.syslog-2.22.3",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591740,
+  "description": "Entrypoint pipeline for system integration syslog data stream",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591740,
+  "processors": [
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "message",
+        "pattern_definitions": {
+          "GREEDYMULTILINE": "(.|\n)*"
+        },
+        "if": "ctx.input?.type == \"log\"",
+        "patterns": [
+          "%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{GREEDYMULTILINE:system.syslog.message}",
+          "%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}",
+          "%{TIMESTAMP_ISO8601:system.syslog.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{GREEDYMULTILINE:system.syslog.message}",
+          "%{TIMESTAMP_ISO8601:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.syslog-2.22.3-journald",
+        "if": "ctx.input?.type == \"journald\""
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.syslog-2.22.3-log",
+        "if": "ctx.input?.type == \"log\""
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `system` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.syslog@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `system.syslog` dataset"
+      }
+    }
+  ]
+}

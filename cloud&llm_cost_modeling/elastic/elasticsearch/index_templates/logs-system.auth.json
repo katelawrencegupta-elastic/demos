@@ -1,0 +1,50 @@
+{
+  "name": "logs-system.auth",
+  "index_template": {
+    "index_patterns": [
+      "logs-system.auth-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "system"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-system.auth@package",
+      "logs@custom",
+      "system@custom",
+      "logs-system.auth@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "system"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "system@custom",
+      "logs-system.auth@custom"
+    ],
+    "created_date_millis": 1786558590372,
+    "modified_date_millis": 1786558590372
+  }
+}

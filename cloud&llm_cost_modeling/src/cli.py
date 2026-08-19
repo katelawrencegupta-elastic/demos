@@ -322,6 +322,7 @@ def main():
         "--scope", choices=["all", "cloud", "llm", "openai-extra"], default="all")
     d = sub.add_parser("dashboards", help="publish FinOps + LLM Kibana dashboards")
     d.add_argument("--variant", choices=["original", "dynamic", "all"], default="dynamic")
+    sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
     if args.cmd == "setup":
@@ -341,6 +342,9 @@ def main():
             include_original=args.variant in ("original", "all"),
             include_dynamic=args.variant in ("dynamic", "all"),
         )
+    elif args.cmd == "backup":
+        from src.backup import run as backup_run
+        backup_run()
 
 
 if __name__ == "__main__":

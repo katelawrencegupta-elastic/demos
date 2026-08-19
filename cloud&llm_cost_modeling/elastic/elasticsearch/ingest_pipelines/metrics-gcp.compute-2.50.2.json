@@ -1,0 +1,207 @@
+{
+  "name": "metrics-gcp.compute-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557400028,
+  "description": "Pipeline for parsing GCP Compute metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557400028,
+  "processors": [
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "gcp.labels"
+        ],
+        "target_field": "gcp.labels_fingerprint"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.firewall.dropped.bytes",
+        "target_field": "gcp.compute.firewall.dropped.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.firewall.dropped_packets_count.value",
+        "target_field": "gcp.compute.firewall.dropped_packets_count.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.cpu.reserved_cores.value",
+        "target_field": "gcp.compute.instance.cpu.reserved_cores.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.cpu.usage_time.sec",
+        "target_field": "gcp.compute.instance.cpu.usage_time.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.cpu.usage.pct",
+        "target_field": "gcp.compute.instance.cpu.usage.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.disk.read.bytes",
+        "target_field": "gcp.compute.instance.disk.read.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.disk.read_ops_count.value",
+        "target_field": "gcp.compute.instance.disk.read_ops_count.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.disk.write.bytes",
+        "target_field": "gcp.compute.instance.disk.write.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.disk.write_ops_count.value",
+        "target_field": "gcp.compute.instance.disk.write_ops_count.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.memory.balloon.ram_size.value",
+        "target_field": "gcp.compute.instance.memory.balloon.ram_size.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.memory.balloon.ram_used.value",
+        "target_field": "gcp.compute.instance.memory.balloon.ram_used.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.memory.balloon.swap_in.bytes",
+        "target_field": "gcp.compute.instance.memory.balloon.swap_in.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.memory.balloon.swap_out.bytes",
+        "target_field": "gcp.compute.instance.memory.balloon.swap_out.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.network.ingress.bytes",
+        "target_field": "gcp.compute.instance.network.ingress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.network.ingress.packets.count",
+        "target_field": "gcp.compute.instance.network.ingress.packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.network.egress.bytes",
+        "target_field": "gcp.compute.instance.network.egress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.network.egress.packets.count",
+        "target_field": "gcp.compute.instance.network.egress.packets.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.uptime.sec",
+        "target_field": "gcp.compute.instance.uptime.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.instance.uptime_total.sec",
+        "target_field": "gcp.compute.instance.uptime_total.sec"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.compute@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.compute` dataset"
+      }
+    }
+  ]
+}

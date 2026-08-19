@@ -16,7 +16,10 @@ from client import (  # noqa: E402
     COMPONENT_TEMPLATES,
     CONFIGS,
     DATA_STREAM,
+    GEOIP_PIPELINE_ID,
     INDEX_TEMPLATE,
+    LOGS_CUSTOM_PIPELINE_ID,
+    OTEL_CUSTOM_COMPONENT_TEMPLATES,
     PIPELINE_ID,
     get_client,
 )
@@ -29,11 +32,12 @@ def load(path: Path) -> dict:
 def main() -> None:
     es = get_client()
 
-    pipeline = load(CONFIGS / "ingest-pipelines" / f"{PIPELINE_ID}.json")
-    es.ingest.put_pipeline(id=PIPELINE_ID, **pipeline)
-    print(f"pipeline: {PIPELINE_ID}")
+    for pipeline_id in (PIPELINE_ID, GEOIP_PIPELINE_ID, LOGS_CUSTOM_PIPELINE_ID):
+        pipeline = load(CONFIGS / "ingest-pipelines" / f"{pipeline_id}.json")
+        es.ingest.put_pipeline(id=pipeline_id, **pipeline)
+        print(f"pipeline: {pipeline_id}")
 
-    for name in COMPONENT_TEMPLATES:
+    for name in (*COMPONENT_TEMPLATES, *OTEL_CUSTOM_COMPONENT_TEMPLATES):
         body = load(CONFIGS / "component-templates" / f"{name}.json")
         es.cluster.put_component_template(name=name, **body)
         print(f"component_template: {name}")

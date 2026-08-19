@@ -1,0 +1,92 @@
+{
+  "name": "logs-system.syslog-2.22.3-log",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591740,
+  "description": "Pipeline for parsing Syslog messages.",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591740,
+  "processors": [
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field. `message` will be set in the next step from `system.syslog.message`.\n",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "system.syslog.message",
+        "target_field": "message"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "{{ _ingest.on_failure_message }}"
+            }
+          }
+        ],
+        "formats": [
+          "MMM  d HH:mm:ss",
+          "MMM dd HH:mm:ss",
+          "MMM d HH:mm:ss",
+          "ISO8601"
+        ],
+        "field": "system.syslog.timestamp",
+        "target_field": "@timestamp",
+        "if": "ctx.event.timezone == null"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "{{ _ingest.on_failure_message }}"
+            }
+          }
+        ],
+        "formats": [
+          "MMM  d HH:mm:ss",
+          "MMM dd HH:mm:ss",
+          "MMM d HH:mm:ss",
+          "ISO8601"
+        ],
+        "field": "system.syslog.timestamp",
+        "target_field": "@timestamp",
+        "timezone": "{{ event.timezone }}",
+        "if": "ctx.event.timezone != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "system.syslog.timestamp"
+      }
+    },
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    }
+  ]
+}

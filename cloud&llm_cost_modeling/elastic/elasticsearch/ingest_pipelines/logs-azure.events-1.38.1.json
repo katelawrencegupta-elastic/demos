@@ -1,0 +1,342 @@
+{
+  "name": "logs-azure.events-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557407225,
+  "description": "Pipeline for parsing Azure logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557407225,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub",
+        "if": "ctx.azure?.eventhub != null"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "json": {
+        "description": "Parses the message field as JSON and stores it in a temporary field to identify the event dataset.",
+        "field": "message",
+        "target_field": "tmp_json"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Set routing.category to tmp_json.category if it exists",
+        "field": "tmp_json.category",
+        "target_field": "routing.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename the invalid `Category` field to `category` to apply the correct routing rules.",
+        "field": "tmp_json.Category",
+        "target_field": "routing.category",
+        "if": "ctx.routing?.category == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename the invalid `CategoryValue` field to `category` to apply the correct routing rules.",
+        "field": "tmp_json.CategoryValue",
+        "target_field": "routing.category",
+        "if": "ctx.routing?.category == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the temporary field used to identify the event dataset.",
+        "field": "tmp_json"
+      }
+    },
+    {
+      "set": {
+        "description": "Sets the default event dataset.",
+        "field": "event.dataset",
+        "value": "azure.events"
+      }
+    },
+    {
+      "set": {
+        "description": "If the event has a category field, we consider it a platform log.",
+        "field": "event.dataset",
+        "value": "azure.platformlogs",
+        "if": "ctx.routing?.category != null"
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.activitylogs",
+        "if": "ctx.routing?.category == \"Administrative\" || ctx.routing?.category == \"Security\" || ctx.routing?.category == \"ServiceHealth\" || ctx.routing?.category == \"Alert\" || ctx.routing?.category == \"Recommendation\" || ctx.routing?.category == \"Policy\" || ctx.routing?.category == \"Autoscale\" || ctx.routing?.category == \"ResourceHealth\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.application_gateway",
+        "if": "ctx.routing?.category == \"ApplicationGatewayFirewallLog\" || ctx.routing?.category == \"ApplicationGatewayAccessLog\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.auditlogs",
+        "if": "ctx.routing?.category == \"AuditLogs\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.firewall_logs",
+        "if": "ctx.routing?.category == \"AzureFirewallApplicationRule\" || ctx.routing?.category == \"AzureFirewallNetworkRule\" || ctx.routing?.category == \"AzureFirewallDnsProxy\" || ctx.routing?.category == \"AZFWApplicationRule\" || ctx.routing?.category == \"AZFWNetworkRule\" || ctx.routing?.category == \"AZFWNatRule\" || ctx.routing?.category == \"AZFWDnsQuery\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.graphactivitylogs",
+        "if": "ctx.routing?.category == \"MicrosoftGraphActivityLogs\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.aadgraphactivitylogs",
+        "if": "ctx.routing?.category == \"AzureADGraphActivityLogs\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.identity_protection",
+        "if": "ctx.routing?.category == \"RiskyUsers\" || ctx.routing?.category == \"UserRiskEvents\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.provisioning",
+        "if": "ctx.routing?.category == \"ProvisioningLogs\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "azure.signinlogs",
+        "if": "ctx.routing?.category != null && ctx.routing?.category.endsWith(\"SignInLogs\")"
+      }
+    },
+    {
+      "set": {
+        "description": "Azure Spring Apps log categories (refs: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-logs/microsoft-appplatform-spring-logs)",
+        "field": "event.dataset",
+        "value": "azure.springcloudlogs",
+        "if": "ctx.routing?.category == \"SystemLogs\" || ctx.routing?.category == \"ApplicationConsole\" || ctx.routing?.category == \"IngressLogs\" || ctx.routing?.category == \"BuildLogs\" || ctx.routing?.category == \"ContainerEventLogs\""
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.events@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.events` dataset"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.activitylogs",
+        "if": "ctx.event?.dataset == 'azure.activitylogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.application_gateway",
+        "if": "ctx.event?.dataset == 'azure.application_gateway'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.auditlogs",
+        "if": "ctx.event?.dataset == 'azure.auditlogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.eventhub",
+        "if": "ctx.event?.dataset == 'azure.eventhub'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.firewall_logs",
+        "if": "ctx.event?.dataset == 'azure.firewall_logs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.graphactivitylogs",
+        "if": "ctx.event?.dataset == 'azure.graphactivitylogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.aadgraphactivitylogs",
+        "if": "ctx.event?.dataset == 'azure.aadgraphactivitylogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.identity_protection",
+        "if": "ctx.event?.dataset == 'azure.identity_protection'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.platformlogs",
+        "if": "ctx.event?.dataset == 'azure.platformlogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.provisioning",
+        "if": "ctx.event?.dataset == 'azure.provisioning'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.signinlogs",
+        "if": "ctx.event?.dataset == 'azure.signinlogs'"
+      }
+    },
+    {
+      "reroute": {
+        "namespace": [
+          "{{data_stream.namespace}}",
+          "default"
+        ],
+        "tag": "azure.events",
+        "dataset": "azure.springcloudlogs",
+        "if": "ctx.event?.dataset == 'azure.springcloudlogs'"
+      }
+    }
+  ]
+}

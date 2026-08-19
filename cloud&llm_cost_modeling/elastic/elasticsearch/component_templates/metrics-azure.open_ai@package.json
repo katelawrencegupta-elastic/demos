@@ -1,0 +1,208 @@
+{
+  "name": "metrics-azure.open_ai@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-azure.open_ai-1.14.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "azure.resource.tags.*": {
+              "path_match": "azure.resource.tags.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "azure.dimensions.*": {
+              "path_match": "azure.dimensions.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          }
+        ],
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "dataset": {
+            "properties": {
+              "name": {
+                "type": "constant_keyword"
+              },
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "timegrain": {
+                "type": "keyword"
+              },
+              "resource": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tags": {
+                    "dynamic": true,
+                    "type": "object"
+                  }
+                }
+              },
+              "open_ai": {
+                "properties": {
+                  "generated_tokens": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "active_tokens": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "processed_prompt_tokens": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "time_to_response": {
+                    "properties": {
+                      "avg": {
+                        "meta": {},
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "requests": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "fine_tuned_training_hours": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "provisioned_managed_utilization_v2": {
+                    "properties": {
+                      "avg": {
+                        "meta": {
+                          "unit": "percent"
+                        },
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "token_transaction": {
+                    "properties": {
+                      "total": {
+                        "meta": {},
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "context_tokens_cache_match_rate": {
+                    "properties": {
+                      "avg": {
+                        "meta": {},
+                        "type": "float"
+                      }
+                    }
+                  }
+                }
+              },
+              "namespace": {
+                "type": "keyword"
+              },
+              "application_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "dimensions": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "fingerprint": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure_openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

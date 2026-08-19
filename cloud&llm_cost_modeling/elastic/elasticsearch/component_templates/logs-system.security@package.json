@@ -1,0 +1,1840 @@
+{
+  "name": "logs-system.security@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-system.security-2.22.3",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "winlog.event_data": {
+              "path_match": "winlog.event_data.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          },
+          {
+            "winlog.user_data": {
+              "path_match": "winlog.user_data.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "process": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword",
+                "fields": {
+                  "caseless": {
+                    "normalizer": "lowercase",
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              },
+              "executable": {
+                "ignore_above": 1024,
+                "type": "keyword",
+                "fields": {
+                  "caseless": {
+                    "normalizer": "lowercase",
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "text": {
+                    "type": "match_only_text"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "winlog": {
+            "dynamic": true,
+            "type": "object",
+            "properties": {
+              "related_activity_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "keywords": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "scheduled_task": {
+                "properties": {
+                  "settings": {
+                    "properties": {
+                      "hidden": {
+                        "type": "boolean"
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "name": {
+                    "ignore_above": 4096,
+                    "type": "keyword"
+                  },
+                  "principals": {
+                    "properties": {
+                      "logon": {
+                        "properties": {
+                          "type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user": {
+                        "properties": {
+                          "identifier": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "run_level": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "group": {
+                        "properties": {
+                          "identifier": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "triggers": {
+                    "properties": {
+                      "definition": {
+                        "ignore_above": 2147483647,
+                        "type": "wildcard"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "repetition": {
+                        "properties": {
+                          "duration": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "interval": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "stop_at_duration_end": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "uri": {
+                    "ignore_above": 4096,
+                    "type": "keyword"
+                  },
+                  "actions": {
+                    "properties": {
+                      "class_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "context": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "definition": {
+                        "ignore_above": 2147483647,
+                        "type": "wildcard"
+                      },
+                      "arguments": {
+                        "ignore_above": 4096,
+                        "type": "wildcard",
+                        "fields": {
+                          "text": {
+                            "type": "match_only_text"
+                          }
+                        }
+                      },
+                      "working_directory": {
+                        "ignore_above": 4096,
+                        "type": "wildcard",
+                        "fields": {
+                          "text": {
+                            "type": "match_only_text"
+                          }
+                        }
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "command": {
+                        "ignore_above": 4096,
+                        "type": "wildcard",
+                        "fields": {
+                          "text": {
+                            "type": "match_only_text"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "logon": {
+                "properties": {
+                  "failure": {
+                    "properties": {
+                      "reason": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "sub_status": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "status": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "channel": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "event_data": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "ProcessName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OriginalFileName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "HardwareIds": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BootMode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Product": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonHours": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectGUID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProfileChanged": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SchemaFriendlyName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "InterfaceIndex": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetLogonGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FileVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TicketOptions": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AllowedToDelegateTo": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TdoAttributes": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "StopTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessMask": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "KeyLength": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ResourceAttributes": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SessionName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PasswordHistoryLength": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TransactionId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetInfo": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSd": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OperationType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetUserSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PackageName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ShutdownActionType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DwordVal": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FileName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceVersionMajor": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SidHistory": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterRTID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TransmittedServices": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DataDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CountOfCredentialsReturned": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "WorkstationName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OpCorrelationID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteAddress_ip": {
+                    "type": "ip"
+                  },
+                  "Protocol": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubStatus": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RelativeTargetName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "IdleStateCount": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Path": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SchemaVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MinorVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CrashOnAuditFailValue": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Flags": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProcessPath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceVersionMinor": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProviderContextType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "HandleId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "IpAddress": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RuleAttr": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AttributeLDAPDisplayName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AttributeValue": {
+                    "ignore_above": 5120,
+                    "type": "keyword",
+                    "fields": {}
+                  },
+                  "FailureReasonsOutcome": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "KeyType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DnsHostName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LastShutdownGood": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Schema": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "VendorIds": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AppCorrelationID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClassId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "IpPort": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CryptoAlgorithms": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DriverNameLength": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LmPackageName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "StatusCode": {
+                    "type": "long"
+                  },
+                  "UserSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LastBootGood": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessListDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PuaCount": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LayerId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ChangeType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MachineAccountQuota": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProcessCreationTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RuleName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "GPOList": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldUacValue": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ReadOperation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "UserParameters": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Signed": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "StartTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubCategoryId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldTargetUserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DSType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewUacValue": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteUserID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AlgorithmName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Weight": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CallerProcessId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClientProcessId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CalloutId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProfilePath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "State": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CompatibleIds": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FailureReason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ComputerAccountChange": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OriginalProfile": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BootType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Binary": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ImpersonationLevel": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MemberName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetUserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DomainPolicyChanged": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CategoryId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LinkName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PreAuthType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Options": {
+                    "type": "long"
+                  },
+                  "Action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccountDomain": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProviderContextName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MemberSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DriverName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewUACList": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Properties": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubcategoryGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ShutdownReason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SidFilteringEnabled": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetServerName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AuditPolicyChanges": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Number": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClassName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterOrigin": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetDomainName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "EventSourceId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectClass": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "UserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DriveName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewProcessId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProfileUsed": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ExtraInfo": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LayerNameDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClientCreationTime": {
+                    "type": "date"
+                  },
+                  "IsLoopback": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PrimaryGroupId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProtectedDataFlags": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetLogonId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Workstation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProviderName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProviderContextKey": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProviderKey": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PasswordLastSet": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSchemeGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "HasRemoteDynamicKeywordAddress": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MinimumThrottlePercent": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "GroupTypeChange": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CalloutType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ErrorCode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessList": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AuthenticationPackageName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NominalFrequency": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CurrentProfile": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SignatureStatus": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AttributeSyntaxOID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LocationInformation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DestPort": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "EventCountTotal": {
+                    "type": "long"
+                  },
+                  "GroupMembership": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SearchString": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DomainSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ScriptPath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TicketEncryptionType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TicketOptionsDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectDN": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectServer": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BackupType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "HomePath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Identity": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "UserWorkstations": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SamAccountName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ReturnCode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RequestId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DomainName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CorruptionActionState": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AuditSourceName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RecoveryKeyId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubCategoryGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PreviousCreationUtcTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CalloutName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AuditPolicyChangesDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LayerKey": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessMaskDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Application": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectUserSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccountName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PerformanceImplementation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TicketEncryptionTypeDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceAccount": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Description": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProcessPid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ScriptBlockText": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteMachineID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NamingContext": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Direction": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FilterKey": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Profile": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ObjectType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ReasonForRejection": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServicePrincipalNames": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MaximumPerformancePercent": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "KerberosPolicyChange": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FinalStatus": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MajorVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MandatoryLabel": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "HomeDirectory": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TdoSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LayerName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TokenElevationType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MasterKeyId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectLogonId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "IdleImplementation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "QfeVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccountExpires": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AdditionalInfo2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "KeyFilePath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceStartType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CalloutKey": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DSName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "UserPrincipalName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdSacl1": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Dummy": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdSacl0": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdSacl2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Company": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PuaPolicyId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdSacl2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "IntegrityLevel": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdSacl1": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdSacl0": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TargetSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSd": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SPI": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Conditions": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "EventIdx": {
+                    "type": "long"
+                  },
+                  "NewTargetUserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClientName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "StatusDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdDacl0": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdDacl2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewSdDacl1": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProcessID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DomainBehaviorVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DestAddress": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SessionId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteMachineDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AdditionalInfo": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessGranted": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ParentProcessName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubcategoryId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessRemoved": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Resource": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RecoveryServer": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ShutdownEventCode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewProcessName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ResourceManager": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FailureNameLength": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LayerRTID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PreviousTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "NewState": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "StartUSN": {
+                    "type": "long"
+                  },
+                  "MixedDomainMode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Detail": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "EnabledPrivilegeList": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdDacl1": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdDacl0": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ReturnCodeOutcome": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TerminalSessionId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSdDacl2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RuleId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ShareName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ClientAddress": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DeviceNameLength": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OldSchemeGuid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Operation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteAddress_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CreationUtcTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SourcePort": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BackupTypeDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CallerProcessName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FailureReasons": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TdoType": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Reason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceFileName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "AccessReason": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "DisplayName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BuildVersion": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectDomainName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "MinimumPerformancePercent": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonProcessName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TSId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "PrivilegeList": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SourceAddress": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param7": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param8": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param5": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param6": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Service": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "TdoDirection": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param3": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param4": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param1": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ShareLocalPath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "param2": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "KeyName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "CommandLine": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectUserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "UserAccountControl": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "OemInformation": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "FailureName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubCategory": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "RemoteUserDescription": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ServiceSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ProcessId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "EntryCount": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "LogonID": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BitlockerUserInputTime": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "opcode": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "provider_guid": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "activity_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "time_created": {
+                "type": "date"
+              },
+              "trustDirection": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "api": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "provider_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "outcome": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "computer_name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "process": {
+                "properties": {
+                  "pid": {
+                    "type": "long"
+                  },
+                  "thread": {
+                    "properties": {
+                      "id": {
+                        "type": "long"
+                      }
+                    }
+                  }
+                }
+              },
+              "trustAttribute": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "level": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "computerObject": {
+                "properties": {
+                  "domain": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "user_data": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "SubjectUserName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "BackupPath": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "Channel": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectDomainName": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectLogonId": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "SubjectUserSid": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "xml_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "version": {
+                "type": "long"
+              },
+              "record_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "event_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "task": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "trustType": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "user": {
+                "properties": {
+                  "identifier": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "domain": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword",
+                "value": "logs"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "system"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "system.security"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "system"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

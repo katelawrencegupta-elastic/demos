@@ -1,0 +1,542 @@
+{
+  "name": "logs-azure.auditlogs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557407463,
+  "description": "Pipeline for parsing azure activity logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557407463,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "azure.auditlogs"
+      }
+    },
+    {
+      "drop": {
+        "if": "ctx.azure.auditlogs.category != 'AuditLogs'"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.auditlogs.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "azure.auditlogs.durationMs",
+        "target_field": "event.duration",
+        "ignore_missing": true,
+        "description": "Convert durationMs to event.duration as long (if it is a string).",
+        "type": "long",
+        "if": "ctx.azure?.auditlogs?.durationMs != null && ctx.azure.auditlogs.durationMs instanceof String"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Rename durationMs to event.duration (if it is not a string).",
+        "field": "azure.auditlogs.durationMs",
+        "target_field": "event.duration",
+        "if": "ctx.azure?.auditlogs?.durationMs != null && !(ctx.azure.auditlogs.durationMs instanceof String)"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Clean up durationMs field, if it is still there after the conversion.",
+        "field": "azure.auditlogs.durationMs"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.event.duration = ctx.event.duration * params.param_nano",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        },
+        "if": "ctx.event?.duration != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "azure.auditlogs.properties.result",
+        "target_field": "event.outcome",
+        "if": "ctx?.azure?.auditlogs?.properties?.result != null && ctx.azure.auditlogs.properties.result instanceof String && (ctx.azure.auditlogs.properties.result.toLowerCase() == 'success' || ctx.azure.auditlogs.properties.result.toLowerCase() == 'failure')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.level",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.auditlogs.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "azure.auditlogs.operationName",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.operationName",
+        "target_field": "azure.auditlogs.operation_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.resultSignature",
+        "target_field": "azure.auditlogs.result_signature"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.resultDescription",
+        "target_field": "azure.auditlogs.result_description"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.operationVersion",
+        "target_field": "azure.auditlogs.operation_version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.tenantId",
+        "target_field": "azure.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.correlationId",
+        "target_field": "azure.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.activityDisplayName",
+        "target_field": "azure.auditlogs.properties.activity_display_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.activityDateTime",
+        "target_field": "azure.auditlogs.properties.activity_datetime"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.additionalDetails",
+        "target_field": "azure.auditlogs.properties.additional_details"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "azure.auditlogs.callerIpAddress",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.auditlogs.callerIpAddress",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.callerIpAddress",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop appId field if value is null.",
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.initiatedBy.app.appId",
+        "if": "ctx?.azure?.auditlogs?.properties?.initiatedBy?.app?.appId == null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop servicePrincipalName field if value is null.",
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.initiatedBy.app.servicePrincipalName",
+        "if": "ctx?.azure?.auditlogs?.properties?.initiatedBy?.app?.servicePrincipalName == null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop userAgent field if value is null.",
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.userAgent",
+        "if": "ctx?.azure?.auditlogs?.properties?.userAgent == null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "client.ip",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.resultReason",
+        "target_field": "azure.auditlogs.properties.result_reason"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.resultDescription",
+        "target_field": "azure.auditlogs.properties.result_description"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.correlationId",
+        "target_field": "azure.auditlogs.properties.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.loggedByService",
+        "target_field": "azure.auditlogs.properties.logged_by_service"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.operationType",
+        "target_field": "azure.auditlogs.properties.operation_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.Level",
+        "target_field": "azure.auditlogs.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.additional_details.userAgent",
+        "target_field": "azure.auditlogs.properties.additional_details.user_agent"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop displayName field if value is null.",
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.initiatedBy.user.displayName",
+        "if": "ctx?.azure?.auditlogs?.properties?.initiatedBy?.user?.displayName == null"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.auditlogs.properties?.targetResources != null) {\n  ctx.azure.auditlogs.properties.target_resources = new HashMap();\n  for (def i = 0; i < ctx.azure.auditlogs.properties.targetResources.length; i++) {\n    String index = String.valueOf(i);\n    ctx.azure.auditlogs.properties.target_resources[index] = new HashMap();\n    if(ctx.azure.auditlogs.properties.targetResources[i].displayName != null) {\n      ctx.azure.auditlogs.properties.target_resources[index].display_name = ctx.azure.auditlogs.properties.targetResources[i].displayName;\n    }\n    ctx.azure.auditlogs.properties.target_resources[index].id = ctx.azure.auditlogs.properties.targetResources[i].id;\n    ctx.azure.auditlogs.properties.target_resources[index].type = ctx.azure.auditlogs.properties.targetResources[i].type;\n    if (ctx.azure.auditlogs.properties.targetResources[i].ipAddress != null) {\n      ctx.azure.auditlogs.properties.target_resources[index].ip_address = ctx.azure.auditlogs.properties.targetResources[i].ipAddress;\n    }\n    if (ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName != null) {\n      ctx.azure.auditlogs.properties.target_resources[index].user_principal_name = ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName;\n    }\n    ctx.azure.auditlogs.properties.target_resources[index].modified_properties = new HashMap();\n    for (def j = 0; j < ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties.length; j++) {\n      String n = String.valueOf(j);\n      ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n] = new HashMap();\n\n      ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].display_name = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].displayName;\n      \n      if (ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].newValue != null) {\n        ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].new_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].newValue;\n      }\n      if (ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].oldValue != null) {\n        ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].old_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].oldValue;\n      }\n    }\n  }\n  ctx.azure.auditlogs.properties.remove('targetResources');\n}",
+        "tag": "whatever",
+        "lang": "painless"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.auditlogs.properties.initiatedBy",
+        "target_field": "azure.auditlogs.properties.initiated_by"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_name",
+        "field": "user.name",
+        "copy_from": "azure.auditlogs.properties.initiated_by.user.userPrincipalName"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "tag": "convert_user_id",
+        "field": "azure.auditlogs.properties.initiated_by.user.id",
+        "target_field": "user.id",
+        "type": "string"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_user_full_name",
+        "field": "user.full_name",
+        "copy_from": "azure.auditlogs.properties.initiated_by.user.displayName"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.auditlogs.properties.initiated_by.user.id }}}",
+        "if": "ctx.azure?.auditlogs?.properties?.initiated_by?.user?.id != null && ctx.azure.auditlogs.properties.initiated_by.user.id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.auditlogs.properties.initiated_by.app.servicePrincipalId }}}",
+        "if": "ctx.azure?.auditlogs?.properties?.initiated_by?.app?.servicePrincipalId != null && ctx.azure.auditlogs.properties.initiated_by.app.servicePrincipalId != ''"
+      }
+    },
+    {
+      "script": {
+        "description": "Appends target resources identifiers to `related.entity`",
+        "on_failure": [
+          {
+            "set": {
+              "description": "Add error reason",
+              "field": "error.message",
+              "value": "{{{ _ingest.on_failure_message }}}"
+            }
+          }
+        ],
+        "source": "ctx.related = ctx.related ?: [:];\nctx.related.entity = ctx.related.entity ?: [];\nif (ctx.azure.auditlogs.properties?.target_resources != null) {\n    for (String k : ctx.azure.auditlogs.properties.target_resources.keySet()) {\n        def resource = ctx.azure.auditlogs.properties.target_resources[k];\n        if (resource?.id != null && resource.id != '' && !ctx.related.entity.contains(resource.id)) {\n                ctx.related.entity.add(resource.id);\n        }\n    }\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_id_to_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.id}}}",
+        "if": "ctx.user?.id != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_name_to_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.name}}}",
+        "if": "ctx.user?.name != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_full_name_to_related_user",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.full_name}}}",
+        "if": "ctx.user?.full_name != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.auditlogs-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.auditlogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.auditlogs` dataset"
+      }
+    }
+  ]
+}

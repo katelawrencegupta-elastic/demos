@@ -1,0 +1,176 @@
+{
+  "name": ".ml-stats",
+  "index_template": {
+    "index_patterns": [
+      ".ml-stats-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "managed_index_mappings_version": 1,
+          "version": "8.11.0"
+        },
+        "dynamic": false,
+        "properties": {
+          "skipped_docs_count": {
+            "type": "long"
+          },
+          "validation_loss": {
+            "properties": {
+              "fold_values": {
+                "properties": {
+                  "fold": {
+                    "type": "integer"
+                  },
+                  "values": {
+                    "type": "double"
+                  }
+                }
+              },
+              "loss_type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "cache_miss_count": {
+            "type": "long"
+          },
+          "timing_stats": {
+            "properties": {
+              "iteration_time": {
+                "type": "long"
+              },
+              "elapsed_time": {
+                "type": "long"
+              }
+            }
+          },
+          "failure_count": {
+            "type": "long"
+          },
+          "model_id": {
+            "type": "keyword"
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "training_docs_count": {
+            "type": "long"
+          },
+          "inference_count": {
+            "type": "long"
+          },
+          "job_id": {
+            "type": "keyword"
+          },
+          "missing_all_fields_count": {
+            "type": "long"
+          },
+          "peak_usage_bytes": {
+            "type": "long"
+          },
+          "iteration": {
+            "type": "integer"
+          },
+          "hyperparameters": {
+            "properties": {
+              "max_attempts_to_add_tree": {
+                "type": "integer"
+              },
+              "downsample_factor": {
+                "type": "double"
+              },
+              "eta_growth_rate_per_tree": {
+                "type": "double"
+              },
+              "soft_tree_depth_tolerance": {
+                "type": "double"
+              },
+              "max_trees": {
+                "type": "integer"
+              },
+              "lambda": {
+                "type": "double"
+              },
+              "max_optimization_rounds_per_hyperparameter": {
+                "type": "integer"
+              },
+              "eta": {
+                "type": "double"
+              },
+              "soft_tree_depth_limit": {
+                "type": "double"
+              },
+              "alpha": {
+                "type": "double"
+              },
+              "class_assignment_objective": {
+                "type": "keyword"
+              },
+              "feature_bag_fraction": {
+                "type": "double"
+              },
+              "num_splits_per_feature": {
+                "type": "integer"
+              },
+              "gamma": {
+                "type": "double"
+              },
+              "num_folds": {
+                "type": "integer"
+              }
+            }
+          },
+          "parameters": {
+            "properties": {
+              "compute_feature_influence": {
+                "type": "boolean"
+              },
+              "feature_influence_threshold": {
+                "type": "double"
+              },
+              "outlier_fraction": {
+                "type": "double"
+              },
+              "method": {
+                "type": "keyword"
+              },
+              "standardization_enabled": {
+                "type": "boolean"
+              },
+              "n_neighbors": {
+                "type": "integer"
+              }
+            }
+          },
+          "test_docs_count": {
+            "type": "long"
+          },
+          "node_id": {
+            "type": "keyword"
+          },
+          "timestamp": {
+            "type": "date"
+          }
+        }
+      },
+      "aliases": {}
+    },
+    "composed_of": [],
+    "priority": 2147483647,
+    "version": 10000008,
+    "_meta": {
+      "description": "index template for ML stats indices",
+      "managed": true
+    },
+    "created_date_millis": 1786555715015,
+    "modified_date_millis": 1786555715015
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "name": ".fleet_event_ingested_pipeline-1",
+  "on_failure": [
+    {
+      "remove": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "_security"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": [
+          "failed in Fleet agent event_ingested_pipeline: {{ _ingest.on_failure_message }}"
+        ]
+      }
+    }
+  ],
+  "modified_date_millis": 1786555751525,
+  "_meta": {
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "description": "Pipeline for processing all incoming Fleet Agent documents that adds event.ingested.\n",
+  "created_date_millis": 1786555751525,
+  "processors": [
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "Add time when event was ingested (and remove sub-seconds to improve storage efficiency)",
+        "tag": "truncate-subseconds-event-ingested",
+        "source": "if (ctx?.event == null) {\n  ctx.event = [:];\n}\n\nctx.event.ingested = metadata().now.withNano(0).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);"
+      }
+    },
+    {
+      "remove": {
+        "description": "Remove any pre-existing untrusted values.",
+        "ignore_missing": true,
+        "field": [
+          "event.agent_id_status",
+          "_security"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "ignore_failure": true,
+        "description": "Remove event.original unless the preserve_original_event tag is set",
+        "ignore_missing": true,
+        "field": "event.original",
+        "if": "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      }
+    },
+    {
+      "set_security_user": {
+        "field": "_security",
+        "properties": [
+          "authentication_type",
+          "username",
+          "realm",
+          "api_key"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "_security",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "version": 1
+}

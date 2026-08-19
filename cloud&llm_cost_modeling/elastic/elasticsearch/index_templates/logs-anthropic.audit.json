@@ -1,0 +1,50 @@
+{
+  "name": "logs-anthropic.audit",
+  "index_template": {
+    "index_patterns": [
+      "logs-anthropic.audit-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "anthropic"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-anthropic.audit@package",
+      "logs@custom",
+      "anthropic@custom",
+      "logs-anthropic.audit@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "anthropic"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "anthropic@custom",
+      "logs-anthropic.audit@custom"
+    ],
+    "created_date_millis": 1786643474389,
+    "modified_date_millis": 1786643474389
+  }
+}

@@ -1,0 +1,494 @@
+{
+  "name": "logs-aws_bedrock.invocation-1.6.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643492430,
+  "description": "Pipeline for Amazon Bedrock model invocation logs.",
+  "_meta": {
+    "package": {
+      "name": "aws_bedrock"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643492430,
+  "processors": [
+    {
+      "rename": {
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Drop fields unrelated to the ingested logs.",
+        "ignore_missing": true,
+        "field": [
+          "host",
+          "cloud",
+          "container"
+        ]
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "aws_bedrock.invocation"
+      }
+    },
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.service.name",
+        "value": "bedrock"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "aws_bedrock.invocation.timestamp",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "aws_bedrock.invocation.timestamp",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.invocation.operation",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.invocation.identity.arn",
+        "target_field": "user.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.invocation.accountId",
+        "target_field": "cloud.account.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "aws_bedrock.invocation.region",
+        "target_field": "cloud.region"
+      }
+    },
+    {
+      "script": {
+        "description": "Remove massive artifact blobs.",
+        "source": "for (int i = 0; i < ctx.aws_bedrock.invocation.artifacts.length; i++) {\n  if (ctx.aws_bedrock.invocation.artifacts[i].base64 instanceof String && ctx.aws_bedrock.invocation.artifacts[i].base64.length() > 32766) {\n    ctx.aws_bedrock.invocation.artifacts[i].base64_massive_hash = ctx.aws_bedrock.invocation.artifacts[i].base64.sha1();\n    ctx.aws_bedrock.invocation.artifacts[i].base64_massive_length = ctx.aws_bedrock.invocation.artifacts[i].base64.length();\n    ctx.aws_bedrock.invocation.artifacts[i].remove(\"base64\");\n  }\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.artifacts instanceof List"
+      }
+    },
+    {
+      "set": {
+        "field": "gen_ai.system",
+        "value": "aws"
+      }
+    },
+    {
+      "set": {
+        "field": "gen_ai.response.timestamp",
+        "copy_from": "@timestamp"
+      }
+    },
+    {
+      "set": {
+        "description": "Prepare destination for request JSON.",
+        "field": "gen_ai.prompt",
+        "value": ""
+      }
+    },
+    {
+      "set": {
+        "description": "Prepare destination for response JSON.",
+        "field": "gen_ai.completion",
+        "value": ""
+      }
+    },
+    {
+      "set": {
+        "description": "Prepare destination for request size.",
+        "field": "gen_ai.performance.request_size",
+        "value": 0
+      }
+    },
+    {
+      "set": {
+        "description": "Prepare destination for response size.",
+        "field": "gen_ai.performance.response_size",
+        "value": 0
+      }
+    },
+    {
+      "script": {
+        "description": "Convert bodies back to JSON so that the string fields are valid JSON data.",
+        "tag": "remarshal_bodies",
+        "source": "String json(def val) {\n  if (val == null) {\n    return null;\n  }\n  if (val instanceof Map) {\n    String out = '{';\n    List keyList = new ArrayList(val.keySet());\n    Collections.sort(keyList);\n    for (int i=0; i < keyList.length; i++){\n      if (i != 0) {\n        out += ',';\n      }\n      String key = keyList[i];\n      out += '\"' +  key + '\"';\n      if (val[key] instanceof String){\n        out += ':\"' + val[key] + '\"';\n      } else {\n        out += ':' + json(val[key]);\n      }\n    }\n    return out + '}';\n  } else if (val instanceof ArrayList) {\n    String out = '[';\n    for (int i = 0; i < val.length; i++){\n      if (i != 0) {\n          out += ',';\n      }\n      out = out + json(val[i]);\n    }\n    return out + ']';\n  } else if (val instanceof String) {\n    return '\"' + val + '\"'; // This may not be valid JSON depending on code points in val. TODO: Add escape helper.\n  }\n  return val.toString();\n}\nctx.gen_ai.prompt = json(ctx.aws_bedrock?.invocation?.input?.inputBodyJson);\nctx.gen_ai.completion = json(ctx.aws_bedrock?.invocation?.output?.outputBodyJson);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "description": "Rename the fields under the aws_bedrock objects.",
+        "tag": "painless_to_rename_fields_under_aws_bedrock_groups",
+        "source": "def renameKeys(Map src, Map keyMap) {\n  def dst = new HashMap();\n  for (def entry: src.entrySet()) {\n    def key = entry.getKey();\n    def value = entry.getValue();\n    if (value instanceof Map) {\n      if (keyMap.containsKey(key)) {\n        dst[keyMap[key]] = renameKeys(value, keyMap);\n      } else {\n        dst[key] = renameKeys(value, keyMap);\n      }\n    } else if (value instanceof List) {\n      def updatedList = [];\n      for (def item: value) {\n        if (item instanceof Map) {\n          updatedList.add(renameKeys(item, keyMap));\n        } else {\n          updatedList.add(item);\n        }\n      }\n      if (keyMap.containsKey(key)) {\n        dst[keyMap[key]] = updatedList;\n      } else {\n        dst[key] = updatedList;\n      }\n    } else {\n      if (keyMap.containsKey(key)) {\n        dst[keyMap[key]] = value;\n      } else {\n        dst[key] = value;\n      }\n    }\n  }\n  return dst;\n}\n\nctx.aws_bedrock = renameKeys(ctx.aws_bedrock, params)\n",
+        "lang": "painless",
+        "params": {
+          "inputTokenCount": "input_token_count",
+          "contentPolicyUnits": "content_policy_units",
+          "guardrailCoverage": "guardrail_coverage",
+          "modelId": "model_id",
+          "errorCode": "error_code",
+          "outputTokenCount": "output_token_count",
+          "imageGenerationConfig": "image_generation_config",
+          "wordPolicy": "word_policy",
+          "outputContentType": "output_content_type",
+          "topicPolicyUnits": "topic_policy_units",
+          "invocationLatency": "invocation_latency",
+          "numberOfImages": "number_of_images",
+          "inputBodyJson": "input_body_json",
+          "taskType": "task_type",
+          "invocationMetrics": "invocation_metrics",
+          "textCharacters": "text_characters",
+          "amazon-bedrock-trace": "amazon_bedrock_trace",
+          "inputContentType": "input_content_type",
+          "cfgScale": "cfg_scale",
+          "requestId": "request_id",
+          "sensitiveInformationPolicyFreeUnits": "sensitive_information_policy_free_units",
+          "sensitiveInformationPolicy": "sensitive_information_policy",
+          "latencyMs": "latency_ms",
+          "stopReason": "stop_reason",
+          "topicPolicy": "topic_policy",
+          "customWords": "custom_words",
+          "schemaVersion": "schema_version",
+          "contextualGroundingPolicy": "contextual_grounding_policy",
+          "wordPolicyUnits": "word_policy_units",
+          "amazon-bedrock-guardrailAction": "amazon_bedrock_guardrail_action",
+          "outputBodyS3Path": "output_body_s3_path",
+          "contentPolicy": "content_policy",
+          "contextualGroundingPolicyUnits": "contextual_grounding_policy_units",
+          "imageVariationParams": "image_variation_params",
+          "outputBodyJson": "output_body_json",
+          "firstByteLatency": "first_byte_latency",
+          "normalizeIndex": "normalize_index",
+          "schemaType": "schema_type",
+          "inputBodyS3Path": "input_body_s3_path",
+          "finishReason": "finish_reason",
+          "sensitiveInformationPolicyUnits": "sensitive_information_policy_units",
+          "piiEntities": "pii_entities",
+          "amazon-bedrock-invocationMetrics": "amazon_bedrock_invocation_metrics",
+          "guardrailProcessingLatency": "guardrail_processing_latency"
+        }
+      }
+    },
+    {
+      "script": {
+        "tag": "script_promote_system_to_object",
+        "source": "Map sys = [:];\nsys.type = 'text';\nsys.text = ctx.aws_bedrock.invocation.system;\nctx.aws_bedrock.invocation.system = sys;",
+        "if": "ctx.aws_bedrock?.invocation?.system instanceof String"
+      }
+    },
+    {
+      "script": {
+        "tag": "script_promote_messages_content_to_object",
+        "source": "// Handle messages as either an array or single object\ndef messagesList = ctx.aws_bedrock.invocation.messages instanceof List\n  ? ctx.aws_bedrock.invocation.messages\n  : [ctx.aws_bedrock.invocation.messages];\n\nfor (def message : messagesList) {\n  if (!(message instanceof Map)) {\n    continue;\n  }\n\n  // If content is a string, promote it to an object with type and text\n  if (message.content instanceof String) {\n    Map contentObj = [:];\n    contentObj.type = 'text';\n    contentObj.text = message.content;\n    message.content = contentObj;\n  }\n  // If content is already an array, ensure each item has type and text fields\n  else if (message.content instanceof List) {\n    for (def contentItem : message.content) {\n      if (!(contentItem instanceof Map)) {\n        continue;\n      }\n\n      // Ensure type field exists\n      if (!contentItem.containsKey('type')) {\n        contentItem.type = 'text';\n      }\n\n      // Check if this item already has a text field with actual content\n      boolean hasExistingText = contentItem.containsKey('text') &&\n                               contentItem.text instanceof String &&\n                               contentItem.text != '';\n\n      // If no text field exists, we need to create one\n      if (!hasExistingText) {\n        // Handle nested content field (e.g., in tool_result)\n        if (contentItem.containsKey('content') && !(contentItem.content instanceof String)) {\n          contentItem.text = Json.dump(contentItem.content);\n        } else if (contentItem.containsKey('content') && contentItem.content instanceof String) {\n          contentItem.text = contentItem.content;\n        } else {\n          // Serialize all fields except type\n          Map itemCopy = [:];\n          for (def entry : contentItem.entrySet()) {\n            if (entry.getKey() != 'type') {\n              itemCopy[entry.getKey()] = entry.getValue();\n            }\n          }\n          contentItem.text = Json.dump(itemCopy);\n        }\n\n        // Remove all fields except type and text to avoid duplication\n        def keysToRemove = new ArrayList(contentItem.keySet());\n        for (def key : keysToRemove) {\n          if (key != 'type' && key != 'text') {\n            contentItem.remove(key);\n          }\n        }\n      }\n    }\n  }\n  // If content is an object, ensure it has type and text fields\n  else if (message.content instanceof Map) {\n    if (!message.content.containsKey('type')) {\n      message.content.type = 'text';\n    }\n\n    boolean hasExistingText = message.content.containsKey('text') &&\n                             message.content.text instanceof String &&\n                             message.content.text != '';\n\n    if (!hasExistingText) {\n      if (message.content.containsKey('content')) {\n        if (message.content.content instanceof String) {\n          message.content.text = message.content.content;\n        } else {\n          message.content.text = Json.dump(message.content.content);\n        }\n      } else {\n        Map contentCopy = [:];\n        for (def entry : message.content.entrySet()) {\n          if (entry.getKey() != 'type') {\n            contentCopy[entry.getKey()] = entry.getValue();\n          }\n        }\n        message.content.text = Json.dump(contentCopy);\n      }\n\n      def keysToRemove = new ArrayList(message.content.keySet());\n      for (def key : keysToRemove) {\n        if (key != 'type' && key != 'text') {\n          message.content.remove(key);\n        }\n      }\n    }\n  }\n}",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.messages != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "script_demote_messages_content_content_to_string",
+        "source": "def messagesList = ctx.aws_bedrock.invocation.messages instanceof List\n  ? ctx.aws_bedrock.invocation.messages\n  : [ctx.aws_bedrock.invocation.messages];\n\nfor (def message : messagesList) {\n  if (!(message instanceof Map) || !message.containsKey('content')) {\n    continue;\n  }\n\n  // Process content if it's an array\n  if (message.content instanceof List) {\n    for (def contentItem : message.content) {\n      if (!(contentItem instanceof Map)) {\n        continue;\n      }\n\n      // Ensure we have a text field - if not, create it from available data\n      boolean needsTextCreation = !contentItem.containsKey('text') ||\n                                 contentItem.text == null ||\n                                 contentItem.text == '';\n\n      if (needsTextCreation) {\n        if (contentItem.containsKey('content')) {\n          if (contentItem.content instanceof String) {\n            contentItem.text = contentItem.content;\n          } else {\n            contentItem.text = Json.dump(contentItem.content);\n          }\n        } else {\n          // Create text from all fields except type\n          Map itemCopy = [:];\n          for (def entry : contentItem.entrySet()) {\n            if (entry.getKey() != 'type') {\n              itemCopy[entry.getKey()] = entry.getValue();\n            }\n          }\n          if (itemCopy.size() > 0) {\n            contentItem.text = Json.dump(itemCopy);\n          } else {\n            contentItem.text = '';\n          }\n        }\n      }\n\n      // Remove all fields except type and text\n      def keysToRemove = new ArrayList(contentItem.keySet());\n      for (def key : keysToRemove) {\n        if (key != 'type' && key != 'text') {\n          contentItem.remove(key);\n        }\n      }\n    }\n  }\n  // Process content if it's a single object\n  else if (message.content instanceof Map) {\n    boolean needsTextCreation = !message.content.containsKey('text') ||\n                               message.content.text == null ||\n                               message.content.text == '';\n\n    if (needsTextCreation) {\n      if (message.content.containsKey('content')) {\n        if (message.content.content instanceof String) {\n          message.content.text = message.content.content;\n        } else {\n          message.content.text = Json.dump(message.content.content);\n        }\n      } else {\n        Map contentCopy = [:];\n        for (def entry : message.content.entrySet()) {\n          if (entry.getKey() != 'type') {\n            contentCopy[entry.getKey()] = entry.getValue();\n          }\n        }\n        if (contentCopy.size() > 0) {\n          message.content.text = Json.dump(contentCopy);\n        } else {\n          message.content.text = '';\n        }\n      }\n    }\n\n    def keysToRemove = new ArrayList(message.content.keySet());\n    for (def key : keysToRemove) {\n      if (key != 'type' && key != 'text') {\n        message.content.remove(key);\n      }\n    }\n  }\n}",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.messages != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gen_ai.request.model.id",
+        "copy_from": "aws_bedrock.invocation.model_id",
+        "if": "ctx.aws_bedrock?.invocation?.model_id != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "get_response_id_type_and_version",
+        "source": "def typ = ctx.gen_ai.request.model.id.substring(0, ctx.gen_ai.request.model.id.indexOf('.'));\nctx.gen_ai.request.model.type = typ;\nctx.gen_ai.request.model.version = ctx.aws_bedrock.invocation.input.input_body_json[typ+'_version'];\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json != null && ctx.gen_ai?.request?.model?.id instanceof String && ctx.gen_ai.request.model.id.contains('.')"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.input.input_token_count",
+        "target_field": "gen_ai.usage.prompt_tokens",
+        "type": "long",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_token_count != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.input.input_body_json.top_k",
+        "target_field": "gen_ai.request.top_k",
+        "type": "float",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json?.top_k != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.input.input_body_json.top_p",
+        "target_field": "gen_ai.request.top_p",
+        "type": "float",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json?.top_p != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.input.input_body_json.temperature",
+        "target_field": "gen_ai.request.temperature",
+        "type": "float",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json?.temperature != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.input.input_body_json.max_tokens",
+        "target_field": "gen_ai.request.max_tokens",
+        "type": "long",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json?.max_tokens != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "aws_bedrock.invocation.output.output_token_count",
+        "target_field": "gen_ai.usage.completion_tokens",
+        "type": "long",
+        "if": "ctx.aws_bedrock?.invocation?.output?.output_token_count != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gen_ai.request.id",
+        "copy_from": "aws_bedrock.invocation.request_id",
+        "if": "ctx.aws_bedrock?.invocation?.request_id != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gen_ai.response.id",
+        "copy_from": "aws_bedrock.invocation.output.output_body_json.id",
+        "if": "!(ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List) && ctx.aws_bedrock?.invocation?.output?.output_body_json?.id != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "append_input_message_content_kinds",
+        "source": "// using a Set to avoid duplicates\ndef content_kinds_set = new HashSet(ctx.aws_bedrock.invocation.input?.messages_content_kinds ?: []);\nfor (def message : ctx.aws_bedrock.invocation.input.input_body_json.messages) {\n    if (message?.content instanceof List) {\n        for (def content_item : message['content']) {\n            if (content_item instanceof Map) {\n                def content_type = '';\n                if (content_item.containsKey('text')) {\n                    content_type = 'text';\n                } else if (content_item.containsKey('document')) {\n                    content_type = 'document';\n                    if (content_item['document'] instanceof Map && content_item['document'].containsKey('format')) {\n                        content_type += '/' + content_item['document']['format'];\n                    }\n                }\n                if (content_type != '') {\n                    content_kinds_set.add(content_type);\n                }\n            }\n        }\n    }\n}\n// convert the Set back to a List\nctx.aws_bedrock.invocation.input.messages_content_kinds = new ArrayList(content_kinds_set);\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.input?.input_body_json?.messages instanceof List"
+      }
+    },
+    {
+      "script": {
+        "tag": "ensure_output_body_json_object_elements",
+        "source": "for (int i = 0; i < ctx.aws_bedrock.invocation.output.output_body_json.length; i++) {\n  def e = ctx.aws_bedrock.invocation.output.output_body_json[i];\n  if (e instanceof Map) {\n    continue;\n  }\n  ctx.aws_bedrock.invocation.output.output_body_json[i] = [:];\n  ctx.aws_bedrock.invocation.output.output_body_json[i].value = e;\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List"
+      }
+    },
+    {
+      "script": {
+        "tag": "get_response_id_and_role_from_list",
+        "source": "for (def e: ctx.aws_bedrock.invocation.output.output_body_json) {\n  if (e.message?.id != null) {\n    if (ctx.gen_ai == null) {\n      ctx.gen_ai = new HashMap();\n    }\n    if (ctx.gen_ai.response == null) {\n      ctx.gen_ai.response = new HashMap();\n    }\n    ctx.gen_ai.request.model.role = e.message?.role; // Surprisingly this is in the invocation.\n    ctx.gen_ai.response.id = e.message?.id;\n    break;\n  }\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List"
+      }
+    },
+    {
+      "set": {
+        "tag": "get_response_role_from_object",
+        "field": "gen_ai.request.model.role",
+        "copy_from": "aws_bedrock.invocation.output.output_body_json.output.message.role",
+        "if": "!(ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List) && ctx.aws_bedrock?.invocation?.output?.output_body_json?.output?.message?.role != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "get_stop_reason",
+        "field": "gen_ai.response.finish_reasons",
+        "copy_from": "aws_bedrock.invocation.output.output_body_json.stop_reason",
+        "if": "!(ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List) && ctx.aws_bedrock?.invocation?.output?.output_body_json?.stop_reason != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "get_response_time",
+        "source": "for (int i = ctx.aws_bedrock.invocation.output.output_body_json.length-1; i >= 0; i--) {\n  def e = ctx.aws_bedrock.invocation.output.output_body_json[i];\n  if (e.amazon_bedrock_invocation_metrics?.invocation_latency != null) {\n    if (ctx.gen_ai == null) {\n      ctx.gen_ai = new HashMap();\n    }\n    if (ctx.gen_ai.performance == null) {\n      ctx.gen_ai.performance = new HashMap();\n    }\n    ctx.gen_ai.performance.start_response_time = e.amazon_bedrock_invocation_metrics.first_byte_latency;\n    ctx.gen_ai.performance.response_time = e.amazon_bedrock_invocation_metrics.invocation_latency;\n    break;\n  }\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.output?.output_body_json instanceof List"
+      }
+    },
+    {
+      "set": {
+        "field": "gen_ai.user.id",
+        "copy_from": "user.id",
+        "if": "ctx.user?.id != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gen_ai.response.error_code",
+        "copy_from": "aws_bedrock.invocation.error_code",
+        "if": "ctx.aws_bedrock?.invocation?.error_code != null"
+      }
+    },
+    {
+      "script": {
+        "tag": "get_guardrail_details",
+        "source": "def allBodies = ctx.aws_bedrock.invocation.output.output_body_json;\nif (allBodies instanceof Map) { // it can be an object or an array\n  allBodies = [allBodies];\n}\n\ndef nameAndDetailsOfPolicies = allBodies.stream()\n  .flatMap(body -> [\n    [body.trace?.guardrail?.inputAssessment],\n    body.trace?.guardrail?.outputAssessments,\n    [body.amazon_bedrock_trace?.guardrail?.input],\n    body.amazon_bedrock_trace?.guardrail?.outputs\n  ].stream())\n  .filter(Objects::nonNull)\n  .flatMap(List::stream)\n  .filter(Objects::nonNull)\n  .flatMap(assessment -> assessment.entrySet().stream())\n  .flatMap(assessmentEntry -> assessmentEntry.getValue().entrySet().stream())\n  .filter(policyEntry -> policyEntry.getKey().endsWith('_policy'))\n  .flatMap(policyEntry ->\n    policyEntry.getValue().entrySet().stream()\n      .flatMap(policyValueEntry -> policyValueEntry.getValue().stream())\n      .map(details -> [ 'name': policyEntry.getKey(), 'details': details ])\n      .collect(Collectors.toList())\n      .stream()\n  )\n  .collect(Collectors.toList());\n\n\nif (ctx.gen_ai == null) ctx.gen_ai = [:];\nif (ctx.gen_ai.compliance == null) ctx.gen_ai.compliance = [:];\nif (ctx.gen_ai.policy == null) ctx.gen_ai.policy = [:];\n\n\nctx.gen_ai.guardrail_id = allBodies.stream()\n  .flatMap(body -> [\n    body.trace?.guardrail?.inputAssessment,\n    body.amazon_bedrock_trace?.guardrail?.input\n  ].stream())\n  .filter(input -> input instanceof HashMap)\n  .flatMap(input -> input.keySet().stream())\n  .distinct()\n  .sorted()\n  .collect(Collectors.toList());\n\nctx.gen_ai.policy.name = nameAndDetailsOfPolicies.stream()\n  .map(policy -> policy.name)\n  .distinct()\n  .sorted()\n  .collect(Collectors.toList());\n\nctx.gen_ai.policy.action = nameAndDetailsOfPolicies.stream()\n  .map(policy -> policy.details.action)\n  .distinct()\n  .sorted()\n  .collect(Collectors.toList());\n\nctx.gen_ai.policy.match_detail = nameAndDetailsOfPolicies.stream()\n  .filter(policy -> policy.details.match != null || policy.name == 'contextual_grounding_policy')\n  .map(policy -> policy.details)\n  .distinct()  // no sort because HashMap isn't Comparable\n  .collect(Collectors.toList());\n\nctx.gen_ai.policy.confidence = nameAndDetailsOfPolicies.stream()\n  .map(policy -> policy.details.confidence)\n  .filter(Objects::nonNull)\n  .distinct()\n  .sorted()\n  .collect(Collectors.toList());\n\nctx.gen_ai.compliance.violation_code = nameAndDetailsOfPolicies.stream()\n  .map(policy -> policy.details.type)\n  .filter(Objects::nonNull)\n  .distinct()\n  .sorted()\n  .collect(Collectors.toList());\n\nif (ctx.gen_ai.compliance.violation_code.size() > 0 && allBodies.stream().anyMatch(body ->\n  body.amazon_bedrock_guardrail_action == 'INTERVENED' ||\n  body.stop_reason == 'guardrail_intervened'\n)) {\n  ctx.gen_ai.compliance.violation_detected = true;\n  ctx.event.outcome = 'failure';\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws_bedrock?.invocation?.output?.output_body_json != null"
+      }
+    },
+    {
+      "set": {
+        "override": true,
+        "field": "event.outcome",
+        "if": "ctx.gen_ai?.response?.error_code != null",
+        "value": "failure"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "event.outcome",
+        "value": "success"
+      }
+    },
+    {
+      "script": {
+        "description": "Remove massive input bodies and keep request perf stats.",
+        "source": "ctx.gen_ai.performance.request_size = ctx.gen_ai.prompt.length();\nif (ctx.gen_ai.prompt.length() > 32766) {\n  ctx.aws_bedrock.invocation.input.input_body_json_massive_hash = ctx.gen_ai.prompt.sha1();\n  ctx.aws_bedrock.invocation.input.remove(\"input_body_json\");\n  ctx.gen_ai.remove(\"prompt\");\n}\n",
+        "lang": "painless",
+        "if": "ctx.gen_ai?.prompt instanceof String"
+      }
+    },
+    {
+      "script": {
+        "description": "Convert chat completion response in map or list format to user friendly format",
+        "source": "try {\n  def completionText = new StringBuilder();\n  if (ctx.aws_bedrock?.invocation?.output?.output_body_json != null) {\n    if (ctx.aws_bedrock.invocation.output.output_body_json instanceof List) {\n      for (def block : ctx.aws_bedrock.invocation.output.output_body_json) {\n        if (!(block instanceof Map)) continue;\n        \n        if (block.containsKey('delta') && block.delta instanceof Map && block.delta.containsKey('text')) {\n          // Titan model response\n          completionText.append(block.delta.text);\n        } else if (block.containsKey('outputs') && block.outputs instanceof List) {\n          // Mistral model response\n          for (def cont : block.outputs) {\n            if (cont instanceof Map && cont.containsKey('text')) {\n                completionText.append(cont.text);\n            }\n          }\n        } else if (block.containsKey('generation')) {\n          // Llama3 model response\n          completionText.append(block.generation);\n        } else if (block.containsKey('outputText')) {\n            // Titan Text G1 - Express response\n            completionText.append(block.outputText);\n        }\n      }\n    }else if (ctx.aws_bedrock.invocation.output.output_body_json instanceof Map) {\n      def block = ctx.aws_bedrock.invocation.output.output_body_json;\n      if (block instanceof Map) {\n        Map blockMap = (Map) block;\n        if (blockMap.containsKey('output') && blockMap.output instanceof Map) {\n          Map outputMap = (Map) blockMap.output;\n          if (outputMap.containsKey('message') && outputMap.message instanceof Map) {\n            Map messageMap = (Map) outputMap.message;\n            if (messageMap.containsKey('content') && messageMap.content instanceof List) {\n              List contentList = (List) messageMap.content;\n              for (def cont : contentList) {\n                if (cont.containsKey('text')) {\n                  completionText.append(cont.text);\n                }\n              }\n            }\n          }\n        } else if(blockMap.containsKey('content') && blockMap.content instanceof List) {\n          // To record Guardrail response content, function calling and agentic workflow response\n          List contentList = (List) blockMap.content;\n            for (def cont : contentList) {\n              if (cont.containsKey('text')) {\n                completionText.append(cont.text);\n              }\n            }\n        }\n      }\n    }else if (ctx.aws_bedrock.invocation.output.output_body_json instanceof String){\n      completionText.append(ctx.aws_bedrock.invocation.output.output_body_json)\n    }\n  }\n\n  // Ensure ctx.aws_bedrock.invocation.output is initialized\n  if (ctx.aws_bedrock?.invocation?.output == null) {\n      ctx.aws_bedrock.invocation.output = new HashMap();\n  }\n  // Trim completionText if it exceeds 32766 characters\n  if (completionText.length() > 32766) {\n    completionText.setLength(32766);\n  }\n  ctx.aws_bedrock.invocation.output.completion_text = completionText.toString();\n}\ncatch (Exception e) {\n  if (ctx.aws_bedrock?.invocation?.output == null) {\n      ctx.aws_bedrock.invocation.output = new HashMap();\n  }\n  ctx.aws_bedrock.invocation.output.completion_text =  '';\n  ctx.error.message = e.getMessage()\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "description": "Remove massive output bodies and keep response perf stats.",
+        "source": "ctx.gen_ai.performance.response_size = ctx.gen_ai.completion.length();\nif (ctx.gen_ai.completion.length() > 32766) {\n  ctx.aws_bedrock.invocation.output.output_body_json_massive_hash = ctx.gen_ai.completion.sha1();\n  ctx.aws_bedrock.invocation.output.remove(\"output_body_json\");\n  ctx.gen_ai.remove(\"completion\");\n}\n",
+        "lang": "painless",
+        "if": "ctx.gen_ai?.completion instanceof String"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively",
+        "source": "boolean drop(Object o) {\n  if (o == null || o == \"\") {\n    return true;\n  } else if (o instanceof Map) {\n    ((Map) o).values().removeIf(v -> drop(v));\n    return (((Map) o).size() == 0);\n  } else if (o instanceof List) {\n    ((List) o).removeIf(v -> drop(v));\n    return (((List) o).length == 0);\n  }\n  return false;\n}\ndrop(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_duplicate_custom_fields",
+        "field": [
+          "aws_bedrock.invocation.input.input_body_json",
+          "aws_bedrock.invocation.output.output_body_json"
+        ],
+        "if": "ctx.tags == null || !(ctx.tags.contains('preserve_duplicate_custom_fields'))"
+      }
+    },
+    {
+      "script": {
+        "description": "Remove massive event.original if it was wanted.",
+        "source": "ctx.event.original = 'sha1-'+ctx.event.original.sha1()+':'+ctx.event.original.length().toString();\n",
+        "lang": "painless",
+        "if": "ctx.event?.original instanceof String && ctx.event.original.length() > 32766"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws_bedrock.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws_bedrock` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws_bedrock.invocation@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws_bedrock.invocation` dataset"
+      }
+    }
+  ]
+}

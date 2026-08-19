@@ -1,0 +1,52 @@
+{
+  "name": "logs@json-pipeline",
+  "deprecated": false,
+  "modified_date_millis": 1786555716895,
+  "_meta": {
+    "description": "automatic parsing of JSON log messages",
+    "managed": true
+  },
+  "created_date_millis": 1786555716895,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "_tmp_json_message",
+        "if": "ctx.message instanceof String && ctx.message.startsWith('{') && ctx.message.endsWith('}')"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_missing": true,
+              "field": "_tmp_json_message",
+              "target_field": "message"
+            }
+          }
+        ],
+        "field": "_tmp_json_message",
+        "allow_duplicate_keys": true,
+        "add_to_root": true,
+        "add_to_root_conflict_strategy": "merge",
+        "if": "ctx._tmp_json_message != null"
+      }
+    },
+    {
+      "dot_expander": {
+        "override": true,
+        "field": "*",
+        "if": "ctx._tmp_json_message != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "_tmp_json_message",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "version": 23
+}

@@ -1,0 +1,11 @@
+{
+  "name": "logs.ecs@stream.reroutes",
+  "_meta": {
+    "description": "Reroute pipeline for the logs.ecs stream",
+    "managed": true
+  },
+  "created_date_millis": 1786555748655,
+  "processors": [],
+  "version": 1,
+  "modified_date_millis": 1786555748655
+}

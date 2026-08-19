@@ -1,0 +1,22 @@
+{
+  "name": "metrics-settings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "codec": "best_compression",
+          "mapping": {
+            "total_fields": {
+              "ignore_dynamic_beyond_limit": "true"
+            }
+          }
+        }
+      }
+    },
+    "version": 5,
+    "_meta": {
+      "description": "default settings for the metrics index template installed by x-pack",
+      "managed": true
+    }
+  }
+}

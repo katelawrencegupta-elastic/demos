@@ -1,0 +1,289 @@
+{
+  "name": "logs-azure.graphactivitylogs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure.graphactivitylogs-1.38.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "session": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "destination": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "region_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "client": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "location": {
+                    "type": "geo_point"
+                  }
+                }
+              }
+            }
+          },
+          "source": {
+            "properties": {
+              "geo": {
+                "properties": {
+                  "location": {
+                    "type": "geo_point"
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "azure"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "azure.graphactivitylogs"
+              }
+            }
+          },
+          "token": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "tenant_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "authorization_rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "correlation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "graphactivitylogs": {
+                "properties": {
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "properties": {
+                    "properties": {
+                      "token_issued_at": {
+                        "type": "date"
+                      },
+                      "sign_in_activity_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_system": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_request_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "roles": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "service_principal_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "is_billable": {
+                        "type": "boolean"
+                      },
+                      "time_generated": {
+                        "type": "date"
+                      },
+                      "api_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "billed_size": {
+                        "type": "double"
+                      },
+                      "request_uri": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "at_content": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "c_sid": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "identity_provider": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "wids": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "c_device_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "operation_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "scopes": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "app_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "user_agent": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_auth_method": {
+                        "type": "long"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

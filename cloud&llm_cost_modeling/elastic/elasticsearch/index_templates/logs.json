@@ -1,0 +1,31 @@
+{
+  "name": "logs",
+  "index_template": {
+    "index_patterns": [
+      "logs-*-*"
+    ],
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs@custom",
+      "ecs@mappings"
+    ],
+    "priority": 100,
+    "version": 23,
+    "_meta": {
+      "description": "default logs template installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "logs@custom"
+    ],
+    "deprecated": false,
+    "created_date_millis": 1786555717395,
+    "modified_date_millis": 1786555717395
+  }
+}

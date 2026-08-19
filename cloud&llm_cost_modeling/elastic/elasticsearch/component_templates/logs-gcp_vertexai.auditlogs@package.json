@@ -1,0 +1,204 @@
+{
+  "name": "logs-gcp_vertexai.auditlogs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-gcp_vertexai.auditlogs-1.5.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "vertexai": {
+                "properties": {
+                  "audit": {
+                    "properties": {
+                      "request": {
+                        "type": "flattened"
+                      },
+                      "metadata": {
+                        "type": "flattened"
+                      },
+                      "service_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "policy_violation_info": {
+                        "properties": {
+                          "payload": {
+                            "type": "flattened"
+                          },
+                          "violations": {
+                            "type": "nested",
+                            "properties": {
+                              "error_message": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "policy_type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "checked_value": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "constraint": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "resource_type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "resource_tags": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_location": {
+                        "properties": {
+                          "current_locations": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "authentication_info": {
+                        "properties": {
+                          "service_account_key_name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "third_party_principal": {
+                            "type": "flattened"
+                          },
+                          "principal_email": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "authority_selector": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "principal_subject": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "service_account_delegation_info": {
+                            "type": "flattened"
+                          }
+                        }
+                      },
+                      "response": {
+                        "type": "flattened"
+                      },
+                      "num_response_items": {
+                        "type": "long"
+                      },
+                      "resource_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "authorization_info": {
+                        "type": "nested",
+                        "properties": {
+                          "permission_type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "resource": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "permission": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "resource_attributes": {
+                            "properties": {
+                              "service": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "granted": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "status": {
+                        "properties": {
+                          "code": {
+                            "type": "long"
+                          },
+                          "details": {
+                            "type": "flattened"
+                          },
+                          "message": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp_vertexai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "logs-apm@pipeline",
+  "modified_date_millis": 1786555720158,
+  "_meta": {
+    "managed": true
+  },
+  "description": "Built-in ingest pipeline for logs-apm.*-* data streams",
+  "created_date_millis": 1786555720158,
+  "processors": [
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "event.dataset",
+        "copy_from": "data_stream.dataset"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "apm@pipeline"
+      }
+    }
+  ],
+  "version": 103
+}

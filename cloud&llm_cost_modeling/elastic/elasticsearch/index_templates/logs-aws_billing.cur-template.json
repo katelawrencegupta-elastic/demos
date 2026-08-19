@@ -1,0 +1,37 @@
+{
+  "name": "logs-aws_billing.cur-template",
+  "index_template": {
+    "index_patterns": [
+      "aws_billing.cur-v1"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "ignore_malformed": "true"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "logs-aws_billing.cur-template@package",
+      "aws_billing@custom",
+      "logs-aws_billing.cur-template@custom",
+      "ecs@mappings"
+    ],
+    "priority": 250,
+    "_meta": {
+      "package": {
+        "name": "aws_billing"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "ignore_missing_component_templates": [
+      "aws_billing@custom",
+      "logs-aws_billing.cur-template@custom"
+    ],
+    "created_date_millis": 1786643507087,
+    "modified_date_millis": 1786643507087
+  }
+}

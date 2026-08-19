@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT / "agents"))
 from elasticsearch.helpers import bulk
 
 from client import get_client  # noqa: E402
-from ingest import HOSTS, SERVICES, events, index_docs  # noqa: E402
+from ingest import HOSTS, PUBLIC_HOST_IPS, SERVICES, events, index_docs  # noqa: E402
 from syslog_events import next_event  # noqa: E402
 from syslog_factory import backfill as syslog_file_backfill  # noqa: E402
 
@@ -44,6 +44,23 @@ SERVICE_TEAMS = {
     "identity-service": "identity",
     "rig-scheduler": "platform",
 }
+
+
+def resource_attrs(host: str, service: str, rng: random.Random, extra: dict | None = None) -> dict:
+    attrs = {
+        "deployment.environment": "workshop",
+        "host.name": host,
+        "host.ip": rng.choice(PUBLIC_HOST_IPS),
+        "service.name": service,
+        "service.version": "8.2312.0" if service == "rsyslog" else "1.8.2",
+        "team": SERVICE_TEAMS.get(service, "platform"),
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.44.0",
+    }
+    if extra:
+        attrs.update(extra)
+    return attrs
 
 
 def iso(ts: datetime) -> str:
@@ -109,16 +126,7 @@ def otel_http_log(ts: datetime, rng: random.Random) -> dict:
             "namespace": "default",
         },
         "resource": {
-            "attributes": {
-                "deployment.environment": "workshop",
-                "host.name": host,
-                "service.name": service,
-                "service.version": "1.8.2",
-                "team": SERVICE_TEAMS[service],
-                "telemetry.sdk.language": "python",
-                "telemetry.sdk.name": "opentelemetry",
-                "telemetry.sdk.version": "1.44.0",
-            }
+            "attributes": resource_attrs(host, service, rng)
         },
         "scope": {"name": f"workshop.{service}"},
         "attributes": {
@@ -145,16 +153,7 @@ def otel_syslog_log(ts: datetime, rng: random.Random) -> dict:
             "namespace": "default",
         },
         "resource": {
-            "attributes": {
-                "deployment.environment": "workshop",
-                "host.name": host,
-                "service.name": "rsyslog",
-                "service.version": "8.2312.0",
-                "team": "platform",
-                "telemetry.sdk.language": "python",
-                "telemetry.sdk.name": "opentelemetry",
-                "telemetry.sdk.version": "1.44.0",
-            }
+            "attributes": resource_attrs(host, "rsyslog", rng)
         },
         "scope": {"name": "sre-01-syslog"},
         "attributes": attrs,
@@ -177,16 +176,7 @@ def otel_metric(ts: datetime, rng: random.Random) -> dict:
             "namespace": "default",
         },
         "resource": {
-            "attributes": {
-                "deployment.environment": "workshop",
-                "host.name": host,
-                "service.name": service,
-                "service.version": "1.8.2",
-                "team": SERVICE_TEAMS[service],
-                "telemetry.sdk.language": "python",
-                "telemetry.sdk.name": "opentelemetry",
-                "telemetry.sdk.version": "1.44.0",
-            }
+            "attributes": resource_attrs(host, service, rng)
         },
         "scope": {"name": "sre-01-factory"},
         "attributes": {
@@ -223,18 +213,15 @@ def otel_trace(ts: datetime, rng: random.Random) -> dict:
             "namespace": "default",
         },
         "resource": {
-            "attributes": {
-                "agent.name": "opentelemetry/python",
-                "agent.version": "1.44.0",
-                "deployment.environment": "workshop",
-                "host.name": host,
-                "service.name": service,
-                "service.version": "1.8.2",
-                "team": SERVICE_TEAMS[service],
-                "telemetry.sdk.language": "python",
-                "telemetry.sdk.name": "opentelemetry",
-                "telemetry.sdk.version": "1.44.0",
-            }
+            "attributes": resource_attrs(
+                host,
+                service,
+                rng,
+                extra={
+                    "agent.name": "opentelemetry/python",
+                    "agent.version": "1.44.0",
+                },
+            )
         },
         "scope": {
             "name": "sre-01-factory",

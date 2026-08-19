@@ -1,0 +1,444 @@
+{
+  "name": "logs-aws.cloudtrail@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.cloudtrail-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "target": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "actor": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "related": {
+            "properties": {
+              "entity": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "service": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              },
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "s3": {
+                "properties": {
+                  "bucket": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "metadata": {
+                    "type": "flattened"
+                  },
+                  "object": {
+                    "properties": {
+                      "key": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudtrail": {
+                "properties": {
+                  "error_message": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "flattened": {
+                    "properties": {
+                      "insight_details": {
+                        "type": "flattened"
+                      },
+                      "additional_eventdata": {
+                        "type": "flattened"
+                      },
+                      "digest": {
+                        "type": "flattened"
+                      },
+                      "service_event_details": {
+                        "type": "flattened"
+                      },
+                      "request_parameters": {
+                        "type": "flattened"
+                      },
+                      "response_elements": {
+                        "type": "flattened"
+                      }
+                    }
+                  },
+                  "session_credential_from_console": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "additional_eventdata": {
+                    "ignore_above": 1024,
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "text"
+                      }
+                    }
+                  },
+                  "resources": {
+                    "properties": {
+                      "account_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "recipient_account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "event_category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "api_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_parameters": {
+                    "ignore_above": 8191,
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "text"
+                      }
+                    }
+                  },
+                  "event_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "event_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "read_only": {
+                    "type": "boolean"
+                  },
+                  "shared_event_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "console_login": {
+                    "properties": {
+                      "additional_eventdata": {
+                        "properties": {
+                          "login_to": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "mobile_version": {
+                            "type": "boolean"
+                          },
+                          "mfa_used": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "user_identity": {
+                    "properties": {
+                      "access_key_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "invoked_by": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "session_context": {
+                        "properties": {
+                          "session_issuer": {
+                            "properties": {
+                              "account_id": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "arn": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "principal_id": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "mfa_authenticated": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "creation_date": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "error_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "service_event_details": {
+                    "ignore_above": 1024,
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "text"
+                      }
+                    }
+                  },
+                  "request_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "response_elements": {
+                    "ignore_above": 8191,
+                    "type": "keyword",
+                    "fields": {
+                      "text": {
+                        "type": "text"
+                      }
+                    }
+                  },
+                  "management_event": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "vpc_endpoint_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "user": {
+            "properties": {
+              "entity": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "target": {
+                "properties": {
+                  "entity": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "entity": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "target": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

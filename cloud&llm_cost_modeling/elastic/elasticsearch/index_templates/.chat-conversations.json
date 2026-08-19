@@ -1,0 +1,205 @@
+{
+  "name": ".chat-conversations",
+  "index_template": {
+    "index_patterns": [
+      ".chat-conversations-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "24ab38c071a25ecb5a9c4d0f74b15293dc6e40af"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "pinned": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "flattened"
+          },
+          "attachments": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "read": {
+            "type": "boolean"
+          },
+          "template_version": {
+            "type": "long"
+          },
+          "agent_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "user_name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "access_control": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "entries": {
+                "type": "nested",
+                "properties": {
+                  "added_at": {
+                    "format": "strict_date_optional_time",
+                    "type": "date"
+                  },
+                  "role": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "access_mode": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "origin": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "external_conversation_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "created_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "title": {
+            "type": "text"
+          },
+          "active_execution": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "execution_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "trigger_event_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "started_at": {
+                "format": "strict_date_optional_time",
+                "type": "date"
+              }
+            }
+          },
+          "space": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "schema_version": {
+            "type": "long"
+          },
+          "workspace_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "updated_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "user_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "conversation_rounds": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "template_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "state": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "events": {
+            "type": "nested",
+            "properties": {
+              "actor": {
+                "dynamic": false,
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "execution_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "data": {
+                "dynamic": false,
+                "type": "object",
+                "properties": {}
+              },
+              "created_at": {
+                "format": "strict_date_optional_time",
+                "type": "date"
+              },
+              "trigger_event_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "status": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {
+        ".chat-conversations": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "24ab38c071a25ecb5a9c4d0f74b15293dc6e40af"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1786994050914,
+    "modified_date_millis": 1786994050914
+  }
+}

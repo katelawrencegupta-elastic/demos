@@ -1,0 +1,22 @@
+{
+  "name": "agentless",
+  "index_template": {
+    "index_patterns": [
+      "agentless-*-*"
+    ],
+    "composed_of": [
+      "agentless@mappings",
+      "agentless@settings"
+    ],
+    "priority": 100,
+    "version": 23,
+    "_meta": {
+      "description": "default agentless template installed by x-pack",
+      "managed": true
+    },
+    "allow_auto_create": true,
+    "deprecated": false,
+    "created_date_millis": 1786555715905,
+    "modified_date_millis": 1786555715905
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "logs-elasticsearch.querylog@template",
+  "index_template": {
+    "index_patterns": [
+      "logs-elasticsearch.querylog-*"
+    ],
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "ecs@mappings",
+      "logs-elasticsearch.querylog@mappings",
+      "logs-elasticsearch.querylog@settings"
+    ],
+    "priority": 250,
+    "version": 8,
+    "_meta": {
+      "description": "Default index template for the Elasticsearch query logs installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "deprecated": false,
+    "created_date_millis": 1786555717400,
+    "modified_date_millis": 1786555717400
+  }
+}

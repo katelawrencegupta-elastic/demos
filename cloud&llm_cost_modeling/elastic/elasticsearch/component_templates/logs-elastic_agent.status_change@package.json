@@ -1,0 +1,81 @@
+{
+  "name": "logs-elastic_agent.status_change@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-elastic_agent.status_change-2.9.4",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "agent": {
+            "properties": {
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "hostname": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "policy_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "agentless": {
+            "type": "boolean"
+          },
+          "health_status": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "space_id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "status": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "90d"
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "elastic_agent"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

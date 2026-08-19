@@ -1,0 +1,642 @@
+{
+  "name": "logs-azure_openai.logs@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-azure_openai.logs-1.14.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "azure": {
+            "properties": {
+              "subscription_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "resource": {
+                "properties": {
+                  "provider": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "authorization_rule": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "group": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "open_ai": {
+                "properties": {
+                  "truncated": {
+                    "type": "long"
+                  },
+                  "caller_ip_address": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result_signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "asset_identity": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "operation_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "deployment_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "correlation_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "location": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "sku": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "event": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tenant": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "properties": {
+                    "properties": {
+                      "model_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "api_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "cache": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "backend_url": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "backend_response_body": {
+                        "properties": {
+                          "content_filtered_categories": {
+                            "properties": {
+                              "severity": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "category_name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "created": {
+                            "type": "long"
+                          },
+                          "prompt_filter_results": {
+                            "properties": {
+                              "content_filter_results": {
+                                "properties": {
+                                  "self_harm": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "jailbreak": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "hate": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "profanity": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "sexual": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "violence": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "prompt_index": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "usage": {
+                            "properties": {
+                              "total_tokens": {
+                                "type": "long"
+                              },
+                              "output_tokens": {
+                                "type": "long"
+                              },
+                              "input_tokens": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "model": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "id": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "system_fingerprint": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "choices": {
+                            "properties": {
+                              "content_filter_results": {
+                                "properties": {
+                                  "protected_material_text": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "custom_blocklists": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "id": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      }
+                                    }
+                                  },
+                                  "self_harm": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "ungrounded_material": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      },
+                                      "details": {
+                                        "properties": {
+                                          "completion_end_offset": {
+                                            "type": "long"
+                                          },
+                                          "completion_start_offset": {
+                                            "type": "long"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "jailbreak": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "protected_material_code": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "citation": {
+                                        "properties": {
+                                          "license": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          },
+                                          "url": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          }
+                                        }
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "hate": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "profanity": {
+                                    "properties": {
+                                      "filtered": {
+                                        "type": "boolean"
+                                      },
+                                      "detected": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "sexual": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  "violence": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "filtered": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "finish_reason": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "index": {
+                                "type": "long"
+                              },
+                              "message": {
+                                "properties": {
+                                  "role": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "content": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              },
+                              "logprobs": {
+                                "type": "flattened"
+                              }
+                            }
+                          },
+                          "error": {
+                            "properties": {
+                              "code": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "param": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "innererror": {
+                                "properties": {
+                                  "code": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "content_filtered_categories": {
+                                    "properties": {
+                                      "severity": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "category_name": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      }
+                                    }
+                                  },
+                                  "content_filter_result": {
+                                    "properties": {
+                                      "custom_blocklists": {
+                                        "properties": {
+                                          "filtered": {
+                                            "type": "boolean"
+                                          },
+                                          "id": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          }
+                                        }
+                                      },
+                                      "self_harm": {
+                                        "properties": {
+                                          "severity": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          },
+                                          "filtered": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      },
+                                      "jailbreak": {
+                                        "properties": {
+                                          "filtered": {
+                                            "type": "boolean"
+                                          },
+                                          "detected": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      },
+                                      "hate": {
+                                        "properties": {
+                                          "severity": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          },
+                                          "filtered": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      },
+                                      "profanity": {
+                                        "properties": {
+                                          "filtered": {
+                                            "type": "boolean"
+                                          },
+                                          "detected": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      },
+                                      "sexual": {
+                                        "properties": {
+                                          "severity": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          },
+                                          "filtered": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      },
+                                      "violence": {
+                                        "properties": {
+                                          "severity": {
+                                            "ignore_above": 1024,
+                                            "type": "keyword"
+                                          },
+                                          "filtered": {
+                                            "type": "boolean"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "message": {
+                                "type": "text"
+                              },
+                              "status": {
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "object": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "object_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "backend_method": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_tls_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "response_length": {
+                        "type": "double"
+                      },
+                      "request_time": {
+                        "type": "long"
+                      },
+                      "model_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "backend_request_body": {
+                        "properties": {
+                          "messages": {
+                            "properties": {
+                              "role": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "content": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "model": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "request_length": {
+                        "type": "double"
+                      },
+                      "api_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_protocol": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "api_revision": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "stream_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "model_deployment_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "response_time": {
+                        "type": "long"
+                      },
+                      "operation_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "client_tls_cipher_suite": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "backend_response_code": {
+                        "type": "long"
+                      },
+                      "backend_time": {
+                        "type": "long"
+                      },
+                      "backend_protocol": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "is_request_success": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "azure_openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

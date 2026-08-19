@@ -1,0 +1,53 @@
+{
+  "id": "fleet-default-elastic_agent-elastic-agent-excessive-memory-usage-rule",
+  "enabled": false,
+  "name": "[Elastic Agent] Excessive memory usage",
+  "tags": [
+    "Elastic Agent",
+    "Resource Consumption"
+  ],
+  "rule_type_id": ".es-query",
+  "consumer": "alerts",
+  "schedule": {
+    "interval": "1m"
+  },
+  "actions": [],
+  "params": {
+    "searchType": "esqlQuery",
+    "timeWindowSize": 5,
+    "timeWindowUnit": "m",
+    "threshold": [
+      0
+    ],
+    "thresholdComparator": ">",
+    "size": 100,
+    "esqlQuery": {
+      "esql": "FROM metrics-system*\n| WHERE TO_LOWER(process.executable) LIKE \"*elastic*agent*\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS max_memory_per_process = MAX(system.process.memory.rss.pct * 100) BY agent.id, process.name\n| STATS total_memory_usage = SUM(max_memory_per_process) BY agent.id\n| WHERE total_memory_usage > 50"
+    },
+    "aggType": "count",
+    "groupBy": "row",
+    "termSize": 5,
+    "sourceFields": [],
+    "timeField": "@timestamp",
+    "excludeHitsFromPreviousRun": true
+  },
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-12T18:16:35.019Z",
+  "updated_at": "2026-08-12T18:16:35.019Z",
+  "api_key_owner": null,
+  "api_key_created_by_user": null,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "pending",
+    "last_execution_date": "2026-08-12T18:16:35.019Z"
+  },
+  "revision": 0,
+  "running": false,
+  "alert_delay": {
+    "active": 1
+  }
+}

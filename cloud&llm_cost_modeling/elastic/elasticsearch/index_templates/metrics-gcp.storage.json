@@ -1,0 +1,53 @@
+{
+  "name": "metrics-gcp.storage",
+  "index_template": {
+    "index_patterns": [
+      "metrics-gcp.storage-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "time_series"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "gcp"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "metrics@tsdb-settings",
+      "metrics-gcp.storage@package",
+      "metrics@custom",
+      "gcp@custom",
+      "metrics-gcp.storage@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "metrics@custom",
+      "gcp@custom",
+      "metrics-gcp.storage@custom"
+    ],
+    "created_date_millis": 1786557401504,
+    "modified_date_millis": 1786557401504
+  }
+}

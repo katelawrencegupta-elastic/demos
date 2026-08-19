@@ -1,0 +1,77 @@
+{
+  "name": "logs-system.syslog-2.22.3-journald",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591740,
+  "description": "Journald pipeline for system integration syslog data stream",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591740,
+  "processors": [
+    {
+      "set": {
+        "field": "event.ingested",
+        "copy_from": "_ingest.timestamp"
+      }
+    },
+    {
+      "set": {
+        "description": "Ensure we have the 'message' field",
+        "field": "message",
+        "copy_from": "event.original"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "process.pid",
+        "copy_from": "journald.pid"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "process.name",
+        "value": "{{ journald.process.name }}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "value": "{{host.hostname}}",
+        "if": "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+      }
+    },
+    {
+      "remove": {
+        "description": "Remove the extra fields added by the Journald input",
+        "ignore_missing": true,
+        "field": [
+          "journald",
+          "process.thread",
+          "syslog",
+          "systemd",
+          "message_id"
+        ]
+      }
+    }
+  ]
+}

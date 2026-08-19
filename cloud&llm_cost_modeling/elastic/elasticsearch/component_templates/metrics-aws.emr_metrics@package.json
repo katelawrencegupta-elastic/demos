@@ -1,0 +1,705 @@
+{
+  "name": "metrics-aws.emr_metrics@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws.emr_metrics-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            },
+            "source": {
+              "mode": "synthetic"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "region": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "account": {
+                "properties": {
+                  "id": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "agent": {
+            "properties": {
+              "id": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "elasticmapreduce": {
+                "properties": {
+                  "metrics": {
+                    "properties": {
+                      "ContainerPending": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRDecommissionedNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MemoryAllocatedMB": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TaskUnitsRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ContainerReserved": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TaskNodesRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AppsCompleted": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "LiveDataNodes": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "TotalVCPURequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRUnhealthyNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HDFSBytesWritten": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CorruptBlocks": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalNodesRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "S3BytesWritten": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MemoryReservedMB": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreNodesRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "PendingDeletionBlocks": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreVCPURequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ContainerPendingRatio": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalLoad": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreVCPURunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalUnitsRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "IsIdle": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalVCPURunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TaskNodesRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AppsRunning": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "S3BytesRead": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRRebootedNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MemoryAvailableMB": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HDFSBytesRead": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "UnderReplicatedBlocks": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AutoTerminationIsClusterIdle": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalNodesRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreUnitsRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AppsSubmitted": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AppsKilled": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRTotalNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MissingBlocks": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TaskVCPURunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreUnitsRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MemoryTotalMB": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TotalNotebookKernels": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MultiMasterInstanceGroupNodesRequested": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "ContainerAllocated": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "HDFSUtilization": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "TaskVCPURequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "DfsPendingReplicationBlocks": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRLostNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreNodesPending": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "AppsFailed": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MultiMasterInstanceGroupNodesRunningPercentage": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "AppsPending": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CoreNodesRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "TaskUnitsRequested": {
+                        "properties": {
+                          "max": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MultiMasterInstanceGroupNodesRunning": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "MRActiveNodes": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "CapacityRemainingGB": {
+                        "properties": {
+                          "sum": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "byte"
+                            },
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "YARNMemoryAvailablePercentage": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {
+                              "unit": "percent"
+                            },
+                            "type": "double"
+                          }
+                        }
+                      },
+                      "TotalUnitsRunning": {
+                        "properties": {
+                          "avg": {
+                            "time_series_metric": "gauge",
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "metrics_names_fingerprint": {
+                "time_series_dimension": true,
+                "type": "keyword"
+              },
+              "cloudwatch": {
+                "properties": {
+                  "namespace": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "dimensions": {
+                "properties": {
+                  "JobFlowId": {
+                    "time_series_dimension": true,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "tags": {
+                "type": "flattened"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,490 @@
+{
+  "name": "logs-gcp.dns-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557400028,
+  "description": "Pipeline for Google Cloud DNS logs",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557400028,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "event.category",
+        "value": [
+          "network"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.action",
+        "value": "dns-query"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "log.logger",
+        "copy_from": "json.logName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "log.level",
+        "copy_from": "json.severity"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "ignore_empty_value": true,
+        "field": "event.id",
+        "copy_from": "json.insertId"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.resource.labels.project_id",
+        "target_field": "cloud.project.id",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "json.resource.labels.location",
+        "target_field": "cloud.region",
+        "type": "string"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.auth_answer",
+        "copy_from": "json.jsonPayload.authAnswer"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.destination_ip",
+        "copy_from": "json.jsonPayload.destinationIP"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "destination.address",
+        "copy_from": "gcp.dns.destination_ip"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.dns.destination_ip",
+        "target_field": "destination.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.egress_error",
+        "copy_from": "json.jsonPayload.egressError"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.protocol",
+        "copy_from": "json.jsonPayload.protocol"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "network.transport",
+        "copy_from": "gcp.dns.protocol"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "network.transport",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "network.iana_number",
+        "value": "6",
+        "if": "ctx.network?.transport == \"tcp\""
+      }
+    },
+    {
+      "set": {
+        "field": "network.iana_number",
+        "value": "17",
+        "if": "ctx.network?.transport == \"udp\""
+      }
+    },
+    {
+      "set": {
+        "field": "network.protocol",
+        "value": "dns"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.query_name",
+        "copy_from": "json.jsonPayload.queryName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "dns.question.name",
+        "copy_from": "gcp.dns.query_name"
+      }
+    },
+    {
+      "gsub": {
+        "pattern": "[.]$",
+        "ignore_failure": true,
+        "field": "dns.question.name",
+        "replacement": ""
+      }
+    },
+    {
+      "registered_domain": {
+        "field": "dns.question.name",
+        "target_field": "dns.question"
+      }
+    },
+    {
+      "remove": {
+        "field": "dns.question.domain",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.query_type",
+        "copy_from": "json.jsonPayload.queryType"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "dns.question.type",
+        "copy_from": "gcp.dns.query_type"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.rdata",
+        "copy_from": "json.jsonPayload.rdata"
+      }
+    },
+    {
+      "script": {
+        "description": "This script processes the DNS RData into `dns.answers`.",
+        "tag": "Process DNS RData",
+        "source": "def rdata = ctx.gcp.dns.rdata;\ndef dns_answers = [];\n\n// Check for truncated answers.\ndef truncated = rdata.endsWith(\"...\") ? 1 : 0;\n\n// Process answers.\ndef rdata_answers = /\\n/.split(rdata);\n\nfor (def i = 0; i < rdata_answers.length - truncated; i++) {\n    def answer_parts = /\\t/.split(rdata_answers[i]);\n\n    // Assign answer parts.\n    def name = answer_parts[0];\n    def ttl = Long.parseLong(answer_parts[1]);\n    def cls = answer_parts[2];\n    def type = answer_parts[3];\n    def data = answer_parts[4];\n\n    // Remove trailing fullstop.\n    if (name.endsWith(\".\")) {\n        name = name.substring(0, name.length() - 1);\n    }\n\n    if (data.endsWith(\".\")) {\n        data = data.substring(0, data.length() - 1);\n    }\n\n    // Uppercase type.\n    type = type.toUpperCase();\n\n    dns_answers.add([\n        \"name\": name,\n        \"ttl\": ttl,\n        \"class\": cls,\n        \"type\": type,\n        \"data\": data\n    ]);\n}\nctx.dns.answers = dns_answers;\n",
+        "lang": "painless",
+        "if": "ctx.gcp?.dns?.rdata != null && ctx.gcp.dns.rdata != \"\""
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "description": "This script processes the Public DNS RData into `dns.answers`.",
+        "source": "List answers = new ArrayList(); for (answer in ctx.json.jsonPayload.structuredRdata) {\n  Map new_answer = new HashMap();\n  if(answer.class != null) {\n    new_answer.put(\"class\", answer.class);\n  }\n  if(answer.type != null) {\n    new_answer.put(\"type\", answer.type);\n  }\n  if(answer.ttl != null) {\n    new_answer.put(\"ttl\", Long.parseLong(answer.ttl));\n  }\n  if(answer.rvalue != null) {\n    new_answer.put(\"data\", answer.rvalue);\n    if (new_answer.data != null && new_answer.data.length() > 0 && new_answer.data.substring(new_answer.data.length() - 1) == '.') {\n        new_answer.data = new_answer.data.substring(0, new_answer.data.length() - 1);\n    }\n    if (answer.domainName != null) {\n      new_answer.put(\"name\", answer.domainName);\n    }\n  }\n  answers.add(new_answer);\n} if(ctx.dns.answers == null) {\n    ctx.dns.put('answers',new ArrayList());\n} ctx.dns.answers = answers;",
+        "lang": "painless",
+        "if": "ctx.json?.jsonPayload?.structuredRdata != null && ctx.json?.jsonPayload?.structuredRdata instanceof List"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "List answers = new ArrayList(); if(ctx.related == null) {\n    ctx.put('related', new HashMap());\n} if(ctx.related.ip == null) {\n    ctx.related.put('ip',new ArrayList());\n} if(ctx.dns.resolved_ip == null) {\n    ctx.dns.put('resolved_ip',new ArrayList());\n} if(ctx.related.hosts == null) {\n    ctx.related.put('hosts',new ArrayList());\n} for (answer in ctx.dns.answers) {\n  if(['A','AAAA'].contains(answer.type)) {\n    if(!ctx.related.ip.contains(answer.data)) {\n        ctx.related.ip.add(answer.data);\n    }\n    if(!ctx.dns.resolved_ip.contains(answer.data)) {\n        ctx.dns.resolved_ip.add(answer.data);\n    }\n  }\n  if(['CNAME'].contains(answer.type) && !ctx.related.hosts.contains(answer.data)) {\n    ctx.related.hosts.add(answer.data);\n  }\n  if(['MX'].contains(answer.type)) {\n    def mx_server = / /.split(answer.data);\n    if(mx_server[1] != null && !ctx.related.hosts.contains(mx_server[1]))\n    ctx.related.hosts.add(mx_server[1]);\n  }\n}",
+        "lang": "painless",
+        "if": "ctx.dns?.answers != null && ctx.dns?.answers instanceof List"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.response_code",
+        "copy_from": "json.jsonPayload.responseCode"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "dns.response_code",
+        "copy_from": "gcp.dns.response_code"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.gcp?.dns?.response_code != null && ctx?.gcp?.dns?.response_code == \"NOERROR\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.gcp?.dns?.response_code != null && ctx?.gcp?.dns?.response_code != \"NOERROR\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.server_latency",
+        "copy_from": "json.jsonPayload.serverLatency"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.source_ip",
+        "copy_from": "json.jsonPayload.sourceIP"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "source.address",
+        "copy_from": "gcp.dns.source_ip"
+      }
+    },
+    {
+      "convert": {
+        "ignore_failure": true,
+        "field": "gcp.dns.source_ip",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.source_network",
+        "copy_from": "json.jsonPayload.sourceNetwork"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.vm_instance_id",
+        "copy_from": "json.jsonPayload.vmInstanceIdString"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "cloud.instance.id",
+        "copy_from": "gcp.dns.vm_instance_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.vm_instance_name",
+        "copy_from": "json.jsonPayload.vmInstanceName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "cloud.instance.name",
+        "copy_from": "gcp.dns.vm_instance_name"
+      }
+    },
+    {
+      "gsub": {
+        "pattern": "^.*[.]",
+        "ignore_failure": true,
+        "field": "cloud.instance.name",
+        "replacement": ""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.vm_project_id",
+        "copy_from": "json.jsonPayload.vmProjectId"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.vm_zone_name",
+        "copy_from": "json.jsonPayload.vmZoneName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "cloud.availability_zone",
+        "copy_from": "gcp.dns.vm_zone_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.target_type",
+        "copy_from": "json.resource.labels.target_type"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.dns.source_type",
+        "copy_from": "json.resource.labels.source_type"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{destination.ip}}",
+        "if": "ctx.destination?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "value": "{{dns.question.name}}",
+        "if": "ctx.dns?.question?.name != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json",
+        "target_field": "gcp.dns.flattened",
+        "if": "ctx.json != null && ctx._conf?.keep_json == true"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "_conf",
+          "json"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "description": "This script processor iterates over the whole document to remove fields with null values.",
+        "source": "void handleMap(Map map) {\n  for (def x : map.values()) {\n    if (x instanceof Map) {\n        handleMap(x);\n    } else if (x instanceof List) {\n        handleList(x);\n    }\n  }\n  map.values().removeIf(v -> v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0));\n}\nvoid handleList(List list) {\n  for (def x : list) {\n      if (x instanceof Map) {\n          handleMap(x);\n      } else if (x instanceof List) {\n          handleList(x);\n      }\n  }\n  list.removeIf(v -> v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0));\n}\nhandleMap(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.dns@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.dns` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,605 @@
+{
+  "name": "logs-aws_bedrock.invocation@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws_bedrock.invocation-1.6.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic_templates": [
+          {
+            "gen_ai.policy.match_detail.*": {
+              "path_match": "gen_ai.policy.match_detail.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          }
+        ],
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "gen_ai": {
+            "properties": {
+              "completion": {
+                "type": "text"
+              },
+              "request": {
+                "properties": {
+                  "top_p": {
+                    "type": "float"
+                  },
+                  "max_tokens": {
+                    "type": "long"
+                  },
+                  "top_k": {
+                    "type": "float"
+                  },
+                  "temperature": {
+                    "type": "float"
+                  },
+                  "model": {
+                    "properties": {
+                      "instructions": {
+                        "type": "text"
+                      },
+                      "role": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "description": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "timestamp": {
+                    "type": "date"
+                  }
+                }
+              },
+              "sentiment": {
+                "properties": {
+                  "score": {
+                    "type": "float"
+                  },
+                  "content_inappropriate": {
+                    "type": "boolean"
+                  },
+                  "toxicity_score": {
+                    "type": "float"
+                  },
+                  "content_categories": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "owasp": {
+                "properties": {
+                  "description": {
+                    "type": "text"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "usage": {
+                "properties": {
+                  "completion_tokens": {
+                    "type": "long"
+                  },
+                  "prompt_tokens": {
+                    "type": "long"
+                  }
+                }
+              },
+              "guardrail_id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "analysis": {
+                "properties": {
+                  "action_recommended": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "function": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "findings": {
+                    "type": "nested"
+                  },
+                  "tool_names": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "security": {
+                "properties": {
+                  "prompt_injection_score": {
+                    "type": "float"
+                  },
+                  "refusal_score": {
+                    "type": "float"
+                  },
+                  "regex_pattern_count": {
+                    "type": "long"
+                  },
+                  "jailbreak_score": {
+                    "type": "float"
+                  },
+                  "hallucination_consistency": {
+                    "type": "float"
+                  }
+                }
+              },
+              "system": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "performance": {
+                "properties": {
+                  "response_time": {
+                    "type": "long"
+                  },
+                  "request_size": {
+                    "type": "long"
+                  },
+                  "response_size": {
+                    "type": "long"
+                  },
+                  "start_response_time": {
+                    "type": "long"
+                  }
+                }
+              },
+              "response": {
+                "properties": {
+                  "finish_reasons": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "error_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "timestamp": {
+                    "type": "date"
+                  }
+                }
+              },
+              "compliance": {
+                "properties": {
+                  "violation_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_triggered": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "violation_detected": {
+                    "type": "boolean"
+                  },
+                  "response_triggered": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "text": {
+                "properties": {
+                  "complexity_score": {
+                    "type": "float"
+                  },
+                  "readability_score": {
+                    "type": "float"
+                  },
+                  "similarity_score": {
+                    "type": "float"
+                  }
+                }
+              },
+              "threat": {
+                "properties": {
+                  "yara_matches": {
+                    "type": "nested"
+                  },
+                  "risk_score": {
+                    "type": "float"
+                  },
+                  "signature": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "detected": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "type": "text"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "source": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "category": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "prompt": {
+                "type": "text"
+              },
+              "user": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "rn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "policy": {
+                "properties": {
+                  "match_detail": {
+                    "dynamic": true,
+                    "type": "object",
+                    "properties": {
+                      "score": {
+                        "type": "float"
+                      },
+                      "threshold": {
+                        "type": "float"
+                      }
+                    }
+                  },
+                  "violation": {
+                    "type": "boolean"
+                  },
+                  "confidence": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "aws_bedrock.invocation"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "s3": {
+                "properties": {
+                  "bucket": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "object": {
+                    "properties": {
+                      "key": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudwatch": {
+                "properties": {
+                  "message": {
+                    "type": "text"
+                  }
+                }
+              }
+            }
+          },
+          "aws_bedrock": {
+            "properties": {
+              "invocation": {
+                "properties": {
+                  "images": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "model_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "error": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "image_generation_config": {
+                    "properties": {
+                      "number_of_images": {
+                        "type": "long"
+                      },
+                      "seed": {
+                        "type": "long"
+                      },
+                      "width": {
+                        "type": "long"
+                      },
+                      "cfg_scale": {
+                        "type": "double"
+                      },
+                      "height": {
+                        "type": "long"
+                      },
+                      "quality": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "output": {
+                    "properties": {
+                      "output_body_json": {
+                        "type": "flattened"
+                      },
+                      "completion_text": {
+                        "type": "text"
+                      },
+                      "output_token_count": {
+                        "type": "long"
+                      },
+                      "output_body_s3_path": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "output_content_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "schema_version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "result": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "input": {
+                    "properties": {
+                      "input_body_json_massive_length": {
+                        "type": "long"
+                      },
+                      "messages_content_kinds": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "input_body_json_massive_hash": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "input_content_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "input_body_json": {
+                        "type": "flattened"
+                      },
+                      "input_body_s3_path": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "input_token_count": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "system": {
+                    "properties": {
+                      "text": {
+                        "type": "match_only_text"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "messages": {
+                    "properties": {
+                      "role": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "content": {
+                        "properties": {
+                          "text": {
+                            "type": "match_only_text"
+                          },
+                          "type": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "error_code": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "image_variation_params": {
+                    "properties": {
+                      "images": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "text": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "task_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "request_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "schema_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "artifacts": {
+                    "type": "flattened"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws_bedrock"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

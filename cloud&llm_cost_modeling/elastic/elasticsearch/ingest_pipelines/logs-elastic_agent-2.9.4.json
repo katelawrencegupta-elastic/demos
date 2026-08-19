@@ -1,0 +1,77 @@
+{
+  "name": "logs-elastic_agent-2.9.4",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591767,
+  "description": "Pipeline for Elastic Agent logs.",
+  "_meta": {
+    "package": {
+      "name": "elastic_agent"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591767,
+  "processors": [
+    {
+      "dot_expander": {
+        "tag": "dot_expander_log_level",
+        "field": "log.level",
+        "if": "ctx['log.level'] != null"
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "field": "message",
+        "patterns": [
+          "^%{TIMESTAMP_ISO8601}: %{LOGLEVEL:log.level}: "
+        ],
+        "description": "Parse the log level from Elastic Defend service installation log messages.",
+        "ignore_missing": true,
+        "tag": "grok_parse_endpoint_log_level",
+        "if": "ctx.context == \"command output\" && ctx['log.logger'] instanceof String && ctx['log.logger'].startsWith('component.runtime.endpoint-')"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `elastic_agent` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-elastic_agent@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `elastic_agent` dataset"
+      }
+    }
+  ]
+}

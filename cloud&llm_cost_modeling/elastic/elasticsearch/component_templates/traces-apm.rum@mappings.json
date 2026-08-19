@@ -1,0 +1,40 @@
+{
+  "name": "traces-apm.rum@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "transaction.experience.longtask.sum": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "transaction.experience.fid": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "transaction.experience.tbt": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "transaction.experience.longtask.count": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "transaction.experience.cls": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "transaction.experience.longtask.max": {
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for traces-apm.rum-* data streams",
+      "managed": true
+    }
+  }
+}

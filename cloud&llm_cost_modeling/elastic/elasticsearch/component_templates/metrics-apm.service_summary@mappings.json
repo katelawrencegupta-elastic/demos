@@ -1,0 +1,39 @@
+{
+  "name": "metrics-apm.service_summary@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "metricset.name": {
+            "type": "constant_keyword",
+            "value": "service_summary"
+          },
+          "transaction.duration.summary": {
+            "metrics": [
+              "sum",
+              "value_count"
+            ],
+            "type": "aggregate_metric_double",
+            "default_metric": "sum"
+          },
+          "event.success_count": {
+            "metrics": [
+              "sum",
+              "value_count"
+            ],
+            "type": "aggregate_metric_double",
+            "default_metric": "sum"
+          },
+          "transaction.duration.histogram": {
+            "type": "histogram"
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for metrics-apm.service_summary.* data streams",
+      "managed": true
+    }
+  }
+}

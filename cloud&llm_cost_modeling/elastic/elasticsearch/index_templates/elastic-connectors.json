@@ -1,0 +1,21 @@
+{
+  "name": "elastic-connectors",
+  "index_template": {
+    "index_patterns": [
+      ".elastic-connectors-v1"
+    ],
+    "composed_of": [
+      "elastic-connectors-settings",
+      "elastic-connectors-mappings"
+    ],
+    "priority": 100,
+    "version": 3,
+    "_meta": {
+      "description": "Built-in template for elastic-connectors",
+      "managed": true
+    },
+    "allow_auto_create": true,
+    "created_date_millis": 1786555715946,
+    "modified_date_millis": 1786555715946
+  }
+}

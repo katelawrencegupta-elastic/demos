@@ -1,0 +1,37 @@
+{
+  "name": "logs-aws.latest_cdr_misconfigurations_awsconfig-template",
+  "index_template": {
+    "index_patterns": [
+      "security_solution-awsconfig.misconfiguration_latest-v1"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "ignore_malformed": "true"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "logs-aws.latest_cdr_misconfigurations_awsconfig-template@package",
+      "aws@custom",
+      "logs-aws.latest_cdr_misconfigurations_awsconfig-template@custom",
+      "ecs@mappings"
+    ],
+    "priority": 250,
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "ignore_missing_component_templates": [
+      "aws@custom",
+      "logs-aws.latest_cdr_misconfigurations_awsconfig-template@custom"
+    ],
+    "created_date_millis": 1786557384220,
+    "modified_date_millis": 1786557384220
+  }
+}

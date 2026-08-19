@@ -1,0 +1,588 @@
+{
+  "name": ".ml-anomalies-",
+  "index_template": {
+    "index_patterns": [
+      ".ml-anomalies-*",
+      ".reindexed-v7-ml-anomalies-*",
+      ".reindexed-v8-ml-anomalies-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1",
+          "query": {
+            "default_field": "all_field_values"
+          }
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "managed_index_mappings_version": 2,
+          "version": "8.11.0"
+        },
+        "dynamic_templates": [
+          {
+            "map_objects": {
+              "mapping": {
+                "type": "object"
+              },
+              "match_mapping_type": "object"
+            }
+          },
+          {
+            "non_objects_as_keywords": {
+              "mapping": {
+                "type": "keyword"
+              },
+              "match": "*"
+            }
+          }
+        ],
+        "properties": {
+          "search_count": {
+            "type": "long"
+          },
+          "bucket_count": {
+            "type": "long"
+          },
+          "anomaly_score_explanation": {
+            "properties": {
+              "by_field_relative_rarity": {
+                "type": "double"
+              },
+              "high_variance_penalty": {
+                "type": "boolean"
+              },
+              "multi_bucket_impact": {
+                "type": "integer"
+              },
+              "by_field_first_occurrence": {
+                "type": "boolean"
+              },
+              "typical_value": {
+                "type": "double"
+              },
+              "upper_confidence_bound": {
+                "type": "double"
+              },
+              "lower_confidence_bound": {
+                "type": "double"
+              },
+              "incomplete_bucket_penalty": {
+                "type": "boolean"
+              },
+              "anomaly_type": {
+                "type": "keyword"
+              },
+              "anomaly_characteristics_impact": {
+                "type": "integer"
+              },
+              "multimodal_distribution": {
+                "type": "boolean"
+              },
+              "anomaly_length": {
+                "type": "integer"
+              },
+              "single_bucket_impact": {
+                "type": "integer"
+              }
+            }
+          },
+          "terms": {
+            "type": "text"
+          },
+          "record_score": {
+            "type": "double"
+          },
+          "forecast_expiry_timestamp": {
+            "type": "date"
+          },
+          "over_field_value": {
+            "copy_to": [
+              "all_field_values"
+            ],
+            "type": "keyword"
+          },
+          "preferred_to_categories": {
+            "type": "long"
+          },
+          "empty_bucket_count": {
+            "type": "long"
+          },
+          "forecast_create_timestamp": {
+            "type": "date"
+          },
+          "probability": {
+            "type": "double"
+          },
+          "missing_field_count": {
+            "type": "long"
+          },
+          "forecast_lower": {
+            "type": "double"
+          },
+          "influencer_field_value": {
+            "copy_to": [
+              "all_field_values"
+            ],
+            "type": "keyword"
+          },
+          "multi_bucket_impact": {
+            "type": "double"
+          },
+          "forecast_progress": {
+            "type": "double"
+          },
+          "max_matching_length": {
+            "type": "long"
+          },
+          "latest_record_time_stamp": {
+            "type": "date"
+          },
+          "regex": {
+            "type": "keyword"
+          },
+          "examples": {
+            "type": "text"
+          },
+          "snapshot_doc_count": {
+            "type": "integer"
+          },
+          "average_bucket_processing_time_ms": {
+            "type": "double"
+          },
+          "initial_anomaly_score": {
+            "type": "double"
+          },
+          "initial_influencer_score": {
+            "type": "double"
+          },
+          "partition_field_value": {
+            "copy_to": [
+              "all_field_values"
+            ],
+            "type": "keyword"
+          },
+          "model_lower": {
+            "type": "double"
+          },
+          "total_over_field_count": {
+            "type": "long"
+          },
+          "retain": {
+            "type": "boolean"
+          },
+          "forecast_upper": {
+            "type": "double"
+          },
+          "latest_sparse_bucket_timestamp": {
+            "type": "date"
+          },
+          "model_median": {
+            "type": "double"
+          },
+          "category_id": {
+            "type": "long"
+          },
+          "causes": {
+            "type": "nested",
+            "properties": {
+              "actual": {
+                "type": "double"
+              },
+              "partition_field_name": {
+                "type": "keyword"
+              },
+              "partition_field_value": {
+                "copy_to": [
+                  "all_field_values"
+                ],
+                "type": "keyword"
+              },
+              "by_field_name": {
+                "type": "keyword"
+              },
+              "probability": {
+                "type": "double"
+              },
+              "geo_results": {
+                "properties": {
+                  "actual_point": {
+                    "type": "geo_point"
+                  },
+                  "typical_point": {
+                    "type": "geo_point"
+                  }
+                }
+              },
+              "field_name": {
+                "type": "keyword"
+              },
+              "by_field_value": {
+                "copy_to": [
+                  "all_field_values"
+                ],
+                "type": "keyword"
+              },
+              "over_field_name": {
+                "type": "keyword"
+              },
+              "correlated_by_field_value": {
+                "copy_to": [
+                  "all_field_values"
+                ],
+                "type": "keyword"
+              },
+              "function": {
+                "type": "keyword"
+              },
+              "typical": {
+                "type": "double"
+              },
+              "over_field_value": {
+                "copy_to": [
+                  "all_field_values"
+                ],
+                "type": "keyword"
+              },
+              "function_description": {
+                "type": "keyword"
+              }
+            }
+          },
+          "all_field_values": {
+            "analyzer": "whitespace",
+            "type": "text"
+          },
+          "event": {
+            "properties": {
+              "ingested": {
+                "format": "strict_date_optional_time||epoch_millis",
+                "type": "date"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "date"
+          },
+          "input_field_count": {
+            "type": "long"
+          },
+          "model_bytes": {
+            "type": "long"
+          },
+          "quantiles": {
+            "type": "object",
+            "enabled": false
+          },
+          "@timestamp": {
+            "path": "timestamp",
+            "type": "alias"
+          },
+          "function_description": {
+            "type": "keyword"
+          },
+          "min_version": {
+            "type": "keyword"
+          },
+          "raw_anomaly_score": {
+            "type": "double"
+          },
+          "exponential_average_bucket_processing_time_ms": {
+            "type": "double"
+          },
+          "invalid_date_count": {
+            "type": "long"
+          },
+          "snapshot_id": {
+            "type": "keyword"
+          },
+          "model_size_stats": {
+            "properties": {
+              "model_bytes": {
+                "type": "long"
+              },
+              "result_type": {
+                "type": "keyword"
+              },
+              "peak_model_bytes": {
+                "type": "long"
+              },
+              "job_id": {
+                "type": "keyword"
+              },
+              "total_over_field_count": {
+                "type": "long"
+              },
+              "total_partition_field_count": {
+                "type": "long"
+              },
+              "total_by_field_count": {
+                "type": "long"
+              },
+              "assignment_memory_basis": {
+                "type": "keyword"
+              },
+              "bucket_allocation_failures_count": {
+                "type": "long"
+              },
+              "memory_status": {
+                "type": "keyword"
+              },
+              "log_time": {
+                "type": "date"
+              },
+              "timestamp": {
+                "type": "date"
+              }
+            }
+          },
+          "total_search_time_ms": {
+            "type": "double"
+          },
+          "latest_empty_bucket_timestamp": {
+            "type": "date"
+          },
+          "anomaly_score": {
+            "type": "double"
+          },
+          "over_field_name": {
+            "type": "keyword"
+          },
+          "earliest_record_timestamp": {
+            "type": "date"
+          },
+          "scheduled_events": {
+            "type": "keyword"
+          },
+          "bucket_span": {
+            "type": "long"
+          },
+          "maximum_bucket_processing_time_ms": {
+            "type": "double"
+          },
+          "exponential_average_calculation_context": {
+            "properties": {
+              "incremental_metric_value_ms": {
+                "type": "double"
+              },
+              "previous_exponential_average_ms": {
+                "type": "double"
+              },
+              "latest_timestamp": {
+                "type": "date"
+              }
+            }
+          },
+          "function": {
+            "type": "keyword"
+          },
+          "influencers": {
+            "type": "nested",
+            "properties": {
+              "influencer_field_name": {
+                "type": "keyword"
+              },
+              "influencer_field_values": {
+                "copy_to": [
+                  "all_field_values"
+                ],
+                "type": "keyword"
+              }
+            }
+          },
+          "input_record_count": {
+            "type": "long"
+          },
+          "latest_result_time_stamp": {
+            "type": "date"
+          },
+          "model_upper": {
+            "type": "double"
+          },
+          "actual": {
+            "type": "double"
+          },
+          "forecast_memory_bytes": {
+            "type": "long"
+          },
+          "total_by_field_count": {
+            "type": "long"
+          },
+          "geo_results": {
+            "properties": {
+              "actual_point": {
+                "type": "geo_point"
+              },
+              "typical_point": {
+                "type": "geo_point"
+              }
+            }
+          },
+          "detector_index": {
+            "type": "integer"
+          },
+          "by_field_value": {
+            "copy_to": [
+              "all_field_values"
+            ],
+            "type": "keyword"
+          },
+          "processed_record_count": {
+            "type": "long"
+          },
+          "total_partition_field_count": {
+            "type": "long"
+          },
+          "mlcategory": {
+            "type": "keyword"
+          },
+          "assignment_memory_basis": {
+            "type": "keyword"
+          },
+          "forecast_end_timestamp": {
+            "type": "date"
+          },
+          "forecast_id": {
+            "type": "keyword"
+          },
+          "partition_field_name": {
+            "type": "keyword"
+          },
+          "by_field_name": {
+            "type": "keyword"
+          },
+          "event_count": {
+            "type": "long"
+          },
+          "description": {
+            "type": "text"
+          },
+          "is_interim": {
+            "type": "boolean"
+          },
+          "bucket_allocation_failures_count": {
+            "type": "long"
+          },
+          "memory_status": {
+            "type": "keyword"
+          },
+          "model_feature": {
+            "type": "keyword"
+          },
+          "num_matches": {
+            "type": "long"
+          },
+          "influencer_score": {
+            "type": "double"
+          },
+          "out_of_order_timestamp_count": {
+            "type": "long"
+          },
+          "result_type": {
+            "type": "keyword"
+          },
+          "last_data_time": {
+            "type": "date"
+          },
+          "latest_record_timestamp": {
+            "type": "date"
+          },
+          "influencer_field_name": {
+            "type": "keyword"
+          },
+          "forecast_messages": {
+            "type": "keyword"
+          },
+          "sparse_bucket_count": {
+            "type": "long"
+          },
+          "log_time": {
+            "type": "date"
+          },
+          "field_name": {
+            "type": "keyword"
+          },
+          "minimum_bucket_processing_time_ms": {
+            "type": "double"
+          },
+          "bucket_influencers": {
+            "type": "nested",
+            "properties": {
+              "anomaly_score": {
+                "type": "double"
+              },
+              "initial_anomaly_score": {
+                "type": "double"
+              },
+              "result_type": {
+                "type": "keyword"
+              },
+              "raw_anomaly_score": {
+                "type": "double"
+              },
+              "bucket_span": {
+                "type": "long"
+              },
+              "job_id": {
+                "type": "keyword"
+              },
+              "probability": {
+                "type": "double"
+              },
+              "influencer_field_name": {
+                "type": "keyword"
+              },
+              "is_interim": {
+                "type": "boolean"
+              },
+              "timestamp": {
+                "type": "date"
+              }
+            }
+          },
+          "processing_time_ms": {
+            "type": "long"
+          },
+          "input_bytes": {
+            "type": "long"
+          },
+          "initial_record_score": {
+            "type": "double"
+          },
+          "job_id": {
+            "copy_to": [
+              "all_field_values"
+            ],
+            "type": "keyword"
+          },
+          "processed_field_count": {
+            "type": "long"
+          },
+          "forecast_status": {
+            "type": "keyword"
+          },
+          "typical": {
+            "type": "double"
+          },
+          "forecast_prediction": {
+            "type": "double"
+          },
+          "forecast_start_timestamp": {
+            "type": "date"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 2147483647,
+    "version": 10000008,
+    "_meta": {
+      "description": "index template for ML anomaly detection results indices",
+      "managed": true
+    },
+    "created_date_millis": 1786555714987,
+    "modified_date_millis": 1786555714987
+  }
+}

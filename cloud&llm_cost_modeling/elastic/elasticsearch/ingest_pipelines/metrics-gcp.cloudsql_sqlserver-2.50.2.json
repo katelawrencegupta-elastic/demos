@@ -1,0 +1,242 @@
+{
+  "name": "metrics-gcp.cloudsql_sqlserver-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557400027,
+  "description": "Pipeline for parsing GCP CloudSQL SQL Server metrics.",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557400027,
+  "processors": [
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "gcp.labels"
+        ],
+        "target_field": "gcp.labels_fingerprint"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop if database is not SQLServer.",
+        "if": "ctx?.gcp?.labels?.cloudsql?.name != 'sqlserver'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.auto_failover_request_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.auto_failover_request.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.available_for_failover.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.available_for_failover"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.reserved_cores.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.cpu.reserved_cores.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.usage_time.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.cpu.usage_time.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.cpu.utilization.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.cpu.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.bytes_used.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.disk.bytes_used.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.quota.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.disk.quota.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.read_ops_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.disk.read_ops.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.utilization.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.disk.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.disk.write_ops_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.disk.write_ops.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.instance_state.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.instance_state"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.quota.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.memory.quota.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.total_usage.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.memory.total_usage.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.usage.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.memory.usage.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.memory.utilization.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.memory.utilization.pct"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.connections.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.network.connections.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.received_bytes_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.network.received_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.network.sent_bytes_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.network.sent_bytes.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.replication.network_lag.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.replication.network_lag.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.replication.replica_lag.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.replication.replica_lag.sec"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.sqlserver.audits_size.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.audits_size.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.sqlserver.audits_upload_count.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.audits_upload.count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.up.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.up"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.metrics.database.uptime.value",
+        "target_field": "gcp.cloudsql_sqlserver.database.uptime.sec"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "gcp.metrics"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-gcp.cloudsql_sqlserver@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.cloudsql_sqlserver` dataset"
+      }
+    }
+  ]
+}

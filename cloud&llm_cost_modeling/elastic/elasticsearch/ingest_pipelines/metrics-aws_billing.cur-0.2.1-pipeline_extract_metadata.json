@@ -1,0 +1,29 @@
+{
+  "name": "metrics-aws_billing.cur-0.2.1-pipeline_extract_metadata",
+  "description": "Extract alphabetically sorted resource tags & cost categories from source index for AWS Cost and Usage integration",
+  "_meta": {
+    "package": {
+      "name": "aws_billing"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643505515,
+  "processors": [
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "resource_tags",
+        "target_field": "aws_billing.cur.resource_tags"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "cost_category",
+        "target_field": "aws_billing.cur.cost_category"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643505515
+}

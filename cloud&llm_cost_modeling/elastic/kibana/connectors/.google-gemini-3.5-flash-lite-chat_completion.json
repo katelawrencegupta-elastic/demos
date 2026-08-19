@@ -1,0 +1,19 @@
+{
+  "id": ".google-gemini-3.5-flash-lite-chat_completion",
+  "name": "Google Gemini 3.5 Flash-Lite",
+  "config": {
+    "provider": "elastic",
+    "taskType": "chat_completion",
+    "inferenceId": ".google-gemini-3.5-flash-lite-chat_completion",
+    "providerConfig": {
+      "model_id": "google-gemini-3.5-flash-lite"
+    }
+  },
+  "connector_type_id": ".inference",
+  "is_preconfigured": true,
+  "is_deprecated": false,
+  "referenced_by_count": 0,
+  "is_system_action": false,
+  "is_connector_type_deprecated": true,
+  "auth_mode": "shared"
+}

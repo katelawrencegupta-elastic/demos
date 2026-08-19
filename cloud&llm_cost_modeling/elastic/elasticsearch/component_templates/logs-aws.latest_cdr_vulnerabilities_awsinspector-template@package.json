@@ -1,0 +1,792 @@
+{
+  "name": "logs-aws.latest_cdr_vulnerabilities_awsinspector-template@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "observer": {
+            "properties": {
+              "vendor": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "package": {
+            "properties": {
+              "fixed_version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "log": {
+            "properties": {
+              "file": {
+                "properties": {
+                  "inode": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "path": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "device_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "resource": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "id": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "vulnerability": {
+            "properties": {
+              "cve": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "scanner": {
+                "properties": {
+                  "vendor": {
+                    "type": "constant_keyword"
+                  }
+                }
+              },
+              "title": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "published_date": {
+                "type": "date"
+              },
+              "status": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "aws.inspector"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "inspector": {
+                "properties": {
+                  "severity": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "inspector_score": {
+                    "type": "double"
+                  },
+                  "package_vulnerability_details": {
+                    "properties": {
+                      "related_vulnerabilities": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "vulnerability_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "vendor": {
+                        "properties": {
+                          "severity": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "updated_at": {
+                            "type": "date"
+                          },
+                          "created_at": {
+                            "type": "date"
+                          }
+                        }
+                      },
+                      "vulnerable_packages": {
+                        "properties": {
+                          "file_path": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "remediation": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "source_lambda_layer_arn": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "package_manager": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "release": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "epoch": {
+                            "type": "long"
+                          },
+                          "fixed_in_version": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "source_layer_hash": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "arch": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "version": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "reference_urls": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source": {
+                        "properties": {
+                          "value": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "url": {
+                            "properties": {
+                              "path": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "extension": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "original": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "scheme": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "domain": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "query": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "cvss": {
+                        "properties": {
+                          "base_score": {
+                            "type": "double"
+                          },
+                          "scoring_vector": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "source": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "version": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "epss": {
+                    "properties": {
+                      "score": {
+                        "type": "double"
+                      }
+                    }
+                  },
+                  "package_nested": {
+                    "type": "nested",
+                    "properties": {
+                      "file_path": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "remediation": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_lambda_layer_arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "package_manager": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "release": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "epoch": {
+                        "type": "long"
+                      },
+                      "fixed_in_version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_layer_hash": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arch": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "version": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "inspector_score_details": {
+                    "properties": {
+                      "adjusted_cvss": {
+                        "properties": {
+                          "score": {
+                            "properties": {
+                              "source": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "value": {
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "adjustments": {
+                            "properties": {
+                              "reason": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "metric": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "scoring_vector": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "cvss_source": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "version": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "description": {
+                    "type": "text"
+                  },
+                  "resources": {
+                    "properties": {
+                      "partition": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "details": {
+                        "properties": {
+                          "code_repository": {
+                            "properties": {
+                              "integration_arn": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "provider_type": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "project_name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          },
+                          "aws": {
+                            "properties": {
+                              "lambda_function": {
+                                "properties": {
+                                  "architectures": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "vpc_config": {
+                                    "properties": {
+                                      "vpc_id": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "subnet_ids": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "security_group_ids": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      }
+                                    }
+                                  },
+                                  "code_sha256": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "execution_role_arn": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "function_name": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "layers": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "runtime": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "package_type": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "version": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "last_modified_at": {
+                                    "type": "date"
+                                  }
+                                }
+                              },
+                              "ec2_instance": {
+                                "properties": {
+                                  "key_name": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "iam_instance_profile_arn": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "ipv6_addresses": {
+                                    "type": "ip"
+                                  },
+                                  "vpc_id": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "launched_at": {
+                                    "type": "date"
+                                  },
+                                  "subnet_id": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "ipv4_addresses": {
+                                    "type": "ip"
+                                  },
+                                  "image_id": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "type": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "platform": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              },
+                              "ecr_container_image": {
+                                "properties": {
+                                  "image": {
+                                    "properties": {
+                                      "hash": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      },
+                                      "tags": {
+                                        "ignore_above": 1024,
+                                        "type": "keyword"
+                                      }
+                                    }
+                                  },
+                                  "registry": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "in_use_count": {
+                                    "type": "long"
+                                  },
+                                  "pushed_at": {
+                                    "type": "date"
+                                  },
+                                  "author": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "platform": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "repository_name": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "architecture": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "last_in_use_at": {
+                                    "type": "date"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "tags": {
+                        "type": "flattened"
+                      }
+                    }
+                  },
+                  "title": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "transform_unique_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "finding_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "exploit_available": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "remediation": {
+                    "properties": {
+                      "recommendation": {
+                        "properties": {
+                          "text": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "url": {
+                            "properties": {
+                              "path": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "extension": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "original": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "scheme": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "domain": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              },
+                              "query": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "network_reachability_details": {
+                    "properties": {
+                      "network_path": {
+                        "properties": {
+                          "steps": {
+                            "properties": {
+                              "component": {
+                                "properties": {
+                                  "id": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "arn": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  },
+                                  "type": {
+                                    "ignore_above": 1024,
+                                    "type": "keyword"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "protocol": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "open_port_range": {
+                        "properties": {
+                          "end": {
+                            "type": "long"
+                          },
+                          "begin": {
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "aws_account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "last_observed_at": {
+                    "type": "date"
+                  },
+                  "updated_at": {
+                    "type": "date"
+                  },
+                  "code_vulnerability_details": {
+                    "properties": {
+                      "detector_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "rule_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "file_path": {
+                        "properties": {
+                          "path": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "name": {
+                            "ignore_above": 1024,
+                            "type": "keyword"
+                          },
+                          "start_line": {
+                            "type": "long"
+                          },
+                          "end_line": {
+                            "type": "long"
+                          }
+                        }
+                      },
+                      "source_lambda_layer_arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "detector_tags": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "reference_urls": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "cwes": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "detector_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "fix_available": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "exploitability_details": {
+                    "properties": {
+                      "last_known_exploit_at": {
+                        "type": "date"
+                      }
+                    }
+                  },
+                  "first_observed_at": {
+                    "type": "date"
+                  },
+                  "status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

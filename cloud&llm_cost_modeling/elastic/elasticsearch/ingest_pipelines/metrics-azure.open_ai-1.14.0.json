@@ -1,0 +1,86 @@
+{
+  "name": "metrics-azure.open_ai-1.14.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643486173,
+  "description": "Pipeline for parsing azure openai metrics.",
+  "_meta": {
+    "package": {
+      "name": "azure_openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643486173,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.metrics",
+        "target_field": "azure.open_ai"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.azure_openairequests.total",
+        "target_field": "azure.open_ai.requests.total"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.azure_openaiprovisioned_managed_utilization_v2.avg",
+        "target_field": "azure.open_ai.provisioned_managed_utilization_v2.avg"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.azure_openaitime_toresponse.avg",
+        "target_field": "azure.open_ai.time_to_response.avg"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.azure_openaicontext_tokens_cache_match_rate.avg",
+        "target_field": "azure.open_ai.context_tokens_cache_match_rate.avg"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-azure_openai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `azure_openai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-azure.open_ai@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.open_ai` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "otel@settings",
+  "component_template": {
+    "template": {
+      "data_stream_options": {
+        "failure_store": {
+          "enabled": true
+        }
+      }
+    },
+    "version": 19,
+    "_meta": {
+      "description": "Default settings for all OpenTelemetry data streams",
+      "managed": true
+    }
+  }
+}

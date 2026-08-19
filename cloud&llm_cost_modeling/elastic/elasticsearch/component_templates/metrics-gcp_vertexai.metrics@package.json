@@ -1,0 +1,234 @@
+{
+  "name": "metrics-gcp_vertexai.metrics@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-gcp_vertexai.metrics-1.5.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "gcp": {
+            "properties": {
+              "vertexai": {
+                "properties": {
+                  "prediction": {
+                    "properties": {
+                      "online": {
+                        "properties": {
+                          "prediction_count": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "response_count": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "memory": {
+                            "properties": {
+                              "bytes_used": {
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          },
+                          "target_replicas": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "replicas": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "cpu": {
+                            "properties": {
+                              "utilization": {
+                                "meta": {
+                                  "unit": "percent"
+                                },
+                                "type": "double"
+                              }
+                            }
+                          },
+                          "prediction_latencies": {
+                            "type": "histogram"
+                          },
+                          "error_count": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "network": {
+                            "properties": {
+                              "received_bytes_count": {
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              },
+                              "sent_bytes_count": {
+                                "meta": {
+                                  "unit": "byte"
+                                },
+                                "type": "long"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "publisher": {
+                    "properties": {
+                      "online_serving": {
+                        "properties": {
+                          "token_count": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "model_invocation_count": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "model_invocation_latencies": {
+                            "type": "histogram"
+                          },
+                          "first_token_latencies": {
+                            "type": "histogram"
+                          },
+                          "consumed_throughput": {
+                            "meta": {},
+                            "type": "long"
+                          },
+                          "character_count": {
+                            "meta": {},
+                            "type": "long"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "labels": {
+                "properties": {
+                  "resource": {
+                    "properties": {
+                      "model_user_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "model_version_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "publisher": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "endpoint_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "location": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_container": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "metrics": {
+                    "properties": {
+                      "response_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "input_token_size": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "request_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "output_token_size": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "method": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "replica_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "max_token_size": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "spot": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "latency_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "deployed_model_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "error_category": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp_vertexai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

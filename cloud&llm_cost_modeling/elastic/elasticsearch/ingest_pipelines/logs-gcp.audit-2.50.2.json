@@ -1,0 +1,1003 @@
+{
+  "name": "logs-gcp.audit-2.50.2",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557401718,
+  "description": "Pipeline for Google Cloud audit logs",
+  "_meta": {
+    "package": {
+      "name": "gcp"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557401718,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "set": {
+              "ignore_empty_value": true,
+              "field": "gcp.audit.notification",
+              "copy_from": "event.original"
+            }
+          }
+        ],
+        "field": "event.original",
+        "target_field": "json",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.type",
+        "copy_from": "json.protoPayload.@type"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop the document if it is not of AuditLog type",
+        "if": "ctx.gcp?.audit?.type != null && ctx.gcp?.audit?.type != 'type.googleapis.com/google.cloud.audit.AuditLog'"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "copy_from": "json.insertId",
+        "if": "ctx.json?.insertId != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.logName",
+        "target_field": "log.logger"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.severity",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{}%2F%{event.provider}",
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "log.logger"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "if": "ctx.json?.timestamp != null && ctx.json.timestamp != ''",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.project.id",
+        "copy_from": "json.resource.labels.project_id",
+        "if": "ctx.json?.resource?.labels?.project_id != null"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.instance.id",
+        "copy_from": "json.resource.labels.instance_id",
+        "if": "ctx.json?.resource?.labels?.instance_id != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "cloud.availability_zone",
+        "copy_from": "json.resource.labels.location"
+      }
+    },
+    {
+      "set": {
+        "field": "orchestrator.type",
+        "value": "kubernetes",
+        "if": "ctx.json?.resource?.type != null && (ctx.json?.resource?.type == 'k8s_cluster' || ctx.json?.resource?.type == 'gke_cluster')"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "orchestrator.cluster.name",
+        "copy_from": "json.resource.labels.cluster_name",
+        "if": "ctx.json?.resource?.type != null && (ctx.json?.resource?.type == 'k8s_cluster' || ctx.json?.resource?.type == 'gke_cluster')"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "_temp.type",
+        "copy_from": "json.protoPayload.resourceName",
+        "if": "ctx.json?.resource?.type != null && ctx.json?.resource?.type == 'k8s_cluster'"
+      }
+    },
+    {
+      "grok": {
+        "ignore_missing": true,
+        "field": "_temp.type",
+        "pattern_definitions": {
+          "API_VERSION": "(v\\d+([a-z]+)?(\\d+)?)",
+          "RESOURCE_TYPE": "([a-z]+((\\.[a-z0-9]+)+)?)"
+        },
+        "patterns": [
+          "%{DATA}/%{API_VERSION:orchestrator.api_version}/namespaces/%{DATA:orchestrator.namespace}/%{RESOURCE_TYPE:orchestrator.resource.type}(/%{HOSTNAME:orchestrator.resource.name})?",
+          "%{DATA}/%{API_VERSION:orchestrator.api_version}/%{RESOURCE_TYPE:orchestrator.resource.type}",
+          "apis/%{RESOURCE_TYPE:orchestrator.resource.type}/%{API_VERSION:orchestrator.api_version}",
+          "api/%{API_VERSION:orchestrator.api_version}",
+          "%{RESOURCE_TYPE:orchestrator.resource.type}"
+        ]
+      }
+    },
+    {
+      "script": {
+        "description": "Appends any relevant entity to `related.entity` for all events",
+        "on_failure": [
+          {
+            "set": {
+              "description": "Adds error reason to the document",
+              "field": "error.message",
+              "value": "{{{ _ingest.on_failure_message }}}"
+            }
+          }
+        ],
+        "source": "void addValue(Set entities, def value) {\n  if (value != null && value != \"\") {\n    entities.add(value);\n  }\n}\n\nboolean isKubernetes = false;\nif (ctx.json?.resource?.type != null) {\n  String typ = ctx.json.resource.type;\n  isKubernetes = (typ == \"k8s_cluster\" || typ == \"gke_cluster\" || typ == \"kubernetes\");\n}\n\n// Using tree set to ensure a sorting is kept (testing purposes)\nTreeSet entities = new TreeSet();\n\naddValue(entities, ctx.json?.protoPayload?.request?.parent);\nif (!isKubernetes) {\n  addValue(entities, ctx.json?.protoPayload?.resourceName);\n  addValue(entities, ctx.json?.protoPayload?.response?.user);\n}\n\nHashMap authInfo = ctx.json?.protoPayload?.authenticationInfo ?: new HashMap();\nif (!isKubernetes) {\n  addValue(entities, authInfo.principalEmail);\n}\naddValue(entities, authInfo.principalSubject);\naddValue(entities, authInfo.serviceAccountKeyName);\nif (authInfo.serviceAccountDelegationInfo instanceof List) {\n  for (def i: authInfo.serviceAccountDelegationInfo) {\n    addValue(entities, i.principalSubject);\n    addValue(entities, i.firstPartyPrincipal?.principalEmail);\n    addValue(entities, i.thirdPartyPrincipal?.principalEmail);\n  }\n}\n\nString serviceName = ctx.json?.protoPayload?.serviceName ?: '';\nif (serviceName == \"compute.googleapis.com\") {\n  if (ctx.json?.protoPayload?.request?.networkInterfaces instanceof List) {\n    for (def e: ctx.json.protoPayload.request.networkInterfaces) {\n      addValue(entities, e.network);\n    }\n  }\n  if (ctx.json?.protoPayload?.request?.serviceAccounts instanceof List) {\n    for (def e: ctx.json.protoPayload.request.serviceAccounts) {\n      addValue(entities, e.email);\n    }\n  }\n  if (ctx.json?.protoPayload?.request?.disks instanceof List) {\n    for (def e: ctx.json.protoPayload.request.disks) {\n      addValue(entities, e.source);\n    }\n  }\n} else if (serviceName == \"cloudresourcemanager.googleapis.com\") {\n  if (ctx.json?.protoPayload?.request?.policy?.bindings instanceof List) {\n    for (def e: ctx.json.protoPayload.request.policy.bindings) {\n      addValue(entities, e.role);\n      for (def m: e.members) {\n        addValue(entities, m);\n      }\n    }\n  }\n  if (ctx.json?.protoPayload?.response?.bindings instanceof List) {\n    for (def e: ctx.json.protoPayload.response.bindings) {\n      addValue(entities, e.role);\n      for (def m: e.members) {\n        addValue(entities, m);\n      }\n    }\n  }\n} else if (serviceName == \"iamcredentials.googleapis.com\") {\n  if (ctx.json?.protoPayload?.metadata?.identityDelegationChain instanceof List) {\n    for (def e: ctx.json.protoPayload.metadata.identityDelegationChain) {\n      addValue(entities, e);\n    }\n  }\n}\n\nif (entities.size() > 0) {\n  ctx.related = ctx.related ?: [:];\n  ctx.related.entity = entities;\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "append": {
+        "field": "actor.entity.id",
+        "value": "{{{json.protoPayload.authenticationInfo.principalSubject}}}",
+        "if": "ctx.json?.protoPayload?.authenticationInfo?.principalSubject != null"
+      }
+    },
+    {
+      "append": {
+        "field": "actor.entity.id",
+        "value": "{{{json.protoPayload.authenticationInfo.principalEmail}}}",
+        "if": "ctx.json?.protoPayload?.authenticationInfo?.principalEmail != null"
+      }
+    },
+    {
+      "append": {
+        "field": "target.entity.id",
+        "value": "{{{json.protoPayload.resourceName}}}",
+        "if": "ctx.json?.resource?.type != 'k8s_cluster' && ctx.json?.protoPayload?.resourceName != null"
+      }
+    },
+    {
+      "append": {
+        "field": "target.entity.id",
+        "value": "{{{json.resource.disk_id}}}",
+        "if": "ctx.json?.resouce?.disk_id != null"
+      }
+    },
+    {
+      "script": {
+        "description": "Classify actor and target entities into type-specific fields",
+        "on_failure": [
+          {
+            "set": {
+              "description": "Adds error reason to the document",
+              "field": "error.message",
+              "value": "{{{ _ingest.on_failure_message }}}"
+            }
+          }
+        ],
+        "source": "void addNestedValue(def currentCtx, String path, def value) {\n  if (value == null || value == \"\") {\n    return;\n  }\n  String[] parts = path.splitOnToken('.');\n  for (int i = 0; i < parts.length - 1; i++) {\n    if (currentCtx[parts[i]] == null) {\n      currentCtx[parts[i]] = [:];\n    }\n    currentCtx = currentCtx[parts[i]];\n  }\n  String lastPart = parts[parts.length - 1];\n  if (currentCtx[lastPart] == null) {\n    currentCtx[lastPart] = [];\n  }\n  if (!currentCtx[lastPart].contains(value)) {\n    currentCtx[lastPart].add(value);\n  }\n}\n\n// Classify actor entities\nif (ctx.actor?.entity?.id instanceof List) {\n  for (def actorId : ctx.actor.entity.id) {\n    if (actorId == null || actorId == \"\") {\n      continue;\n    }\n    String actor = actorId.toString();\n    \n    // Service accounts: serviceAccount:* or *.gserviceaccount.com (includes cloudservices and iam)\n    if (actor.startsWith(\"serviceAccount:\") || actor.contains(\".gserviceaccount.com\")) {\n      addNestedValue(ctx, \"service.entity.id\", actor);\n    }\n    // Service account paths: projects/*/serviceAccounts/*\n    else if (actor.contains(\"/serviceAccounts\")) {\n      addNestedValue(ctx, \"service.entity.id\", actor);\n    }\n    // User accounts: user:* or email addresses (not service accounts)\n    else if (actor.startsWith(\"user:\") || (actor.contains(\"@\") && !actor.contains(\".gserviceaccount.com\"))) {\n      addNestedValue(ctx, \"user.entity.id\", actor);\n    }\n    // Compute instances: projects/*/zones/*/instances/*\n    else if (actor.contains(\"/instances\")) {\n      addNestedValue(ctx, \"host.entity.id\", actor);\n    }\n    // GCP service or API names: *.googleapis.com (but not principal:// or workloadIdentityPools)\n    else if (actor.contains(\".googleapis.com\") && !actor.startsWith(\"principal://\") && !actor.contains(\"/workloadIdentityPools\")) {\n      addNestedValue(ctx, \"service.entity.id\", actor);\n    }\n    // Everything else (repo:, workloadIdentityPools, principal://, etc.)\n    else {\n      addNestedValue(ctx, \"entity.id\", actor);\n    }\n  }\n}\n\n// Classify target entities\nif (ctx.target?.entity?.id instanceof List) {\n  for (def targetId : ctx.target.entity.id) {\n    if (targetId == null || targetId == \"\") {\n      continue;\n    }\n    String target = targetId.toString();\n    \n    // Compute instances\n    if (target.contains(\"/instances\")) {\n      addNestedValue(ctx, \"host.target.entity.id\", target);\n    }\n    // Service accounts: projects/*/serviceAccounts/* or email addresses ending with .gserviceaccount.com\n    else if (target.contains(\"/serviceAccounts\") || \n             (target.contains(\"@\") && target.contains(\".gserviceaccount.com\"))) {\n      addNestedValue(ctx, \"service.target.entity.id\", target);\n    }\n    // IAM principals (users, groups)\n    else if (target.contains(\"/users\") || \n             target.contains(\"/groups\") ||\n             (target.contains(\"@\") && target.contains(\"/members\"))) {\n      addNestedValue(ctx, \"user.target.entity.id\", target);\n    }\n    // GCP service resources\n    else if (target.contains(\"/machineTypes\") ||\n             target.contains(\"/deployments\") ||\n             target.contains(\"/services\") ||\n             target.contains(\"/policies\") ||\n             target.contains(\"/operations\") ||\n             target.contains(\"/subnetworks\") ||\n             target.contains(\"/networkEdgeSecurityServices\") ||\n             target.contains(\"/functions\") ||\n             target.contains(\"/buckets\") ||\n             target.contains(\"/datasets\") ||\n             target.contains(\"/tables\") ||\n             target.contains(\"/disks\") ||\n             target.contains(\"/networks\") ||\n             target.contains(\"/firewalls\") ||\n             target.contains(\"/backendServices\") ||\n             target.contains(\"/forwardingRules\") ||\n             target.contains(\"/healthChecks\") ||\n             target.contains(\"/sslCertificates\") ||\n             target.contains(\"/targetPools\") ||\n             target.contains(\"/urlMaps\") ||\n             target.contains(\".googleapis.com\")) {\n      addNestedValue(ctx, \"service.target.entity.id\", target);\n    }\n    // Everything else (projects, zones, workloadIdentityPools, etc.)\n    else {\n      addNestedValue(ctx, \"entity.target.id\", target);\n    }\n  }\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "description": "Appends any relevant entity to `related.entity` for all events",
+        "on_failure": [
+          {
+            "set": {
+              "description": "Adds error reason to the document",
+              "field": "error.message",
+              "value": "{{{ _ingest.on_failure_message }}}"
+            }
+          }
+        ],
+        "source": "void addValue(Set entities, def value) {\n  if (value != null && value != \"\") {\n    entities.add(value);\n  }\n}\n\nboolean isKubernetes = false;\nif (ctx.json?.resource?.type != null) {\n  String typ = ctx.json.resource.type;\n  isKubernetes = (typ == \"k8s_cluster\" || typ == \"gke_cluster\" || typ == \"kubernetes\");\n}\n\n// Using tree set to ensure a sorting is kept (testing purposes)\nTreeSet entities = new TreeSet();\n\naddValue(entities, ctx.json?.protoPayload?.request?.parent);\nif (!isKubernetes) {\n  addValue(entities, ctx.json?.protoPayload?.resourceName);\n  addValue(entities, ctx.json?.protoPayload?.response?.user);\n}\n\nHashMap authInfo = ctx.json?.protoPayload?.authenticationInfo ?: new HashMap();\nif (!isKubernetes) {\n  addValue(entities, authInfo.principalEmail);\n}\naddValue(entities, authInfo.principalSubject);\naddValue(entities, authInfo.serviceAccountKeyName);\nif (authInfo.serviceAccountDelegationInfo instanceof List) {\n  for (def i: authInfo.serviceAccountDelegationInfo) {\n    addValue(entities, i.principalSubject);\n    addValue(entities, i.firstPartyPrincipal?.principalEmail);\n    addValue(entities, i.thirdPartyPrincipal?.principalEmail);\n  }\n}\n\nString serviceName = ctx.json?.protoPayload?.serviceName ?: '';\nif (serviceName == \"compute.googleapis.com\") {\n  if (ctx.json?.protoPayload?.request?.networkInterfaces instanceof List) {\n    for (def e: ctx.json.protoPayload.request.networkInterfaces) {\n      addValue(entities, e.network);\n    }\n  }\n  if (ctx.json?.protoPayload?.request?.serviceAccounts instanceof List) {\n    for (def e: ctx.json.protoPayload.request.serviceAccounts) {\n      addValue(entities, e.email);\n    }\n  }\n  if (ctx.json?.protoPayload?.request?.disks instanceof List) {\n    for (def e: ctx.json.protoPayload.request.disks) {\n      addValue(entities, e.source);\n    }\n  }\n} else if (serviceName == \"cloudresourcemanager.googleapis.com\") {\n  if (ctx.json?.protoPayload?.request?.policy?.bindings instanceof List) {\n    for (def e: ctx.json.protoPayload.request.policy.bindings) {\n      addValue(entities, e.role);\n      for (def m: e.members) {\n        addValue(entities, m);\n      }\n    }\n  }\n  if (ctx.json?.protoPayload?.response?.bindings instanceof List) {\n    for (def e: ctx.json.protoPayload.response.bindings) {\n      addValue(entities, e.role);\n      for (def m: e.members) {\n        addValue(entities, m);\n      }\n    }\n  }\n} else if (serviceName == \"iamcredentials.googleapis.com\") {\n  if (ctx.json?.protoPayload?.metadata?.identityDelegationChain instanceof List) {\n    for (def e: ctx.json.protoPayload.metadata.identityDelegationChain) {\n      addValue(entities, e);\n    }\n  }\n}\n\nif (entities.size() > 0) {\n  ctx.related = ctx.related ?: [:];\n  ctx.related.entity = entities;\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.authoritySelector",
+        "target_field": "gcp.audit.authentication_info.authority_selector"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.principalEmail",
+        "target_field": "gcp.audit.authentication_info.principal_email"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.principalSubject",
+        "target_field": "gcp.audit.authentication_info.principal_subject"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.serviceAccountKeyName",
+        "target_field": "gcp.audit.authentication_info.service_account_key_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.serviceAccountDelegationInfo",
+        "target_field": "gcp.audit.authentication_info.service_account_delegation_info"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.thirdPartyPrincipal",
+        "target_field": "gcp.audit.authentication_info.third_party_principal"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.audit.authentication_info.principal_email",
+        "target_field": "client.user.email",
+        "if": "ctx.client?.user?.email == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.audit.authentication_info.principal_subject",
+        "target_field": "client.user.id",
+        "if": "ctx.client?.user?.id == null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.authorization_info",
+        "copy_from": "json.protoPayload.authorizationInfo"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.audit.authorization_info",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.resourceAttributes",
+            "target_field": "_ingest._value.resource_attributes"
+          }
+        },
+        "if": "ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.labels",
+        "copy_from": "json.labels",
+        "if": "ctx.json?.labels != null"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "json_labels_payload",
+        "field": "labels.payload",
+        "if": "ctx.labels?.payload != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "cloud.project.id",
+        "tag": "set_cloud_project_id_from_labels_project_id",
+        "override": false,
+        "copy_from": "labels.project_id",
+        "if": "ctx.cloud?.project?.id == null && ctx.labels?.project_id != null"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_orchestrator_type",
+        "override": false,
+        "field": "orchestrator.type",
+        "value": "kubernetes",
+        "if": "ctx.orchestrator?.type == null && ctx.labels?.cluster_name != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "orchestrator.cluster.name",
+        "tag": "set_orchestrator_cluster_name_from_labels_cluster_name",
+        "override": false,
+        "copy_from": "labels.cluster_name",
+        "if": "ctx.orchestrator?.cluster?.name == null && ctx.labels?.cluster_name != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "orchestrator.resource.type",
+        "tag": "set_orchestrator_resource_type_from_labels_payload_resourceType",
+        "override": false,
+        "copy_from": "labels.payload.resourceType",
+        "if": "ctx.orchestrator?.resource?.type == null && ctx.labels?.payload?.resourceType != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "orchestrator.resource.name",
+        "tag": "set_orchestrator_resource_name_from_labels_payload_resource",
+        "override": false,
+        "copy_from": "labels.payload.resource",
+        "if": "ctx.orchestrator?.resource?.name == null && ctx.labels?.payload?.resource != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "type": "ip",
+        "field": "json.protoPayload.requestMetadata.callerIp",
+        "target_field": "source.ip",
+        "if": "ctx.json?.protoPayload?.requestMetadata?.callerIp != null && ctx.json?.protoPayload?.requestMetadata?.callerIp != \"gce-internal-ip\"  && ctx.json?.protoPayload?.requestMetadata?.callerIp != \"private\""
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "user_agent.original",
+        "copy_from": "json.protoPayload.requestMetadata.callerSuppliedUserAgent"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.metadata",
+        "copy_from": "json.protoPayload.metadata",
+        "if": "ctx.json?.protoPayload?.metadata != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.policy_violation_info.violations",
+        "copy_from": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.violationInfo"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.payload",
+        "target_field": "gcp.audit.policy_violation_info.payload"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.resourceType",
+        "target_field": "gcp.audit.policy_violation_info.resource_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.resourceTags",
+        "target_field": "gcp.audit.policy_violation_info.resource_tags"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.logentry_operation.id",
+        "copy_from": "json.operation.id",
+        "if": "ctx.json?.operation?.id != null && ctx.event?.id != null && ctx.event?.id != ctx.json?.operation?.id"
+      }
+    },
+    {
+      "script": {
+        "description": "set event.category and type for long running operation",
+        "tag": "set-event-type-for-long-operations",
+        "source": "def first = (ctx.json.operation.first == null) ? false : ctx.json.operation.first;\ndef last = (ctx.json.operation.last == null) ? false : ctx.json.operation.last;\nif (first && last) {\n  return;\n}\nif (ctx.event.category == null) {\n  ctx.event.category = new ArrayList();\n}\nif (ctx.event.type == null) {\n  ctx.event.type = new ArrayList();\n}\nctx.event.category.add('session');\nif (first == true && last == false) {\n  ctx.event.type.add('start');\n}\nif (first == false && last == true) {\n  ctx.event.type.add('end');\n}\n",
+        "lang": "painless",
+        "if": "ctx.json?.operation != null"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.service_data.policy_delta.binding_deltas",
+        "copy_from": "json.protoPayload.serviceData.policyDelta.bindingDeltas",
+        "if": "ctx.json?.protoPayload?.serviceData?.policyDelta?.bindingDeltas != null && !ctx.json.protoPayload.serviceData.policyDelta.bindingDeltas.isEmpty()"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "event.action",
+        "copy_from": "json.protoPayload.methodName"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.numResponseItems",
+        "target_field": "gcp.audit.num_response_items",
+        "type": "long"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.request",
+        "copy_from": "json.protoPayload.request",
+        "if": "ctx.json?.protoPayload?.request != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "gcp.audit.request.policy",
+        "if": "ctx.json?.protoPayload?.request?.policy != null && !(ctx.json?.protoPayload?.request.policy instanceof Map)"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.request.policy_value",
+        "copy_from": "json.protoPayload.request.policy",
+        "if": "ctx.json?.protoPayload?.request?.policy != null && !(ctx.json?.protoPayload?.request.policy instanceof Map)"
+      }
+    },
+    {
+      "set": {
+        "field": "gcp.audit.response",
+        "copy_from": "json.protoPayload.response",
+        "if": "ctx.json?.protoPayload?.response != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "gcp.audit.response.status",
+        "if": "ctx.json?.protoPayload?.response?.status != null && !(ctx.json?.protoPayload?.response.status instanceof Map)"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.response.status_value",
+        "copy_from": "json.protoPayload.response.status",
+        "if": "ctx.json?.protoPayload?.response?.status != null && !(ctx.json?.protoPayload?.response.status instanceof Map)"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.resource_name",
+        "copy_from": "json.protoPayload.resourceName"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.resource_location.current_locations",
+        "copy_from": "json.protoPayload.resourceLocation.currentLocations"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "gcp.audit.resource.labels.resource_container",
+        "copy_from": "json.resource.labels.resource_container"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "gcp.audit.resource.type",
+        "copy_from": "json.resource.type"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.service_name",
+        "copy_from": "json.protoPayload.serviceName"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.audit.service_name",
+        "target_field": "service.name",
+        "if": "ctx.service?.name == null"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.receiveTimestamp",
+        "target_field": "gcp.audit.receive_timestamp",
+        "if": "ctx.json?.receiveTimestamp != null && ctx.json.receiveTimestamp != ''"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.callerIp",
+        "target_field": "source.ip",
+        "type": "ip",
+        "if": "ctx.json?.jsonPayload?.access?.callerIp != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.callerIpGeo.regionCode",
+        "target_field": "gcp.audit.access.caller_ip_geo.region_code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.methodName",
+        "target_field": "gcp.audit.access.method_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "event.action",
+        "copy_from": "gcp.audit.access.method_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.principalEmail",
+        "target_field": "gcp.audit.access.principal_email"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "client.user.email",
+        "copy_from": "gcp.audit.access.principal_email"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.principalSubject",
+        "target_field": "gcp.audit.access.principal_subject"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.serviceName",
+        "target_field": "gcp.audit.access.service_name"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "service.name",
+        "copy_from": "gcp.audit.access.service_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.access.userAgent",
+        "target_field": "gcp.audit.access.user_agent"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "override": false,
+        "field": "user_agent.original",
+        "copy_from": "gcp.audit.access.user_agent"
+      }
+    },
+    {
+      "user_agent": {
+        "field": "user_agent.original",
+        "ignore_missing": true
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.jsonPayload.actionTime",
+        "target_field": "gcp.audit.action_time",
+        "if": "ctx.json?.jsonPayload?.actionTime != null && ctx.json.jsonPayload.actionTime != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.actionType",
+        "target_field": "gcp.audit.action_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.affectedResources",
+        "target_field": "gcp.audit.affected_resources"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.learnMoreUri",
+        "target_field": "gcp.audit.learn_more_uri"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.jsonPayload.sourceLogIds",
+        "target_field": "gcp.audit.source_log_ids"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "gcp.audit.source_log_ids",
+        "if": "ctx.gcp?.audit?.source_log_ids instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "field": "_ingest._value.insertId",
+            "target_field": "_ingest._value.insert_id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "gcp.audit.source_log_ids",
+        "if": "ctx.gcp?.audit?.source_log_ids instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "field": "_ingest._value.queryUri",
+            "target_field": "_ingest._value.query_uri"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "gcp.audit.source_log_ids",
+        "if": "ctx.gcp?.audit?.source_log_ids instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "field": "_ingest._value.resourceContainer",
+            "target_field": "_ingest._value.resource_container"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "gcp.audit.source_log_ids",
+        "if": "ctx.gcp?.audit?.source_log_ids instanceof List",
+        "processor": {
+          "date": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.logTime",
+                  "ignore_missing": true
+                }
+              }
+            ],
+            "formats": [
+              "ISO8601"
+            ],
+            "field": "_ingest._value.logTime",
+            "target_field": "_ingest._value.log_time"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "field": "gcp.audit.source_log_ids",
+        "if": "ctx.gcp?.audit?.source_log_ids instanceof List",
+        "processor": {
+          "remove": {
+            "field": "_ingest._value.logTime",
+            "ignore_missing": true
+          }
+        }
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.status.code",
+        "target_field": "gcp.audit.status.code",
+        "type": "long"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "gcp.audit.status.message",
+        "copy_from": "json.protoPayload.status.message"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "gcp.audit.status.details",
+        "copy_from": "json.protoPayload.status.details"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx.gcp?.audit?.status?.code != null && ctx.gcp?.audit?.status?.code == 0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.gcp?.audit?.status?.code != null && ctx?.gcp?.audit?.status?.code != 0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.gcp?.audit?.status?.code == null && ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List && ctx?.gcp?.audit?.authorization_info.size() == 1 && ctx?.gcp?.audit?.authorization_info[0]?.granted == true"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.gcp?.audit?.status?.code == null && ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List && ctx?.gcp?.audit?.authorization_info.size() == 1 && ctx?.gcp?.audit?.authorization_info[0]?.granted == false"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "event.outcome",
+        "value": "unknown"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": [
+          "network",
+          "configuration"
+        ],
+        "if": "ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List && ctx?.gcp?.audit?.authorization_info.size() == 1"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": [
+          "access",
+          "allowed"
+        ],
+        "if": "ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List && ctx?.gcp?.audit?.authorization_info.size() == 1 && ctx?.gcp?.audit?.authorization_info[0]?.granted != null && ctx?.gcp?.audit?.authorization_info[0]?.granted"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": [
+          "access",
+          "denied"
+        ],
+        "if": "ctx?.gcp?.audit?.authorization_info != null && ctx?.gcp?.audit?.authorization_info instanceof List && ctx?.gcp?.audit?.authorization_info.size() == 1 && ctx?.gcp?.audit?.authorization_info[0]?.granted != null && !ctx?.gcp?.audit?.authorization_info[0]?.granted"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "user.email",
+        "copy_from": "client.user.email"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "user.id",
+        "copy_from": "client.user.id"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{{source.ip}}}"
+      }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{client.user.email}}}",
+        "if": "ctx.client?.user?.email != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json",
+        "target_field": "gcp.audit.flattened",
+        "if": "ctx.json != null && ctx._conf?.keep_json == true"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "_conf",
+          "_temp",
+          "json"
+        ],
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null and empty values and dotted keys recursively",
+        "source": "boolean drop(Object o) {\n  if (o == null || o == \"\") {\n    return true;\n  } else if (o instanceof Map) {\n    def m = ((Map) o);\n    def it = m.entrySet().iterator();\n    while (it.hasNext()) {\n      def e = ((Map.Entry) it.next());\n      def key = ((String) e.getKey());\n      def value = e.getValue();\n      Pattern onlyDotsRegex = /^\\.+$/;\n      if (onlyDotsRegex.matcher(key).matches() || drop(value)) {\n        it.remove();\n      }\n    }\n    return (m.size() == 0);\n  } else if (o instanceof List) {\n    def l = ((List) o);\n    l.removeIf(v -> drop(v));\n    return (l.length == 0);\n  }\n  return false;\n}\ndrop(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp.audit@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp.audit` dataset"
+      }
+    }
+  ]
+}

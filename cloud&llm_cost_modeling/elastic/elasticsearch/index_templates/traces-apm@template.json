@@ -1,0 +1,57 @@
+{
+  "name": "traces-apm@template",
+  "index_template": {
+    "index_patterns": [
+      "traces-apm-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "traces-apm@default-pipeline",
+          "final_pipeline": "traces-apm@pipeline"
+        }
+      },
+      "mappings": {
+        "properties": {
+          "data_stream.dataset": {
+            "type": "constant_keyword",
+            "value": "apm"
+          },
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "traces"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "traces@mappings",
+      "apm@mappings",
+      "apm@settings",
+      "apm-10d@lifecycle",
+      "traces-apm@mappings",
+      "traces-apm-fallback@ilm",
+      "traces@custom",
+      "traces-apm@custom",
+      "ecs@mappings"
+    ],
+    "priority": 210,
+    "version": 103,
+    "_meta": {
+      "description": "Index template for traces-apm-*",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "traces@custom",
+      "traces-apm@custom",
+      "traces-apm-fallback@ilm"
+    ],
+    "created_date_millis": 1786555716305,
+    "modified_date_millis": 1786555716305
+  }
+}

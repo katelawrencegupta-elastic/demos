@@ -1,0 +1,316 @@
+{
+  "name": "logs-aws.vpcflow@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-aws.vpcflow-7.1.1",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "aws"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "s3": {
+                "properties": {
+                  "bucket": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "metadata": {
+                    "type": "flattened"
+                  },
+                  "object": {
+                    "properties": {
+                      "key": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "vpcflow": {
+                "properties": {
+                  "packets_lost_mtu_exceeded": {
+                    "type": "long"
+                  },
+                  "tgw_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_dst_eni": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_pair_attachment_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "vpc_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_dst_az_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "pkt_srcaddr": {
+                    "type": "ip"
+                  },
+                  "packets_lost_blackhole": {
+                    "type": "long"
+                  },
+                  "tgw_src_az_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "packets_lost_no_route": {
+                    "type": "long"
+                  },
+                  "tgw_src_eni": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "pkt_src_service": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_container_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "traffic_path": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tcp_flags": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "action": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_second_container_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_dst_vpc_account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "pkt_dstaddr": {
+                    "type": "ip"
+                  },
+                  "ecs_task_definition_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_src_vpc_account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_cluster_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_dst_vpc_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tcp_flags_array": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_src_subnet_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_service_name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_task_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "resource_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "packets_lost_ttl_expired": {
+                    "type": "long"
+                  },
+                  "ecs_task_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "account_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "interface_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "log_status": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "instance_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "pkt_dst_service": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_container_instance_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_container_instance_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "ecs_cluster_arn": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_attachment_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "subnet_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "sublocation": {
+                    "properties": {
+                      "id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "tgw_src_vpc_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "tgw_dst_subnet_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

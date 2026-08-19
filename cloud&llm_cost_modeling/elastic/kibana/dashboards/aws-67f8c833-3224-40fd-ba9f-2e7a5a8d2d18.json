@@ -1,0 +1,833 @@
+{
+  "id": "aws-67f8c833-3224-40fd-ba9f-2e7a5a8d2d18",
+  "data": {
+    "description": "Overview dashboard for AWS Lambda showcasing execution and billed duration, memory usage, and detailed function logs per invocation.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-aws-default"
+    ],
+    "title": "[Logs AWS] Lambda Log Overview",
+    "filters": [
+      {
+        "disabled": false,
+        "data_view_id": "logs-*",
+        "type": "condition",
+        "condition": {
+          "field": "data_stream.dataset",
+          "operator": "is",
+          "value": "aws.lambda_logs"
+        }
+      }
+    ],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 4,
+          "w": 48,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "hide_title": true,
+          "links": [
+            {
+              "label": "AWS lambda metrics overview",
+              "type": "dashboardLink",
+              "destination": "aws-7ac8e1d0-28d2-11ea-ba6c-49a884eb104f",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            },
+            {
+              "label": "AWS lambda log overview",
+              "type": "dashboardLink",
+              "destination": "aws-67f8c833-3224-40fd-ba9f-2e7a5a8d2d18",
+              "options": {
+                "use_filters": false,
+                "use_time_range": true,
+                "open_in_new_tab": false
+              }
+            }
+          ],
+          "layout": "horizontal"
+        },
+        "id": "16ff8dfd-f32e-429d-8ef7-1a8f1fff3188",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 18,
+          "y": 4
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "The time taken to initialize the Lambda execution environment during a cold start.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "duration",
+                "from": "ms",
+                "to": "auto",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Average Init duration",
+              "field": "aws.lambda.metrics.init_duration_ms",
+              "operation": "average",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#b0e3f3"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "0b5c93ba-ef5d-488d-a48c-98b6c48aa0eb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 25,
+          "y": 4
+        },
+        "config": {
+          "type": "metric",
+          "title": "Average duration",
+          "description": "The time the lambda function handler method spent processing the event.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "duration",
+                "from": "ms",
+                "to": "auto",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Average duration",
+              "field": "aws.lambda.metrics.duration_ms",
+              "operation": "average",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#9fd1ea"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "2a075b40-10b8-454d-a1a9-0d827df10742",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 32,
+          "y": 4
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "The total time billed for the invocation",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "duration",
+                "from": "ms",
+                "to": "auto",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Average billed duration",
+              "field": "aws.lambda.metrics.billed_duration_ms",
+              "operation": "average",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#87b0d6"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "62fb5b16-4049-44ab-af2b-e31d4c391504",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 18,
+          "y": 10
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "The amount of memory allocated to your Lambda function during its configuration.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 0
+              },
+              "label": "Average memory allocated",
+              "operation": "formula",
+              "formula": "average(aws.lambda.metrics.memory_size_mb) * 1024 * 1024",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#bfdeca"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "60fbcba5-6ee6-417d-9cf4-347a316cdf99",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 25,
+          "y": 10
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "The peak amount of memory utilised by the AWS Lambda function during a specific invocation.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 0
+              },
+              "label": "Average memory used",
+              "operation": "formula",
+              "formula": "average(aws.lambda.metrics.max_memory_used_mb) * 1024 * 1024",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#9dc695"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "7c805952-ffc2-4f2b-a5af-ce0f2c245e42",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 6,
+          "w": 7,
+          "x": 32,
+          "y": 10
+        },
+        "config": {
+          "type": "metric",
+          "title": "",
+          "description": "The amount of memory allocated to your Lambda function during its configuration.",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "logs-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "bytes",
+                "decimals": 0
+              },
+              "label": "Average instance max memory",
+              "operation": "formula",
+              "formula": "average(aws.lambda.metrics.instance_max_memory)",
+              "type": "primary",
+              "color": {
+                "type": "static",
+                "color": "#8eb4b0"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "3392ff68-2f08-4d20-b2cf-57e8499d66c0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 48,
+          "x": 0,
+          "y": 16
+        },
+        "config": {
+          "type": "xy",
+          "title": "Init duration  vs Duration vs Billed duration",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Time",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar",
+              "y": [
+                {
+                  "format": {
+                    "type": "duration",
+                    "from": "ms",
+                    "to": "auto",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Init duration",
+                  "field": "aws.lambda.metrics.init_duration_ms",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "duration",
+                    "from": "ms",
+                    "to": "auto",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Duration",
+                  "field": "aws.lambda.metrics.duration_ms",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "duration",
+                    "from": "ms",
+                    "to": "auto",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Billed duration",
+                  "field": "aws.lambda.metrics.billed_duration_ms",
+                  "operation": "average",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "07ea027e-a6b5-48f7-99b0-da5a03cef570",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 14,
+          "w": 48,
+          "x": 0,
+          "y": 28
+        },
+        "config": {
+          "type": "xy",
+          "title": "Memory allocated vs memory used",
+          "description": "The amount of memory allocated to your Lambda function during its configuration.",
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "bottom"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "Memory",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            },
+            "bars": {
+              "minimum_height": 1,
+              "data_labels": {
+                "visible": false
+              }
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "bar_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 0
+                  },
+                  "label": "Memory allocated",
+                  "operation": "formula",
+                  "formula": "average(aws.lambda.metrics.max_memory_used_mb) * 1024 * 1024",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "type": "area",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": "Memory used",
+                  "operation": "formula",
+                  "formula": "average(aws.lambda.metrics.memory_size_mb)* 1024 *1024",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "auto",
+                "use_original_time_range": false,
+                "include_empty_rows": true,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d8da4da1-878f-4af5-ad54-94ab7a20ddfa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 16,
+          "w": 48,
+          "x": 0,
+          "y": 42
+        },
+        "config": {
+          "description": "",
+          "title": "AWS Lambda logs",
+          "tabs": [
+            {
+              "column_order": [
+                "log.level",
+                "aws.lambda.event_type",
+                "aws.lambda.request_id",
+                "message",
+                "aws.lambda.error.message",
+                "aws.lambda.error.stack_trace"
+              ],
+              "sort": [
+                {
+                  "name": "@timestamp",
+                  "direction": "desc"
+                }
+              ],
+              "query": {
+                "expression": "data_stream.dataset : \"aws.lambda_logs\" and (message : * or aws.lambda.error.message : *  or aws.lambda.error.stack_trace : * or log.level : * or aws.lambda.event_type : * )",
+                "language": "kql"
+              },
+              "filters": [],
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "logs-*"
+              },
+              "view_mode": "documents"
+            }
+          ]
+        },
+        "id": "d5024a6f-71c3-4fd2-8081-cdd2d1e3a0ea",
+        "type": "discover_session"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "8b211e2f-1b3c-429f-bbbf-4197c071730e",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "CloudWatch log group",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "aws.cloudwatch.log_group",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      },
+      {
+        "id": "20e885a7-22c2-44d1-8ccb-ceea0b066fa3",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "CloudWatch log stream",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "logs-*",
+          "field_name": "aws.cloudwatch.log_stream",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": false,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T17:56:20.600Z",
+    "managed": true,
+    "updated_at": "2026-08-12T17:56:21.831Z",
+    "version": "Wzk3LDFd"
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "### AWS Lambda logs\n\nThis dashboard highlights key AWS Lambda metrics and logs such as:\n\n- Execution duration and billed duration\n\n- Memory allocation and usage\n\n- Function logs for each invocation",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "title": "",
+        "hide_title": true
+      }
+    }
+  ]
+}

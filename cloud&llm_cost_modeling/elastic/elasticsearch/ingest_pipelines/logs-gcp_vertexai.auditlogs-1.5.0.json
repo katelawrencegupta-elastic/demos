@@ -1,0 +1,528 @@
+{
+  "name": "logs-gcp_vertexai.auditlogs-1.5.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "{{{ _ingest.on_failure_message }}}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643498448,
+  "description": "Pipeline for Google Cloud Vertex AI Audit logs",
+  "_meta": {
+    "package": {
+      "name": "gcp_vertexai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643498448,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.provider",
+        "value": "gcp"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.@type",
+        "target_field": "gcp.vertexai.audit.type"
+      }
+    },
+    {
+      "drop": {
+        "description": "Drop the document if it is not of AuditLog type",
+        "if": "ctx.gcp?.vertexai?.audit?.type != null && ctx.gcp?.vertexai?.audit?.type != 'type.googleapis.com/google.cloud.audit.AuditLog'"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "copy_from": "json.insertId",
+        "if": "ctx.json?.insertId != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.logName",
+        "target_field": "log.logger"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.severity",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "json.timestamp",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.resource.labels.project_id",
+        "target_field": "cloud.project.id",
+        "if": "ctx.json?.resource?.labels?.project_id != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.resource.labels.instance_id",
+        "target_field": "cloud.instance.id",
+        "if": "ctx.json?.resource?.labels?.instance_id != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.resource.type",
+        "target_field": "gcp.vertexai.audit.resource_type",
+        "if": "ctx.json?.resource?.type != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.authoritySelector",
+        "target_field": "gcp.vertexai.audit.authentication_info.authority_selector"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.principalEmail",
+        "target_field": "gcp.vertexai.audit.authentication_info.principal_email"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.principalSubject",
+        "target_field": "gcp.vertexai.audit.authentication_info.principal_subject"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.serviceAccountKeyName",
+        "target_field": "gcp.vertexai.audit.authentication_info.service_account_key_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.serviceAccountDelegationInfo",
+        "target_field": "gcp.vertexai.audit.authentication_info.service_account_delegation_info"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authenticationInfo.thirdPartyPrincipal",
+        "target_field": "gcp.vertexai.audit.authentication_info.third_party_principal"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.serviceName",
+        "target_field": "gcp.vertexai.audit.service_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.methodName",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.resourceName",
+        "target_field": "gcp.vertexai.audit.resource_name"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.protoPayload.request",
+        "target_field": "gcp.vertexai.audit.request",
+        "if": "ctx.json?.protoPayload?.request != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.protoPayload.response",
+        "target_field": "gcp.vertexai.audit.response",
+        "if": "ctx.json?.protoPayload?.response != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.resourceLocation.currentLocations",
+        "target_field": "gcp.vertexai.audit.resource_location.current_locations"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.numResponseItems",
+        "target_field": "gcp.vertexai.audit.num_response_items",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.status.code",
+        "target_field": "gcp.vertexai.audit.status.code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.status.message",
+        "target_field": "gcp.vertexai.audit.status.message"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "json.protoPayload.status.details",
+        "target_field": "gcp.vertexai.audit.status.details"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": [
+          "network",
+          "configuration"
+        ],
+        "if": "ctx?.gcp?.vertexai?.audit?.authorization_info != null && ctx?.gcp?.vertexai?.audit?.authorization_info instanceof List && ctx?.gcp?.vertexai?.audit?.authorization_info.size() == 1"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": [
+          "access",
+          "allowed"
+        ],
+        "if": "ctx?.gcp?.vertexai?.audit?.authorization_info != null && ctx?.gcp?.vertexai?.audit?.authorization_info instanceof List && ctx?.gcp?.vertexai?.audit?.authorization_info.size() == 1 && ctx?.gcp?.vertexai?.audit?.authorization_info[0]?.granted != null && ctx?.gcp?.vertexai?.audit?.authorization_info[0]?.granted"
+      }
+    },
+    {
+      "append": {
+        "field": "event.type",
+        "value": [
+          "access",
+          "denied"
+        ],
+        "if": "ctx?.gcp?.vertexai?.audit?.authorization_info != null && ctx?.gcp?.vertexai?.audit?.authorization_info instanceof List && ctx?.gcp?.vertexai?.audit?.authorization_info.size() == 1 && ctx?.gcp?.vertexai?.audit?.authorization_info[0]?.granted != null && !ctx?.gcp?.vertexai?.audit?.authorization_info[0]?.granted"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.violationInfo",
+        "target_field": "gcp.vertexai.audit.policy_violation_info.violations"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.policy_violation_info.violations",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.errorMessage",
+            "target_field": "_ingest._value.error_message"
+          }
+        },
+        "if": "ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations != null && ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations instanceof List"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.policy_violation_info.violations",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.checkedValue",
+            "target_field": "_ingest._value.checked_value"
+          }
+        },
+        "if": "ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations != null && ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations instanceof List"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.policy_violation_info.violations",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.policyType",
+            "target_field": "_ingest._value.policy_type"
+          }
+        },
+        "if": "ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations != null && ctx?.gcp?.vertexai?.audit?.policy_violation_info?.violations instanceof List"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.payload",
+        "target_field": "gcp.vertexai.audit.policy_violation_info.payload"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.resourceType",
+        "target_field": "gcp.vertexai.audit.policy_violation_info.resource_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.policyViolationInfo.orgPolicyViolationInfo.resourceTags",
+        "target_field": "gcp.vertexai.audit.policy_violation_info.resource_tags"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "type": "ip",
+        "field": "json.protoPayload.requestMetadata.callerIp",
+        "target_field": "source.ip",
+        "if": "ctx.json?.protoPayload?.requestMetadata?.callerIp != null && ctx.json?.protoPayload?.requestMetadata?.callerIp != \"gce-internal-ip\"  && ctx.json?.protoPayload?.requestMetadata?.callerIp != \"private\""
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "json.protoPayload.requestMetadata.callerIp",
+        "if": "ctx.json?.protoPayload?.requestMetadata?.callerIp != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.requestMetadata.callerSuppliedUserAgent",
+        "target_field": "user_agent.original"
+      }
+    },
+    {
+      "user_agent": {
+        "field": "user_agent.original",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{{source.ip}}}"
+      }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{client.user.email}}}",
+        "if": "ctx.client?.user?.email != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.protoPayload.metadata",
+        "target_field": "gcp.vertexai.audit.metadata",
+        "if": "ctx.json?.protoPayload?.metadata != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.authentication_info.principal_email",
+        "target_field": "client.user.email",
+        "if": "ctx.client?.user?.email == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.authentication_info.principal_subject",
+        "target_field": "client.user.id",
+        "if": "ctx.client?.user?.id == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "field": "json.protoPayload.authorizationInfo",
+        "target_field": "gcp.vertexai.audit.authorization_info"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.authorization_info",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.resourceAttributes",
+            "target_field": "_ingest._value.resource_attributes"
+          }
+        },
+        "if": "ctx?.gcp?.vertexai?.audit?.authorization_info != null && ctx?.gcp?.vertexai?.audit?.authorization_info instanceof List"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "gcp.vertexai.audit.authorization_info",
+        "processor": {
+          "rename": {
+            "field": "_ingest._value.permissionType",
+            "target_field": "_ingest._value.permission_type"
+          }
+        },
+        "if": "ctx?.gcp?.vertexai?.audit?.authorization_info != null && ctx?.gcp?.vertexai?.audit?.authorization_info instanceof List"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "tag": "painless_remove_null",
+        "source": "boolean drop(Object object) {\n  if (object == null || object == '') {\n    return true;\n  } else if (object instanceof Map) {\n    ((Map) object).values().removeIf(v -> drop(v));\n    return (((Map) object).size() == 0);\n  } else if (object instanceof List) {\n    ((List) object).removeIf(v -> drop(v));\n    return (((List) object).length == 0);\n  }\n  return false;\n}\ndrop(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "field": "json",
+        "ignore_missing": true
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp_vertexai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `gcp_vertexai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-gcp_vertexai.auditlogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `gcp_vertexai.auditlogs` dataset"
+      }
+    }
+  ]
+}

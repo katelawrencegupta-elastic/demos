@@ -1,0 +1,2005 @@
+{
+  "name": "logs-aws.inspector-7.1.1",
+  "on_failure": [
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}'\n{{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'\n{{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_to_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557382720,
+  "description": "Pipeline for processing Amazon Inspector Findings logs.",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557382720,
+  "processors": [
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the fields added by Agentless as metadata, as they can collide with ECS fields.",
+        "tag": "remove_agentless_tags",
+        "field": [
+          "organization",
+          "division",
+          "team"
+        ],
+        "if": "ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_kind",
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_vulnerability_into_event_category",
+        "field": "event.category",
+        "value": "vulnerability"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_info_into_event_type",
+        "field": "event.type",
+        "value": "info"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_observer_vendor",
+        "field": "observer.vendor",
+        "value": "Amazon Inspector"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_vulnerability_scanner_vendor",
+        "field": "vulnerability.scanner.vendor",
+        "value": "Amazon Inspector"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove ECS cloud fields that are populated from EA metadata.",
+        "tag": "remove_cloud_fields",
+        "field": "cloud"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_cloud_provider",
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_cea45f41",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "json_event_original",
+        "field": "event.original",
+        "target_field": "json"
+      }
+    },
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "tag": "fingerprint_inspector",
+        "fields": [
+          "event.original"
+        ],
+        "target_field": "_id"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_0a49e009",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.updatedAt",
+        "target_field": "aws.inspector.updated_at",
+        "tag": "date_updatedAt",
+        "if": "ctx.json?.updatedAt != null && ctx.json.updatedAt != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_@timestamp_from_updated_at",
+        "field": "@timestamp",
+        "copy_from": "aws.inspector.updated_at"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_description",
+        "field": "json.description",
+        "target_field": "aws.inspector.description"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_message_from_description",
+        "field": "message",
+        "copy_from": "aws.inspector.description"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_description",
+        "field": "vulnerability.description",
+        "copy_from": "aws.inspector.description"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_awsAccountId",
+        "field": "json.awsAccountId",
+        "target_field": "aws.inspector.aws_account_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_cloud_account_id_from_aws_account_id",
+        "field": "cloud.account.id",
+        "copy_from": "aws.inspector.aws_account_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_severity",
+        "field": "json.severity",
+        "target_field": "aws.inspector.severity"
+      }
+    },
+    {
+      "script": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_efe324d2",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "description": "Map vulnerability.severity to CVSS standard",
+        "tag": "script_to_map_severity_to_CVSS",
+        "source": "String severity = ctx.aws.inspector.severity.toLowerCase(); if (severity == 'untriaged') {\n  ctx.vulnerability.put('severity', 'Unknown');\n} else if (severity == 'informational') {\n  ctx.vulnerability.put('severity', 'Low');\n} else if (severity == 'low') {\n  ctx.vulnerability.put('severity', 'Low');\n} else if (severity == 'medium') {\n  ctx.vulnerability.put('severity', 'Medium');\n} else if (severity == 'high') {\n  ctx.vulnerability.put('severity', 'High');\n} else if (severity == 'critical') {\n  ctx.vulnerability.put('severity', 'Critical');\n}\n",
+        "lang": "painless",
+        "if": "ctx.aws?.inspector?.severity != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_networkReachabilityDetails_protocol",
+        "field": "json.networkReachabilityDetails.protocol",
+        "target_field": "aws.inspector.network_reachability_details.protocol"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_network_transport_from_network_reachability_details_protocol",
+        "field": "network.transport",
+        "copy_from": "aws.inspector.network_reachability_details.protocol"
+      }
+    },
+    {
+      "lowercase": {
+        "ignore_missing": true,
+        "tag": "lowercase_network_transport",
+        "field": "network.transport"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_cwes",
+        "field": "json.codeVulnerabilityDetails.cwes",
+        "target_field": "aws.inspector.code_vulnerability_details.cwes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_detectorId",
+        "field": "json.codeVulnerabilityDetails.detectorId",
+        "target_field": "aws.inspector.code_vulnerability_details.detector_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_detectorName",
+        "field": "json.codeVulnerabilityDetails.detectorName",
+        "target_field": "aws.inspector.code_vulnerability_details.detector_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_detectorTags",
+        "field": "json.codeVulnerabilityDetails.detectorTags",
+        "target_field": "aws.inspector.code_vulnerability_details.detector_tags"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_e73b9b49",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.codeVulnerabilityDetails.filePath.endLine",
+        "target_field": "aws.inspector.code_vulnerability_details.file_path.end_line",
+        "ignore_missing": true,
+        "tag": "convert_codeVulnerabilityDetails_filePath_endLine_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_filePath_fileName",
+        "field": "json.codeVulnerabilityDetails.filePath.fileName",
+        "target_field": "aws.inspector.code_vulnerability_details.file_path.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_filePath_filePath",
+        "field": "json.codeVulnerabilityDetails.filePath.filePath",
+        "target_field": "aws.inspector.code_vulnerability_details.file_path.path"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_f1246d44",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.codeVulnerabilityDetails.filePath.startLine",
+        "target_field": "aws.inspector.code_vulnerability_details.file_path.start_line",
+        "ignore_missing": true,
+        "tag": "convert_codeVulnerabilityDetails_filePath_startLine_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_referenceUrls",
+        "field": "json.codeVulnerabilityDetails.referenceUrls",
+        "target_field": "aws.inspector.code_vulnerability_details.reference_urls"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_ruleId",
+        "field": "json.codeVulnerabilityDetails.ruleId",
+        "target_field": "aws.inspector.code_vulnerability_details.rule_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_codeVulnerabilityDetails_sourceLambdaLayerArn",
+        "field": "json.codeVulnerabilityDetails.sourceLambdaLayerArn",
+        "target_field": "aws.inspector.code_vulnerability_details.source_lambda_layer_arn"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_0588064c",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.epss.score",
+        "target_field": "aws.inspector.epss.score",
+        "ignore_missing": true,
+        "tag": "convert_epss_score_to_double",
+        "type": "double"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_011cf6a6",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.exploitabilityDetails.lastKnownExploitAt",
+        "target_field": "aws.inspector.exploitability_details.last_known_exploit_at",
+        "tag": "date_exploitabilityDetails_lastKnownExploitAt",
+        "if": "ctx.json?.exploitabilityDetails?.lastKnownExploitAt != null && ctx.json.exploitabilityDetails.lastKnownExploitAt != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_exploitAvailable",
+        "field": "json.exploitAvailable",
+        "target_field": "aws.inspector.exploit_available"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_referenceUrls",
+        "field": "json.packageVulnerabilityDetails.referenceUrls",
+        "target_field": "aws.inspector.package_vulnerability_details.reference_urls"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_reference_from_package_vulnerability_details_reference_urls",
+        "field": "vulnerability.reference",
+        "copy_from": "aws.inspector.package_vulnerability_details.reference_urls"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_vulnerabilityId",
+        "field": "json.packageVulnerabilityDetails.vulnerabilityId",
+        "target_field": "aws.inspector.package_vulnerability_details.vulnerability_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_id_from_package_vulnerability_details_vulnerability_id",
+        "field": "vulnerability.id",
+        "copy_from": "aws.inspector.package_vulnerability_details.vulnerability_id"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_cve_from_package_vulnerability_details_vulnerability_id",
+        "field": "vulnerability.cve",
+        "copy_from": "aws.inspector.package_vulnerability_details.vulnerability_id",
+        "if": "ctx.aws?.inspector?.type == 'PACKAGE_VULNERABILITY' && ctx.aws.inspector.package_vulnerability_details?.vulnerability_id?.startsWith('CVE') == true"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_vulnerability_enumeration",
+        "field": "vulnerability.enumeration",
+        "value": "CVE",
+        "if": "ctx.vulnerability?.cve != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_findingArn",
+        "field": "json.findingArn",
+        "target_field": "aws.inspector.finding_arn"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_d63716e9",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.firstObservedAt",
+        "target_field": "aws.inspector.first_observed_at",
+        "tag": "date_firstObservedAt",
+        "if": "ctx.json?.firstObservedAt != null && ctx.json.firstObservedAt != ''"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_fixAvailable",
+        "field": "json.fixAvailable",
+        "target_field": "aws.inspector.fix_available"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_935ed3f4",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.inspectorScore",
+        "target_field": "aws.inspector.inspector_score",
+        "ignore_missing": true,
+        "tag": "convert_inspectorScore_to_double",
+        "type": "double"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_inspectorScoreDetails_adjustedCvss_adjustments",
+        "field": "json.inspectorScoreDetails.adjustedCvss.adjustments",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.adjustments"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_inspectorScoreDetails_adjustedCvss_cvssSource",
+        "field": "json.inspectorScoreDetails.adjustedCvss.cvssSource",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.cvss_source"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_fd9ed83c",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.inspectorScoreDetails.adjustedCvss.score",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.score.value",
+        "ignore_missing": true,
+        "tag": "convert_inspectorScoreDetails_adjustedCvss_score_to_double",
+        "type": "double"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_score_base",
+        "field": "vulnerability.score.base",
+        "copy_from": "aws.inspector.inspector_score_details.adjusted_cvss.score.value"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_vulnerability_classification",
+        "field": "vulnerability.classification",
+        "value": "CVSS",
+        "if": "ctx.aws?.inspector?.type == 'PACKAGE_VULNERABILITY' && ctx.aws.inspector.inspector_score_details?.adjusted_cvss?.score?.value != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_inspectorScoreDetails_adjustedCvss_scoreSource",
+        "field": "json.inspectorScoreDetails.adjustedCvss.scoreSource",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.score.source"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_inspectorScoreDetails_adjustedCvss_scoringVector",
+        "field": "json.inspectorScoreDetails.adjustedCvss.scoringVector",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.scoring_vector"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_inspectorScoreDetails_adjustedCvss_version",
+        "field": "json.inspectorScoreDetails.adjustedCvss.version",
+        "target_field": "aws.inspector.inspector_score_details.adjusted_cvss.version"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_score_version",
+        "field": "vulnerability.score.version",
+        "copy_from": "aws.inspector.inspector_score_details.adjusted_cvss.version"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_f82c7841",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.lastObservedAt",
+        "target_field": "aws.inspector.last_observed_at",
+        "tag": "date_lastObservedAt",
+        "if": "ctx.json?.lastObservedAt != null && ctx.json.lastObservedAt != ''"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_networkReachabilityDetails_networkPath_steps_3f0e7034",
+        "field": "json.networkReachabilityDetails.networkPath.steps",
+        "if": "ctx.json?.networkReachabilityDetails?.networkPath?.steps instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_networkReachabilityDetails_networkPath_steps_componentId",
+            "field": "_ingest._value.componentId",
+            "target_field": "_ingest._value.component.id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_networkReachabilityDetails_networkPath_steps_1bdfbe9b",
+        "field": "json.networkReachabilityDetails.networkPath.steps",
+        "if": "ctx.json?.networkReachabilityDetails?.networkPath?.steps instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_networkReachabilityDetails_networkPath_steps_componentType",
+            "field": "_ingest._value.componentType",
+            "target_field": "_ingest._value.component.type"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_networkReachabilityDetails_networkPath_steps_29f74ce0",
+        "field": "json.networkReachabilityDetails.networkPath.steps",
+        "if": "ctx.json?.networkReachabilityDetails?.networkPath?.steps instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_networkReachabilityDetails_networkPath_steps_componentArn",
+            "field": "_ingest._value.componentArn",
+            "target_field": "_ingest._value.component.arn"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_networkReachabilityDetails_networkPath_steps",
+        "field": "json.networkReachabilityDetails.networkPath.steps",
+        "target_field": "aws.inspector.network_reachability_details.network_path.steps"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_634e7220",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.networkReachabilityDetails.openPortRange.begin",
+        "target_field": "aws.inspector.network_reachability_details.open_port_range.begin",
+        "ignore_missing": true,
+        "tag": "convert_networkReachabilityDetails_openPortRange_begin_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_15b1ed18",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.networkReachabilityDetails.openPortRange.end",
+        "target_field": "aws.inspector.network_reachability_details.open_port_range.end",
+        "ignore_missing": true,
+        "tag": "convert_networkReachabilityDetails_openPortRange_end_to_long",
+        "type": "long"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_cvss_a6d89ede",
+        "field": "json.packageVulnerabilityDetails.cvss",
+        "if": "ctx.json?.packageVulnerabilityDetails?.cvss instanceof List",
+        "processor": {
+          "convert": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.baseScore",
+                  "ignore_missing": true
+                }
+              },
+              {
+                "append": {
+                  "field": "error.message",
+                  "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                }
+              }
+            ],
+            "field": "_ingest._value.baseScore",
+            "target_field": "_ingest._value.base_score",
+            "ignore_missing": true,
+            "tag": "convert_packageVulnerabilityDetails_cvss_baseScore_to_double",
+            "type": "double"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_cvss_1a44209d",
+        "field": "json.packageVulnerabilityDetails.cvss",
+        "if": "ctx.json?.packageVulnerabilityDetails?.cvss instanceof List",
+        "processor": {
+          "remove": {
+            "ignore_missing": true,
+            "tag": "remove_packageVulnerabilityDetails_cvss_baseScore",
+            "field": "_ingest._value.baseScore"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_cvss_1130ad25",
+        "field": "json.packageVulnerabilityDetails.cvss",
+        "if": "ctx.json?.packageVulnerabilityDetails?.cvss instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_cvss_scoringVector",
+            "field": "_ingest._value.scoringVector",
+            "target_field": "_ingest._value.scoring_vector"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_cvss",
+        "field": "json.packageVulnerabilityDetails.cvss",
+        "target_field": "aws.inspector.package_vulnerability_details.cvss"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_json_networkReachabilityDetails_networkPath_steps_to_aws_inspector_network_reachability_details_network_path_steps_4b117ba7",
+        "field": "json.networkReachabilityDetails.networkPath.steps",
+        "target_field": "aws.inspector.network_reachability_details.network_path.steps"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_relatedVulnerabilities",
+        "field": "json.packageVulnerabilityDetails.relatedVulnerabilities",
+        "target_field": "aws.inspector.package_vulnerability_details.related_vulnerabilities"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_source",
+        "field": "json.packageVulnerabilityDetails.source",
+        "target_field": "aws.inspector.package_vulnerability_details.source.value"
+      }
+    },
+    {
+      "uri_parts": {
+        "on_failure": [
+          {
+            "remove": {
+              "ignore_missing": true,
+              "tag": "remove_json_packageVulnerabilityDetails_sourceUrl_2131d595",
+              "field": "json.packageVulnerabilityDetails.sourceUrl"
+            }
+          },
+          {
+            "append": {
+              "tag": "append_error_message_6134a7d6",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.packageVulnerabilityDetails.sourceUrl",
+        "target_field": "aws.inspector.package_vulnerability_details.source.url",
+        "keep_original": true,
+        "tag": "uri_parts_packageVulnerabilityDetails_sourceUrl",
+        "if": "ctx.json?.packageVulnerabilityDetails?.sourceUrl != null"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_4b43e61a",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.packageVulnerabilityDetails.vendorCreatedAt",
+        "target_field": "aws.inspector.package_vulnerability_details.vendor.created_at",
+        "tag": "date_packageVulnerabilityDetails_vendorCreatedAt",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vendorCreatedAt != null && ctx.json.packageVulnerabilityDetails.vendorCreatedAt != ''"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_published_date",
+        "field": "vulnerability.published_date",
+        "copy_from": "aws.inspector.package_vulnerability_details.vendor.created_at"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_vendorSeverity",
+        "field": "json.packageVulnerabilityDetails.vendorSeverity",
+        "target_field": "aws.inspector.package_vulnerability_details.vendor.severity"
+      }
+    },
+    {
+      "date": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_67ca7c47",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "formats": [
+          "ISO8601",
+          "UNIX",
+          "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        ],
+        "field": "json.packageVulnerabilityDetails.vendorUpdatedAt",
+        "target_field": "aws.inspector.package_vulnerability_details.vendor.updated_at",
+        "tag": "date_packageVulnerabilityDetails_vendorUpdatedAt",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vendorUpdatedAt!= null && ctx.json.packageVulnerabilityDetails.vendorUpdatedAt != ''"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_16913f8c",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_vulnerablePackages_filePath",
+            "field": "_ingest._value.filePath",
+            "target_field": "_ingest._value.file_path"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_8a1f2869",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_vulnerablePackages_fixedInVersion",
+            "field": "_ingest._value.fixedInVersion",
+            "target_field": "_ingest._value.fixed_in_version"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_ef960ebc",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_vulnerablePackages_packageManager",
+            "field": "_ingest._value.packageManager",
+            "target_field": "_ingest._value.package_manager"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_fc41ed43",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_vulnerablePackages_sourceLambdaLayerArn",
+            "field": "_ingest._value.sourceLambdaLayerArn",
+            "target_field": "_ingest._value.source_lambda_layer_arn"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_00a54da8",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_packageVulnerabilityDetails_vulnerablePackages_sourceLayerHash",
+            "field": "_ingest._value.sourceLayerHash",
+            "target_field": "_ingest._value.source_layer_hash"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_packageVulnerabilityDetails_vulnerablePackages_9dedba0f",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "if": "ctx.json?.packageVulnerabilityDetails?.vulnerablePackages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_packageVulnerabilityDetails_vulnerablePackages_source_layer_hash_into_related_hash",
+            "field": "related.hash",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.source_layer_hash}}}"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_packageVulnerabilityDetails_vulnerablePackages",
+        "field": "json.packageVulnerabilityDetails.vulnerablePackages",
+        "target_field": "aws.inspector.package_vulnerability_details.vulnerable_packages"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_package_nested_from_package_vulnerability_details_vulnerable_packages",
+        "field": "aws.inspector.package_nested",
+        "copy_from": "aws.inspector.package_vulnerability_details.vulnerable_packages"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_aws_inspector_package_vulnerability_details_vulnerable_packages_06d5f6ad",
+        "field": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+        "if": "ctx.aws?.inspector?.package_vulnerability_details?.vulnerable_packages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_package_vulnerability_details_vulnerable_packages_arch_into_package_architecture",
+            "field": "package.architecture",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.arch}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_aws_inspector_package_vulnerability_details_vulnerable_packages_230e1c93",
+        "field": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+        "if": "ctx.aws?.inspector?.package_vulnerability_details?.vulnerable_packages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_package_vulnerability_details_vulnerable_packages_name_into_package_name",
+            "field": "package.name",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.name}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_aws_inspector_package_vulnerability_details_vulnerable_packages_5a1f8aa9",
+        "field": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+        "if": "ctx.aws?.inspector?.package_vulnerability_details?.vulnerable_packages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_package_vulnerability_details_vulnerable_packages_version_into_package_version",
+            "field": "package.version",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.version}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_aws_inspector_package_vulnerability_details_vulnerable_packages_55903e77",
+        "field": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+        "if": "ctx.aws?.inspector?.package_vulnerability_details?.vulnerable_packages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_package_vulnerability_details_vulnerable_packages_file_path_into_package_path",
+            "field": "package.path",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.file_path}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_aws_inspector_package_vulnerability_details_vulnerable_packages_26dbe747",
+        "field": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+        "if": "ctx.aws?.inspector?.package_vulnerability_details?.vulnerable_packages instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_package_vulnerability_details_vulnerable_packages_fixed_in_version_into_package_fixed_version",
+            "field": "package.fixed_version",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.fixed_in_version}}}"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_remediation_recommendation_text",
+        "field": "json.remediation.recommendation.text",
+        "target_field": "aws.inspector.remediation.recommendation.text"
+      }
+    },
+    {
+      "uri_parts": {
+        "on_failure": [
+          {
+            "remove": {
+              "ignore_missing": true,
+              "tag": "remove_json_remediation_recommendation_Url_ced20895",
+              "field": "json.remediation.recommendation.Url"
+            }
+          },
+          {
+            "append": {
+              "tag": "append_error_message_c4a03341",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "field": "json.remediation.recommendation.Url",
+        "target_field": "aws.inspector.remediation.recommendation.url",
+        "keep_original": true,
+        "tag": "uri_parts_remediation_recommendation_Url",
+        "if": "ctx.json?.remediation?.recommendation?.Url != null"
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_ac2134b6",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_iamInstanceProfileArn",
+            "field": "_ingest._value.details.awsEc2Instance.iamInstanceProfileArn",
+            "target_field": "_ingest._value.details.aws.ec2_instance.iam_instance_profile_arn"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_b64133a2",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_imageId",
+            "field": "_ingest._value.details.awsEc2Instance.imageId",
+            "target_field": "_ingest._value.details.aws.ec2_instance.image_id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_bd8946bb",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_ipV4Addresses",
+            "field": "_ingest._value.details.awsEc2Instance.ipV4Addresses",
+            "target_field": "_ingest._value.details.aws.ec2_instance.ipv4_addresses"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_43e262ed",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "foreach": {
+            "ignore_missing": true,
+            "field": "_ingest._value.details.aws.ec2_instance.ipv4_addresses",
+            "processor": {
+              "convert": {
+                "on_failure": [
+                  {
+                    "remove": {
+                      "field": "_ingest._value"
+                    }
+                  },
+                  {
+                    "append": {
+                      "field": "error.message",
+                      "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                    }
+                  }
+                ],
+                "tag": "convert_details_aws_ec2_instance_ipv4_addresses_to_ip",
+                "field": "_ingest._value",
+                "type": "ip"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_630cb948",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "foreach": {
+            "ignore_missing": true,
+            "field": "_ingest._value.details.aws.ec2_instance.ipv4_addresses",
+            "processor": {
+              "append": {
+                "tag": "append_resources_details_aws_ec2_instance_ipv4_addresses_into_related_ip",
+                "field": "related.ip",
+                "allow_duplicates": false,
+                "value": "{{{_ingest._value}}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_55a02249",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_ipV6Addresses",
+            "field": "_ingest._value.details.awsEc2Instance.ipV6Addresses",
+            "target_field": "_ingest._value.details.aws.ec2_instance.ipv6_addresses"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_43afa091",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "foreach": {
+            "ignore_missing": true,
+            "field": "_ingest._value.details.aws.ec2_instance.ipv6_addresses",
+            "processor": {
+              "convert": {
+                "on_failure": [
+                  {
+                    "remove": {
+                      "field": "_ingest._value"
+                    }
+                  },
+                  {
+                    "append": {
+                      "field": "error.message",
+                      "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                    }
+                  }
+                ],
+                "tag": "convert_details_aws_ec2_instance_ipv6_addresses_to_ip",
+                "field": "_ingest._value",
+                "type": "ip"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_bba66bcc",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "foreach": {
+            "ignore_missing": true,
+            "field": "_ingest._value.details.aws.ec2_instance.ipv6_addresses",
+            "processor": {
+              "append": {
+                "tag": "append_resources_details_aws_ec2_instance_ipv6_addresses_into_related_ip",
+                "field": "related.ip",
+                "allow_duplicates": false,
+                "value": "{{{_ingest._value}}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_bb559ca6",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_keyName",
+            "field": "_ingest._value.details.awsEc2Instance.keyName",
+            "target_field": "_ingest._value.details.aws.ec2_instance.key_name"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_e506ea1a",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "date": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.details.awsEc2Instance.launchedAt",
+                  "ignore_missing": true
+                }
+              }
+            ],
+            "tag": "date_resources_details_awsEc2Instance_launchedAt",
+            "formats": [
+              "ISO8601",
+              "UNIX",
+              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            ],
+            "field": "_ingest._value.details.awsEc2Instance.launchedAt",
+            "target_field": "_ingest._value.details.aws.ec2_instance.launched_at"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_ae04f354",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_platform",
+            "field": "_ingest._value.details.awsEc2Instance.platform",
+            "target_field": "_ingest._value.details.aws.ec2_instance.platform"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_fd9b49a8",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_subnetId",
+            "field": "_ingest._value.details.awsEc2Instance.subnetId",
+            "target_field": "_ingest._value.details.aws.ec2_instance.subnet_id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_0b8fdb2f",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_type",
+            "field": "_ingest._value.details.awsEc2Instance.type",
+            "target_field": "_ingest._value.details.aws.ec2_instance.type"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_392ada08",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEc2Instance_vpcId",
+            "field": "_ingest._value.details.awsEc2Instance.vpcId",
+            "target_field": "_ingest._value.details.aws.ec2_instance.vpc_id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_8b993cb4",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_architecture",
+            "field": "_ingest._value.details.awsEcrContainerImage.architecture",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.architecture"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_b0a0e420",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_author",
+            "field": "_ingest._value.details.awsEcrContainerImage.author",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.author"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_6d35ff4a",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_imageHash",
+            "field": "_ingest._value.details.awsEcrContainerImage.imageHash",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.image.hash"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_ec8dabdb",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_resources_details_awsEcrContainerImage_imageHash_into_related_hash",
+            "field": "related.hash",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.details.aws.ecr_container_image.image.hash}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_42c3b875",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_imageTags",
+            "field": "_ingest._value.details.awsEcrContainerImage.imageTags",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.image.tags"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_65925e83",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "convert": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.details.awsEcrContainerImage.inUseCount",
+                  "ignore_missing": true
+                }
+              },
+              {
+                "append": {
+                  "field": "error.message",
+                  "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                }
+              }
+            ],
+            "field": "_ingest._value.details.awsEcrContainerImage.inUseCount",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.in_use_count",
+            "ignore_missing": true,
+            "tag": "convert_resources_details_awsEcrContainerImage_inUseCount_to_long",
+            "type": "long"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_a9455749",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "date": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.details.awsEcrContainerImage.lastInUseAt",
+                  "ignore_missing": true
+                }
+              }
+            ],
+            "tag": "date_resources_details_awsEcrContainerImage_lastInUseAt",
+            "formats": [
+              "ISO8601",
+              "UNIX",
+              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            ],
+            "field": "_ingest._value.details.awsEcrContainerImage.lastInUseAt",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.last_in_use_at"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_3b57b024",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_platform",
+            "field": "_ingest._value.details.awsEcrContainerImage.platform",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.platform"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_e9ccb3fb",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "date": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.details.awsEcrContainerImage.pushedAt",
+                  "ignore_missing": true
+                }
+              }
+            ],
+            "tag": "date_resources_details_awsEcrContainerImage_pushedAt",
+            "formats": [
+              "ISO8601",
+              "UNIX",
+              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            ],
+            "field": "_ingest._value.details.awsEcrContainerImage.pushedAt",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.pushed_at"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_2715cf38",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_registry",
+            "field": "_ingest._value.details.awsEcrContainerImage.registry",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.registry"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_f6c8b8c1",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsEcrContainerImage_repositoryName",
+            "field": "_ingest._value.details.awsEcrContainerImage.repositoryName",
+            "target_field": "_ingest._value.details.aws.ecr_container_image.repository_name"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_82d9a3d5",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_codeSha256",
+            "field": "_ingest._value.details.awsLambdaFunction.codeSha256",
+            "target_field": "_ingest._value.details.awsLambdaFunction.code_sha256"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_e5abebac",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "append": {
+            "tag": "append_resource_details_awsLambdaFunction_code_sha256_into_related_hash",
+            "field": "related.hash",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value.details.awsLambdaFunction.code_sha256}}}"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_ee9fa493",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_executionRoleArn",
+            "field": "_ingest._value.details.awsLambdaFunction.executionRoleArn",
+            "target_field": "_ingest._value.details.awsLambdaFunction.execution_role_arn"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_2fc5e528",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_functionName",
+            "field": "_ingest._value.details.awsLambdaFunction.functionName",
+            "target_field": "_ingest._value.details.awsLambdaFunction.function_name"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_f4f4115c",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "date": {
+            "on_failure": [
+              {
+                "remove": {
+                  "field": "_ingest._value.details.awsLambdaFunction.lastModifiedAt",
+                  "ignore_missing": true
+                }
+              }
+            ],
+            "tag": "date_resources_details_awsLambdaFunction_lastModifiedAt",
+            "formats": [
+              "ISO8601",
+              "UNIX",
+              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            ],
+            "field": "_ingest._value.details.awsLambdaFunction.lastModifiedAt",
+            "target_field": "_ingest._value.details.awsLambdaFunction.last_modified_at"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_bd31e481",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_packageType",
+            "field": "_ingest._value.details.awsLambdaFunction.packageType",
+            "target_field": "_ingest._value.details.awsLambdaFunction.package_type"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_b1fa8fbe",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_vpcConfig_securityGroupIds",
+            "field": "_ingest._value.details.awsLambdaFunction.vpcConfig.securityGroupIds",
+            "target_field": "_ingest._value.details.awsLambdaFunction.vpc_config.security_group_ids"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_88e6abe9",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_vpcConfig_subnetIds",
+            "field": "_ingest._value.details.awsLambdaFunction.vpcConfig.subnetIds",
+            "target_field": "_ingest._value.details.awsLambdaFunction.vpc_config.subnet_ids"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_24dd8d44",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction_vpcConfig_vpcId",
+            "field": "_ingest._value.details.awsLambdaFunction.vpcConfig.vpcId",
+            "target_field": "_ingest._value.details.awsLambdaFunction.vpc_config.vpc_id"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_24fa5676",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "remove": {
+            "ignore_missing": true,
+            "tag": "remove_resources_fields",
+            "field": [
+              "_ingest._value.details.awsEc2Instance.launchedAt",
+              "_ingest._value.details.awsEcrContainerImage.inUseCount",
+              "_ingest._value.details.awsEcrContainerImage.lastInUseAt",
+              "_ingest._value.details.awsEcrContainerImage.pushedAt",
+              "_ingest._value.details.awsLambdaFunction.lastModifiedAt"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_6918858c",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_awsLambdaFunction",
+            "field": "_ingest._value.details.awsLambdaFunction",
+            "target_field": "_ingest._value.details.aws.lambda_function"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_86dc252e",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_codeRepository_integrationArn",
+            "field": "_ingest._value.details.codeRepository.integrationArn",
+            "target_field": "_ingest._value.details.code_repository.integration_arn"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_a204a363",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_codeRepository_projectName",
+            "field": "_ingest._value.details.codeRepository.projectName",
+            "target_field": "_ingest._value.details.code_repository.project_name"
+          }
+        }
+      }
+    },
+    {
+      "foreach": {
+        "tag": "foreach_json_resources_1cd3a1d2",
+        "field": "json.resources",
+        "if": "ctx.json?.resources instanceof List",
+        "processor": {
+          "rename": {
+            "ignore_missing": true,
+            "tag": "rename_resources_details_codeRepository_providerType",
+            "field": "_ingest._value.details.codeRepository.providerType",
+            "target_field": "_ingest._value.details.code_repository.provider_type"
+          }
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_resources",
+        "field": "json.resources",
+        "target_field": "aws.inspector.resources"
+      }
+    },
+    {
+      "script": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_1b3fbfea",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "description": "Extract fields from aws.inspector.resources with single resource.",
+        "tag": "script_extract_fields_from_single_resource",
+        "source": "// Arrays won't work in general in current UI of Cloud Security Posture workflow. In Amazon Inspector, a finding may contain multiple resources, but rarely.\n// When a finding has single-resource, we extract fields as single-value so that the Vulnerability Findings UI behaves as expected for almost all cases.\n// But in the rare multi-resource case, we extract fields into an array to not miss any affected resources for a finding. \n// This trade-off is okay as not many findings will be affected. When our UI natively supports multi-resources, the single-value resource extraction must be removed.\n\ndef resources = ctx.aws.inspector.resources;\n\n// Define fields to be extracted.\nctx.resource = ctx.resource ?: [:];\nctx.host = ctx.host ?: [:];\nctx.host.os = ctx.host.os ?: [:];\nctx.host.ip = ctx.host.ip ?: [];\nctx.cloud = ctx.cloud ?: [:];\nctx.cloud.instance = ctx.cloud.instance ?: [:];\nctx.cloud.machine = ctx.cloud.machine ?: [:];\n\n// This extraction logic is only for single resource case. Multiple resources are extracted inside script - script_extract_fields_from_multiple_resources.\nif (resources.size() == 1){\n  def res = resources[0];\n\n  ctx.resource.id = res.id;\n  ctx.resource.name = res.tags?.Name;\n  ctx.resource.type = res.type;\n  ctx.cloud.region = res.region;\n\n  if (res.type == 'AWS_EC2_INSTANCE') {\n    ctx.cloud.instance.id = res.id;\n    ctx.cloud.machine.type = res.details?.aws?.ec2_instance?.type;\n    ctx.host.id = res.id;\n    ctx.host.name = res.tags?.Name;\n    ctx.host.type = res.details?.aws?.ec2_instance?.type;\n    ctx.host.os.platform = res.details?.aws?.ec2_instance?.platform;\n    if (res.details?.aws?.ec2_instance?.ipv4_addresses instanceof List) {\n      for (ipv4 in res.details?.aws?.ec2_instance?.ipv4_addresses) {\n        ctx.host.ip.add(ipv4);\n      }\n    }\n    if (res.details?.aws?.ec2_instance?.ipv6_addresses instanceof List) {\n      for (ipv6 in res.details?.aws?.ec2_instance?.ipv6_addresses) {\n        ctx.host.ip.add(ipv6);\n      }\n    }\n    def platform = res.details?.aws?.ec2_instance?.platform?.toLowerCase();\n    if (platform?.contains('windows') == true) {\n      ctx.host.os.type = 'windows';\n    } else if (platform?.contains('linux') == true) {\n      ctx.host.os.type = 'linux';\n    } else if (platform?.contains('macos') == true) {\n      ctx.host.os.type = 'macos';\n    }\n  }\n}",
+        "lang": "painless",
+        "if": "ctx.aws?.inspector?.resources instanceof List && ctx.aws.inspector.resources.size() == 1"
+      }
+    },
+    {
+      "script": {
+        "on_failure": [
+          {
+            "append": {
+              "tag": "append_error_message_c134000a",
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "description": "Extract fields from aws.inspector.resources with multiple resources.",
+        "tag": "script_extract_fields_from_multiple_resources",
+        "source": "def resources = ctx.aws.inspector.resources;\n\n// Define fields to be extracted.\nctx.resource = ctx.resource ?: [:];\nctx.resource.id = ctx.resource.id ?: [];\nctx.resource.name = ctx.resource.name ?: [];\n\nctx.host = ctx.host ?: [:];\nctx.host.id = ctx.host.id ?: [];\nctx.host.name = ctx.host.name ?: [];\nctx.host.ip = ctx.host.ip ?: [];\nctx.host.type = ctx.host.type ?: [];\nctx.host.os = ctx.host.os ?: [:];\nctx.host.os.platform = ctx.host.os.platform ?: [];\nctx.host.os.type = ctx.host.os.type ?: [];\n\nctx.cloud = ctx.cloud ?: [:];\nctx.cloud.instance = ctx.cloud.instance ?: [:];\nctx.cloud.instance.id = ctx.cloud.instance.id ?: [];\nctx.cloud.machine = ctx.cloud.machine ?: [:];\nctx.cloud.machine.type = ctx.cloud.machine.type ?: [];\nctx.cloud.region = ctx.cloud.region ?: [];\n\nfor (res in resources) {\n  ctx.resource.id.add(res.id);\n  ctx.resource.name.add(res.tags?.Name);\n  ctx.resource.type.add(res.type);\n  ctx.cloud.region.add(res.region);\n\n  if (res.type == 'AWS_EC2_INSTANCE') {\n    ctx.cloud.instance.id.add(res.id);\n    ctx.cloud.machine.type.add(res.details?.aws?.ec2_instance?.type);\n    ctx.host.id.add(res.id);\n    ctx.host.name.add(res.tags?.Name);\n    ctx.host.type.add(res.details?.aws?.ec2_instance?.type);\n    ctx.host.os.platform.add(res.details?.aws?.ec2_instance?.platform);\n    if (res.details?.aws?.ec2_instance?.ipv4_addresses instanceof List) {\n      for (ipv4 in res.details?.aws?.ec2_instance?.ipv4_addresses) {\n        ctx.host.ip.add(ipv4);\n      }\n    }\n    if (res.details?.aws?.ec2_instance?.ipv6_addresses instanceof List) {\n      for (ipv6 in res.details?.aws?.ec2_instance?.ipv6_addresses) {\n        ctx.host.ip.add(ipv6);\n      }\n    }\n    def platform = res.details?.aws?.ec2_instance?.platform?.toLowerCase();\n    if (platform?.contains('windows') == true) {\n      ctx.host.os.type = 'windows';\n    } else if (platform?.contains('linux') == true) {\n      ctx.host.os.type = 'linux';\n    } else if (platform?.contains('macos') == true) {\n      ctx.host.os.type = 'macos';\n    }\n  }\n}",
+        "lang": "painless",
+        "if": "ctx.aws?.inspector?.resources instanceof List && ctx.aws.inspector.resources.size() > 1"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_status",
+        "field": "json.status",
+        "target_field": "aws.inspector.status"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_vulnerability_status_open",
+        "field": "vulnerability.status",
+        "value": "open",
+        "if": "ctx.aws?.inspector?.status == 'ACTIVE' || ctx.aws?.inspector?.status == 'SUPPRESSED'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_vulnerability_status_fixed",
+        "field": "vulnerability.status",
+        "value": "fixed",
+        "if": "ctx.aws?.inspector?.status == 'CLOSED'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_title",
+        "field": "json.title",
+        "target_field": "aws.inspector.title"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_vulnerability_title",
+        "field": "vulnerability.title",
+        "copy_from": "aws.inspector.title"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_type",
+        "field": "json.type",
+        "target_field": "aws.inspector.type"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_event_id",
+        "field": "event.id",
+        "value": "{{vulnerability.id}}|{{resource.id}}|{{package.name}}|{{package.version}}|{{@timestamp}}",
+        "if": "ctx.aws?.inspector?.type == 'PACKAGE_VULNERABILITY'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_transform_unique_id",
+        "field": "aws.inspector.transform_unique_id",
+        "value": "{{vulnerability.id}}|{{resource.id}}|{{package.name}}|{{package.version}}",
+        "if": "ctx.aws?.inspector?.type == 'PACKAGE_VULNERABILITY'"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json",
+        "field": [
+          "json"
+        ]
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_preserve_duplicate_custom_fields",
+        "field": [
+          "aws.inspector.description",
+          "aws.inspector.updated_at",
+          "aws.inspector.aws_account_id",
+          "aws.inspector.network_reachability_details.protocol",
+          "aws.inspector.package_vulnerability_details.reference_urls",
+          "aws.inspector.package_vulnerability_details.vulnerability_id",
+          "aws.inspector.package_vulnerability_details.vendor.created_at",
+          "aws.inspector.inspector_score_details.adjusted_cvss.score.value",
+          "aws.inspector.inspector_score_details.adjusted_cvss.version",
+          "aws.inspector.title"
+        ],
+        "if": "ctx.tags == null || !(ctx.tags.contains('preserve_duplicate_custom_fields'))"
+      }
+    },
+    {
+      "script": {
+        "description": "This script processor iterates over the whole document to remove fields with null values.",
+        "tag": "script_to_drop_null_values",
+        "source": "void handleMap(Map map) {\n  map.values().removeIf(v -> {\n    if (v instanceof Map) {\n      handleMap(v);\n    } else if (v instanceof List) {\n      handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nvoid handleList(List list) {\n  list.removeIf(v -> {\n    if (v instanceof Map) {\n      handleMap(v);\n    } else if (v instanceof List) {\n      handleList(v);\n    }\n    return v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0)\n  });\n}\nhandleMap(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_into_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_tags_9fe66b2c",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-aws.inspector@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.inspector` dataset"
+      }
+    }
+  ]
+}

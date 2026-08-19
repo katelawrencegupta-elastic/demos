@@ -1,0 +1,62 @@
+{
+  "name": ".ml-notifications-000002",
+  "index_template": {
+    "index_patterns": [
+      ".ml-notifications-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "managed_index_mappings_version": 1,
+          "version": "8.11.0"
+        },
+        "dynamic": "false",
+        "properties": {
+          "job_type": {
+            "type": "keyword"
+          },
+          "level": {
+            "type": "keyword"
+          },
+          "job_id": {
+            "type": "keyword"
+          },
+          "node_name": {
+            "type": "keyword"
+          },
+          "message": {
+            "type": "text",
+            "fields": {
+              "raw": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "cleared": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "type": "date"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 2147483647,
+    "version": 10000008,
+    "_meta": {
+      "description": "index template for ML notifications indices",
+      "managed": true
+    },
+    "created_date_millis": 1786555713941,
+    "modified_date_millis": 1786555713941
+  }
+}

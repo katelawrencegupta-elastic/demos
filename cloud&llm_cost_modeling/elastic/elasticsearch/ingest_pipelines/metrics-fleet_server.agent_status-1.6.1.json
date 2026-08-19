@@ -1,0 +1,42 @@
+{
+  "name": "metrics-fleet_server.agent_status-1.6.1",
+  "_meta": {
+    "package": {
+      "name": "fleet_server"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786555754497,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-fleet_server.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `fleet_server` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-fleet_server.agent_status@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `fleet_server.agent_status` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786555754497
+}

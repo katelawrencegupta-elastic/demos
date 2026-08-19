@@ -1,0 +1,62 @@
+{
+  "name": ".fleet-fileds-tohost-data",
+  "index_template": {
+    "index_patterns": [
+      ".fleet-fileds-tohost-data-*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "_meta": {
+          "version": "1"
+        },
+        "dynamic": false,
+        "properties": {
+          "@timestamp": {
+            "type": "date"
+          },
+          "namespaces": {
+            "type": "keyword"
+          },
+          "data": {
+            "type": "binary",
+            "store": true
+          },
+          "bid": {
+            "type": "keyword"
+          },
+          "sha2": {
+            "type": "keyword",
+            "index": false
+          },
+          "last": {
+            "type": "boolean",
+            "index": false
+          }
+        }
+      },
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "24d"
+      }
+    },
+    "composed_of": [],
+    "priority": 200,
+    "version": 1,
+    "_meta": {
+      "description": "fleet file delivery data index template",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1786555715137,
+    "modified_date_millis": 1786555715137
+  }
+}

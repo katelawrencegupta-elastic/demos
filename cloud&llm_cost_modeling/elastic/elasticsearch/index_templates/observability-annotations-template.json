@@ -1,0 +1,110 @@
+{
+  "name": "observability-annotations-template",
+  "index_template": {
+    "index_patterns": [
+      "observability-annotations"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "auto_expand_replicas": "0-1"
+        }
+      },
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "annotation": {
+            "properties": {
+              "style": {
+                "type": "flattened"
+              },
+              "title": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "alert": {
+            "properties": {
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "service": {
+            "properties": {
+              "environment": {
+                "type": "keyword"
+              },
+              "name": {
+                "type": "keyword"
+              },
+              "version": {
+                "type": "keyword"
+              }
+            }
+          },
+          "slo": {
+            "properties": {
+              "instanceId": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              }
+            }
+          },
+          "monitor": {
+            "properties": {
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "message": {
+            "type": "text"
+          },
+          "event": {
+            "properties": {
+              "created": {
+                "type": "date"
+              },
+              "start": {
+                "type": "date"
+              },
+              "end": {
+                "type": "date"
+              },
+              "updated": {
+                "type": "date"
+              }
+            }
+          },
+          "tags": {
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "created_date_millis": 1786555731546,
+    "modified_date_millis": 1786555731546
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "name": "traces-apm@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "properties": {
+          "http.response.transfer_size": {
+            "index": false,
+            "type": "long"
+          },
+          "transaction.representative_count": {
+            "index": false,
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          },
+          "http.request.headers": {
+            "type": "flattened"
+          },
+          "transaction.custom": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "http.request.cookies": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "http.request.body": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "transaction.duration.us": {
+            "meta": {
+              "unit": "micros"
+            },
+            "type": "long"
+          },
+          "transaction.profiler_stack_trace_ids": {
+            "type": "counted_keyword"
+          },
+          "span.duration.us": {
+            "meta": {
+              "unit": "micros"
+            },
+            "type": "long"
+          },
+          "span.stacktrace": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "event.success_count": {
+            "index": false,
+            "type": "byte"
+          },
+          "processor.event": {
+            "type": "keyword"
+          },
+          "http.response.headers": {
+            "type": "flattened"
+          },
+          "http.response.encoded_body_size": {
+            "index": false,
+            "type": "long"
+          },
+          "http.response.decoded_body_size": {
+            "index": false,
+            "type": "long"
+          },
+          "span.representative_count": {
+            "index": false,
+            "scaling_factor": 1000,
+            "type": "scaled_float"
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for traces-apm* data streams",
+      "managed": true
+    }
+  }
+}

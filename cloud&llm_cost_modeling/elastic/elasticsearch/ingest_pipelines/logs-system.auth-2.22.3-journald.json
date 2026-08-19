@@ -1,0 +1,63 @@
+{
+  "name": "logs-system.auth-2.22.3-journald",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786558591741,
+  "description": "Journald pipeline for system integration auth data stream",
+  "_meta": {
+    "package": {
+      "name": "system"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786558591741,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "journald.process.name",
+        "target_field": "process.name"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "tag": "convert_procid",
+        "field": "log.syslog.procid",
+        "type": "string",
+        "if": "ctx.log?.syslog?.procid != null"
+      }
+    },
+    {
+      "remove": {
+        "description": "Remove the extra fields added by the Journald input",
+        "ignore_missing": true,
+        "field": [
+          "journald",
+          "process.thread",
+          "syslog",
+          "systemd",
+          "message_id"
+        ]
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-system.auth-2.22.3-message"
+      }
+    }
+  ]
+}

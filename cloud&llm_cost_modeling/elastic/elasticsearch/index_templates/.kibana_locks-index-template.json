@@ -1,0 +1,23 @@
+{
+  "name": ".kibana_locks-index-template",
+  "index_template": {
+    "index_patterns": [
+      ".kibana_locks*"
+    ],
+    "template": {
+      "settings": {
+        "index": {
+          "hidden": "true",
+          "number_of_shards": "1",
+          "auto_expand_replicas": "0-1"
+        }
+      }
+    },
+    "composed_of": [
+      ".kibana_locks-component"
+    ],
+    "priority": 500,
+    "created_date_millis": 1786555732299,
+    "modified_date_millis": 1786555732299
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "description": "GeoIP lookup from host.ip into host.geo (ECS). Copies OTel resource host.ip first.",
+  "processors": [
+    {
+      "script": {
+        "description": "Copy resource.attributes host.ip onto ECS host.ip when missing",
+        "lang": "painless",
+        "ignore_failure": true,
+        "source": "if (ctx.host == null) { ctx.host = new HashMap(); } if (ctx.host.ip != null) { return; } if (ctx.resource == null || ctx.resource.attributes == null) { return; } def ip = ctx.resource.attributes['host.ip']; if (ip != null) { ctx.host.ip = ip; }"
+      }
+    },
+    {
+      "geoip": {
+        "field": "host.ip",
+        "target_field": "host.geo",
+        "database_file": "GeoLite2-City.mmdb",
+        "first_only": true,
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "description": "Expose lat,lon as a resource attribute so TSDS metrics can plot GeoIP",
+        "lang": "painless",
+        "ignore_failure": true,
+        "if": "ctx.host?.geo?.location != null",
+        "source": "if (ctx.resource == null) { ctx.resource = new HashMap(); } if (ctx.resource.attributes == null) { ctx.resource.attributes = new HashMap(); } def loc = ctx.host.geo.location; ctx.resource.attributes['geo.location'] = 'POINT(' + loc.lon + ' ' + loc.lat + ')'; if (ctx.host.geo.country_iso_code != null) { ctx.resource.attributes['geo.country_iso_code'] = ctx.host.geo.country_iso_code; }"
+      }
+    }
+  ],
+  "_meta": {
+    "managed_by": "slb_workshop",
+    "description": "SRE-01 host.ip GeoIP enrichment for logs@default-pipeline and OTel @custom streams"
+  }
+}

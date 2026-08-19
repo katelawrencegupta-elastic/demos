@@ -1,0 +1,53 @@
+{
+  "id": "fleet-default-elastic_agent-elastic-agent-cpu-usage-spike-rule",
+  "enabled": false,
+  "name": "[Elastic Agent] CPU usage spike",
+  "tags": [
+    "Elastic Agent",
+    "Resource Consumption"
+  ],
+  "rule_type_id": ".es-query",
+  "consumer": "alerts",
+  "schedule": {
+    "interval": "1m"
+  },
+  "actions": [],
+  "params": {
+    "searchType": "esqlQuery",
+    "timeWindowSize": 7,
+    "timeWindowUnit": "m",
+    "threshold": [
+      0
+    ],
+    "thresholdComparator": ">",
+    "size": 100,
+    "esqlQuery": {
+      "esql": "FROM metrics-system*\n| WHERE TO_LOWER(process.executable) LIKE \"*elastic*agent*\" AND agent.name NOT LIKE \"*agentless*\"\n| STATS cpu_process_pct = MAX(system.process.cpu.total.norm.pct) * 100\n    BY elastic_agent.id, process.name,\n      time_bucket = BUCKET(@timestamp, 1 minute)\n// Count the 1 minute timebuckets that are above 80% by process and agent\n| WHERE cpu_process_pct >= 80\n| STATS count_above_threshold = COUNT(*)\n    BY elastic_agent.id, process.name\n// Alert if there are 5 or more occurences\n| WHERE count_above_threshold >= 5"
+    },
+    "aggType": "count",
+    "groupBy": "row",
+    "termSize": 5,
+    "sourceFields": [],
+    "timeField": "@timestamp",
+    "excludeHitsFromPreviousRun": true
+  },
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-12T18:16:35.000Z",
+  "updated_at": "2026-08-12T18:16:35.000Z",
+  "api_key_owner": null,
+  "api_key_created_by_user": null,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "pending",
+    "last_execution_date": "2026-08-12T18:16:35.000Z"
+  },
+  "revision": 0,
+  "running": false,
+  "alert_delay": {
+    "active": 1
+  }
+}

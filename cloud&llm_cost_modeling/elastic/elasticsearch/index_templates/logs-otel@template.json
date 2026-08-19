@@ -1,0 +1,46 @@
+{
+  "name": "logs-otel@template",
+  "index_template": {
+    "index_patterns": [
+      "logs-*.otel-*"
+    ],
+    "template": {
+      "mappings": {
+        "properties": {
+          "data_stream.type": {
+            "type": "constant_keyword",
+            "value": "logs"
+          }
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "otel@mappings",
+      "otel@settings",
+      "logs-otel@mappings",
+      "semconv-resource-to-ecs@mappings",
+      "logs@custom",
+      "logs-otel@custom",
+      "ecs@mappings"
+    ],
+    "priority": 120,
+    "version": 19,
+    "_meta": {
+      "description": "default OpenTelemetry logs template installed by x-pack",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "logs-otel@custom"
+    ],
+    "created_date_millis": 1786555717412,
+    "modified_date_millis": 1786555717412
+  }
+}

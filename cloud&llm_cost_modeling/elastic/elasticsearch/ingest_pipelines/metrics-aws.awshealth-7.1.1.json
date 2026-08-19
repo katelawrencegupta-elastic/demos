@@ -1,0 +1,73 @@
+{
+  "name": "metrics-aws.awshealth-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378548,
+  "description": "Pipeline for AWS Health metrics",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378548,
+  "processors": [
+    {
+      "script": {
+        "tag": "script_aad5131d",
+        "source": "ctx.aws.awshealth.end_time = null",
+        "lang": "painless",
+        "if": "ctx.aws != null && ctx.aws.awshealth != null && ctx.aws.awshealth.end_time == '0001-01-01T00:00:00.000Z'"
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "tag": "script_7a0bd239",
+        "source": "boolean drop(Object o) {\n    if (o == null || o == '') {\n    return true;\n    } else if (o instanceof Map) {\n    ((Map) o).values().removeIf(v -> drop(v));\n    return (((Map) o).size() == 0);\n    } else if (o instanceof List) {\n    ((List) o).removeIf(v -> drop(v));\n    return (((List) o).length == 0);\n    }\n    return false;\n}\ndrop(ctx);",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.awshealth@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.awshealth` dataset"
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "name": "metrics-aws.ec2_metrics-7.1.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}in pipeline '{{{ _ingest.pipeline }}}' failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557378549,
+  "description": "Pipeline for EC2 metrics",
+  "_meta": {
+    "package": {
+      "name": "aws"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557378549,
+  "processors": [
+    {
+      "dot_expander": {
+        "ignore_failure": true,
+        "tag": "dot_expander_*_c2762c23",
+        "field": "*"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "tag": "set_cloud_account_name_20733914",
+        "override": false,
+        "field": "cloud.account.name",
+        "copy_from": "cloud.account.id"
+      }
+    },
+    {
+      "script": {
+        "description": "This script converts aws.ec2.metrics.CPUUtilization.avg from percentage to decimal.",
+        "tag": "script_682928e2",
+        "source": "if(ctx.aws?.ec2?.metrics?.CPUUtilization?.avg != null && ctx.host?.cpu?.usage == null) {\n    ctx.aws.ec2.metrics.CPUUtilization.avg = ctx.aws.ec2.metrics.CPUUtilization.avg / 100;\n}\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_CPUUtilization_avg_to_host_cpu_usage_c2a42cb4",
+        "field": "aws.ec2.metrics.CPUUtilization.avg",
+        "target_field": "host.cpu.usage"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_NetworkIn_sum_to_host_network_ingress_bytes_dabf5cc1",
+        "field": "aws.ec2.metrics.NetworkIn.sum",
+        "target_field": "host.network.ingress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_NetworkOut_sum_to_host_network_egress_bytes_17a73fa2",
+        "field": "aws.ec2.metrics.NetworkOut.sum",
+        "target_field": "host.network.egress.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_NetworkPacketsIn_sum_to_host_network_ingress_packets_b05e0f26",
+        "field": "aws.ec2.metrics.NetworkPacketsIn.sum",
+        "target_field": "host.network.ingress.packets"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_NetworkPacketsOut_sum_to_host_network_egress_packets_e7b45209",
+        "field": "aws.ec2.metrics.NetworkPacketsOut.sum",
+        "target_field": "host.network.egress.packets"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_DiskReadBytes_sum_to_host_disk_read_bytes_5e316e1c",
+        "field": "aws.ec2.metrics.DiskReadBytes.sum",
+        "target_field": "host.disk.read.bytes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "rename_aws_ec2_metrics_DiskWriteBytes_sum_to_host_disk_write_bytes_391326ee",
+        "field": "aws.ec2.metrics.DiskWriteBytes.sum",
+        "target_field": "host.disk.write.bytes"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `aws` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-aws.ec2_metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `aws.ec2_metrics` dataset"
+      }
+    }
+  ]
+}

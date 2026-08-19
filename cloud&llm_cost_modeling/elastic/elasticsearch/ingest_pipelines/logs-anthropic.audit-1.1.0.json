@@ -1,0 +1,1922 @@
+{
+  "name": "logs-anthropic.audit-1.1.0",
+  "on_failure": [
+    {
+      "append": {
+        "tag": "append_pipeline_failure_message",
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    },
+    {
+      "set": {
+        "tag": "set_pipeline_error_to_event_kind",
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_preserve_original_event_on_pipeline_failure",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643474128,
+  "description": "Parse Anthropic compliance audit activities from the Activities API.",
+  "_meta": {
+    "package": {
+      "name": "anthropic"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643474128,
+  "processors": [
+    {
+      "set": {
+        "tag": "set_ecs_version",
+        "field": "ecs.version",
+        "value": "9.3.0"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Removes the fields added by Agentless as metadata, as they can collide with ECS fields.",
+        "tag": "remove_agentless_tags",
+        "field": [
+          "organization",
+          "division",
+          "team"
+        ],
+        "if": "ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String"
+      }
+    },
+    {
+      "terminate": {
+        "description": "error message set and no data to process.",
+        "tag": "data_collection_error",
+        "if": "ctx.error?.message != null && ctx.message == null && ctx.event?.original == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "message",
+        "target_field": "event.original",
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one.",
+        "tag": "rename_message_to_event_original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "tag": "remove_message",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "tag": "parse_event_original_json",
+        "field": "event.original",
+        "target_field": "json",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_event_id",
+        "field": "json.id",
+        "target_field": "event.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_event_action",
+        "field": "json.type",
+        "target_field": "event.action"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "tag": "date_timestamp",
+        "field": "json.created_at",
+        "target_field": "@timestamp",
+        "if": "ctx.json?.created_at != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_created_at",
+        "field": "json.created_at"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_organization_id",
+        "field": "json.organization_id",
+        "target_field": "organization.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_http_request_method",
+        "field": "json.request_method",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_http_request_id",
+        "field": "json.request_id",
+        "target_field": "http.request.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_http_response_status_code",
+        "field": "json.status_code",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_url_original",
+        "field": "json.url",
+        "target_field": "url.original"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_email_invited",
+        "field": "json.invited_email",
+        "target_field": "user.target.email"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_email_deleted",
+        "field": "json.deleted_user_email",
+        "target_field": "user.target.email",
+        "if": "ctx.user?.target?.email == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_email_user",
+        "field": "json.user_email",
+        "target_field": "user.target.email",
+        "if": "ctx.user?.target?.email == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_email_invitee",
+        "field": "json.invitee_email",
+        "target_field": "user.target.email",
+        "if": "ctx.user?.target?.email == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_id_user",
+        "field": "json.user_id",
+        "target_field": "user.target.id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_id_deleted",
+        "field": "json.deleted_user_id",
+        "target_field": "user.target.id",
+        "if": "ctx.user?.target?.id == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_user_target_id_requester",
+        "field": "json.requester_user_id",
+        "target_field": "user.target.id",
+        "if": "ctx.user?.target?.id == null"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.principal_id",
+        "target_field": "user.target.id",
+        "ignore_missing": true,
+        "description": "On RBAC role-assignment activities the principal is the user being granted or revoked the role; move the ID into `user.target.id`. Only applies when the API explicitly says `principal_type` is `user`.",
+        "tag": "rename_user_target_id_principal",
+        "if": "ctx.user?.target?.id == null && ctx.json?.principal_type == 'user'"
+      }
+    },
+    {
+      "rename": {
+        "field": "json.target_id",
+        "target_field": "user.target.id",
+        "ignore_missing": true,
+        "description": "On role-assignment activities the target is the user being granted or revoked the role; move the ID into `user.target.id`. Only applies when `target_type` is `user` so we do not clobber non-user targets.",
+        "tag": "rename_user_target_id_target",
+        "if": "ctx.user?.target?.id == null && ctx.json?.target_type == 'user'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Move the whole actor sub-object under `anthropic.audit.actor`. ECS-mappable members are pulled out of it by subsequent processors.",
+        "tag": "rename_json_actor_to_anthropic_audit_actor",
+        "field": "json.actor",
+        "target_field": "anthropic.audit.actor"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_actor_ip_to_source_ip",
+        "field": "anthropic.audit.actor.ip_address",
+        "target_field": "source.ip"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_actor_user_agent",
+        "field": "anthropic.audit.actor.user_agent",
+        "target_field": "user_agent.original"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_actor_email_to_user_email",
+        "field": "anthropic.audit.actor.email_address",
+        "target_field": "user.email",
+        "if": "ctx.anthropic?.audit?.actor?.type == 'user_actor' || ctx.anthropic?.audit?.actor?.type == 'anthropic_actor'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_actor_user_id_to_user_id",
+        "field": "anthropic.audit.actor.user_id",
+        "target_field": "user.id",
+        "if": "ctx.anthropic?.audit?.actor?.type == 'user_actor'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_actor_unauthenticated_email_to_user_email",
+        "field": "anthropic.audit.actor.unauthenticated_email_address",
+        "target_field": "user.email"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_anthropic_organization_uuid",
+        "field": "json.organization_uuid",
+        "target_field": "anthropic.audit.organization_uuid"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_api_key_id",
+        "field": "json.api_key_id",
+        "target_field": "anthropic.audit.api_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_admin_api_key_id",
+        "field": "json.admin_api_key_id",
+        "target_field": "anthropic.audit.admin_api_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_scopes",
+        "field": "json.scopes",
+        "target_field": "anthropic.audit.scopes"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_request_body",
+        "field": "json.request_body",
+        "target_field": "anthropic.audit.request_body"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_principal_id",
+        "field": "json.principal_id",
+        "target_field": "anthropic.audit.principal_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_principal_type",
+        "field": "json.principal_type",
+        "target_field": "anthropic.audit.principal_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_role_id",
+        "field": "json.role_id",
+        "target_field": "anthropic.audit.role_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_chat_id",
+        "field": "json.claude_chat_id",
+        "target_field": "anthropic.audit.claude_chat_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_project_id",
+        "field": "json.claude_project_id",
+        "target_field": "anthropic.audit.claude_project_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_published_artifact_id",
+        "field": "json.claude_published_artifact_id",
+        "target_field": "anthropic.audit.claude_published_artifact_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_artifact_type",
+        "field": "json.artifact_type",
+        "target_field": "anthropic.audit.artifact_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_title",
+        "field": "json.title",
+        "target_field": "anthropic.audit.title"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_invite_id",
+        "field": "json.invite_id",
+        "target_field": "anthropic.audit.invite_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_invited_role",
+        "field": "json.invited_role",
+        "target_field": "anthropic.audit.invited_role"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_mcp_server_id",
+        "field": "json.mcp_server_id",
+        "target_field": "anthropic.audit.mcp_server_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_mcp_server_name",
+        "field": "json.mcp_server_name",
+        "target_field": "anthropic.audit.mcp_server_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_domain",
+        "field": "json.domain",
+        "target_field": "anthropic.audit.domain"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_workspace_id",
+        "field": "json.workspace_id",
+        "target_field": "anthropic.audit.workspace_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_webhook_id",
+        "field": "json.webhook_id",
+        "target_field": "anthropic.audit.webhook_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_repo_name",
+        "field": "json.repo_name",
+        "target_field": "anthropic.audit.repo_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_repo_owner",
+        "field": "json.repo_owner",
+        "target_field": "anthropic.audit.repo_owner"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_scan_project_id",
+        "field": "json.scan_project_id",
+        "target_field": "anthropic.audit.scan_project_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_config_id",
+        "field": "json.config_id",
+        "target_field": "anthropic.audit.config_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ghe_configuration_id",
+        "field": "json.ghe_configuration_id",
+        "target_field": "anthropic.audit.ghe_configuration_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_access_level",
+        "field": "json.access_level",
+        "target_field": "anthropic.audit.access_level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_account_id",
+        "field": "json.account_id",
+        "target_field": "anthropic.audit.account_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_action",
+        "field": "json.action",
+        "target_field": "anthropic.audit.action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_added_seats",
+        "field": "json.added_seats",
+        "target_field": "anthropic.audit.added_seats"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_alert_emails",
+        "field": "json.alert_emails",
+        "target_field": "anthropic.audit.alert_emails"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_alerted_roles",
+        "field": "json.alerted_roles",
+        "target_field": "anthropic.audit.alerted_roles"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_algorithm",
+        "field": "json.algorithm",
+        "target_field": "anthropic.audit.algorithm"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_amount",
+        "field": "json.amount",
+        "target_field": "anthropic.audit.amount"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_api_key_name",
+        "field": "json.api_key_name",
+        "target_field": "anthropic.audit.api_key_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_approved",
+        "field": "json.approved",
+        "target_field": "anthropic.audit.approved"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_audience",
+        "field": "json.audience",
+        "target_field": "anthropic.audit.audience"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_auth_method",
+        "field": "json.auth_method",
+        "target_field": "anthropic.audit.auth_method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_baa_content_hash",
+        "field": "json.baa_content_hash",
+        "target_field": "anthropic.audit.baa_content_hash"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_baa_version_label",
+        "field": "json.baa_version_label",
+        "target_field": "anthropic.audit.baa_version_label"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_billing_address_updated",
+        "field": "json.billing_address_updated",
+        "target_field": "anthropic.audit.billing_address_updated"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_billing_interval",
+        "field": "json.billing_interval",
+        "target_field": "anthropic.audit.billing_interval"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_billing_name_updated",
+        "field": "json.billing_name_updated",
+        "target_field": "anthropic.audit.billing_name_updated"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_cadence",
+        "field": "json.cadence",
+        "target_field": "anthropic.audit.cadence"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_cc_email_count",
+        "field": "json.cc_email_count",
+        "target_field": "anthropic.audit.cc_email_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_artifact_id",
+        "field": "json.claude_artifact_id",
+        "target_field": "anthropic.audit.claude_artifact_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_artifact_version_id",
+        "field": "json.claude_artifact_version_id",
+        "target_field": "anthropic.audit.claude_artifact_version_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_chat_snapshot_id",
+        "field": "json.claude_chat_snapshot_id",
+        "target_field": "anthropic.audit.claude_chat_snapshot_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_file_id",
+        "field": "json.claude_file_id",
+        "target_field": "anthropic.audit.claude_file_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_claude_project_document_id",
+        "field": "json.claude_project_document_id",
+        "target_field": "anthropic.audit.claude_project_document_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_cli_name",
+        "field": "json.cli_name",
+        "target_field": "anthropic.audit.cli_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_command_id",
+        "field": "json.command_id",
+        "target_field": "anthropic.audit.command_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_command_name",
+        "field": "json.command_name",
+        "target_field": "anthropic.audit.command_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_compliance_api_enabled",
+        "field": "json.compliance_api_enabled",
+        "target_field": "anthropic.audit.compliance_api_enabled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_compliance_api_logging_enabled",
+        "field": "json.compliance_api_logging_enabled",
+        "target_field": "anthropic.audit.compliance_api_logging_enabled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_connection_id",
+        "field": "json.connection_id",
+        "target_field": "anthropic.audit.connection_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_connection_type",
+        "field": "json.connection_type",
+        "target_field": "anthropic.audit.connection_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_consent_id",
+        "field": "json.consent_id",
+        "target_field": "anthropic.audit.consent_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_consent_type",
+        "field": "json.consent_type",
+        "target_field": "anthropic.audit.consent_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_current_role",
+        "field": "json.current_role",
+        "target_field": "anthropic.audit.current_role"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_current_value",
+        "field": "json.current_value",
+        "target_field": "anthropic.audit.current_value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_current_version",
+        "field": "json.current_version",
+        "target_field": "anthropic.audit.current_version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_decision",
+        "field": "json.decision",
+        "target_field": "anthropic.audit.decision"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_enabled",
+        "field": "json.enabled",
+        "target_field": "anthropic.audit.enabled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_entity_id",
+        "field": "json.entity_id",
+        "target_field": "anthropic.audit.entity_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_entity_type",
+        "field": "json.entity_type",
+        "target_field": "anthropic.audit.entity_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_environment_id",
+        "field": "json.environment_id",
+        "target_field": "anthropic.audit.environment_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_extension_id",
+        "field": "json.extension_id",
+        "target_field": "anthropic.audit.extension_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_federation_issuer_id",
+        "field": "json.federation_issuer_id",
+        "target_field": "anthropic.audit.federation_issuer_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_federation_rule_id",
+        "field": "json.federation_rule_id",
+        "target_field": "anthropic.audit.federation_rule_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_file_id",
+        "field": "json.file_id",
+        "target_field": "anthropic.audit.file_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_filename_to_file_name",
+        "field": "json.filename",
+        "target_field": "file.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_folder_id",
+        "field": "json.folder_id",
+        "target_field": "anthropic.audit.folder_id"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "tag": "date_anthropic_from_date",
+        "field": "json.from_date",
+        "target_field": "anthropic.audit.from_date",
+        "if": "ctx.json?.from_date != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_from_date",
+        "field": "json.from_date"
+      }
+    },
+    {
+      "convert": {
+        "field": "json.github_webhook_id",
+        "target_field": "anthropic.audit.github_webhook_id",
+        "ignore_missing": true,
+        "description": "The Compliance API returns the GitHub-assigned webhook ID as a number, but it is stored as a keyword identifier.",
+        "tag": "convert_github_webhook_id",
+        "type": "string"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_github_webhook_id",
+        "field": "json.github_webhook_id",
+        "if": "ctx.json?.github_webhook_id != null && ctx.anthropic.audit.github_webhook_id != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_group_id",
+        "field": "json.group_id",
+        "target_field": "anthropic.audit.group_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_group_name",
+        "field": "json.group_name",
+        "target_field": "anthropic.audit.group_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_idp_saml_config_updated",
+        "field": "json.idp_saml_config_updated",
+        "target_field": "anthropic.audit.idp_saml_config_updated"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_ignore",
+        "field": "json.ignore",
+        "target_field": "anthropic.audit.ignore"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_installation_preference",
+        "field": "json.installation_preference",
+        "target_field": "anthropic.audit.installation_preference"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_integration_id",
+        "field": "json.integration_id",
+        "target_field": "anthropic.audit.integration_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_integration_type",
+        "field": "json.integration_type",
+        "target_field": "anthropic.audit.integration_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_is_enabled",
+        "field": "json.is_enabled",
+        "target_field": "anthropic.audit.is_enabled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_is_service_created",
+        "field": "json.is_service_created",
+        "target_field": "anthropic.audit.is_service_created"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_item_allocations",
+        "field": "json.item_allocations",
+        "target_field": "anthropic.audit.item_allocations"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_key_backing_type",
+        "field": "json.key_backing_type",
+        "target_field": "anthropic.audit.key_backing_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_key_group_identifier",
+        "field": "json.key_group_identifier",
+        "target_field": "anthropic.audit.key_group_identifier"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_key_name",
+        "field": "json.key_name",
+        "target_field": "anthropic.audit.key_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_limit_action",
+        "field": "json.limit_action",
+        "target_field": "anthropic.audit.limit_action"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_limit_type",
+        "field": "json.limit_type",
+        "target_field": "anthropic.audit.limit_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_limit_usd",
+        "field": "json.limit_usd",
+        "target_field": "anthropic.audit.limit_usd"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_limiter_type",
+        "field": "json.limiter_type",
+        "target_field": "anthropic.audit.limiter_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_lti_platform_id",
+        "field": "json.lti_platform_id",
+        "target_field": "anthropic.audit.lti_platform_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_lti_platform_issuer",
+        "field": "json.lti_platform_issuer",
+        "target_field": "anthropic.audit.lti_platform_issuer"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_magic_link_enabled",
+        "field": "json.magic_link_enabled",
+        "target_field": "anthropic.audit.magic_link_enabled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_magic_link_toggled",
+        "field": "json.magic_link_toggled",
+        "target_field": "anthropic.audit.magic_link_toggled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_marketplace_id",
+        "field": "json.marketplace_id",
+        "target_field": "anthropic.audit.marketplace_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_max_permission",
+        "field": "json.max_permission",
+        "target_field": "anthropic.audit.max_permission"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_member_ids",
+        "field": "json.member_ids",
+        "target_field": "anthropic.audit.member_ids"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_metadata",
+        "field": "json.metadata",
+        "target_field": "anthropic.audit.setting_metadata"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_mfa_method",
+        "field": "json.mfa_method",
+        "target_field": "anthropic.audit.mfa_method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_model",
+        "field": "json.model",
+        "target_field": "anthropic.audit.model"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_model_group",
+        "field": "json.model_group",
+        "target_field": "anthropic.audit.model_group"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_collection_method",
+        "field": "json.new_collection_method",
+        "target_field": "anthropic.audit.new_collection_method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_limit_usd",
+        "field": "json.new_limit_usd",
+        "target_field": "anthropic.audit.new_limit_usd"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_mode",
+        "field": "json.new_mode",
+        "target_field": "anthropic.audit.new_mode"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_owner_id",
+        "field": "json.new_owner_id",
+        "target_field": "anthropic.audit.new_owner_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_plan",
+        "field": "json.new_plan",
+        "target_field": "anthropic.audit.new_plan"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_quantity",
+        "field": "json.new_quantity",
+        "target_field": "anthropic.audit.new_quantity"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_new_signing_key_id",
+        "field": "json.new_signing_key_id",
+        "target_field": "anthropic.audit.new_signing_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_old_plan",
+        "field": "json.old_plan",
+        "target_field": "anthropic.audit.old_plan"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_old_signing_key_id",
+        "field": "json.old_signing_key_id",
+        "target_field": "anthropic.audit.old_signing_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_op_name",
+        "field": "json.op_name",
+        "target_field": "anthropic.audit.op_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_org_id",
+        "field": "json.org_id",
+        "target_field": "anthropic.audit.org_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_org_name_to_organization_name",
+        "field": "json.org_name",
+        "target_field": "organization.name",
+        "if": "ctx.organization?.name == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_organization_name_to_organization_name",
+        "field": "json.organization_name",
+        "target_field": "organization.name",
+        "if": "ctx.organization?.name == null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_per_review_limit_usd",
+        "field": "json.per_review_limit_usd",
+        "target_field": "anthropic.audit.per_review_limit_usd"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_plan_type",
+        "field": "json.plan_type",
+        "target_field": "anthropic.audit.plan_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_plugin_id",
+        "field": "json.plugin_id",
+        "target_field": "anthropic.audit.plugin_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_plugin_name",
+        "field": "json.plugin_name",
+        "target_field": "anthropic.audit.plugin_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_preview_only",
+        "field": "json.preview_only",
+        "target_field": "anthropic.audit.preview_only"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_mode",
+        "field": "json.previous_mode",
+        "target_field": "anthropic.audit.previous_mode"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_owner_id",
+        "field": "json.previous_owner_id",
+        "target_field": "anthropic.audit.previous_owner_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_quantity",
+        "field": "json.previous_quantity",
+        "target_field": "anthropic.audit.previous_quantity"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_role",
+        "field": "json.previous_role",
+        "target_field": "anthropic.audit.previous_role"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_value",
+        "field": "json.previous_value",
+        "target_field": "anthropic.audit.previous_value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_previous_version",
+        "field": "json.previous_version",
+        "target_field": "anthropic.audit.previous_version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_primary_email_set",
+        "field": "json.primary_email_set",
+        "target_field": "anthropic.audit.primary_email_set"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_provider",
+        "field": "json.provider",
+        "target_field": "anthropic.audit.provider"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_reason",
+        "field": "json.reason",
+        "target_field": "event.reason"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_repository_name",
+        "field": "json.repository_name",
+        "target_field": "anthropic.audit.repository_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_request_type",
+        "field": "json.request_type",
+        "target_field": "anthropic.audit.request_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_resolved_count",
+        "field": "json.resolved_count",
+        "target_field": "anthropic.audit.resolved_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_resource_id",
+        "field": "json.resource_id",
+        "target_field": "anthropic.audit.resource_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_resource_type",
+        "field": "json.resource_type",
+        "target_field": "anthropic.audit.resource_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_resync_uuid",
+        "field": "json.resync_uuid",
+        "target_field": "anthropic.audit.resync_uuid"
+      }
+    },
+    {
+      "append": {
+        "field": "user.target.roles",
+        "description": "On `role_assignment_granted`/`role_assignment_revoked` activities the `role` field is the role being granted to (or revoked from) the target user. Lift it into `user.target.roles` so it lands on the ECS user target instead of the vendor namespace.",
+        "tag": "append_role_to_user_target_roles",
+        "allow_duplicates": false,
+        "value": "{{{json.role}}}",
+        "if": "ctx.json?.role != null && ctx.event?.action != null && (ctx.event.action == 'role_assignment_granted' ||\n ctx.event.action == 'role_assignment_revoked')"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_role_after_user_target_roles",
+        "field": "json.role",
+        "if": "ctx.event?.action != null && (ctx.event.action == 'role_assignment_granted' ||\n ctx.event.action == 'role_assignment_revoked')"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_role",
+        "field": "json.role",
+        "target_field": "anthropic.audit.role"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_role_name",
+        "field": "json.role_name",
+        "target_field": "anthropic.audit.role_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_scans_cancelled",
+        "field": "json.scans_cancelled",
+        "target_field": "anthropic.audit.scans_cancelled"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_seat_count",
+        "field": "json.seat_count",
+        "target_field": "anthropic.audit.seat_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_service_account_id",
+        "field": "json.service_account_id",
+        "target_field": "anthropic.audit.service_account_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_service_key_id",
+        "field": "json.service_key_id",
+        "target_field": "anthropic.audit.service_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_service_name",
+        "field": "json.service_name",
+        "target_field": "anthropic.audit.service_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_session_id",
+        "field": "json.session_id",
+        "target_field": "anthropic.audit.session_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_settings_uuid",
+        "field": "json.settings_uuid",
+        "target_field": "anthropic.audit.settings_uuid"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_setup_guide_content_hash",
+        "field": "json.setup_guide_content_hash",
+        "target_field": "anthropic.audit.setup_guide_content_hash"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_share_id",
+        "field": "json.share_id",
+        "target_field": "anthropic.audit.share_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_shipping_address_updated",
+        "field": "json.shipping_address_updated",
+        "target_field": "anthropic.audit.shipping_address_updated"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_shipping_name_updated",
+        "field": "json.shipping_name_updated",
+        "target_field": "anthropic.audit.shipping_name_updated"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_signing_key_id",
+        "field": "json.signing_key_id",
+        "target_field": "anthropic.audit.signing_key_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_skill_id",
+        "field": "json.skill_id",
+        "target_field": "anthropic.audit.skill_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_skill_name",
+        "field": "json.skill_name",
+        "target_field": "anthropic.audit.skill_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_spend_limit_id",
+        "field": "json.spend_limit_id",
+        "target_field": "anthropic.audit.spend_limit_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_spend_limit_increase_request_id",
+        "field": "json.spend_limit_increase_request_id",
+        "target_field": "anthropic.audit.spend_limit_increase_request_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_status",
+        "field": "json.status",
+        "target_field": "anthropic.audit.status"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_sync_destinations",
+        "field": "json.sync_destinations",
+        "target_field": "anthropic.audit.sync_destinations"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_taint",
+        "field": "json.taint",
+        "target_field": "anthropic.audit.taint"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_target_amount",
+        "field": "json.target_amount",
+        "target_field": "anthropic.audit.target_amount"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_target_id",
+        "field": "json.target_id",
+        "target_field": "anthropic.audit.target_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_target_type",
+        "field": "json.target_type",
+        "target_field": "anthropic.audit.target_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_threshold_amount",
+        "field": "json.threshold_amount",
+        "target_field": "anthropic.audit.threshold_amount"
+      }
+    },
+    {
+      "date": {
+        "formats": [
+          "ISO8601"
+        ],
+        "tag": "date_anthropic_to_date",
+        "field": "json.to_date",
+        "target_field": "anthropic.audit.to_date",
+        "if": "ctx.json?.to_date != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_to_email_count",
+        "field": "json.to_email_count",
+        "target_field": "anthropic.audit.to_email_count"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_token_id",
+        "field": "json.token_id",
+        "target_field": "anthropic.audit.token_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_token_name",
+        "field": "json.token_name",
+        "target_field": "anthropic.audit.token_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_tool_name",
+        "field": "json.tool_name",
+        "target_field": "anthropic.audit.tool_name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_trigger_mode",
+        "field": "json.trigger_mode",
+        "target_field": "anthropic.audit.trigger_mode"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_updates",
+        "field": "json.updates",
+        "target_field": "anthropic.audit.updates"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_value",
+        "field": "json.value",
+        "target_field": "anthropic.audit.value"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_version",
+        "field": "json.version",
+        "target_field": "anthropic.audit.version"
+      }
+    },
+    {
+      "rename": {
+        "field": "json",
+        "target_field": "anthropic.audit.metadata",
+        "ignore_missing": true,
+        "description": "Forward-compat safety net: if Anthropic adds a brand-new activity field that is not yet handled by an explicit rename above, dump whatever is left in `json` into `anthropic.audit.metadata` (flattened) so no data is lost. For the documented activity set this rename is a no-op (json is empty at this point).",
+        "tag": "rename_unmodeled_to_metadata",
+        "if": "ctx.json instanceof Map && !ctx.json.isEmpty()"
+      }
+    },
+    {
+      "dissect": {
+        "pattern": "%{user.name}@%{?user.domain}",
+        "ignore_failure": true,
+        "tag": "dissect_user_name_from_email",
+        "field": "user.email",
+        "if": "ctx.user?.email != null"
+      }
+    },
+    {
+      "uri_parts": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "tag": "parse_url_parts",
+        "field": "url.original",
+        "if": "ctx.url?.original != null"
+      }
+    },
+    {
+      "user_agent": {
+        "ignore_missing": true,
+        "tag": "enrich_user_agent",
+        "field": "user_agent.original",
+        "if": "ctx.user_agent?.original != null"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "tag": "enrich_source_geo",
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.as",
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "tag": "enrich_source_asn",
+        "if": "ctx.source?.ip != null",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_asn",
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "tag": "rename_source_as_org",
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-anthropic.audit-1.1.0-categorize",
+        "ignore_missing_pipeline": true,
+        "tag": "pipeline_categorize",
+        "if": "ctx.event?.action != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_source_ip_to_related",
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{{source.ip}}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_email_to_related",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.email}}}",
+        "if": "ctx.user?.email != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_id_to_related",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.id}}}",
+        "if": "ctx.user?.id != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_target_email_to_related",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.target.email}}}",
+        "if": "ctx.user?.target?.email != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_user_target_id_to_related",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{user.target.id}}}",
+        "if": "ctx.user?.target?.id != null"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_principal_id_to_related",
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{{anthropic.audit.principal_id}}}",
+        "if": "ctx.anthropic?.audit?.principal_type == 'user' && ctx.anthropic?.audit?.principal_id != null"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "tag": "foreach_member_ids_to_related",
+        "field": "anthropic.audit.member_ids",
+        "processor": {
+          "append": {
+            "field": "related.user",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value}}}"
+          }
+        },
+        "if": "ctx.anthropic?.audit?.member_ids instanceof List"
+      }
+    },
+    {
+      "foreach": {
+        "ignore_missing": true,
+        "tag": "foreach_alert_emails_to_related",
+        "field": "anthropic.audit.alert_emails",
+        "processor": {
+          "append": {
+            "field": "related.user",
+            "allow_duplicates": false,
+            "value": "{{{_ingest._value}}}"
+          }
+        },
+        "if": "ctx.anthropic?.audit?.alert_emails instanceof List"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_url_domain_to_related_hosts",
+        "field": "related.hosts",
+        "allow_duplicates": false,
+        "value": "{{{url.domain}}}",
+        "if": "ctx.url?.domain != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove_json_temp",
+        "field": "json"
+      }
+    },
+    {
+      "script": {
+        "description": "This script processor iterates over the whole document to remove fields with null values.",
+        "tag": "cleanup_null_values",
+        "source": "void handleMap(Map map) {\n  for (def x : map.values()) {\n    if (x instanceof Map) {\n        handleMap(x);\n    } else if (x instanceof List) {\n        handleList(x);\n    }\n  }\n  map.values().removeIf(v -> v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0));\n}\nvoid handleList(List list) {\n  for (def x : list) {\n      if (x instanceof Map) {\n          handleMap(x);\n      } else if (x instanceof List) {\n          handleList(x);\n      }\n  }\n  list.removeIf(v -> v == null || v == '' || (v instanceof Map && v.size() == 0) || (v instanceof List && v.size() == 0));\n}\nhandleMap(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "append": {
+        "tag": "append_preserve_original_event_on_error",
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event",
+        "if": "ctx.error?.message != null"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-anthropic.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `anthropic` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-anthropic.audit@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `anthropic.audit` dataset"
+      }
+    }
+  ]
+}

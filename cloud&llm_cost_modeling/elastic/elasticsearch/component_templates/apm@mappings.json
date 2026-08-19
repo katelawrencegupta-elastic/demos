@@ -1,0 +1,42 @@
+{
+  "name": "apm@mappings",
+  "component_template": {
+    "template": {
+      "mappings": {
+        "dynamic": true,
+        "dynamic_templates": [
+          {
+            "numeric_labels": {
+              "path_match": "numeric_labels.*",
+              "mapping": {
+                "scaling_factor": 1000000,
+                "type": "scaled_float"
+              }
+            }
+          }
+        ],
+        "date_detection": false,
+        "properties": {
+          "data_stream.namespace": {
+            "type": "constant_keyword"
+          },
+          "data_stream.dataset": {
+            "type": "constant_keyword"
+          },
+          "timestamp": {
+            "properties": {
+              "us": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      }
+    },
+    "version": 103,
+    "_meta": {
+      "description": "Default mappings for all APM data streams",
+      "managed": true
+    }
+  }
+}

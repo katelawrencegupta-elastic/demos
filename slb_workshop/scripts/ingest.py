@@ -27,6 +27,25 @@ SERVICES = (
     "rig-scheduler",
 )
 HOSTS = ("aks-sre-01", "aks-sre-02", "aks-sre-03")
+# Public DNS / RIR addresses so GeoIP on host.ip plots on the workshop maps.
+PUBLIC_HOST_IPS = (
+    "8.8.8.8",
+    "8.8.4.4",
+    "208.67.222.222",
+    "94.140.14.14",
+    "77.88.8.8",
+    "168.95.1.1",
+    "200.160.0.8",
+    "196.216.2.1",
+    "101.101.101.101",
+    "80.67.169.12",
+    "202.12.27.33",
+    "139.130.4.5",
+    "84.200.69.80",
+    "4.2.2.1",
+    "193.19.64.8",
+    "41.204.63.58",
+)
 TEAMS = ("platform", "drilling-apps", "identity")
 PATHS = (
     "/v2/wells/8321/surveys",
@@ -38,7 +57,7 @@ PATHS = (
 
 JSON_TEMPLATES = (
     '{{"service":{{"name":"{service}","environment":"prod","version":"1.8.2"}},'
-    '"host":{{"name":"{host}"}},"log":{{"level":"{level}"}},'
+    '"host":{{"name":"{host}","ip":"{ip}"}},"log":{{"level":"{level}"}},'
     '"http":{{"request":{{"method":"{method}"}},"response":{{"status_code":{status}}}}},'
     '"url":{{"path":"{path}"}},"labels":{{"team":"{team}"}},'
     '"message":"{msg}"}}'
@@ -116,6 +135,7 @@ def events(
         payload = JSON_TEMPLATES.format(
             service=service,
             host=rng.choice(HOSTS),
+            ip=rng.choice(PUBLIC_HOST_IPS),
             level=level,
             method="GET" if status != 201 else "POST",
             status=status,

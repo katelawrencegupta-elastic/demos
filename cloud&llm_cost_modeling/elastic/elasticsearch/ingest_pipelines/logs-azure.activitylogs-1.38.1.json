@@ -1,0 +1,573 @@
+{
+  "name": "logs-azure.activitylogs-1.38.1",
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    },
+    {
+      "append": {
+        "field": "tags",
+        "allow_duplicates": false,
+        "value": "preserve_original_event"
+      }
+    },
+    {
+      "append": {
+        "field": "error.message",
+        "value": "Processor '{{{ _ingest.on_failure_processor_type }}}' {{#_ingest.on_failure_processor_tag}}with tag '{{{ _ingest.on_failure_processor_tag }}}' {{/_ingest.on_failure_processor_tag}}failed with message '{{{ _ingest.on_failure_message }}}'"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557407461,
+  "description": "Pipeline for parsing azure activity logs.",
+  "_meta": {
+    "package": {
+      "name": "azure"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557407461,
+  "processors": [
+    {
+      "set": {
+        "field": "ecs.version",
+        "value": "8.11.0"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure",
+        "target_field": "azure-eventhub"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "Remove the routing.category field if it exists.",
+        "field": "routing.category"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
+        "params": {
+          "empty_field_name": "\"\":\"\","
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "azure.activitylogs"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601",
+          "M/d/yyyy h:mm:ss a XXX",
+          "M/d/yyyy h:mm:ss a",
+          "M/d/yyyy H:mm:ss",
+          "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+        ],
+        "field": "azure.activitylogs.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.activitylogs.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.resourceId",
+        "target_field": "azure.resource_id"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_failure": true,
+              "ignore_missing": true,
+              "field": "azure.activitylogs.callerIpAddress",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.activitylogs.callerIpAddress",
+        "target_field": "source.ip",
+        "type": "ip"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.callerIpAddress",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "client.ip",
+        "value": "{{source.ip}}"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "allow_duplicates": false,
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.level",
+        "target_field": "log.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.durationMs",
+        "target_field": "event.duration"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        }
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.location",
+        "target_field": "geo.name"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity",
+        "target_field": "azure.activitylogs.identity_name",
+        "if": "ctx.azure?.activitylogs?.identity instanceof String"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.activitylogs.identity",
+        "if": "ctx.azure?.activitylogs?.identity instanceof String"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.activitylogs.properties",
+        "if": "ctx.azure?.activitylogs?.properties instanceof String"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.activitylogs.properties.responseBody",
+        "if": "ctx.azure?.activitylogs?.properties?.responseBody instanceof String"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.activitylogs.properties.requestBody",
+        "if": "ctx.azure?.activitylogs?.properties?.requestBody instanceof String"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx?.azure?.activitylogs?.properties?.eventCategory != null) {\n  ctx.azure.activitylogs.event_category = ctx.azure.activitylogs.properties.eventCategory;\n} else if (ctx?.azure?.activitylogs?.properties?.policies != null)  {\n  ctx.azure.activitylogs.event_category = 'Policy';\n} else {\n  ctx.azure.activitylogs.event_category = 'Administrative';\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.properties.eventCategory",
+        "if": "ctx.azure.activitylogs.event_category != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.resultType",
+        "target_field": "azure.activitylogs.result_type"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.activitylogs.result_type",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.azure?.activitylogs?.result_type != null && ctx.azure.activitylogs.result_type instanceof String && (ctx.azure.activitylogs.result_type.toLowerCase() == 'success' || ctx.azure.activitylogs.result_type.toLowerCase() == 'failure')"
+      }
+    },
+    {
+      "convert": {
+        "field": "azure.activitylogs.properties.result",
+        "target_field": "event.outcome",
+        "type": "string",
+        "if": "ctx?.event?.outcome == null && ctx?.azure?.activitylogs?.properties?.result != null && ctx?.azure?.activitylogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.activitylogs?.properties?.result)"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.operationName",
+        "target_field": "azure.activitylogs.operation_name"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.operation_name",
+        "target_field": "event.action",
+        "type": "string"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.operationVersion",
+        "target_field": "azure.activitylogs.operation_version"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.tenantId",
+        "target_field": "azure.activitylogs.tenant_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.Level",
+        "target_field": "azure.activitylogs.level"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.resultSignature",
+        "target_field": "azure.activitylogs.result_signature"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentScope",
+        "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_scope"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.authorization.evidence.roleDefinitionId",
+        "target_field": "azure.activitylogs.identity.authorization.evidence.role_definition_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentId",
+        "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.authorization.evidence.principalId",
+        "target_field": "azure.activitylogs.identity.authorization.evidence.principal_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.authorization.evidence.principalType",
+        "target_field": "azure.activitylogs.identity.authorization.evidence.principal_type"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.correlationId",
+        "target_field": "azure.correlation_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.properties.serviceRequestId",
+        "target_field": "azure.activitylogs.properties.service_request_id"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.properties.statusMessage",
+        "target_field": "message"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.properties.statusCode",
+        "target_field": "azure.activitylogs.properties.status_code"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "geo"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.claims.name",
+        "target_field": "azure.activitylogs.identity.claims_initiated_by_user.fullname"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] != null) {\n  ctx.azure.activitylogs.identity.claims_initiated_by_user.surname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'];\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] != null) {\n  ctx.azure.activitylogs.identity.claims_initiated_by_user.name = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] != null) {\n  ctx.azure.activitylogs.identity.claims_initiated_by_user.givenname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'];\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "azure.activitylogs.identity.claims_initiated_by_user.schema",
+        "if": "ctx.azure.activitylogs.identity!= null && ctx.azure.activitylogs.identity.claims_initiated_by_user != null && ctx.azure.activitylogs.identity.claims_initiated_by_user.name != null",
+        "value": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.activitylogs.identity.claims != null) {\n  ctx.temp_claims = new HashMap();\n  for (String key : ctx.azure.activitylogs.identity.claims.keySet()) {\n    ctx.temp_claims[key.replace('.', '_')] = ctx.azure.activitylogs.identity.claims.get(key);\n  }\n  ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove('temp_claims');\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "source": "if (ctx?.azure?.activitylogs?.category == null) {\n  return;\n} def category = ctx.azure.activitylogs.category.toLowerCase(); if (params.get(category) == null) {\n  return;\n} def hm = new HashMap(params.get(category)); hm.forEach((k, v) -> ctx.event[k] = v);",
+        "lang": "painless",
+        "params": {
+          "action": {
+            "type": [
+              "change"
+            ]
+          },
+          "read": {
+            "type": [
+              "access"
+            ]
+          },
+          "write": {
+            "type": [
+              "change"
+            ]
+          },
+          "delete": {
+            "type": [
+              "deletion"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "grok": {
+        "ignore_failure": true,
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.claims_initiated_by_user.name",
+        "patterns": [
+          "%{USERNAME:user.name}@%{HOSTNAME:user.domain}"
+        ]
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "user.email",
+        "value": "{{azure.activitylogs.identity.claims_initiated_by_user.name}}",
+        "if": "ctx.user?.name != null"
+      }
+    },
+    {
+      "set": {
+        "ignore_empty_value": true,
+        "field": "user.name",
+        "value": "{{azure.activitylogs.identity.claims_initiated_by_user.name}}",
+        "if": "ctx.user?.name == null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "allow_duplicates": false,
+        "value": "{{user.name}}",
+        "if": "ctx.user?.name != null"
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+        "target_field": "user.full_name",
+        "type": "string"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.resource_id }}}",
+        "if": "ctx.azure?.resource_id != null && ctx.azure.resource_id != ''"
+      }
+    },
+    {
+      "append": {
+        "field": "related.entity",
+        "allow_duplicates": false,
+        "value": "{{{ azure.activitylogs.identity.authorization.evidence.principal_id }}}",
+        "if": "ctx.azure?.activitylogs?.identity?.authorization?.evidence?.principal_id != null && ctx.azure.activitylogs.identity.authorization.evidence.principal_id != ''\n"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.activitylogs-1.38.1-azure-shared-pipeline"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure.activitylogs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.activitylogs` dataset"
+      }
+    }
+  ]
+}

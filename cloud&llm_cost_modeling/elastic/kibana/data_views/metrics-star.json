@@ -1,0 +1,6494 @@
+{
+  "data_view": {
+    "id": "metrics-*",
+    "version": "WzQsMV0=",
+    "title": "metrics-*",
+    "timeFieldName": "@timestamp",
+    "sourceFilters": [],
+    "fieldFormats": {},
+    "runtimeFieldMap": {},
+    "fieldAttrs": {},
+    "allowNoIndex": true,
+    "name": "",
+    "allowHidden": false,
+    "fields": {
+      "@timestamp": {
+        "count": 0,
+        "name": "@timestamp",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "_id": {
+        "count": 0,
+        "name": "_id",
+        "type": "string",
+        "esTypes": [
+          "_id"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_ignored": {
+        "count": 0,
+        "name": "_ignored",
+        "type": "string",
+        "esTypes": [
+          "_ignored"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_index": {
+        "count": 0,
+        "name": "_index",
+        "type": "string",
+        "esTypes": [
+          "_index"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_score": {
+        "count": 0,
+        "name": "_score",
+        "type": "number",
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "_source": {
+        "count": 0,
+        "name": "_source",
+        "type": "_source",
+        "esTypes": [
+          "_source"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "_source"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.id": {
+        "count": 0,
+        "name": "agent.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.name": {
+        "count": 0,
+        "name": "agent.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.name.text": {
+        "count": 0,
+        "name": "agent.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "agent.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.type": {
+        "count": 0,
+        "name": "agent.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "agent.version": {
+        "count": 0,
+        "name": "agent.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.amount": {
+        "count": 0,
+        "name": "anthropic.cost.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.bucket_end_time": {
+        "count": 0,
+        "name": "anthropic.cost.bucket_end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.bucket_start_time": {
+        "count": 0,
+        "name": "anthropic.cost.bucket_start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.context_window": {
+        "count": 0,
+        "name": "anthropic.cost.context_window",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.cost_type": {
+        "count": 0,
+        "name": "anthropic.cost.cost_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.currency": {
+        "count": 0,
+        "name": "anthropic.cost.currency",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.description": {
+        "count": 0,
+        "name": "anthropic.cost.description",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.inference_geo": {
+        "count": 0,
+        "name": "anthropic.cost.inference_geo",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.model": {
+        "count": 0,
+        "name": "anthropic.cost.model",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.service_tier": {
+        "count": 0,
+        "name": "anthropic.cost.service_tier",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.token_type": {
+        "count": 0,
+        "name": "anthropic.cost.token_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.cost.workspace_id": {
+        "count": 0,
+        "name": "anthropic.cost.workspace_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.api_key_id": {
+        "count": 0,
+        "name": "anthropic.usage.api_key_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.bucket_end_time": {
+        "count": 0,
+        "name": "anthropic.usage.bucket_end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.bucket_start_time": {
+        "count": 0,
+        "name": "anthropic.usage.bucket_start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.cache_creation_input_tokens": {
+        "count": 0,
+        "name": "anthropic.usage.cache_creation_input_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.cached_input_tokens": {
+        "count": 0,
+        "name": "anthropic.usage.cached_input_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.context_window": {
+        "count": 0,
+        "name": "anthropic.usage.context_window",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.inference_geo": {
+        "count": 0,
+        "name": "anthropic.usage.inference_geo",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.model": {
+        "count": 0,
+        "name": "anthropic.usage.model",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.output_tokens": {
+        "count": 0,
+        "name": "anthropic.usage.output_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.service_tier": {
+        "count": 0,
+        "name": "anthropic.usage.service_tier",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.speed": {
+        "count": 0,
+        "name": "anthropic.usage.speed",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.uncached_input_tokens": {
+        "count": 0,
+        "name": "anthropic.usage.uncached_input_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.usage.workspace_id": {
+        "count": 0,
+        "name": "anthropic.usage.workspace_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.AmortizedCost.amount": {
+        "count": 0,
+        "name": "aws.billing.AmortizedCost.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.AmortizedCost.unit": {
+        "count": 0,
+        "name": "aws.billing.AmortizedCost.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.BlendedCost.amount": {
+        "count": 0,
+        "name": "aws.billing.BlendedCost.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.BlendedCost.unit": {
+        "count": 0,
+        "name": "aws.billing.BlendedCost.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.Currency": {
+        "count": 0,
+        "name": "aws.billing.Currency",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.EstimatedCharges": {
+        "count": 0,
+        "name": "aws.billing.EstimatedCharges",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.NormalizedUsageAmount.amount": {
+        "count": 0,
+        "name": "aws.billing.NormalizedUsageAmount.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.NormalizedUsageAmount.unit": {
+        "count": 0,
+        "name": "aws.billing.NormalizedUsageAmount.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.ServiceName": {
+        "count": 0,
+        "name": "aws.billing.ServiceName",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.UnblendedCost.amount": {
+        "count": 0,
+        "name": "aws.billing.UnblendedCost.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.UnblendedCost.unit": {
+        "count": 0,
+        "name": "aws.billing.UnblendedCost.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.UsageQuantity.amount": {
+        "count": 0,
+        "name": "aws.billing.UsageQuantity.amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.UsageQuantity.unit": {
+        "count": 0,
+        "name": "aws.billing.UsageQuantity.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.end_date": {
+        "count": 0,
+        "name": "aws.billing.end_date",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_by.COST_CENTER": {
+        "count": 0,
+        "name": "aws.billing.group_by.COST_CENTER",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_by.LINKED_ACCOUNT": {
+        "count": 0,
+        "name": "aws.billing.group_by.LINKED_ACCOUNT",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_by.SERVICE": {
+        "count": 0,
+        "name": "aws.billing.group_by.SERVICE",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_by.fingerprint": {
+        "count": 0,
+        "name": "aws.billing.group_by.fingerprint",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_definition.key": {
+        "count": 0,
+        "name": "aws.billing.group_definition.key",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.group_definition.type": {
+        "count": 0,
+        "name": "aws.billing.group_definition.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.billing.start_date": {
+        "count": 0,
+        "name": "aws.billing.start_date",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.cloudwatch.message": {
+        "count": 0,
+        "name": "aws.cloudwatch.message",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.cloudwatch.namespace": {
+        "count": 0,
+        "name": "aws.cloudwatch.namespace",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.dimensions.AutoScalingGroupName": {
+        "count": 0,
+        "name": "aws.dimensions.AutoScalingGroupName",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.dimensions.ImageId": {
+        "count": 0,
+        "name": "aws.dimensions.ImageId",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.dimensions.InstanceId": {
+        "count": 0,
+        "name": "aws.dimensions.InstanceId",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.dimensions.InstanceType": {
+        "count": 0,
+        "name": "aws.dimensions.InstanceType",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.core.count": {
+        "count": 0,
+        "name": "aws.ec2.instance.core.count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.image.id": {
+        "count": 0,
+        "name": "aws.ec2.instance.image.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.monitoring.state": {
+        "count": 0,
+        "name": "aws.ec2.instance.monitoring.state",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.private.dns_name": {
+        "count": 0,
+        "name": "aws.ec2.instance.private.dns_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.private.ip": {
+        "count": 0,
+        "name": "aws.ec2.instance.private.ip",
+        "type": "ip",
+        "esTypes": [
+          "ip"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "ip"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.public.dns_name": {
+        "count": 0,
+        "name": "aws.ec2.instance.public.dns_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.public.ip": {
+        "count": 0,
+        "name": "aws.ec2.instance.public.ip",
+        "type": "ip",
+        "esTypes": [
+          "ip"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "ip"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.state.code": {
+        "count": 0,
+        "name": "aws.ec2.instance.state.code",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.state.name": {
+        "count": 0,
+        "name": "aws.ec2.instance.state.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.instance.threads_per_core": {
+        "count": 0,
+        "name": "aws.ec2.instance.threads_per_core",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.CPUCreditBalance.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.CPUCreditBalance.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.CPUCreditUsage.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.CPUCreditUsage.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.CPUSurplusCreditBalance.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.CPUSurplusCreditBalance.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.CPUSurplusCreditsCharged.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.CPUSurplusCreditsCharged.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.CPUUtilization.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.CPUUtilization.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskReadBytes.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskReadBytes.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskReadBytes.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskReadBytes.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskReadOps.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskReadOps.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskReadOps.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskReadOps.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskWriteBytes.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskWriteBytes.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskWriteBytes.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskWriteBytes.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskWriteOps.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskWriteOps.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.DiskWriteOps.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.DiskWriteOps.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkIn.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkIn.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkIn.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkIn.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkOut.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkOut.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkOut.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkOut.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkPacketsIn.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkPacketsIn.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkPacketsIn.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkPacketsIn.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkPacketsOut.rate": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkPacketsOut.rate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.NetworkPacketsOut.sum": {
+        "count": 0,
+        "name": "aws.ec2.metrics.NetworkPacketsOut.sum",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.StatusCheckFailed.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.StatusCheckFailed.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.StatusCheckFailed_Instance.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.StatusCheckFailed_Instance.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.ec2.metrics.StatusCheckFailed_System.avg": {
+        "count": 0,
+        "name": "aws.ec2.metrics.StatusCheckFailed_System.avg",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.linked_account.id": {
+        "count": 0,
+        "name": "aws.linked_account.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.linked_account.name": {
+        "count": 0,
+        "name": "aws.linked_account.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.metrics_names_fingerprint": {
+        "count": 0,
+        "name": "aws.metrics_names_fingerprint",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.bucket.arn": {
+        "count": 0,
+        "name": "aws.s3.bucket.arn",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.bucket.name": {
+        "count": 0,
+        "name": "aws.s3.bucket.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.s3.object.key": {
+        "count": 0,
+        "name": "aws.s3.object.key",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws.tags": {
+        "count": 0,
+        "name": "aws.tags",
+        "type": "flattened",
+        "esTypes": [
+          "flattened"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.bucketed_step_size": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.bucketed_step_size",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.image_size": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.image_size",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.input_token_count": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.input_token_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.invocation_client_errors": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.invocation_client_errors",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.invocation_latency": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.invocation_latency",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "inputFormat": "milliseconds",
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "ms"
+      },
+      "aws_bedrock.runtime.invocation_server_errors": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.invocation_server_errors",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.invocation_throttles": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.invocation_throttles",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.invocations": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.invocations",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.legacymodel_invocations": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.legacymodel_invocations",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.model_id": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.model_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.output_image_count": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.output_image_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.output_token_count": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.output_token_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.runtime.quality": {
+        "count": 0,
+        "name": "aws_bedrock.runtime.quality",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_period_end_date": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_period_end_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.billing_period_start_date": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.billing_period_start_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.invoice_id": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.invoice_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.invoicing_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.invoicing_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.payer_account_id": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.payer_account_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.payer_account_name": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.payer_account_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bill.type": {
+        "count": 0,
+        "name": "aws_billing.cur.bill.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.bundled_discount": {
+        "count": 0,
+        "name": "aws_billing.cur.bundled_discount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost.amortized_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.cost.amortized_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost.net_amortized_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.cost.net_amortized_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.cost_category": {
+        "count": 0,
+        "name": "aws_billing.cur.cost_category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.identity.line_item_id": {
+        "count": 0,
+        "name": "aws_billing.cur.identity.line_item_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.identity.time_interval": {
+        "count": 0,
+        "name": "aws_billing.cur.identity.time_interval",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.availability_zone": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.availability_zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.blended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.blended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.blended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.blended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.currency_code": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.currency_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.description": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.description",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.legal_entity": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.legal_entity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.net_unblended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.net_unblended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.net_unblended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.net_unblended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.normalization_factor": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.normalization_factor",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.normalized_usage_amount": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.normalized_usage_amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.operation": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.operation",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.product_code": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.product_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.resource_id": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.resource_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.tax_type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.tax_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_cost_str": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_cost_str",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.unblended_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.unblended_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_account_id": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_account_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_account_name": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_account_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_amount": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_amount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_end_date": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_end_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_start_date": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_start_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.line_item.usage_type": {
+        "count": 0,
+        "name": "aws_billing.cur.line_item.usage_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.currency": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.currency",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.lease_contract_length": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.lease_contract_length",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.offering_class": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.offering_class",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.public_on_demand_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.public_on_demand_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.public_on_demand_rate": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.public_on_demand_rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.purchase_option": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.purchase_option",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.rate_code": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.rate_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.rate_id": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.rate_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.term": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.term",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.pricing.unit": {
+        "count": 0,
+        "name": "aws_billing.cur.pricing.unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.comment": {
+        "count": 0,
+        "name": "aws_billing.cur.product.comment",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.family": {
+        "count": 0,
+        "name": "aws_billing.cur.product.family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.fee_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.fee_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.fee_description": {
+        "count": 0,
+        "name": "aws_billing.cur.product.fee_description",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.from_region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.from_region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instance_family": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instance_family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instance_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instance_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.instancesku": {
+        "count": 0,
+        "name": "aws_billing.cur.product.instancesku",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.operation": {
+        "count": 0,
+        "name": "aws_billing.cur.product.operation",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.pricing_unit": {
+        "count": 0,
+        "name": "aws_billing.cur.product.pricing_unit",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.product": {
+        "count": 0,
+        "name": "aws_billing.cur.product.product",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.servicecode": {
+        "count": 0,
+        "name": "aws_billing.cur.product.servicecode",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.sku": {
+        "count": 0,
+        "name": "aws_billing.cur.product.sku",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_location": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_location_type": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_location_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.to_region_code": {
+        "count": 0,
+        "name": "aws_billing.cur.product.to_region_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.product.usagetype": {
+        "count": 0,
+        "name": "aws_billing.cur.product.usagetype",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.a_r_n": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.a_r_n",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.amortized_upfront_cost_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.amortized_upfront_cost_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.availability_zone": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.availability_zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.end_time": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.modification_status": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.modification_status",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_amortized_upfront_cost_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_amortized_upfront_cost_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_recurring_fee_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_recurring_fee_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_unused_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_unused_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_unused_recurring_fee": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_unused_recurring_fee",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.net_upfront_value": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.net_upfront_value",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.normalized_units_per_reservation": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.normalized_units_per_reservation",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.number_of_reservations": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.number_of_reservations",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.recurring_fee_for_usage": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.recurring_fee_for_usage",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.start_time": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.subscription_id": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.subscription_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.total_reserved_normalized_units": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.total_reserved_normalized_units",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.total_reserved_units": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.total_reserved_units",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.units_per_reservation": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.units_per_reservation",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_amortized_upfront_fee_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_amortized_upfront_fee_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_normalized_unit_quantity": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_normalized_unit_quantity",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_quantity": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_quantity",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.unused_recurring_fee": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.unused_recurring_fee",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.reservation.upfront_value": {
+        "count": 0,
+        "name": "aws_billing.cur.reservation.upfront_value",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.resource.tags": {
+        "count": 0,
+        "name": "aws_billing.cur.resource.tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.resource_tags": {
+        "count": 0,
+        "name": "aws_billing.cur.resource_tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.a_r_n": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.a_r_n",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.amortized_upfront_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.amortized_upfront_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.end_time": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.instance_type_family": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.instance_type_family",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_amortized_upfront_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_amortized_upfront_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_effective_cost": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_effective_cost",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.net_recurring_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.net_recurring_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.offering_type": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.offering_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.payment_option": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.payment_option",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.purchase_term": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.purchase_term",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.rate": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.rate",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.recurring_commitment_for_billing_period": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.recurring_commitment_for_billing_period",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.region": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.start_time": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.total_commitment_to_date": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.total_commitment_to_date",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.savings_plan.used_commitment": {
+        "count": 0,
+        "name": "aws_billing.cur.savings_plan.used_commitment",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_billing.cur.total_discount": {
+        "count": 0,
+        "name": "aws_billing.cur.total_discount",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.application_id": {
+        "count": 0,
+        "name": "azure.application_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.account_name": {
+        "count": 0,
+        "name": "azure.billing.account_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.actual_cost": {
+        "count": 0,
+        "name": "azure.billing.actual_cost",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.billing_period_id": {
+        "count": 0,
+        "name": "azure.billing.billing_period_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.currency": {
+        "count": 0,
+        "name": "azure.billing.currency",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.department_name": {
+        "count": 0,
+        "name": "azure.billing.department_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.forecast_cost": {
+        "count": 0,
+        "name": "azure.billing.forecast_cost",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.pretax_cost": {
+        "count": 0,
+        "name": "azure.billing.pretax_cost",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.product": {
+        "count": 0,
+        "name": "azure.billing.product",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.usage_date": {
+        "count": 0,
+        "name": "azure.billing.usage_date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.usage_end": {
+        "count": 0,
+        "name": "azure.billing.usage_end",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.billing.usage_start": {
+        "count": 0,
+        "name": "azure.billing.usage_start",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions": {
+        "count": 0,
+        "conflictDescriptions": {
+          "flattened": [
+            ".ds-metrics-azure.billing-default-2026.08.13-000001"
+          ],
+          "object": [
+            ".ds-metrics-azure.open_ai-default-2026.08.17-000001"
+          ]
+        },
+        "name": "azure.dimensions",
+        "type": "conflict",
+        "esTypes": [
+          "flattened",
+          "object"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions.fingerprint": {
+        "count": 0,
+        "name": "azure.dimensions.fingerprint",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "azure.dimensions"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions.model_deployment_name": {
+        "count": 0,
+        "name": "azure.dimensions.model_deployment_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "azure.dimensions"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions.model_name": {
+        "count": 0,
+        "name": "azure.dimensions.model_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "azure.dimensions"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions.model_version": {
+        "count": 0,
+        "name": "azure.dimensions.model_version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "azure.dimensions"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.dimensions.region": {
+        "count": 0,
+        "name": "azure.dimensions.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "azure.dimensions"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.namespace": {
+        "count": 0,
+        "name": "azure.namespace",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.active_tokens.total": {
+        "count": 0,
+        "name": "azure.open_ai.active_tokens.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.context_tokens_cache_match_rate.avg": {
+        "count": 0,
+        "name": "azure.open_ai.context_tokens_cache_match_rate.avg",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.fine_tuned_training_hours.total": {
+        "count": 0,
+        "name": "azure.open_ai.fine_tuned_training_hours.total",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.generated_tokens.total": {
+        "count": 0,
+        "name": "azure.open_ai.generated_tokens.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.processed_prompt_tokens.total": {
+        "count": 0,
+        "name": "azure.open_ai.processed_prompt_tokens.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.provisioned_managed_utilization_v2.avg": {
+        "count": 0,
+        "name": "azure.open_ai.provisioned_managed_utilization_v2.avg",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "percent"
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "percent"
+      },
+      "azure.open_ai.requests.total": {
+        "count": 0,
+        "name": "azure.open_ai.requests.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.time_to_response.avg": {
+        "count": 0,
+        "name": "azure.open_ai.time_to_response.avg",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.open_ai.token_transaction.total": {
+        "count": 0,
+        "name": "azure.open_ai.token_transaction.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.resource.group": {
+        "count": 0,
+        "name": "azure.resource.group",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.resource.id": {
+        "count": 0,
+        "name": "azure.resource.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.resource.name": {
+        "count": 0,
+        "name": "azure.resource.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.resource.tags": {
+        "count": 0,
+        "name": "azure.resource.tags",
+        "type": "flattened",
+        "esTypes": [
+          "flattened"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.resource.type": {
+        "count": 0,
+        "name": "azure.resource.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.subscription_id": {
+        "count": 0,
+        "name": "azure.subscription_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.subscription_name": {
+        "count": 0,
+        "name": "azure.subscription_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "azure.timegrain": {
+        "count": 0,
+        "name": "azure.timegrain",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.id": {
+        "count": 0,
+        "name": "cloud.account.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.name": {
+        "count": 0,
+        "name": "cloud.account.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.account.name.text": {
+        "count": 0,
+        "name": "cloud.account.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "cloud.account.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.availability_zone": {
+        "count": 0,
+        "name": "cloud.availability_zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.image.id": {
+        "count": 0,
+        "name": "cloud.image.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.instance.id": {
+        "count": 0,
+        "name": "cloud.instance.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.instance.name": {
+        "count": 0,
+        "name": "cloud.instance.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.instance.name.text": {
+        "count": 0,
+        "name": "cloud.instance.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "cloud.instance.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.machine.type": {
+        "count": 0,
+        "name": "cloud.machine.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.project.id": {
+        "count": 0,
+        "name": "cloud.project.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.project.name": {
+        "count": 0,
+        "name": "cloud.project.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.project.name.text": {
+        "count": 0,
+        "name": "cloud.project.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "cloud.project.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.provider": {
+        "count": 0,
+        "name": "cloud.provider",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cloud.region": {
+        "count": 0,
+        "name": "cloud.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "cluster.id": {
+        "count": 0,
+        "name": "cluster.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesDimension": true
+      },
+      "data_stream.dataset": {
+        "count": 0,
+        "name": "data_stream.dataset",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.namespace": {
+        "count": 0,
+        "name": "data_stream.namespace",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.type": {
+        "count": 0,
+        "name": "data_stream.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "dataset.name": {
+        "count": 0,
+        "name": "dataset.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "dataset.namespace": {
+        "count": 0,
+        "name": "dataset.namespace",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "dataset.type": {
+        "count": 0,
+        "name": "dataset.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "ecs.version": {
+        "count": 0,
+        "name": "ecs.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "error.message": {
+        "count": 0,
+        "name": "error.message",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.category": {
+        "count": 0,
+        "name": "event.category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.dataset": {
+        "count": 0,
+        "name": "event.dataset",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.duration": {
+        "count": 0,
+        "name": "event.duration",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "event.end": {
+        "count": 0,
+        "name": "event.end",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "event.ingested": {
+        "count": 0,
+        "name": "event.ingested",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "event.kind": {
+        "count": 0,
+        "name": "event.kind",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.module": {
+        "count": 0,
+        "name": "event.module",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "event.start": {
+        "count": 0,
+        "name": "event.start",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "event.type": {
+        "count": 0,
+        "name": "event.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "fleet.agent.count": {
+        "count": 0,
+        "name": "fleet.agent.count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agent.version": {
+        "count": 0,
+        "name": "fleet.agent.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesDimension": true
+      },
+      "fleet.agents.enrolled": {
+        "count": 0,
+        "name": "fleet.agents.enrolled",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.healthy": {
+        "count": 0,
+        "name": "fleet.agents.healthy",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.inactive": {
+        "count": 0,
+        "name": "fleet.agents.inactive",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.offline": {
+        "count": 0,
+        "name": "fleet.agents.offline",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.total": {
+        "count": 0,
+        "name": "fleet.agents.total",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.unenrolled": {
+        "count": 0,
+        "name": "fleet.agents.unenrolled",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.unhealthy": {
+        "count": 0,
+        "name": "fleet.agents.unhealthy",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.unhealthy_reason.input": {
+        "count": 0,
+        "name": "fleet.agents.unhealthy_reason.input",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.unhealthy_reason.other": {
+        "count": 0,
+        "name": "fleet.agents.unhealthy_reason.other",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.unhealthy_reason.output": {
+        "count": 0,
+        "name": "fleet.agents.unhealthy_reason.output",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.updating": {
+        "count": 0,
+        "name": "fleet.agents.updating",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.downloading": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.downloading",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.extracting": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.extracting",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.failed": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.failed",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.replacing": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.replacing",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.requested": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.requested",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.restarting": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.restarting",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.rollback": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.rollback",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.scheduled": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.scheduled",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "fleet.agents.upgrading_step.watching": {
+        "count": 0,
+        "name": "fleet.agents.upgrading_step.watching",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false,
+        "timeSeriesMetric": "gauge"
+      },
+      "gcp.billing.billing_account_id": {
+        "count": 0,
+        "name": "gcp.billing.billing_account_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.cost_type": {
+        "count": 0,
+        "name": "gcp.billing.cost_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.effective_price": {
+        "count": 0,
+        "name": "gcp.billing.effective_price",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.invoice_month": {
+        "count": 0,
+        "name": "gcp.billing.invoice_month",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.location.country": {
+        "count": 0,
+        "name": "gcp.billing.location.country",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.location.region": {
+        "count": 0,
+        "name": "gcp.billing.location.region",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.location.zone": {
+        "count": 0,
+        "name": "gcp.billing.location.zone",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.project_id": {
+        "count": 0,
+        "name": "gcp.billing.project_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.project_name": {
+        "count": 0,
+        "name": "gcp.billing.project_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.service_description": {
+        "count": 0,
+        "name": "gcp.billing.service_description",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.service_id": {
+        "count": 0,
+        "name": "gcp.billing.service_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.sku_description": {
+        "count": 0,
+        "name": "gcp.billing.sku_description",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.sku_id": {
+        "count": 0,
+        "name": "gcp.billing.sku_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.tags.key": {
+        "count": 0,
+        "name": "gcp.billing.tags.key",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "nested": {
+            "path": "gcp.billing.tags"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.tags.value": {
+        "count": 0,
+        "name": "gcp.billing.tags.value",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "nested": {
+            "path": "gcp.billing.tags"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.total": {
+        "count": 0,
+        "name": "gcp.billing.total",
+        "type": "number",
+        "esTypes": [
+          "float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.usage_end_time": {
+        "count": 0,
+        "name": "gcp.billing.usage_end_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.billing.usage_start_time": {
+        "count": 0,
+        "name": "gcp.billing.usage_start_time",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.deployed_model_id": {
+        "count": 0,
+        "name": "gcp.labels.metrics.deployed_model_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.error_category": {
+        "count": 0,
+        "name": "gcp.labels.metrics.error_category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.input_token_size": {
+        "count": 0,
+        "name": "gcp.labels.metrics.input_token_size",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.latency_type": {
+        "count": 0,
+        "name": "gcp.labels.metrics.latency_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.max_token_size": {
+        "count": 0,
+        "name": "gcp.labels.metrics.max_token_size",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.method": {
+        "count": 0,
+        "name": "gcp.labels.metrics.method",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.output_token_size": {
+        "count": 0,
+        "name": "gcp.labels.metrics.output_token_size",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.replica_id": {
+        "count": 0,
+        "name": "gcp.labels.metrics.replica_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.request_type": {
+        "count": 0,
+        "name": "gcp.labels.metrics.request_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.response_code": {
+        "count": 0,
+        "name": "gcp.labels.metrics.response_code",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.spot": {
+        "count": 0,
+        "name": "gcp.labels.metrics.spot",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.metrics.type": {
+        "count": 0,
+        "name": "gcp.labels.metrics.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.endpoint_id": {
+        "count": 0,
+        "name": "gcp.labels.resource.endpoint_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.location": {
+        "count": 0,
+        "name": "gcp.labels.resource.location",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.model_user_id": {
+        "count": 0,
+        "name": "gcp.labels.resource.model_user_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.model_version_id": {
+        "count": 0,
+        "name": "gcp.labels.resource.model_version_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.publisher": {
+        "count": 0,
+        "name": "gcp.labels.resource.publisher",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.labels.resource.resource_container": {
+        "count": 0,
+        "name": "gcp.labels.resource.resource_container",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.cpu.utilization": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.cpu.utilization",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "percent"
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "percent"
+      },
+      "gcp.vertexai.prediction.online.error_count": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.error_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.memory.bytes_used": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.memory.bytes_used",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "bytes"
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "byte"
+      },
+      "gcp.vertexai.prediction.online.network.received_bytes_count": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.network.received_bytes_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "bytes"
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "byte"
+      },
+      "gcp.vertexai.prediction.online.network.sent_bytes_count": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.network.sent_bytes_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "bytes"
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "byte"
+      },
+      "gcp.vertexai.prediction.online.prediction_count": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.prediction_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.prediction_latencies": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.prediction_latencies",
+        "type": "histogram",
+        "esTypes": [
+          "histogram"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "histogram"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.replicas": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.replicas",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.response_count": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.response_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.prediction.online.target_replicas": {
+        "count": 0,
+        "name": "gcp.vertexai.prediction.online.target_replicas",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.character_count": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.character_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.consumed_throughput": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.consumed_throughput",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.first_token_latencies": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.first_token_latencies",
+        "type": "histogram",
+        "esTypes": [
+          "histogram"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "histogram"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.model_invocation_count": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.model_invocation_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.model_invocation_latencies": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.model_invocation_latencies",
+        "type": "histogram",
+        "esTypes": [
+          "histogram"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "histogram"
+        },
+        "shortDotsEnable": false
+      },
+      "gcp.vertexai.publisher.online_serving.token_count": {
+        "count": 0,
+        "name": "gcp.vertexai.publisher.online_serving.token_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.containerized": {
+        "count": 0,
+        "name": "host.containerized",
+        "type": "boolean",
+        "esTypes": [
+          "boolean"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "boolean"
+        },
+        "shortDotsEnable": false
+      },
+      "host.cpu.usage": {
+        "count": 0,
+        "name": "host.cpu.usage",
+        "type": "number",
+        "esTypes": [
+          "scaled_float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.disk.read.bytes": {
+        "count": 0,
+        "name": "host.disk.read.bytes",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.disk.write.bytes": {
+        "count": 0,
+        "name": "host.disk.write.bytes",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.name": {
+        "count": 0,
+        "name": "host.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "host.name.text": {
+        "count": 0,
+        "name": "host.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "host.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "host.network.egress.bytes": {
+        "count": 0,
+        "name": "host.network.egress.bytes",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.network.egress.packets": {
+        "count": 0,
+        "name": "host.network.egress.packets",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.network.ingress.bytes": {
+        "count": 0,
+        "name": "host.network.ingress.bytes",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.network.ingress.packets": {
+        "count": 0,
+        "name": "host.network.ingress.packets",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "host.os.build": {
+        "count": 0,
+        "name": "host.os.build",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "host.os.codename": {
+        "count": 0,
+        "name": "host.os.codename",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "input.type": {
+        "count": 0,
+        "name": "input.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "kibana.uuid": {
+        "count": 0,
+        "name": "kibana.uuid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "kibana.version": {
+        "count": 0,
+        "name": "kibana.version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "labels.app": {
+        "count": 0,
+        "name": "labels.app",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "log.offset": {
+        "count": 0,
+        "name": "log.offset",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.name": {
+        "count": 0,
+        "name": "metricset.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.name.text": {
+        "count": 0,
+        "name": "metricset.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "metricset.name"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "metricset.period": {
+        "count": 0,
+        "name": "metricset.period",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "service.type": {
+        "count": 0,
+        "name": "service.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "tags": {
+        "count": 0,
+        "name": "tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      }
+    },
+    "namespaces": [
+      "*",
+      "default"
+    ]
+  }
+}

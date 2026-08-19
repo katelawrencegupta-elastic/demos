@@ -1,0 +1,50 @@
+{
+  "name": "logs-gcp.loadbalancing_logs",
+  "index_template": {
+    "index_patterns": [
+      "logs-gcp.loadbalancing_logs-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "gcp"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-gcp.loadbalancing_logs@package",
+      "logs@custom",
+      "gcp@custom",
+      "logs-gcp.loadbalancing_logs@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "gcp@custom",
+      "logs-gcp.loadbalancing_logs@custom"
+    ],
+    "created_date_millis": 1786557401290,
+    "modified_date_millis": 1786557401290
+  }
+}

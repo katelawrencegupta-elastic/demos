@@ -1,0 +1,50 @@
+{
+  "name": "logs-azure_openai.logs",
+  "index_template": {
+    "index_patterns": [
+      "logs-azure_openai.logs-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "azure_openai"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-azure_openai.logs@package",
+      "logs@custom",
+      "azure_openai@custom",
+      "logs-azure_openai.logs@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "azure_openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "azure_openai@custom",
+      "logs-azure_openai.logs@custom"
+    ],
+    "created_date_millis": 1786643486926,
+    "modified_date_millis": 1786643486926
+  }
+}

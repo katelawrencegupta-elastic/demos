@@ -1,0 +1,146 @@
+{
+  "name": "logs-openai.embeddings@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-openai.embeddings-2.4.0",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "openai": {
+            "properties": {
+              "embeddings": {
+                "properties": {
+                  "input_tokens": {
+                    "type": "long"
+                  }
+                }
+              },
+              "images": {
+                "properties": {
+                  "images": {
+                    "type": "long"
+                  },
+                  "size": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "moderations": {
+                "properties": {
+                  "input_tokens": {
+                    "type": "long"
+                  }
+                }
+              },
+              "audio_transcriptions": {
+                "properties": {
+                  "seconds": {
+                    "meta": {
+                      "unit": "s"
+                    },
+                    "type": "long"
+                  }
+                }
+              },
+              "completions": {
+                "properties": {
+                  "output_audio_tokens": {
+                    "type": "long"
+                  },
+                  "output_tokens": {
+                    "type": "long"
+                  },
+                  "input_audio_tokens": {
+                    "type": "long"
+                  },
+                  "input_cached_tokens": {
+                    "type": "long"
+                  },
+                  "input_tokens": {
+                    "type": "long"
+                  }
+                }
+              },
+              "audio_speeches": {
+                "properties": {
+                  "characters": {
+                    "type": "long"
+                  }
+                }
+              },
+              "base": {
+                "properties": {
+                  "start_time": {
+                    "type": "date"
+                  },
+                  "num_model_requests": {
+                    "type": "long"
+                  },
+                  "project_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "user_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "end_time": {
+                    "type": "date"
+                  },
+                  "usage_tokens": {
+                    "type": "long"
+                  },
+                  "model": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "usage_object_type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "api_key_id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "openai"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

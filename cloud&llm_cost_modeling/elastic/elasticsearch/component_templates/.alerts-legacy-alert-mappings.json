@@ -1,0 +1,136 @@
+{
+  "name": ".alerts-legacy-alert-mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "total_fields": {
+              "limit": "1500"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "ecs": {
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "severity": {
+                    "type": "keyword"
+                  },
+                  "workflow_status_updated_at": {
+                    "type": "date"
+                  },
+                  "risk_score": {
+                    "type": "float"
+                  },
+                  "system_status": {
+                    "type": "keyword"
+                  },
+                  "suppression": {
+                    "properties": {
+                      "terms": {
+                        "properties": {
+                          "field": {
+                            "type": "keyword"
+                          },
+                          "value": {
+                            "type": "keyword"
+                          }
+                        }
+                      },
+                      "start": {
+                        "type": "date"
+                      },
+                      "end": {
+                        "type": "date"
+                      },
+                      "docs_count": {
+                        "type": "long"
+                      }
+                    }
+                  },
+                  "rule": {
+                    "properties": {
+                      "note": {
+                        "type": "keyword"
+                      },
+                      "references": {
+                        "type": "keyword"
+                      },
+                      "author": {
+                        "type": "keyword"
+                      },
+                      "created_at": {
+                        "type": "date"
+                      },
+                      "description": {
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "type": "keyword"
+                      },
+                      "created_by": {
+                        "type": "keyword"
+                      },
+                      "version": {
+                        "type": "keyword"
+                      },
+                      "enabled": {
+                        "type": "keyword"
+                      },
+                      "rule_name_override": {
+                        "type": "keyword"
+                      },
+                      "rule_id": {
+                        "type": "keyword"
+                      },
+                      "license": {
+                        "type": "keyword"
+                      },
+                      "updated_at": {
+                        "type": "date"
+                      },
+                      "updated_by": {
+                        "type": "keyword"
+                      },
+                      "from": {
+                        "type": "keyword"
+                      },
+                      "interval": {
+                        "type": "keyword"
+                      },
+                      "to": {
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "workflow_user": {
+                    "type": "keyword"
+                  },
+                  "workflow_reason": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

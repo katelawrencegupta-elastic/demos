@@ -1,0 +1,232 @@
+{
+  "name": "logs-gcp.firewall@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "logs-gcp.firewall-2.50.2",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "cloud": {
+            "properties": {
+              "image": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "input": {
+            "properties": {
+              "type": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "gcp": {
+            "properties": {
+              "firewall": {
+                "properties": {
+                  "flattened": {
+                    "type": "flattened"
+                  },
+                  "rule_details": {
+                    "properties": {
+                      "reference": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_service_account": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_range": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "target_service_account": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "source_tag": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "destination_range": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "ip_port_info": {
+                        "type": "nested"
+                      },
+                      "action": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "target_tag": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "priority": {
+                        "type": "long"
+                      },
+                      "direction": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "destination": {
+                "properties": {
+                  "instance": {
+                    "properties": {
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "vpc": {
+                    "properties": {
+                      "vpc_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "subnetwork_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "source": {
+                "properties": {
+                  "instance": {
+                    "properties": {
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "vpc": {
+                    "properties": {
+                      "vpc_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "project_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "subnetwork_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "host": {
+            "properties": {
+              "os": {
+                "properties": {
+                  "build": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "codename": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              },
+              "containerized": {
+                "type": "boolean"
+              }
+            }
+          },
+          "event": {
+            "properties": {
+              "module": {
+                "type": "constant_keyword",
+                "value": "gcp"
+              },
+              "dataset": {
+                "type": "constant_keyword",
+                "value": "gcp.firewall"
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "gcp"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

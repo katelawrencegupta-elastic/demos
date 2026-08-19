@@ -1,0 +1,42 @@
+{
+  "name": "metrics-azure.billing-1.12.0",
+  "_meta": {
+    "package": {
+      "name": "azure_billing"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786557414128,
+  "processors": [
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-azure_billing.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `metrics` defined by the `azure_billing` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "metrics-azure.billing@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure.billing` dataset"
+      }
+    }
+  ],
+  "modified_date_millis": 1786557414128
+}

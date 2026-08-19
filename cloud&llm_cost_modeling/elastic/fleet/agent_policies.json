@@ -1,0 +1,3541 @@
+[
+  {
+    "id": "345e6f70-e65a-4c2f-adc7-2899e0bc9e1d",
+    "version": "WzE2MTksMV0=",
+    "created_at": "2026-08-12T18:16:38.114Z",
+    "space_ids": [
+      "default"
+    ],
+    "description": "Internal agentless policy",
+    "monitoring_enabled": [],
+    "inactivity_timeout": 3600,
+    "data_output_id": "es-default-output-internal",
+    "monitoring_output_id": "es-default-output-internal",
+    "fleet_server_host_id": "default-fleet-server-internal",
+    "schema_version": "1.1.1",
+    "package_policies": [
+      {
+        "id": "345e6f70-e65a-4c2f-adc7-2899e0bc9e1d",
+        "version": "WzE5NTIsMV0=",
+        "spaceIds": [
+          "default"
+        ],
+        "name": "aws-1",
+        "namespace": "default",
+        "description": "aws-1",
+        "package": {
+          "name": "aws",
+          "title": "AWS",
+          "version": "7.1.1"
+        },
+        "enabled": true,
+        "policy_id": "345e6f70-e65a-4c2f-adc7-2899e0bc9e1d",
+        "policy_ids": [
+          "345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+        ],
+        "inputs": [
+          {
+            "type": "aws/metrics",
+            "policy_template": "awshealth",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.awshealth"
+                },
+                "vars": {
+                  "period": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.awshealth-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-awshealth-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "billing",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.billing"
+                },
+                "vars": {
+                  "period": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "cost_explorer_config.group_by_dimension_keys": {
+                    "value": [
+                      "AZ",
+                      "INSTANCE_TYPE",
+                      "SERVICE",
+                      "LINKED_ACCOUNT"
+                    ],
+                    "type": "text"
+                  },
+                  "cost_explorer_config.group_by_tag_keys": {
+                    "value": [
+                      "aws:createdBy"
+                    ],
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "leaderelection": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.billing-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-billing-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "cloudtrail",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.cloudtrail"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-cloudtrail"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "cloudtrail_regex": {
+                    "value": "/CloudTrail/",
+                    "type": "text"
+                  },
+                  "cloudtrail_digest_regex": {
+                    "value": "/CloudTrail-Digest/",
+                    "type": "text"
+                  },
+                  "cloudtrail_insight_regex": {
+                    "value": "/CloudTrail-Insight/",
+                    "type": "text"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  },
+                  "actor_target_mapping": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "retain": {
+                    "value": "all",
+                    "type": "select"
+                  }
+                },
+                "id": "aws-s3-aws.cloudtrail-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-cloudtrail-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "cloudtrail",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.cloudtrail"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-cloudtrail"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "actor_target_mapping": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "retain": {
+                    "value": "all",
+                    "type": "select"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.cloudtrail-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-cloudtrail-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "cloudwatch",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.cloudwatch_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-cloudwatch-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "data_stream.dataset": {
+                    "value": "aws.cloudwatch_logs",
+                    "type": "text"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.cloudwatch_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-cloudwatch-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "cloudwatch",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.cloudwatch_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "300s",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "metrics": {
+                    "value": "- namespace: AWS/EC2\n  resource_type: ec2:instance\n  name:\n    - CPUUtilization\n    - DiskWriteOps\n  statistic:\n    - Average\n    - Maximum\n  # dimensions:\n   # - name: InstanceId\n      # value: i-123456\n  # tags:\n    # - key: created-by\n      # value: foo\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.cloudwatch_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-cloudwatch-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "cel",
+            "policy_template": "config",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.config"
+                },
+                "vars": {
+                  "interval": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "batch_size": {
+                    "value": 100,
+                    "type": "integer"
+                  },
+                  "http_client_timeout": {
+                    "value": "30s",
+                    "type": "text"
+                  },
+                  "rate_limit": {
+                    "value": "1",
+                    "type": "text"
+                  },
+                  "rate_limit_burst": {
+                    "value": 1,
+                    "type": "integer"
+                  },
+                  "retry_max_attempts": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "retry_wait_min": {
+                    "value": "1s",
+                    "type": "text"
+                  },
+                  "retry_wait_max": {
+                    "value": "60s",
+                    "type": "text"
+                  },
+                  "enable_request_tracer": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-config"
+                    ],
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "cel-aws.config-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "cel-config-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "dynamodb",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.dynamodb"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.dynamodb-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-dynamodb-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "ebs",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.ebs"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.ebs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-ebs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "ec2",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.ec2_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-ec2-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.ec2_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-ec2-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "ec2",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.ec2_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-ec2-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.ec2_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-ec2-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "ec2",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.ec2_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.ec2_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-ec2-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "ecs",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.ecs_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.ecs_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-ecs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "elb",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.elb_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-elb-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.elb_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-elb-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "elb",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.elb_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-elb-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.elb_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-elb-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "elb",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.elb_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.elb_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-elb-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "lambda",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.lambda"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "collect_esm_metrics": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws/metrics-aws.lambda-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-lambda-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "lambda",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.lambda_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-lambda-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.lambda_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-lambda-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "natgateway",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.natgateway"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.natgateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-natgateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "firewall",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.firewall_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-firewall-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.firewall_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-firewall-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "firewall",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.firewall_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-firewall-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.firewall_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-firewall-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "firewall",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.firewall_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "60s",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "metrics": {
+                    "value": "- namespace: AWS/NetworkFirewall\n  name:\n    - DroppedPackets\n    - PassedPackets\n    - ReceivedPackets\n    - Packets\n  statistic:\n    - Sum\n  # dimensions:\n   # - name: FirewallName\n      # value: SampleFirewall\n  # tags:\n    # - key: created-by\n      # value: sample\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.firewall_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-firewall-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "rds",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.rds"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.rds-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-rds-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "s3",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.s3access"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-s3access"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.s3access-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-s3-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "s3",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.s3_daily_storage"
+                },
+                "vars": {
+                  "period": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.s3_daily_storage-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              },
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.s3_request"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.s3_request-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-s3-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "s3_storage_lens",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.s3_storage_lens"
+                },
+                "vars": {
+                  "period": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.s3_storage_lens-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-s3_storage_lens-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "sns",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.sns"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.sns-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-sns-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "sqs",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.sqs"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.sqs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-sqs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "transitgateway",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.transitgateway"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.transitgateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-transitgateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "usage",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.usage"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.usage-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-usage-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "vpcflow",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.vpcflow"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-vpcflow"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.vpcflow-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-vpcflow-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "vpcflow",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.vpcflow"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-vpcflow"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.vpcflow-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-vpcflow-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "vpn",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.vpn"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.vpn-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-vpn-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "waf",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.waf"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-waf"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.waf-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-waf-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "waf",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.waf"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-waf"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.waf-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-waf-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "route53",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.route53_public_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "log_streams": {
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-route53_public-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.route53_public_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              },
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.route53_resolver_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "log_streams": {
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-route53_resolver-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.route53_resolver_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-route53-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "route53",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.route53_resolver_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-route53_resolver-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.route53_resolver_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-route53-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "cloudfront",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.cloudfront_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-cloudfront"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "value": "# - drop_event:\n  # when:\n    # contains:\n      # source: \"test\"\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.cloudfront_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-cloudfront-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "redshift",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.redshift"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.redshift-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-redshift-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "kinesis",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.kinesis"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.kinesis-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-kinesis-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "httpjson",
+            "policy_template": "securityhub",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.securityhub_findings"
+                },
+                "vars": {
+                  "interval": {
+                    "value": "1h",
+                    "type": "text"
+                  },
+                  "enable_request_tracer": {
+                    "type": "bool"
+                  },
+                  "initial_interval": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws_securityhub_findings"
+                    ],
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "proxy_url": {
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "httpjson-aws.securityhub_findings-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              },
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.securityhub_findings_full_posture"
+                },
+                "vars": {
+                  "enable_request_tracer": {
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws_securityhub_findings_full_posture"
+                    ],
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "proxy_url": {
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "httpjson-aws.securityhub_findings_full_posture-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              },
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.securityhub_insights"
+                },
+                "vars": {
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "enable_request_tracer": {
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws_securityhub_insights"
+                    ],
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "proxy_url": {
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "httpjson-aws.securityhub_insights-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "httpjson-securityhub-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "httpjson",
+            "policy_template": "inspector",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.inspector"
+                },
+                "vars": {
+                  "interval": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "enable_request_tracer": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "initial_interval": {
+                    "value": "2160h",
+                    "type": "text"
+                  },
+                  "lag_time": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "http_client_timeout": {
+                    "value": "30s",
+                    "type": "text"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-inspector"
+                    ],
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "proxy_url": {
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "httpjson-aws.inspector-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "httpjson-inspector-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "httpjson",
+            "policy_template": "guardduty",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.guardduty"
+                },
+                "vars": {
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "enable_request_tracer": {
+                    "type": "bool"
+                  },
+                  "initial_interval": {
+                    "value": "24h",
+                    "type": "text"
+                  },
+                  "detector_id": {
+                    "type": "text"
+                  },
+                  "http_client_timeout": {
+                    "value": "30s",
+                    "type": "text"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-guardduty"
+                    ],
+                    "type": "text"
+                  },
+                  "aws_region": {
+                    "type": "text"
+                  },
+                  "tld": {
+                    "value": "amazonaws.com",
+                    "type": "text"
+                  },
+                  "ssl": {
+                    "value": "#certificate_authorities:\n#  - |\n#    -----BEGIN CERTIFICATE-----\n#    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF\n#    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2\n#    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB\n#    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n\n#    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl\n#    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t\n#    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP\n#    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41\n#    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O\n#    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux\n#    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D\n#    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw\n#    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA\n#    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu\n#    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0\n#    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk\n#    sxSmbIUfc2SGJGCJD4I=\n#    -----END CERTIFICATE-----\n",
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "httpjson-aws.guardduty-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "httpjson-guardduty-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "guardduty",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.guardduty"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "value": "300s",
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "file_selectors": {
+                    "type": "yaml"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-guardduty"
+                    ],
+                    "type": "text"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "preserve_duplicate_custom_fields": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.guardduty-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-guardduty-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "apigateway",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.apigateway_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.apigateway_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-apigateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "apigateway",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.apigateway_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-apigateway-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.apigateway_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-apigateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "apigateway",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.apigateway_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-apigateway-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.apigateway_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-apigateway-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "emr",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.emr_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "5m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws/metrics-aws.emr_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-emr-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-s3",
+            "policy_template": "emr",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.emr_logs"
+                },
+                "vars": {
+                  "collect_s3_logs": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "bucket_arn": {
+                    "type": "text"
+                  },
+                  "access_point_arn": {
+                    "type": "text"
+                  },
+                  "start_timestamp": {
+                    "type": "text"
+                  },
+                  "ignore_older": {
+                    "type": "text"
+                  },
+                  "queue_url": {
+                    "value": false,
+                    "type": "text"
+                  },
+                  "endpoint": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "region": {
+                    "value": "",
+                    "type": "text"
+                  },
+                  "bucket_list_prefix": {
+                    "type": "text"
+                  },
+                  "interval": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "visibility_timeout": {
+                    "type": "text"
+                  },
+                  "api_timeout": {
+                    "type": "text"
+                  },
+                  "max_number_of_messages": {
+                    "value": 5,
+                    "type": "integer"
+                  },
+                  "fips_enabled": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-emr-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  },
+                  "custom": {
+                    "type": "yaml"
+                  }
+                },
+                "id": "aws-s3-aws.emr_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-s3-emr-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws-cloudwatch",
+            "policy_template": "emr",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "logs",
+                  "dataset": "aws.emr_logs"
+                },
+                "vars": {
+                  "log_group_arn": {
+                    "type": "text"
+                  },
+                  "log_group_name": {
+                    "type": "text"
+                  },
+                  "log_group_name_prefix": {
+                    "type": "text"
+                  },
+                  "include_linked_accounts_with_prefix": {
+                    "type": "bool"
+                  },
+                  "region_name": {
+                    "type": "text"
+                  },
+                  "log_streams": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "log_stream_prefix": {
+                    "type": "text"
+                  },
+                  "start_position": {
+                    "value": "beginning",
+                    "type": "text"
+                  },
+                  "scan_frequency": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "api_timeput": {
+                    "value": "120s",
+                    "type": "text"
+                  },
+                  "api_sleep": {
+                    "value": "200ms",
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "number_of_workers": {
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "value": [
+                      "forwarded",
+                      "aws-emr-logs"
+                    ],
+                    "type": "text"
+                  },
+                  "processors": {
+                    "type": "yaml"
+                  },
+                  "preserve_original_event": {
+                    "value": false,
+                    "type": "bool"
+                  }
+                },
+                "id": "aws-cloudwatch-aws.emr_logs-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws-cloudwatch-emr-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          },
+          {
+            "type": "aws/metrics",
+            "policy_template": "kafka",
+            "enabled": false,
+            "streams": [
+              {
+                "enabled": false,
+                "data_stream": {
+                  "type": "metrics",
+                  "dataset": "aws.kafka_metrics"
+                },
+                "vars": {
+                  "period": {
+                    "value": "1m",
+                    "type": "text"
+                  },
+                  "data_granularity": {
+                    "type": "text"
+                  },
+                  "regions": {
+                    "value": [],
+                    "type": "text"
+                  },
+                  "latency": {
+                    "type": "text"
+                  },
+                  "tags_filter": {
+                    "value": "# - key: \"created-by\"\n  # value: \"foo\"\n",
+                    "type": "yaml"
+                  },
+                  "include_linked_accounts": {
+                    "value": true,
+                    "type": "bool"
+                  },
+                  "owning_account": {
+                    "type": "integer"
+                  }
+                },
+                "id": "aws/metrics-aws.kafka_metrics-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+              }
+            ],
+            "id": "aws/metrics-kafka-345e6f70-e65a-4c2f-adc7-2899e0bc9e1d"
+          }
+        ],
+        "vars": {
+          "shared_credential_file": {
+            "type": "text"
+          },
+          "credential_profile_name": {
+            "type": "text"
+          },
+          "access_key_id": "[REDACTED]",
+          "secret_access_key": "[REDACTED]",
+          "session_token": "[REDACTED]",
+          "role_arn": {
+            "type": "text"
+          },
+          "external_id": {
+            "type": "text"
+          },
+          "assume_role_duration": {
+            "type": "duration"
+          },
+          "assume_role_expiry_window": {
+            "type": "duration"
+          },
+          "default_region": {
+            "value": "",
+            "type": "text"
+          },
+          "proxy_url": {
+            "type": "text"
+          },
+          "supports_identity_federation": {
+            "type": "bool"
+          }
+        },
+        "supports_agentless": true,
+        "var_group_selections": {
+          "credential_type": "direct_access_key"
+        },
+        "secret_references": "[REDACTED]",
+        "revision": 1,
+        "created_at": "2026-08-12T18:16:43.057Z",
+        "created_by": "719348788",
+        "updated_at": "2026-08-12T18:16:43.057Z",
+        "updated_by": "719348788",
+        "package_agent_version_condition": "^9.4.0"
+      }
+    ],
+    "agents": 0,
+    "name": "Agentless policy for aws-1",
+    "supports_agentless": true,
+    "namespace": "default",
+    "keep_monitoring_alive": true,
+    "global_data_tags": [
+      {
+        "name": "organization",
+        "value": "observability"
+      },
+      {
+        "name": "division",
+        "value": "engineering"
+      },
+      {
+        "name": "team",
+        "value": "obs-infraobs-integrations"
+      }
+    ],
+    "is_protected": false,
+    "status": "active",
+    "is_managed": false,
+    "revision": 1,
+    "updated_at": "2026-08-12T18:28:58.298Z",
+    "updated_by": "system",
+    "agentless": {
+      "cluster_id": "bb1595f2cee44b7cb6dc8c572977d973"
+    },
+    "has_agent_version_conditions": true,
+    "min_agent_version": "9.4.0",
+    "package_agent_version_conditions": [
+      {
+        "name": "aws",
+        "title": "AWS",
+        "version_condition": "^9.4.0"
+      }
+    ]
+  }
+]

@@ -1,0 +1,595 @@
+{
+  "name": "logs-aws_billing.cur-template@package",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "default_pipeline": "metrics-aws_billing.cur-0.2.1-pipeline_extract_metadata",
+          "mapping": {
+            "total_fields": {
+              "limit": "1000"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": true,
+        "dynamic_templates": [
+          {
+            "aws_billing.cur.cost_category": {
+              "path_match": "aws_billing.cur.cost_category.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "aws_billing.cur.discount.discount": {
+              "path_match": "aws_billing.cur.discount.discount.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "aws_billing.cur.resource_tags": {
+              "path_match": "aws_billing.cur.resource_tags.*",
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "*"
+            }
+          },
+          {
+            "strings_as_keyword": {
+              "mapping": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "@timestamp": {
+            "ignore_malformed": false,
+            "type": "date"
+          },
+          "aws_billing": {
+            "properties": {
+              "cur": {
+                "dynamic": true,
+                "type": "object",
+                "properties": {
+                  "product": {
+                    "properties": {
+                      "product": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "fee_description": {
+                        "type": "text"
+                      },
+                      "from_location_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "usagetype": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "location_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "to_location_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "servicecode": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "to_location": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "fee_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "to_region_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "from_region_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "from_location": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "comment": {
+                        "type": "text"
+                      },
+                      "location": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "instance_family": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "family": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "sku": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "instance_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "operation": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "instancesku": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "pricing_unit": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "region_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "cost": {
+                    "properties": {
+                      "amortized_cost": {
+                        "type": "double"
+                      },
+                      "net_amortized_cost": {
+                        "type": "double"
+                      }
+                    }
+                  },
+                  "line_item": {
+                    "properties": {
+                      "availability_zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "normalization_factor": {
+                        "type": "double"
+                      },
+                      "usage_account_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "normalized_usage_amount": {
+                        "type": "double"
+                      },
+                      "description": {
+                        "type": "text"
+                      },
+                      "usage_account_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "blended_cost": {
+                        "type": "double"
+                      },
+                      "net_unblended_rate": {
+                        "type": "double"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "product_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "usage_start_date": {
+                        "type": "date"
+                      },
+                      "usage_end_date": {
+                        "type": "date"
+                      },
+                      "currency_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "net_unblended_cost": {
+                        "type": "double"
+                      },
+                      "unblended_cost_str": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "unblended_rate": {
+                        "type": "double"
+                      },
+                      "blended_rate": {
+                        "type": "double"
+                      },
+                      "tax_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "unblended_cost": {
+                        "type": "double"
+                      },
+                      "usage_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "resource_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "legal_entity": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "usage_amount": {
+                        "type": "double"
+                      },
+                      "operation": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "resource": {
+                    "properties": {
+                      "tags": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "identity": {
+                    "properties": {
+                      "line_item_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "time_interval": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "bill": {
+                    "properties": {
+                      "billing_period_start_date": {
+                        "type": "date"
+                      },
+                      "payer_account_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "payer_account_name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "billing_entity": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "billing_period_end_date": {
+                        "type": "date"
+                      },
+                      "invoice_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "invoicing_entity": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "discount": {
+                    "dynamic": true,
+                    "type": "object",
+                    "properties": {
+                      "total_discount": {
+                        "type": "double"
+                      },
+                      "discount": {
+                        "dynamic": true,
+                        "type": "object"
+                      },
+                      "bundled_discount": {
+                        "type": "double"
+                      }
+                    }
+                  },
+                  "reservation": {
+                    "properties": {
+                      "a_r_n": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "total_reserved_normalized_units": {
+                        "type": "double"
+                      },
+                      "unused_amortized_upfront_fee_for_billing_period": {
+                        "type": "double"
+                      },
+                      "net_upfront_value": {
+                        "type": "double"
+                      },
+                      "net_amortized_upfront_cost_for_usage": {
+                        "type": "double"
+                      },
+                      "subscription_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "net_effective_cost": {
+                        "type": "double"
+                      },
+                      "number_of_reservations": {
+                        "type": "double"
+                      },
+                      "net_recurring_fee_for_usage": {
+                        "type": "double"
+                      },
+                      "total_reserved_units": {
+                        "type": "double"
+                      },
+                      "net_amortized_upfront_fee_for_billing_period": {
+                        "type": "double"
+                      },
+                      "upfront_value": {
+                        "type": "double"
+                      },
+                      "unused_recurring_fee": {
+                        "type": "double"
+                      },
+                      "amortized_upfront_cost_for_usage": {
+                        "type": "double"
+                      },
+                      "availability_zone": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "net_unused_recurring_fee": {
+                        "type": "double"
+                      },
+                      "recurring_fee_for_usage": {
+                        "type": "double"
+                      },
+                      "units_per_reservation": {
+                        "type": "double"
+                      },
+                      "normalized_units_per_reservation": {
+                        "type": "double"
+                      },
+                      "end_time": {
+                        "type": "date"
+                      },
+                      "net_unused_amortized_upfront_fee_for_billing_period": {
+                        "type": "double"
+                      },
+                      "unused_normalized_unit_quantity": {
+                        "type": "double"
+                      },
+                      "unused_quantity": {
+                        "type": "double"
+                      },
+                      "start_time": {
+                        "type": "date"
+                      },
+                      "modification_status": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "amortized_upfront_fee_for_billing_period": {
+                        "type": "double"
+                      },
+                      "effective_cost": {
+                        "type": "double"
+                      }
+                    }
+                  },
+                  "resource_tags": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "cost_category": {
+                    "dynamic": true,
+                    "type": "object"
+                  },
+                  "pricing": {
+                    "properties": {
+                      "purchase_option": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "unit": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "offering_class": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "rate_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "public_on_demand_rate": {
+                        "type": "double"
+                      },
+                      "lease_contract_length": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "currency": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "term": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "public_on_demand_cost": {
+                        "type": "double"
+                      },
+                      "rate_code": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "savings_plan": {
+                    "properties": {
+                      "a_r_n": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "recurring_commitment_for_billing_period": {
+                        "type": "double"
+                      },
+                      "payment_option": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "end_time": {
+                        "type": "date"
+                      },
+                      "net_amortized_upfront_commitment_for_billing_period": {
+                        "type": "double"
+                      },
+                      "used_commitment": {
+                        "type": "double"
+                      },
+                      "amortized_upfront_commitment_for_billing_period": {
+                        "type": "double"
+                      },
+                      "instance_type_family": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "net_effective_cost": {
+                        "type": "double"
+                      },
+                      "start_time": {
+                        "type": "date"
+                      },
+                      "offering_type": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "rate": {
+                        "type": "double"
+                      },
+                      "net_recurring_commitment_for_billing_period": {
+                        "type": "double"
+                      },
+                      "total_commitment_to_date": {
+                        "type": "double"
+                      },
+                      "effective_cost": {
+                        "type": "double"
+                      },
+                      "region": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "purchase_term": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "log": {
+            "properties": {
+              "offset": {
+                "type": "long"
+              }
+            }
+          },
+          "data_stream": {
+            "properties": {
+              "namespace": {
+                "type": "constant_keyword"
+              },
+              "type": {
+                "type": "constant_keyword"
+              },
+              "dataset": {
+                "type": "constant_keyword"
+              }
+            }
+          },
+          "aws": {
+            "properties": {
+              "s3": {
+                "properties": {
+                  "bucket": {
+                    "properties": {
+                      "name": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      },
+                      "arn": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  },
+                  "object": {
+                    "properties": {
+                      "key": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudwatch": {
+                "properties": {
+                  "message": {
+                    "type": "text"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "date_detection": true
+      }
+    },
+    "_meta": {
+      "package": {
+        "name": "aws_billing"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "logs-azure.graphactivitylogs",
+  "index_template": {
+    "index_patterns": [
+      "logs-azure.graphactivitylogs-*"
+    ],
+    "template": {
+      "settings": {},
+      "mappings": {
+        "_meta": {
+          "package": {
+            "name": "azure"
+          },
+          "managed_by": "fleet",
+          "managed": true
+        }
+      }
+    },
+    "composed_of": [
+      "logs@mappings",
+      "logs@settings",
+      "logs-azure.graphactivitylogs@package",
+      "logs@custom",
+      "azure@custom",
+      "logs-azure.graphactivitylogs@custom",
+      "ecs@mappings",
+      ".fleet_globals-1",
+      ".fleet_event_ingested-1"
+    ],
+    "priority": 200,
+    "_meta": {
+      "package": {
+        "name": "azure"
+      },
+      "managed_by": "fleet",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "ignore_missing_component_templates": [
+      "logs@custom",
+      "azure@custom",
+      "logs-azure.graphactivitylogs@custom"
+    ],
+    "created_date_millis": 1786557409033,
+    "modified_date_millis": 1786557409033
+  }
+}

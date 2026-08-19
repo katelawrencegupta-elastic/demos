@@ -1,0 +1,5202 @@
+{
+  "id": "elastic_agent-f47f18cc-9c7d-4278-b2ea-a6dee816d395",
+  "data": {
+    "description": "Elastic Agent metrics dashboard",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": true,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [
+      "fleet-managed-default",
+      "fleet-pkg-elastic_agent-default"
+    ],
+    "title": "[Elastic Agent] Agent metrics",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "grid": {
+          "h": 14,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "hide_title": true,
+          "title": "Navigation",
+          "links": [
+            {
+              "label": "Overview",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a148dc70-6b3c-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Concerning Agents",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-0600ffa0-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Agent Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-f47f18cc-9c7d-4278-b2ea-a6dee816d395",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Integrations",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-1a4e7280-6b5e-11ed-98de-67bdecd21824",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            },
+            {
+              "label": "Input Metrics",
+              "type": "dashboardLink",
+              "destination": "elastic_agent-a8192f90-cd3f-11ed-869d-e7dc1b551cd2",
+              "options": {
+                "open_in_new_tab": false,
+                "use_time_range": true,
+                "use_filters": true
+              }
+            }
+          ],
+          "layout": "vertical"
+        },
+        "id": "443b1597-9d5f-4b9c-8848-643d0381b2f4",
+        "type": "links"
+      },
+      {
+        "grid": {
+          "h": 4,
+          "w": 40,
+          "x": 8,
+          "y": 2
+        },
+        "config": {
+          "type": "data_table",
+          "title": "Agent Details",
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "custom",
+                  "max_lines": 1
+                },
+                "value": {
+                  "type": "auto"
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Version",
+              "filter": {
+                "language": "kql",
+                "expression": "\"elastic_agent.version\": *"
+              },
+              "field": "elastic_agent.version",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "Architecture",
+              "filter": {
+                "language": "kql",
+                "expression": "\"host.architecture\": *"
+              },
+              "field": "host.architecture",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "OS",
+              "filter": {
+                "language": "kql",
+                "expression": "\"host.os.name\": *"
+              },
+              "field": "host.os.name",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "OS Version",
+              "filter": {
+                "language": "kql",
+                "expression": "\"host.os.version\": *"
+              },
+              "field": "host.os.version",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "Kernel",
+              "filter": {
+                "language": "kql",
+                "expression": "\"host.os.kernel\": *"
+              },
+              "field": "host.os.kernel",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "Last Seen",
+              "filter": {
+                "language": "kql",
+                "expression": "\"@timestamp\": *"
+              },
+              "field": "@timestamp",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Selected Agent",
+              "fields": [
+                "agent.name"
+              ],
+              "limit": 5,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 5,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "ca491918-8011-4c39-b855-e13ae7b9b581",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 5,
+          "x": 8,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "c53da947-80c1-4b7a-8772-542336201200",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "duration",
+                "from": "ms",
+                "to": "auto-approximate",
+                "suffix": " "
+              },
+              "label": " Uptime",
+              "filter": {
+                "language": "kql",
+                "expression": "\"beat.stats.info.uptime.ms\": *"
+              },
+              "field": "beat.stats.info.uptime.ms",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "breakdown_by": {
+            "operation": "terms",
+            "fields": [
+              "component.id"
+            ],
+            "limit": 5,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "columns": 3,
+            "collapse_by": "max"
+          },
+          "hide_title": true
+        },
+        "id": "21961c2f-d420-4482-964e-5e7799545c7f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 5,
+          "x": 13,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "a56d2368-a048-4c48-a261-e878eb2690c8",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent.elastic_agent"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Components",
+              "field": "component.id",
+              "empty_as_null": true,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "e3042c9b-987d-41fa-bc6b-0a73565ef278",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 4,
+          "x": 18,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "elastic_agent.id",
+                "operator": "exists"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": "Datasets",
+              "field": "data_stream.dataset",
+              "empty_as_null": true,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "6546c431-8922-4c36-8546-822a6e3f0804",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 4,
+          "x": 22,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "a56d2368-a048-4c48-a261-e878eb2690c8",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent.elastic_agent"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Metrics Ingest",
+              "time_scale": "s",
+              "empty_as_null": true,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "7f03f527-3388-4868-b7d6-337a4e77c89e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 5,
+          "x": 26,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "f763ed3b-a574-481a-baf5-a78df962c86c",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "negate": true,
+                "operator": "is",
+                "value": "elastic_agent.elastic_agent"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": true
+              },
+              "label": "Logs Ingest",
+              "time_scale": "s",
+              "empty_as_null": true,
+              "operation": "count",
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "a7989318-9ba9-41ba-94f0-ec95e1993ab0",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 5,
+          "x": 31,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "suffix": " Events",
+                "compact": true
+              },
+              "label": "Output Errors",
+              "filter": {
+                "language": "kql",
+                "expression": "\"beat.stats.libbeat.output.write.errors\": *"
+              },
+              "field": "beat.stats.libbeat.output.write.errors",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "color": {
+                "type": "auto"
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "hide_title": true
+        },
+        "id": "fe2be814-0113-4056-a509-69ddd2458dfa",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 6,
+          "x": 36,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "duration",
+                "from": "ms",
+                "to": "s",
+                "decimals": 2,
+                "compact": true
+              },
+              "label": "Write Latency",
+              "filter": {
+                "language": "kql",
+                "expression": "\"beat.stats.libbeat.output.write.latency.histogram.median\": *"
+              },
+              "field": "beat.stats.libbeat.output.write.latency.histogram.median",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "type": "primary",
+              "color": {
+                "type": "dynamic",
+                "range": "absolute",
+                "steps": [
+                  {
+                    "lt": 2000,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 2000,
+                    "lt": 5000,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 5000,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "breakdown_by": {
+            "operation": "terms",
+            "fields": [
+              "component.id"
+            ],
+            "limit": 8,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "columns": 3,
+            "collapse_by": "max"
+          },
+          "hide_title": true
+        },
+        "id": "2d1e0d7f-fedd-40e0-9bdc-cf46148e7527",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 3,
+          "w": 6,
+          "x": 42,
+          "y": 9
+        },
+        "config": {
+          "type": "metric",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "984238c0-f884-4029-adad-bdec62efc673",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": "compact",
+            "primary": {
+              "position": "bottom",
+              "labels": {
+                "alignment": "left"
+              },
+              "value": {
+                "alignment": "right",
+                "sizing": "auto"
+              }
+            }
+          },
+          "metrics": [
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Component Restarts",
+              "field": "beat.stats.info.ephemeral_id",
+              "empty_as_null": true,
+              "operation": "unique_count",
+              "type": "primary",
+              "color": {
+                "type": "dynamic",
+                "range": "absolute",
+                "steps": [
+                  {
+                    "lt": 500,
+                    "color": "#209280"
+                  },
+                  {
+                    "gte": 500,
+                    "lt": 1000,
+                    "color": "#d6bf57"
+                  },
+                  {
+                    "gte": 1000,
+                    "color": "#cc5642"
+                  }
+                ]
+              },
+              "background_chart": {
+                "type": "trend"
+              }
+            }
+          ],
+          "breakdown_by": {
+            "operation": "terms",
+            "fields": [
+              "component.id"
+            ],
+            "limit": 8,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "columns": 3,
+            "collapse_by": "max"
+          },
+          "hide_title": true
+        },
+        "id": "4dfe7f9d-c1a8-4906-9a56-31e2a808f893",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 22,
+          "x": 8,
+          "y": 12
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] CPU Usage",
+          "description": "",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "7f71ff88-5a2c-435c-87ab-13edec063180",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is_one_of",
+                "value": [
+                  "elastic_agent.elastic_agent",
+                  "elastic_agent.endpoint_security"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "linear"
+            },
+            "interpolation": "smooth",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 100,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "collapse_by": "sum",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 1,
+                    "compact": false
+                  },
+                  "label": " CPU Usage",
+                  "operation": "formula",
+                  "formula": "pick_max(\n  pick_max(\n    counter_rate(\n      defaults(\n        divide(\n          max(system.process.cpu.total.time.ms),\n          ifelse(\n            count(kql='system.cpu.cores : *') > 0,\n            max(system.cpu.cores),\n            1\n          )\n        )\n        ,0)\n      )/counter_rate(max(@timestamp)),\n    0\n  ),\n  defaults(max(system.process.cpu.total.pct),0)\n)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6c637f96-6ff3-41f1-93f5-958a105c6749",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 18,
+          "x": 30,
+          "y": 12
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] CPU Throttling",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "zero"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "collapse_by": "max",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Throttle %",
+                  "operation": "formula",
+                  "formula": "pick_max(counter_rate(max(beat.stats.cgroup.cpu.stats.throttled.ns))/1000000000,0)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e46fb4f9-a784-4e8f-abd4-6889a40b64fb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 22,
+          "x": 8,
+          "y": 22
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Memory Usage",
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Memory",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "collapse_by": "sum",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 0
+                  },
+                  "label": " Memory",
+                  "operation": "formula",
+                  "formula": "defaults(\n   max(system.process.memory.rss.bytes),\n   max(system.process.memory.size)\n)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "label": "cgroup limit",
+                  "filter": {
+                    "language": "kql",
+                    "expression": "component.id : \"elastic-agent\" "
+                  },
+                  "field": "system.process.cgroup.memory.mem.limit.bytes",
+                  "operation": "max",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "59293071-891d-47d8-9729-8d109fa8a6a3",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 18,
+          "x": 30,
+          "y": 22
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Max Queue Usage",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "beat.stats.libbeat.pipeline.queue.filled.pct",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "hidden",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : elastic_agent.*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Queue",
+                  "field": "beat.stats.libbeat.pipeline.queue.filled.pct",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "75%",
+                  "operation": "static_value",
+                  "value": 0.75,
+                  "fill": "above",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "91a584c2-e04c-47c5-af83-c547250120d1",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 21,
+          "x": 8,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Acknowledged Events /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "s"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 15,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "collapse_by": "sum",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": true
+                  },
+                  "label": "Success",
+                  "operation": "formula",
+                  "formula": "counter_rate(max(beat.stats.libbeat.output.events.acked), kql='')",
+                  "time_scale": "s",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "label": "Failed",
+                  "operation": "formula",
+                  "formula": "abs(counter_rate(max(beat.stats.libbeat.output.events.total))-counter_rate(max(beat.stats.libbeat.output.events.acked))-counter_rate(max(beat.stats.libbeat.output.events.active)))",
+                  "time_scale": "s",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "6f1753a7-612d-4e25-a33f-8aa3542d3c39",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 19,
+          "x": 29,
+          "y": 32
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events with issues /s",
+          "filters": [
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "beat.stats.libbeat.output.type",
+                "negate": true,
+                "operator": "is",
+                "value": "otelconsumer"
+              }
+            },
+            {
+              "disabled": false,
+              "negate": true,
+              "data_view_id": "b7328148-f1b1-4fb5-9cfc-8f8d66f10a8c",
+              "type": "condition",
+              "condition": {
+                "field": "beat.stats.libbeat.output.type",
+                "negate": true,
+                "operator": "is",
+                "value": ""
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 2
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "beat.stats.libbeat.output.type"
+                ],
+                "limit": 5,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Dropped",
+                  "operation": "formula",
+                  "formula": "counter_rate(max(beat.stats.libbeat.output.events.dropped))",
+                  "time_scale": "s",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Duplicates",
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.duplicates",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Failed",
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.failed",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Too Many",
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.toomany",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d87ea2e6-8959-4b66-b61d-d72386b038ed",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 24,
+          "x": 0,
+          "y": 46
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] CPU Usage",
+          "description": "",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "bc8ad325-8dac-4bb0-8673-21dcdec88caa",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is_one_of",
+                "value": [
+                  "elastic_agent.elastic_agent",
+                  "elastic_agent.endpoint_security"
+                ]
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "visible",
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": true
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "eui_amsterdam_color_blind",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "CPU Usage",
+                  "operation": "formula",
+                  "formula": "pick_max(\n  pick_max(\n    counter_rate(\n      defaults(\n        divide(\n          max(system.process.cpu.total.time.ms),\n          ifelse(\n            count(kql='system.cpu.cores : *') > 0,\n            max(system.cpu.cores),\n            1\n          )\n        )\n        ,0)\n      )/counter_rate(max(@timestamp)),\n    0\n  ),\n  defaults(max(system.process.cpu.total.pct),0)\n)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": false
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e8ddcef1-152d-4e3e-8022-ee7175b44b8d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 12,
+          "w": 24,
+          "x": 24,
+          "y": 46
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Memory Usage",
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : elastic_agent.*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": " ",
+                  "operation": "formula",
+                  "formula": "defaults(\n   max(system.process.memory.rss.bytes),\n   max(system.process.memory.size)\n)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "59d829a2-c460-450d-b3f1-e24463ca8fbc",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 58
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Open Handles",
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "elastic_agent.process"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "field": "system.process.fd.open",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "3f8fc111-60c1-4886-bb6d-3b83cdcf88c5",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 58
+        },
+        "config": {
+          "type": "data_table",
+          "title": "[Elastic Agent] Open Handles",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "e4529f3a-4130-4ecd-9ccc-d68ed04aec15",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent*"
+              }
+            }
+          ],
+          "sampling": 1,
+          "ignore_global_filters": false,
+          "data_source": {
+            "type": "data_view_reference",
+            "ref_id": "metrics-*"
+          },
+          "styling": {
+            "density": {
+              "mode": "default",
+              "height": {
+                "header": {
+                  "type": "auto"
+                }
+              }
+            }
+          },
+          "metrics": [
+            {
+              "label": " Open Handles (Current)",
+              "filter": {
+                "language": "kql",
+                "expression": "\"system.process.fd.open\": *"
+              },
+              "field": "system.process.fd.open",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "format": {
+                "type": "number",
+                "decimals": 0,
+                "compact": false
+              },
+              "label": "Open Handles (Max)",
+              "field": "system.process.fd.open",
+              "operation": "max",
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "Handle Limit (Soft)",
+              "filter": {
+                "language": "kql",
+                "expression": "\"system.process.fd.limit.soft\": *"
+              },
+              "field": "system.process.fd.limit.soft",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            },
+            {
+              "label": "Handle Limit (Hard)",
+              "filter": {
+                "language": "kql",
+                "expression": "\"system.process.fd.limit.hard\": *"
+              },
+              "field": "system.process.fd.limit.hard",
+              "operation": "last_value",
+              "time_field": "@timestamp",
+              "multi_value": true,
+              "visible": true,
+              "color": {
+                "type": "auto"
+              },
+              "alignment": "right"
+            }
+          ],
+          "rows": [
+            {
+              "operation": "terms",
+              "label": "Component",
+              "fields": [
+                "elastic_agent.process"
+              ],
+              "limit": 10,
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "visible": true,
+              "alignment": "left",
+              "color": {
+                "type": "auto"
+              },
+              "click_filter": false
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "0d849dfd-6797-4b44-b296-00d489d87bbb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 67
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Queue Usage",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "beat.stats.libbeat.pipeline.queue.filled.pct",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : elastic_agent.*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Queue",
+                  "field": "beat.stats.libbeat.pipeline.queue.filled.pct",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "75%",
+                  "operation": "static_value",
+                  "value": 0.75,
+                  "fill": "above",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "307d21da-619c-4f4c-8b53-dab72539a21e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 67
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Output write latency",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.write.latency.histogram.median",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "ea5a0af6-28f9-412b-bbd7-99c48037b794",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Beat types",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "metric",
+                  "metric_index": 0,
+                  "direction": "desc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "duration",
+                    "from": "ms",
+                    "to": "s",
+                    "decimals": 2,
+                    "compact": true
+                  },
+                  "label": "Write Latency (Median)",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "field": "beat.stats.libbeat.output.write.latency.histogram.median",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "0932230e-b82c-47c3-81e9-d4506a0e4431",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 76
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Total events rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.total",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " Events",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.total",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "aede4b57-f9c0-4d57-8a28-9fb03f09f779",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 76
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events dropped rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.dropped",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.dropped",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ded80e0c-7b32-4022-bee5-1c224e1ec73b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 85
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Output write batches",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.batches",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "ea5a0af6-28f9-412b-bbd7-99c48037b794",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Beat types",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.batches",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "1a30ba18-2c22-4935-b245-6ec8f1a37ced",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 85
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Output write errors",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.write.errors",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "9ef414bb-7c9f-40b2-a01f-da090834917a",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Beat types",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.write.errors",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "0165de2d-694a-40f5-95e1-855ce4ebd03e",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 94
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Output batch size",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.active",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "a867faed-481f-461e-9416-0b99b025f7a8",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "breakdown_by": {
+                "operation": "terms",
+                "label": "Beat types",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.active",
+                  "operation": "max",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d004044a-99f4-44fa-964a-361accd1810d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 94
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Output write throughput",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.write.bytes",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "4984682b-b209-448b-a8bc-239d1858c0ae",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 2
+                  },
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.write.bytes",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "daff36f6-d0b5-45e8-b0d9-910bace3c15b",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 103
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events failed rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.failed",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.failed",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "ce5bea64-4178-4290-997b-a59455991f3d",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 24,
+          "y": 103
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events acknowledged rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.acked",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "d8c4f995-b5b9-4da1-9c7c-32fd11cfbcee",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.acked",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "b1dcfde7-66f1-41fb-bc7d-d3deef840d4f",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 112
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events TooMany rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.toomany",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.toomany",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "d3b72917-b8be-4c96-b10f-cbca8ebf0a68",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 24,
+          "x": 24,
+          "y": 112
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Events duplicate rate /s",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "group",
+              "group": {
+                "operator": "and",
+                "conditions": [
+                  {
+                    "field": "beat.stats.libbeat.output.events.duplicates",
+                    "operator": "exists"
+                  },
+                  {
+                    "field": "beat.stats.libbeat.output.type",
+                    "negate": true,
+                    "operator": "is",
+                    "value": "otelconsumer"
+                  }
+                ]
+              }
+            },
+            {
+              "disabled": false,
+              "data_view_id": "1f53ae6d-f631-4ef1-8da4-e1918fd352af",
+              "type": "condition",
+              "condition": {
+                "field": "data_stream.dataset",
+                "operator": "is",
+                "value": "elastic_agent.*"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 10,
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "label": " ",
+                  "filter": {
+                    "language": "kql",
+                    "expression": ""
+                  },
+                  "time_scale": "s",
+                  "field": "beat.stats.libbeat.output.events.duplicates",
+                  "operation": "counter_rate",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "08f30154-3b1f-475b-acd2-6a6f6415b9eb",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 122
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Queue Depth",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "metrics-*",
+              "type": "condition",
+              "condition": {
+                "field": "beat.stats.libbeat.pipeline.queue.filled.events",
+                "operator": "exists"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "none"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "query": {
+            "language": "kql",
+            "expression": "data_stream.dataset : elastic_agent.*"
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "Queue",
+                  "operation": "formula",
+                  "formula": "max(beat.stats.libbeat.pipeline.queue.filled.events)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "format": {
+                    "type": "number",
+                    "decimals": 0,
+                    "compact": false
+                  },
+                  "label": "max_events",
+                  "field": "beat.stats.libbeat.pipeline.queue.max_events",
+                  "operation": "max",
+                  "color": {
+                    "type": "static",
+                    "color": "#e7664c"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e85d17e8-acc8-461c-91ca-942b6f13bd87",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 10,
+          "w": 24,
+          "x": 24,
+          "y": 122
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] Cgroup Memory Usage",
+          "filters": [
+            {
+              "disabled": false,
+              "data_view_id": "49f6230d-caf4-482d-a382-80072116cd60",
+              "type": "condition",
+              "condition": {
+                "field": "elastic_agent.process",
+                "operator": "is",
+                "value": "elastic-agent"
+              }
+            }
+          ],
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            },
+            "areas": {
+              "fill_opacity": 0.3,
+              "fill": "solid"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "area_stacked",
+              "y": [
+                {
+                  "format": {
+                    "type": "bytes",
+                    "decimals": 0
+                  },
+                  "label": " Memory",
+                  "operation": "formula",
+                  "formula": "max(system.process.cgroup.memory.mem.usage.bytes)",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            },
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "reference_lines",
+              "thresholds": [
+                {
+                  "label": "Container Limit",
+                  "field": "system.process.cgroup.memory.mem.limit.bytes",
+                  "operation": "max",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "axis": "y"
+                }
+              ]
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "e651fb9f-763d-4c9d-80d7-7c56adb98883",
+        "type": "vis"
+      },
+      {
+        "grid": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 132
+        },
+        "config": {
+          "type": "xy",
+          "title": "[Elastic Agent] CPU Throttling",
+          "legend": {
+            "visibility": "auto",
+            "statistics": [
+              "current_and_last_value"
+            ],
+            "placement": "outside",
+            "layout": {
+              "type": "grid",
+              "truncate": {
+                "max_lines": 1,
+                "enabled": true
+              }
+            },
+            "position": "right",
+            "size": "l"
+          },
+          "axis": {
+            "x": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "domain": {
+                "type": "fit",
+                "rounding": false
+              }
+            },
+            "y": {
+              "title": {
+                "text": "",
+                "visible": false
+              },
+              "ticks": {
+                "visible": true
+              },
+              "grid": {
+                "visible": true
+              },
+              "labels": {
+                "orientation": "horizontal"
+              },
+              "scale": "linear",
+              "domain": {
+                "type": "full",
+                "rounding": true
+              }
+            }
+          },
+          "styling": {
+            "overlays": {
+              "partial_buckets": {
+                "visible": false
+              },
+              "current_time_marker": {
+                "visible": false
+              }
+            },
+            "fitting": {
+              "type": "zero"
+            },
+            "interpolation": "linear",
+            "points": {
+              "visibility": "auto"
+            }
+          },
+          "layers": [
+            {
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "data_view_reference",
+                "ref_id": "metrics-*"
+              },
+              "type": "line",
+              "breakdown_by": {
+                "operation": "terms",
+                "fields": [
+                  "component.id"
+                ],
+                "limit": 15,
+                "other_bucket": {
+                  "include_documents_without_field": false
+                },
+                "rank_by": {
+                  "type": "alphabetical",
+                  "direction": "asc"
+                },
+                "color": {
+                  "mode": "categorical",
+                  "palette": "elastic_line_optimized",
+                  "mapping": []
+                },
+                "aggregate_first": true
+              },
+              "y": [
+                {
+                  "format": {
+                    "type": "percent",
+                    "decimals": 2,
+                    "compact": false
+                  },
+                  "label": "Throttle %",
+                  "operation": "formula",
+                  "formula": "counter_rate(max(beat.stats.cgroup.cpu.stats.throttled.ns))/1000000000",
+                  "axis": "y",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "x": {
+                "operation": "date_histogram",
+                "field": "@timestamp",
+                "suggested_interval": "m",
+                "use_original_time_range": false,
+                "include_empty_rows": false,
+                "drop_partial_intervals": true
+              }
+            }
+          ],
+          "hide_title": false
+        },
+        "id": "4cf0690a-3b5c-4224-9941-cc836a26163f",
+        "type": "vis"
+      }
+    ],
+    "pinned_panels": [
+      {
+        "id": "eb9c5004-7ad4-43f1-b707-54f4ee26b720",
+        "width": "medium",
+        "grow": true,
+        "config": {
+          "title": "Agent Hostname",
+          "use_global_filters": true,
+          "ignore_validations": false,
+          "values_source": "field",
+          "data_view_id": "metrics-*",
+          "field_name": "agent.name",
+          "exclude": false,
+          "exists_selected": false,
+          "run_past_timeout": false,
+          "search_technique": "prefix",
+          "selected_options": [],
+          "single_select": true,
+          "sort": {
+            "by": "_count",
+            "direction": "desc"
+          }
+        },
+        "type": "options_list_control"
+      }
+    ]
+  },
+  "meta": {
+    "created_at": "2026-08-12T18:16:27.890Z",
+    "managed": true,
+    "updated_at": "2026-08-12T18:16:30.183Z",
+    "version": "WzM4NCwxXQ=="
+  },
+  "warnings": [
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Agent Metrics**\n\nThis dashboard is used to show detailed metrics related to the specific agent used in the filter.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        },
+        "hide_title": true
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "id": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "This dashboard is designed to be viewed only after filtering to a specific Agent.",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        }
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "## Agent-level Metrics",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        }
+      }
+    },
+    {
+      "type": "dropped_panel",
+      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
+      "panel_type": "legacy_vis",
+      "panel_config": {
+        "savedVis": {
+          "data": {
+            "aggs": [],
+            "searchSource": {
+              "filter": [],
+              "query": {
+                "language": "kuery",
+                "query": ""
+              }
+            }
+          },
+          "description": "",
+          "params": {
+            "fontSize": 12,
+            "markdown": "## Component-Level Metrics",
+            "openLinksInNewTab": false
+          },
+          "title": "",
+          "type": "markdown",
+          "uiState": {}
+        }
+      }
+    }
+  ]
+}

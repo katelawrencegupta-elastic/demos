@@ -1,0 +1,48 @@
+{
+  "name": ".alerts-transform.health.alerts-mappings",
+  "component_template": {
+    "template": {
+      "settings": {},
+      "mappings": {
+        "dynamic": "strict",
+        "properties": {
+          "kibana": {
+            "properties": {
+              "alert": {
+                "properties": {
+                  "results": {
+                    "dynamic": false,
+                    "type": "object",
+                    "properties": {
+                      "transform_state": {
+                        "type": "keyword"
+                      },
+                      "transform_id": {
+                        "type": "keyword"
+                      },
+                      "node_name": {
+                        "type": "keyword"
+                      },
+                      "description": {
+                        "type": "text"
+                      },
+                      "health_status": {
+                        "type": "keyword"
+                      },
+                      "issues": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "_meta": {
+      "managed": true
+    }
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "name": "logs-azure_openai.logs-1.14.0",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }} {{ _ingest.on_failure_processor_type }}"
+      }
+    }
+  ],
+  "modified_date_millis": 1786643486652,
+  "description": "Pipeline for parsing azure open_ai logs.",
+  "_meta": {
+    "package": {
+      "name": "azure_openai"
+    },
+    "managed_by": "fleet",
+    "managed": true
+  },
+  "created_date_millis": 1786643486652,
+  "processors": [
+    {
+      "rename": {
+        "ignore_missing": true,
+        "description": "Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.",
+        "field": "message",
+        "target_field": "event.original",
+        "if": "ctx.event?.original == null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "description": "The `message` field is no longer required if the document has an `event.original` field.",
+        "field": "message",
+        "if": "ctx.event?.original != null"
+      }
+    },
+    {
+      "json": {
+        "field": "event.original",
+        "target_field": "azure.open_ai"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.resourceId",
+        "target_field": "azure.resource.id"
+      }
+    },
+    {
+      "drop": {
+        "ignore_failure": true,
+        "description": "Drop non Azure OpenAI logs.",
+        "if": "ctx.azure.open_ai.category != 'Audit' && ctx.azure.open_ai.category != 'RequestResponse' && ctx.azure.open_ai.category != 'GatewayLogs'"
+      }
+    },
+    {
+      "json": {
+        "on_failure": [
+          {
+            "remove": {
+              "field": "azure.open_ai.properties"
+            }
+          },
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "json-extract-stringly-Properties",
+        "field": "azure.open_ai.properties",
+        "if": "ctx.azure?.open_ai?.properties instanceof String"
+      }
+    },
+    {
+      "script": {
+        "description": "Convert Azure JSON keys to snake case.",
+        "tag": "azure-json-keys-to-snake-case",
+        "source": "Map keysToSnakeCase(Map m) {\n  def regex = /_?([a-z])([A-Z]+)/;\n  def out = [:];\n\n  for (entry in m.entrySet()) {\n    def k = entry.getKey();\n    def v = entry.getValue();\n\n    if (v instanceof Map) {\n      v = keysToSnakeCase(v);\n    } else if (v instanceof List) {\n      for (int i = 0; i < v.size(); i++) {\n        def item = v.get(i);\n        if (item instanceof Map) {\n          v.set(i, keysToSnakeCase(item));\n        }\n      }\n    }\n\n    k = regex.matcher(k).replaceAll('$1_$2').toLowerCase();\n    out.put(k, v);\n  }\n\n  return out;\n}\n\nctx.azure['open_ai'] = keysToSnakeCase(ctx.azure.open_ai);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "json": {
+        "field": "azure.open_ai.properties.backend_request_body",
+        "if": "ctx.azure?.open_ai?.properties?.backend_request_body instanceof String"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.azure.open_ai.properties.backend_request != null) {\n  ctx.temp_request = new HashMap();\n  for (String key : ctx.azure.open_ai.properties.backend_request.keySet()) {\n    ctx.temp_request[key.replace('.', '_')] = ctx.azure.open_ai.properties.backend_request.get(key);\n  }\n  ctx.azure.open_ai.properties.backend_request = ctx.temp_request; ctx.remove('temp_request');\n}"
+      }
+    },
+    {
+      "json": {
+        "ignore_failure": true,
+        "field": "azure.open_ai.properties.backend_response_body",
+        "if": "ctx.azure?.open_ai?.properties?.backend_response_body instanceof String"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.azure.open_ai.properties.backend_response != null) {\n  ctx.temp_response = new HashMap();\n  for (String key : ctx.azure.open_ai.properties.backend_response.keySet()) {\n    ctx.temp_response[key.replace('.', '_')] = ctx.azure.open_ai.properties.backend_response.get(key);\n  }\n  ctx.azure.open_ai.properties.backend_response = ctx.temp_response; ctx.remove('temp_response');\n}",
+        "lang": "painless"
+      }
+    },
+    {
+      "date": {
+        "ignore_failure": true,
+        "formats": [
+          "ISO8601"
+        ],
+        "field": "azure.open_ai.time",
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": "azure.open_ai.time",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "ignore_missing": true,
+        "tag": "convert-level",
+        "field": "azure.open_ai.level",
+        "target_field": "log.level",
+        "type": "string"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-level",
+        "field": "azure.open_ai.level"
+      }
+    },
+    {
+      "convert": {
+        "on_failure": [
+          {
+            "rename": {
+              "ignore_missing": true,
+              "on_failure": [
+                {
+                  "append": {
+                    "field": "error.message",
+                    "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+                  }
+                }
+              ],
+              "tag": "rename-caller_ip_address",
+              "field": "azure.open_ai.caller_ip_address",
+              "target_field": "source.address"
+            }
+          }
+        ],
+        "field": "azure.open_ai.caller_ip_address",
+        "target_field": "source.ip",
+        "ignore_missing": true,
+        "tag": "convert-caller_ip_address",
+        "type": "ip",
+        "if": "ctx.azure.open_ai.category == 'GatewayLogs'"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-gatewaylog-caller_ip_address",
+        "field": [
+          "azure.open_ai.caller_ip_address"
+        ],
+        "if": "ctx.source?.ip != null && ctx.azure.open_ai.category == 'GatewayLogs'"
+      }
+    },
+    {
+      "geoip": {
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    },
+    {
+      "geoip": {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "ignore_missing": true,
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.asn",
+        "target_field": "source.as.number"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx?.azure?.open_ai?.result_type != null && ctx?.azure?.open_ai?.result_type instanceof String && ctx?.azure?.open_ai?.result_type.toLowerCase() == \"succeeded\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "failure",
+        "if": "ctx?.azure?.open_ai?.result_type != null && ctx?.azure?.open_ai?.result_type instanceof String && ctx?.azure?.open_ai?.result_type.toLowerCase() == \"failed\""
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-properties_result_type",
+        "field": "azure.open_ai.result_type",
+        "if": "ctx.azure?.open_ai?.result_type != null && ctx.azure?.open_ai?.category == 'GatewayLogs'"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.request_size",
+        "target_field": "azure.open_ai.properties.request_length"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.response_size",
+        "target_field": "azure.open_ai.properties.response_length"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.backend_response_body.usage.prompt_tokens",
+        "target_field": "azure.open_ai.properties.backend_response_body.usage.input_tokens"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.backend_response_body.usage.completion_tokens",
+        "target_field": "azure.open_ai.properties.backend_response_body.usage.output_tokens"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.backend_response_body.choices.content_filter_results.protected_material_code.citation.URL",
+        "target_field": "azure.open_ai.properties.backend_response_body.choices.content_filter_results.protected_material_code.citation.url"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "List prompt_categories = new ArrayList(); Map self_harm_category = new HashMap(); if(ctx.azure?.open_ai?.properties?.backend_response_body?.error?.innererror?.content_filter_result?.self_harm?.filtered == true) {\n  self_harm_category.put(\"category_name\", \"self_harm\");\n  self_harm_category.put(\"severity\", ctx.azure.open_ai.properties.backend_response_body.error.innererror.content_filter_result.self_harm.severity);\n} prompt_categories.add(self_harm_category); Map sexual_category = new HashMap(); if(ctx.azure?.open_ai?.properties?.backend_response_body?.error?.innererror?.content_filter_result?.sexual?.filtered == true) {\n  sexual_category.put(\"category_name\", \"sexual\");\n  sexual_category.put(\"severity\", ctx.azure.open_ai.properties.backend_response_body.error.innererror.content_filter_result.sexual.severity);\n} prompt_categories.add(sexual_category); Map hate_category = new HashMap(); if(ctx.azure?.open_ai?.properties?.backend_response_body?.error?.innererror?.content_filter_result?.hate?.filtered == true) {\n  hate_category.put(\"category_name\", \"hate\");\n  hate_category.put(\"severity\", ctx.azure.open_ai.properties.backend_response_body.error.innererror.content_filter_result.hate.severity);\n} prompt_categories.add(hate_category); Map violence_category = new HashMap(); if(ctx.azure?.open_ai?.properties?.backend_response_body?.error?.innererror?.content_filter_result?.violence?.filtered == true) {\n  violence_category.put(\"category_name\", \"violence\");\n  violence_category.put(\"severity\", ctx.azure.open_ai.properties.backend_response_body.error.innererror.content_filter_result.violence.severity);\n} prompt_categories.add(violence_category);\nctx.azure.open_ai.properties.backend_response_body.error.innererror.content_filtered_categories = prompt_categories;",
+        "lang": "painless"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "List response_categories = new ArrayList(); for(choice in ctx.azure.open_ai.properties.backend_response_body.choices)\n  {\n    if(choice.content_filter_results?.self_harm?.filtered == true) {\n      Map self_harm_category = new HashMap();\n      self_harm_category.put(\"category_name\", \"self_harm\");\n      self_harm_category.put(\"severity\", choice.content_filter_results.self_harm.severity);\n      response_categories.add(self_harm_category);\n    }\n    if(choice.content_filter_results?.sexual?.filtered == true) {\n      Map sexual_category = new HashMap();\n      sexual_category.put(\"category_name\", \"sexual\");\n      sexual_category.put(\"severity\", choice.content_filter_results.sexual.severity);\n      response_categories.add(sexual_category);\n    }\n    if(choice.content_filter_results?.hate?.filtered == true) {\n      Map hate_category = new HashMap();\n      hate_category.put(\"category_name\", \"hate\");\n      hate_category.put(\"severity\", choice.content_filter_results.hate.severity);\n      response_categories.add(hate_category);\n    }\n    if(choice.content_filter_results?.violence?.filtered == true) {\n      Map violence_category = new HashMap();\n      violence_category.put(\"category_name\", \"violence\");\n      violence_category.put(\"severity\", choice.content_filter_results.violence.severity);\n      response_categories.add(violence_category);\n    }\n} ctx.azure.open_ai.properties.backend_response_body.content_filtered_categories = response_categories;",
+        "lang": "painless",
+        "if": "ctx.azure?.open_ai?.properties?.backend_response_body?.choices != null"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.method",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.properties.response_code",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "uri_parts": {
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.on_failure_pipeline}}} failed with message: {{{_ingest.on_failure_message}}}"
+            }
+          }
+        ],
+        "tag": "uri_parts-properties-request_uri",
+        "field": "azure.open_ai.properties.url",
+        "if": "ctx.azure?.open_ai?.properties?.url != null",
+        "keep_original": true
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-properties_url",
+        "field": "azure.open_ai.properties.url",
+        "if": "ctx.url?.original != null"
+      }
+    },
+    {
+      "remove": {
+        "ignore_missing": true,
+        "tag": "remove-request-response-body",
+        "field": [
+          "azure.open_ai.properties.response_body",
+          "azure.open_ai.properties.request_body"
+        ]
+      }
+    },
+    {
+      "rename": {
+        "ignore_missing": true,
+        "field": "azure.open_ai.duration_ms",
+        "target_field": "event.duration"
+      }
+    },
+    {
+      "script": {
+        "ignore_failure": true,
+        "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
+        "lang": "painless",
+        "params": {
+          "param_nano": 1000000
+        }
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure_openai.logs-1.14.0-azure-shared-pipeline",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "description": "Drops null/empty values recursively.",
+        "source": "boolean drop(Object o) {\n  if (o == null || o == \"\") {\n    return true;\n  } else if (o instanceof Map) {\n    ((Map) o).values().removeIf(v -> drop(v));\n    return (((Map) o).size() == 0);\n  } else if (o instanceof List) {\n    ((List) o).removeIf(v -> drop(v));\n    return (((List) o).length == 0);\n  }\n  return false;\n}\ndrop(ctx);\n",
+        "lang": "painless"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "global@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Global pipeline for all data streams"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs`"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure_openai.integration@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for all data streams of type `logs` defined by the `azure_openai` integration"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "logs-azure_openai.logs@custom",
+        "ignore_missing_pipeline": true,
+        "description": "[Fleet] Pipeline for the `azure_openai.logs` dataset"
+      }
+    }
+  ]
+}
