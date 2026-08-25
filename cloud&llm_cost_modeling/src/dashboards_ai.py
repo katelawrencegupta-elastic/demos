@@ -267,5 +267,8 @@ def publish_ai():
     _ensure_data_view("traces-agent_builder.otel-*", "traces-agent_builder.otel-*")
     _ensure_data_view("logs-elastic.inference_token_usage-*",
                       "logs-elastic.inference_token_usage-*")
+    from src.setup_cmd import patch_inference_token_usage_dashboard
+    print("== OOTB [Elastic] Inference Token Usage ==")
+    patch_inference_token_usage_dashboard()
     print(f"== PUT dashboard {DASHBOARD_ID_AI} ==")
     return _put_dashboard(DASHBOARD_ID_AI, build_ai_assistant_dashboard())

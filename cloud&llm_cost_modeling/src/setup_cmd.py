@@ -230,7 +230,52 @@ def pin_azure_openai_dashboards():
         _pin_dashboard_time_range(did)
 
 
-def run():
+INFERENCE_TOKEN_USAGE_DATA_VIEW_ID = "kibana-inference-token-usage"
+INFERENCE_TOKEN_USAGE_DASHBOARD_ID = "kibana-inference-token-usage"
+INFERENCE_TOKEN_USAGE_INDEX = "logs-elastic.inference_token_usage-default"
+
+
+def patch_inference_token_usage_dashboard():
+    """OOTB [Elastic] Inference Token Usage dashboard.
+
+    Kibana installs a data view titled `.kibana-inference-token-usage` (hidden
+    stream). On Serverless users cannot create dot-prefixed indices, the stream
+    never materializes, and the data view has empty fields — every Lens panel
+    errors. Point the same data-view id at the demo stream that already has
+    the token_usage / model / inference mappings.
+    """
+    r = requests.get(
+        f"{KIBANA_URL}/api/data_views/data_view/{INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}",
+        headers=KBN_HEADERS, timeout=30)
+    if r.status_code != 200:
+        print(f"  [warn] data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}: {r.status_code}")
+        return
+    current = r.json()["data_view"]
+    title = current.get("title")
+    fields = current.get("fields") or {}
+    n_fields = len(fields) if isinstance(fields, dict) else 0
+    already = (title == INFERENCE_TOKEN_USAGE_INDEX and n_fields > 0)
+    if already:
+        print(f"  [ok] data view already -> {INFERENCE_TOKEN_USAGE_INDEX} ({n_fields} fields)")
+    else:
+        r = requests.post(
+            f"{KIBANA_URL}/api/data_views/data_view/{INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}",
+            headers=KBN_HEADERS, timeout=30, json={
+                "refresh_fields": True,
+                "data_view": {
+                    "title": INFERENCE_TOKEN_USAGE_INDEX,
+                    "name": "Inference Token Usage",
+                    "timeFieldName": "@timestamp",
+                    "allowNoIndex": True,
+                },
+            })
+        if r.status_code >= 300:
+            print(f"  [warn] could not retarget data view: {r.status_code} {r.text[:400]}")
+            return
+        updated = r.json().get("data_view") or r.json()
+        n_fields = len(updated.get("fields") or {})
+        print(f"  [ok] data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID} -> "
+              f"{INFERENCE_TOKEN_USAGE_INDEX} ({n_fields} fields)")
     print("== checking Elasticsearch ==")
     r = requests.get(ELASTIC_URL, headers=ES_HEADERS, timeout=30)
     r.raise_for_status()
@@ -255,4 +300,6 @@ def run():
     from src.generators.elastic_ai import _ensure_template
     _ensure_template()
     print("  [ok] logs-elastic.inference_token_usage-*")
+    print("== OOTB Inference Token Usage dashboard (data view + time range) ==")
+    patch_inference_token_usage_dashboard()
     print("setup complete.")
