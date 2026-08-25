@@ -27,31 +27,66 @@
       "grid": {
         "y": 0
       },
-      "id": "e3b13bcf-4a3c-406a-8678-971983bba0d1",
+      "id": "d231c64a-44cf-4951-b91d-5cbab9af57e6",
       "panels": [
         {
           "grid": {
             "x": 0,
             "y": 0,
-            "w": 24,
+            "w": 20,
             "h": 10
           },
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.",
+            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.\n\nElastic AI Assistant / Agent Builder usage and the managed inference token dashboard are linked at right.",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "d70b7e6e-c562-4ab1-a983-62e6e8f2961c",
+          "id": "2bb324ca-aff3-47da-aeca-ccbaac38dee3",
           "type": "markdown"
         },
         {
           "grid": {
-            "x": 24,
+            "x": 20,
             "y": 0,
-            "w": 24,
+            "w": 12,
+            "h": 10
+          },
+          "config": {
+            "title": "Elastic AI",
+            "links": [
+              {
+                "label": "AI Assistant & inference usage",
+                "type": "dashboardLink",
+                "destination": "meridian-ai-assistant-inference-usage",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "[Elastic] Inference Token Usage",
+                "type": "dashboardLink",
+                "destination": "kibana-inference-token-usage",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              }
+            ]
+          },
+          "id": "3791b3e9-08a5-41ab-abc6-b9f2cc6f27e1",
+          "type": "links"
+        },
+        {
+          "grid": {
+            "x": 32,
+            "y": 0,
+            "w": 16,
             "h": 10
           },
           "config": {
@@ -169,7 +204,7 @@
               }
             ]
           },
-          "id": "478da001-eb81-4c42-97d1-e7d4640e17a1",
+          "id": "77607c48-fe46-4362-9ede-9857ba51caf0",
           "type": "links"
         }
       ]
@@ -180,7 +215,7 @@
       "grid": {
         "y": 12
       },
-      "id": "a4a4e8f7-e920-4936-9c0f-5572b69e543a",
+      "id": "12d8d0e7-d370-47e1-a1f6-7bf4fe937da3",
       "panels": [
         {
           "grid": {
@@ -197,7 +232,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "2c385b50-b631-40e4-88a1-1b01e4d5db43",
+          "id": "9a9d9358-3f24-4946-ace0-b5a733095f73",
           "type": "markdown"
         },
         {
@@ -240,7 +275,7 @@
               }
             ]
           },
-          "id": "e1b1b20c-6e74-4a70-8299-54e773b015cf",
+          "id": "ba8ee931-1ad3-47d6-aa3a-501192f2ddc6",
           "type": "vis"
         },
         {
@@ -283,7 +318,7 @@
               }
             ]
           },
-          "id": "d7b434ee-0552-4d75-8227-36521ef35bdf",
+          "id": "1f6179d7-b3e8-4e0c-b03c-58b6668bfdf2",
           "type": "vis"
         },
         {
@@ -326,7 +361,7 @@
               }
             ]
           },
-          "id": "c6d18661-8c87-4867-8004-f1bdd8b43264",
+          "id": "f8713d46-27d5-42d8-806d-bb677d6d3d6e",
           "type": "vis"
         },
         {
@@ -369,7 +404,7 @@
               }
             ]
           },
-          "id": "40421794-b9a3-4eba-a9b6-4e266d966ed4",
+          "id": "f45b6ca7-5b67-42a9-9680-0a218de847cf",
           "type": "vis"
         },
         {
@@ -425,7 +460,7 @@
               }
             ]
           },
-          "id": "c77b54fa-cdc2-4c1f-b100-ea01fadff9fc",
+          "id": "a7b9573d-7f82-476f-aa64-77ba1f5912ae",
           "type": "vis"
         },
         {
@@ -541,7 +576,7 @@
               }
             ]
           },
-          "id": "62132ac3-73c5-4675-8665-f37c45c7b9c5",
+          "id": "a19bd5be-5e28-4ea0-bbc6-de3605baa16b",
           "type": "vis"
         }
       ]
@@ -552,7 +587,7 @@
       "grid": {
         "y": 36
       },
-      "id": "7a30eea3-e0cb-446d-bee0-01c00cdfbf75",
+      "id": "d314471a-1f7a-4796-897b-4c2d5647eae1",
       "panels": [
         {
           "grid": {
@@ -569,7 +604,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "b2e49e15-803f-4d28-a875-e4e50dd1356f",
+          "id": "325ba78e-0a2e-4984-b602-aa031c1833c1",
           "type": "markdown"
         },
         {
@@ -676,7 +711,7 @@
               }
             ]
           },
-          "id": "49457b8c-b655-44db-8e3e-2ca4fa222a34",
+          "id": "b418ea3b-4544-4ea7-af44-1f97f0667d63",
           "type": "vis"
         },
         {
@@ -783,7 +818,7 @@
               }
             ]
           },
-          "id": "1d5a1ad0-cc7f-4d09-be42-8beaebf94761",
+          "id": "9b064120-288e-4a56-b230-8d269a9837b8",
           "type": "vis"
         },
         {
@@ -839,7 +874,7 @@
               }
             ]
           },
-          "id": "a64fd87e-ae6b-47d6-a523-67290c128449",
+          "id": "973d004a-201f-4403-8135-ab23d61a6cd0",
           "type": "vis"
         },
         {
@@ -946,7 +981,7 @@
               }
             ]
           },
-          "id": "643c0e84-aae7-44b3-bc93-b83eb9c94bcc",
+          "id": "c38ebba7-10e2-4054-88e3-de4d55721785",
           "type": "vis"
         },
         {
@@ -1053,7 +1088,7 @@
               }
             ]
           },
-          "id": "acb1d2fb-7788-42dc-82b3-91b0bd7376ac",
+          "id": "3d5b7a51-c48a-4b76-86ea-4819ad9a5fda",
           "type": "vis"
         },
         {
@@ -1126,7 +1161,7 @@
               }
             ]
           },
-          "id": "6ede032b-b46b-4ecf-b270-ae55fd86cfb6",
+          "id": "64ea2049-6162-4573-aa25-795d417aa75e",
           "type": "vis"
         },
         {
@@ -1200,7 +1235,7 @@
               }
             ]
           },
-          "id": "178f3502-a2e2-4dba-9667-64a75988442e",
+          "id": "7a0b55a9-23ac-49c5-9190-90f2cc9e939e",
           "type": "vis"
         },
         {
@@ -1307,7 +1342,7 @@
               }
             ]
           },
-          "id": "29624673-32a1-4f3a-aba1-ec40f70bb163",
+          "id": "045d043c-74e7-405d-9191-c5198b439fa6",
           "type": "vis"
         },
         {
@@ -1414,7 +1449,7 @@
               }
             ]
           },
-          "id": "353fa58f-cad2-47d9-a684-58dd199bcc46",
+          "id": "341496e9-d86f-4122-a881-ba87b29ed36b",
           "type": "vis"
         }
       ]
@@ -1425,7 +1460,7 @@
       "grid": {
         "y": 90
       },
-      "id": "f0910111-6d2e-48db-a510-96aece40d1c7",
+      "id": "b08765a4-d29a-4e9b-8898-659880366b77",
       "panels": [
         {
           "grid": {
@@ -1442,7 +1477,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "1e5b5d38-bb01-4025-9461-96b2d3bf08e1",
+          "id": "f2891900-11a4-41a6-bfe4-e2b1ef7115a0",
           "type": "markdown"
         },
         {
@@ -1546,7 +1581,7 @@
               }
             ]
           },
-          "id": "b2a7b4ac-0eff-4649-9786-5afa1b1bad74",
+          "id": "10058cc1-643a-423b-b678-fd2584c2ed1c",
           "type": "vis"
         },
         {
@@ -1650,7 +1685,7 @@
               }
             ]
           },
-          "id": "ba090ec3-539f-4029-b7f3-86a689fdadbc",
+          "id": "b01ef328-ed88-4c38-8ca9-a9b748bd6997",
           "type": "vis"
         },
         {
@@ -1754,7 +1789,7 @@
               }
             ]
           },
-          "id": "790e09ad-a9a3-4e60-b0c2-56d137b9da1a",
+          "id": "c0b426b6-0670-44c4-906d-895e921af09a",
           "type": "vis"
         },
         {
@@ -1861,7 +1896,7 @@
               }
             ]
           },
-          "id": "ce53173b-386c-4820-b74c-6857979ba6e4",
+          "id": "6934438f-f039-4567-9625-e2355e8de47e",
           "type": "vis"
         },
         {
@@ -1933,7 +1968,7 @@
               }
             ]
           },
-          "id": "1ef89785-cace-4676-a225-571f7f4ab556",
+          "id": "16ad15e1-cbdd-410f-a655-cd47072d928b",
           "type": "vis"
         }
       ]
@@ -1944,7 +1979,7 @@
       "grid": {
         "y": 128
       },
-      "id": "f24757dc-35b8-4ee5-a59c-ee8cb1b5aeaa",
+      "id": "07db5000-8140-43a4-86fd-73480f763d37",
       "panels": [
         {
           "grid": {
@@ -1961,7 +1996,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "4df2b9d4-f972-493c-9ae9-28df83942aa6",
+          "id": "0679180b-356b-4b9b-bc70-dafaa93df32d",
           "type": "markdown"
         },
         {
@@ -2065,7 +2100,7 @@
               }
             ]
           },
-          "id": "1004f708-b44f-4799-a256-2dd177e33619",
+          "id": "3cad2833-de61-44f8-8cd5-464e414434a0",
           "type": "vis"
         },
         {
@@ -2108,7 +2143,7 @@
               }
             ]
           },
-          "id": "4a5ff285-b436-41d5-8b12-f90b8a000bfb",
+          "id": "85f7a398-9015-4b85-8cfa-0462a1de841b",
           "type": "vis"
         },
         {
@@ -2151,7 +2186,7 @@
               }
             ]
           },
-          "id": "a90d633a-d53c-4b5d-aeee-e6dce9f03cce",
+          "id": "2236b0b5-d1dd-4b8f-b940-d10b8f555ccb",
           "type": "vis"
         },
         {
@@ -2255,7 +2290,7 @@
               }
             ]
           },
-          "id": "aa15c532-4f12-4691-8482-bcef22424b24",
+          "id": "84835c6c-a7e3-438f-85f7-b08810f7f06a",
           "type": "vis"
         },
         {
@@ -2359,7 +2394,7 @@
               }
             ]
           },
-          "id": "1b68e2fa-d207-479b-a7ef-37bbb8dab703",
+          "id": "63894ed9-a88d-4b75-a8f7-ccbe1e41361e",
           "type": "vis"
         }
       ]
@@ -2370,7 +2405,7 @@
       "grid": {
         "y": 156
       },
-      "id": "ffaa17b1-4750-4e3d-b94e-9a0fbd380ce8",
+      "id": "c2b52533-2b81-445f-8e26-4ddad24f2e70",
       "panels": [
         {
           "grid": {
@@ -2387,7 +2422,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "5643d8e3-424a-4b59-a17d-a37d84c4ffbb",
+          "id": "621a7e5b-a3a9-4a52-824c-ec884e904ec2",
           "type": "markdown"
         },
         {
@@ -2429,7 +2464,7 @@
               }
             ]
           },
-          "id": "c42016ea-19a5-4efc-82c3-a3c17087a6cb",
+          "id": "830f318d-b90f-49f0-9aae-50845fe57add",
           "type": "vis"
         },
         {
@@ -2471,7 +2506,7 @@
               }
             ]
           },
-          "id": "c9a10f01-1b3d-4db2-828c-4836ca074e64",
+          "id": "06e2ea31-92cf-417f-8cd3-59e62a4362fa",
           "type": "vis"
         },
         {
@@ -2513,7 +2548,7 @@
               }
             ]
           },
-          "id": "feb0bc91-d6b9-430d-8a31-9d72a0a17114",
+          "id": "8c38f3f5-90e5-4233-9e8e-69f729502a13",
           "type": "vis"
         },
         {
@@ -2555,7 +2590,7 @@
               }
             ]
           },
-          "id": "75fb9061-647d-4ef0-921c-b41e4548bcff",
+          "id": "09cdfa78-66a2-4679-bf47-05c0cbd7d5f5",
           "type": "vis"
         },
         {
@@ -2697,7 +2732,7 @@
               }
             ]
           },
-          "id": "a3aa5280-f65a-4d08-ab4a-51964a00c872",
+          "id": "7e71e7fd-cf47-4c0e-ba9c-5b215a678674",
           "type": "vis"
         }
       ]
@@ -2708,7 +2743,7 @@
       "grid": {
         "y": 180
       },
-      "id": "ac4fe75a-4add-4c46-af2f-1ab40c9f39b8",
+      "id": "5a094ad2-d9de-48de-a9ab-ccb7de639e82",
       "panels": [
         {
           "grid": {
@@ -2829,7 +2864,7 @@
               }
             ]
           },
-          "id": "434b5525-d7b9-444d-80c6-c5b82a72fb1e",
+          "id": "7870303d-9daf-4ace-b8e4-d6eea52f7226",
           "type": "vis"
         },
         {
@@ -2885,7 +2920,7 @@
               }
             ]
           },
-          "id": "3ddcb003-03bc-4cb2-bf25-6b307fb5ad79",
+          "id": "a19d3412-a391-4e6b-a6b2-b6a013217d26",
           "type": "vis"
         },
         {
@@ -3000,7 +3035,7 @@
               }
             ]
           },
-          "id": "f2752ed7-009a-4f0b-8152-2aeb71d593c7",
+          "id": "a3261975-d638-4c1e-a35e-e6edc5a2bdab",
           "type": "vis"
         },
         {
@@ -3115,7 +3150,7 @@
               }
             ]
           },
-          "id": "2c86b330-ec76-4ae6-9e8c-116005d0b073",
+          "id": "029613fe-c1d1-482f-b76c-6b30cd9e26b9",
           "type": "vis"
         }
       ]
@@ -3126,7 +3161,7 @@
       "grid": {
         "y": 206
       },
-      "id": "69b61e81-9b65-4e63-b28f-2c67f1934213",
+      "id": "40079a9a-3fc5-4df3-8eb4-d61c9ddc282d",
       "panels": [
         {
           "grid": {
@@ -3232,7 +3267,7 @@
               }
             ]
           },
-          "id": "da4e5e99-4c46-49e1-8be1-6ac7af0e2ca5",
+          "id": "dbd94850-8a4e-4ee6-8ad6-b50c8305d69a",
           "type": "vis"
         },
         {
@@ -3339,7 +3374,7 @@
               }
             ]
           },
-          "id": "574e8b10-f73a-436d-b81f-00b94715b342",
+          "id": "d1acaefa-f250-4b5e-b831-b5aae93b89f4",
           "type": "vis"
         },
         {
@@ -3446,7 +3481,7 @@
               }
             ]
           },
-          "id": "8f09850c-bf8e-4636-9520-3965690aa2ce",
+          "id": "72940350-ad4b-4033-955d-705c5df22862",
           "type": "vis"
         },
         {
@@ -3553,7 +3588,7 @@
               }
             ]
           },
-          "id": "d3a512af-6ffd-4539-b6da-52adbc77c3aa",
+          "id": "57e6584c-bddb-438a-8668-f63b3f6279ee",
           "type": "vis"
         },
         {
@@ -3633,7 +3668,7 @@
               }
             ]
           },
-          "id": "480e0cf9-0182-4b41-9280-92539fca3ff7",
+          "id": "bca75916-eef0-44e1-821e-a1d81a6aca08",
           "type": "vis"
         },
         {
@@ -3706,7 +3741,7 @@
               }
             ]
           },
-          "id": "b8f7d42c-5cf1-49d2-b93e-6fdbf7fd06df",
+          "id": "eb4172e4-05cb-4605-8570-012591ccd86f",
           "type": "vis"
         }
       ]
@@ -3717,7 +3752,7 @@
       "grid": {
         "y": 246
       },
-      "id": "9597f3ef-d17f-4aa4-bb2d-8ee06ade7800",
+      "id": "a0577c8e-1b2f-4b83-9066-3258483d7115",
       "panels": [
         {
           "grid": {
@@ -3758,7 +3793,7 @@
               }
             ]
           },
-          "id": "5b651b41-5156-4e30-b210-2ed7c8e9fb99",
+          "id": "8edd1bf5-35f5-4804-8433-8a3c8d970916",
           "type": "vis"
         },
         {
@@ -3800,7 +3835,7 @@
               }
             ]
           },
-          "id": "2bc356ce-a4d9-44b2-821a-7383211b5792",
+          "id": "a98b8db2-ae05-43a8-a8e3-686b7b1423ba",
           "type": "vis"
         },
         {
@@ -3842,7 +3877,7 @@
               }
             ]
           },
-          "id": "efbf40e2-2b6d-4f61-8036-1952969bc963",
+          "id": "f110a764-99ff-4072-a134-d663dbaa252b",
           "type": "vis"
         },
         {
@@ -3898,7 +3933,7 @@
               }
             ]
           },
-          "id": "2645e306-b712-45fd-b6ec-82dd6482dbcc",
+          "id": "7386163f-c21e-491d-b51c-61616a08bc95",
           "type": "vis"
         },
         {
@@ -4012,7 +4047,7 @@
               }
             ]
           },
-          "id": "42e52c09-b632-4617-871f-2fa69edc39a9",
+          "id": "705dcf03-dfb0-4d05-8d27-95afcbffe907",
           "type": "vis"
         },
         {
@@ -4116,7 +4151,7 @@
               }
             ]
           },
-          "id": "70f12654-f6ed-4fdc-97ca-76e1da886fb9",
+          "id": "ff2d8d89-cecf-4c47-8a88-fef85ace0b5d",
           "type": "vis"
         }
       ]
@@ -4127,7 +4162,7 @@
       "grid": {
         "y": 278
       },
-      "id": "27a61b0b-a861-44af-aa96-b4685af6c979",
+      "id": "56cedabf-f077-4eb4-89ed-553a90d83d4f",
       "panels": [
         {
           "grid": {
@@ -4144,7 +4179,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "5c5e64a3-096d-45e8-a183-eb7949c972fe",
+          "id": "4ffb3afa-beec-495a-8497-e8abf59fc020",
           "type": "markdown"
         },
         {
@@ -4251,7 +4286,7 @@
               }
             ]
           },
-          "id": "eaa89800-6d5a-49ff-b893-64ac0628ac64",
+          "id": "50aabf8a-c9cd-459c-a423-7ba7da4b9baf",
           "type": "vis"
         },
         {
@@ -4307,7 +4342,7 @@
               }
             ]
           },
-          "id": "71a1e7ab-e07b-43e4-bbda-daeda6e583ad",
+          "id": "a8029c4d-6063-4dfb-87a0-87d8dbb19944",
           "type": "vis"
         },
         {
@@ -4420,7 +4455,7 @@
               }
             ]
           },
-          "id": "f6b3240d-14ff-4159-9fe5-18ce4217ccdd",
+          "id": "52f0f74f-9832-4397-812a-560c4f22b6f3",
           "type": "vis"
         }
       ]

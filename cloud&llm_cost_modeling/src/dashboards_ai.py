@@ -1,11 +1,10 @@
 """Publish Meridian Elastic AI Assistant + inference usage dashboard."""
 from src.dashboards import (
-    DASHBOARD_ID, DASHBOARD_ID_DYNAMIC, TS, TIME_FROM,
+    DASHBOARD_ID, DASHBOARD_ID_AI, DASHBOARD_ID_DYNAMIC,
+    DASHBOARD_ID_INFERENCE_USAGE, TS, TIME_FROM,
     gauge, links_panel, markdown, metric, pie, section, table,
     treemap, waffle, xy, _put_dashboard, _ensure_data_view, _q,
 )
-
-DASHBOARD_ID_AI = "meridian-ai-assistant-inference-usage"
 TIME_TO_AI = "2026-08-26T00:00:00.000Z"
 
 TRACES = "traces-agent_builder.otel-default"
@@ -238,6 +237,7 @@ def build_ai_assistant_dashboard():
                 ("FinOps & LLM Observability", DASHBOARD_ID),
                 ("FinOps & LLM — dynamic", DASHBOARD_ID_DYNAMIC),
                 ("This AI Assistant dashboard", DASHBOARD_ID_AI),
+                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
             ]),
         ]),
     ]

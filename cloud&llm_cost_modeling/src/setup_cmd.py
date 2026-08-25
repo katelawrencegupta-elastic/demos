@@ -296,6 +296,9 @@ def patch_inference_token_usage_dashboard():
     pin_azure_openai_dashboards()
     print("== checking write access ==")
     check_write_access()
+    print("== APM gen_ai mappings + retention (ES|QL) ==")
+    from src.generators.llm_apm import ensure_apm_genai_mappings
+    ensure_apm_genai_mappings()
     print("== inference token-usage template ==")
     from src.generators.elastic_ai import _ensure_template
     _ensure_template()

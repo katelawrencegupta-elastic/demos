@@ -11,6 +11,8 @@ from src.config import KBN_HEADERS, KIBANA_URL
 
 DASHBOARD_ID = "meridian-finops-llm-observability"
 DASHBOARD_ID_DYNAMIC = "meridian-finops-llm-observability-dynamic"
+DASHBOARD_ID_AI = "meridian-ai-assistant-inference-usage"
+DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
 TIME_FROM = "2026-07-14T00:00:00.000Z"
 TIME_TO = "2026-08-14T00:00:00.000Z"
 
@@ -360,13 +362,19 @@ def build_dashboard():
 
     panels = [
         section("FinOps integration — native cloud provider dashboards", 0, [
-            markdown(0, 0, 24, 10,
+            markdown(0, 0, 20, 10,
                      "These are the **out-of-the-box Elastic integration dashboards** installed from "
                      "Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, "
                      "`azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\n"
                      "This Meridian dashboard is the cross-provider overlay; provider packs remain "
-                     "the source of truth for CUR line items, PTU, Guardrails, etc."),
-            links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
+                     "the source of truth for CUR line items, PTU, Guardrails, etc.\n\n"
+                     "Elastic AI Assistant / Agent Builder usage and the managed inference token "
+                     "dashboard are linked at right."),
+            links_panel(20, 0, 12, 10, "Elastic AI", [
+                ("AI Assistant & inference usage", DASHBOARD_ID_AI),
+                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
+            ]),
+            links_panel(32, 0, 16, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
         ]),
         section("Overview — multi-cloud + LLM spend", 12, [
             markdown(0, 0, 48, 3,
@@ -968,7 +976,8 @@ def build_dynamic_dashboard():
                 ("Original dashboard", DASHBOARD_ID),
                 ("Backup snapshot", f"{DASHBOARD_ID}-backup"),
                 ("This dynamic copy", DASHBOARD_ID_DYNAMIC),
-                ("AI Assistant & inference", "meridian-ai-assistant-inference-usage"),
+                ("AI Assistant & inference usage", DASHBOARD_ID_AI),
+                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
             ]),
             links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
         ]),
