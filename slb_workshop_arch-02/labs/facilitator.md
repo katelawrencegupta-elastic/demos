@@ -44,7 +44,7 @@ If time is short, **cut lab 3 CLI** and keep the namespace decision plus lab 2 `
 .venv/bin/python scripts/create_kibana.py
 ```
 
-Confirm Kibana login on `https://slbworkshoparch02-f3f54b.kb.us-central1.gcp.elastic.cloud`.
+Confirm Kibana login on `https://klg-slb-workshop-arch02-939ab5.kb.us-central1.gcp.cloud.es.io`.
 
 Do not paste API keys into slides or chat transcripts.
 
@@ -59,10 +59,9 @@ Do not paste API keys into slides or chat transcripts.
 
 ## Known gotchas on this cluster
 
-- `GET _cluster/health` returns **410** in Serverless. Use `scripts/ping.py` / `GET /`.
-- ILM APIs fail. Use `_data_stream/<name>/_lifecycle`.
-- Do not PUT anything in `configs/ilm/` here.
-- `frozen_after` (DLM searchable snapshots, 9.5 GA) is hosted/self-managed, not Serverless.
+- This is **Elastic Cloud Hosted**, not Serverless. `GET _cluster/health` and ILM APIs work.
+- Labs still attach **data stream lifecycle** per retention class. Treat ILM as the hosted mapping, not a second policy on the same stream unless you intend ILM to win.
+- Do not PUT `configs/ilm/hosted-audit-hot-warm-cold-frozen.json` unless you mean to enable frozen searchable snapshots on this deployment.
 - OTel docs are **intentionally** left untranslated. If someone "fixes" the pipeline by copying `body.text` → `message`, they have violated the mixed-authoring rule this lab exists to show.
 
 ## Reset

@@ -1,14 +1,14 @@
 # ARCH-02 — Lifecycle, Governance & Standards
 
 Hands-on companion to the SLB Architect enablement session (Wed Sep 23, 2026).
-This workshop cluster is **Elastic Cloud Serverless** (`slbworkshoparch02`).
+This workshop cluster is **Elastic Cloud Hosted** (`f427dfc2751c468f942dcf7e7d46b323`).
 
 Deck: [SLB - Enablement - ARCH 02](https://docs.google.com/presentation/d/1fowlbV3TjGpYHDFuX1lVrsjyZmpJ8uC6/edit)
 
 | | URL |
 |---|---|
-| Elasticsearch | `https://slbworkshoparch02-f3f54b.es.us-central1.gcp.elastic.cloud:443` |
-| Kibana | `https://slbworkshoparch02-f3f54b.kb.us-central1.gcp.elastic.cloud` |
+| Elasticsearch | `https://f427dfc2751c468f942dcf7e7d46b323.us-central1.gcp.cloud.es.io:443` |
+| Kibana | `https://klg-slb-workshop-arch02-939ab5.kb.us-central1.gcp.cloud.es.io` |
 
 The deck is **80% design review, 20% product evidence**. These labs are the evidence. The deliverable is the six governance artifacts in `artifacts/`, not a click-by-click product tour.
 
@@ -43,12 +43,12 @@ Kibana evidence is **Discover** data views (ECS vs OTel) plus `scripts/verify.py
 
 ## Design constraints on this cluster
 
-| Capability | On this Serverless project |
+| Capability | On this Hosted deployment |
 |---|---|
 | Data streams, index / component templates, ingest pipelines | Yes |
-| Data stream lifecycle (`data_retention`) | Yes — this is the retention lever |
-| ILM + hot/warm/cold/frozen data tiers | **No** — hosted/self-managed only; lab 1 maps classes to ILM |
-| DLM frozen searchable snapshots (`frozen_after`, 9.5 GA) | **No** on Serverless |
+| Data stream lifecycle (`data_retention`) | Yes — labs still use DLM as the default lever |
+| ILM + hot/warm/cold/frozen data tiers | Yes — lab 1 maps classes to ILM; do not PUT the sample frozen policy unless you mean to |
+| DLM frozen searchable snapshots (`frozen_after`, 9.5 GA) | Available on hosted 9.5+ |
 | Fleet vs EDOT as an operating model | Design decision in lab 4; do not treat them as interchangeable |
 
 ## Docs from the deck

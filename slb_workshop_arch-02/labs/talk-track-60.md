@@ -4,7 +4,7 @@
 **When:** Wed Sep 23, 2026 · ARCH-02  
 **Audience:** Architects  
 **Visual:** keep the governance-decisions slide (deck slide 3) on screen after the open.  
-**Live cluster:** Serverless project `slbworkshoparch02`
+**Live cluster:** Elastic Cloud Hosted `f427dfc2751c468f942dcf7e7d46b323`
 
 This is a **design review**. Do not start Docker or enroll agents. Hands-on lives in labs 1–4. Show Kibana only when a decision needs evidence (retention table, schema miss).
 
