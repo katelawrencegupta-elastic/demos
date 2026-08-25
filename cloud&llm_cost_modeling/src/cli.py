@@ -294,6 +294,36 @@ def cmd_verify(scope: str):
         except requests.HTTPError:
             pass
 
+    if scope in ("all", "elastic-ai"):
+        try:
+            r = es_search("traces-agent_builder.otel-default", {
+                "size": 0, "track_total_hits": True,
+                "aggs": {
+                    "kinds": {"terms": {"field": "attributes.elastic.inference.span.kind", "size": 8}},
+                    "agents": {"terms": {"field": "attributes.gen_ai.agent.id", "size": 8}},
+                }})
+            kinds = {b["key"]: b["doc_count"]
+                     for b in r["aggregations"]["kinds"]["buckets"]}
+            agents = {b["key"]: b["doc_count"]
+                      for b in r["aggregations"]["agents"]["buckets"]}
+            print(f"  Agent Builder traces: {r['hits']['total']['value']:,}  "
+                  f"kinds={kinds}  agents={agents}")
+        except requests.HTTPError as e:
+            print(f"  Agent Builder traces: FAIL {e}")
+        try:
+            r = es_search("logs-elastic.inference_token_usage-default", {
+                "size": 0, "track_total_hits": True,
+                "aggs": {
+                    "features": {"terms": {"field": "inference.feature_name", "size": 8}},
+                    "cost": {"sum": {"field": "labels.cost_usd"}},
+                }})
+            features = {b["key"]: b["doc_count"]
+                        for b in r["aggregations"]["features"]["buckets"]}
+            print(f"  Inference token usage: {r['hits']['total']['value']:,}  "
+                  f"cost=${r['aggregations']['cost']['value']:.2f}  features={features}")
+        except requests.HTTPError as e:
+            print(f"  Inference token usage: FAIL {e}")
+
     print("\n== kibana ==")
     print(f"  Discover:   {KIBANA_URL}/app/discover")
     print(f"  Dashboards: {KIBANA_URL}/app/dashboards")
@@ -308,20 +338,21 @@ def main():
     sub.add_parser("setup", help="install integrations, patch TSDS, check access")
     s_sample = sub.add_parser("sample", help="validate one doc per log generator")
     s_sample.add_argument(
-        "--scope", choices=["all", "cloud", "llm", "openai-extra"], default="all")
+        "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     b = sub.add_parser("backfill", help="bulk-index historical data")
     b.add_argument("--days", type=int, default=30)
     b.add_argument(
-        "--scope", choices=["all", "cloud", "llm", "openai-extra"], default="all")
+        "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     s = sub.add_parser("stream", help="continuously emit live events")
     s.add_argument("--tick", type=int, default=60)
     s.add_argument(
-        "--scope", choices=["all", "cloud", "llm", "openai-extra"], default="all")
+        "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     v = sub.add_parser("verify", help="doc counts and scenario spot checks")
     v.add_argument(
-        "--scope", choices=["all", "cloud", "llm", "openai-extra"], default="all")
+        "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     d = sub.add_parser("dashboards", help="publish FinOps + LLM Kibana dashboards")
-    d.add_argument("--variant", choices=["original", "dynamic", "all"], default="dynamic")
+    d.add_argument("--variant", choices=["original", "dynamic", "ai-assistant", "all"],
+                   default="dynamic")
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
@@ -341,6 +372,7 @@ def main():
         publish(
             include_original=args.variant in ("original", "all"),
             include_dynamic=args.variant in ("dynamic", "all"),
+            include_ai=args.variant in ("ai-assistant", "dynamic", "all"),
         )
     elif args.cmd == "backup":
         from src.backup import run as backup_run

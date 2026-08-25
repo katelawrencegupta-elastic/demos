@@ -968,6 +968,7 @@ def build_dynamic_dashboard():
                 ("Original dashboard", DASHBOARD_ID),
                 ("Backup snapshot", f"{DASHBOARD_ID}-backup"),
                 ("This dynamic copy", DASHBOARD_ID_DYNAMIC),
+                ("AI Assistant & inference", "meridian-ai-assistant-inference-usage"),
             ]),
             links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
         ]),
@@ -1028,7 +1029,7 @@ def _put_dashboard(dash_id, body):
     return url
 
 
-def publish(include_original=True, include_dynamic=True):
+def publish(include_original=True, include_dynamic=True, include_ai=True):
     print("== data views ==")
     _ensure_data_view("traces-*", "traces-*")
     _ensure_data_view("metrics-*", "metrics-*")
@@ -1040,5 +1041,8 @@ def publish(include_original=True, include_dynamic=True):
     if include_dynamic:
         print(f"== PUT dashboard {DASHBOARD_ID_DYNAMIC} ==")
         urls.append(_put_dashboard(DASHBOARD_ID_DYNAMIC, build_dynamic_dashboard()))
+    if include_ai:
+        from src.dashboards_ai import publish_ai
+        urls.append(publish_ai())
     return urls
 

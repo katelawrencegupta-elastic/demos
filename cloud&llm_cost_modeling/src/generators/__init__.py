@@ -1,6 +1,7 @@
 from src.generators import (
     aws_billing, aws_billing_cur, aws_cloudtrail, aws_ec2_metrics,
     aws_guardduty, aws_s3access, azure_activity, azure_billing,
+    elastic_ai,
     gcp_audit, gcp_billing,
     llm_anthropic, llm_apm, llm_azure_openai, llm_bedrock,
     llm_openai, llm_vertexai,
@@ -34,7 +35,12 @@ OPENAI_EXTRA = [
     llm_openai.openai_rate_limits,
 ]
 
-ALL = CLOUD + LLM
+ELASTIC_AI = [
+    elastic_ai.agent_builder_traces,
+    elastic_ai.inference_token_usage,
+]
+
+ALL = CLOUD + LLM + ELASTIC_AI
 LOG_GENERATORS = [g for g in ALL if getattr(g, "DATA_STREAM", "").startswith("logs-")]
 METRIC_GENERATORS = [g for g in ALL if getattr(g, "DATA_STREAM", "").startswith("metrics-")]
 
@@ -46,4 +52,6 @@ def select(scope: str = "all"):
         return LLM
     if scope == "openai-extra":
         return OPENAI_EXTRA
+    if scope == "elastic-ai":
+        return ELASTIC_AI
     return ALL

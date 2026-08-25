@@ -1,0 +1,9 @@
+{
+  "description": "Stamp ARCH-02 OTel-native app logs. Leave body.text / severity_text / trace_id untranslated.",
+  "processors": [
+    { "set": { "field": "event.ingested", "value": "{{_ingest.timestamp}}" } },
+    { "set": { "field": "labels.workshop", "value": "arch-02" } },
+    { "set": { "field": "labels.schema", "value": "otel" } },
+    { "set": { "field": "labels.retention_class", "value": "application_logs" } }
+  ]
+}

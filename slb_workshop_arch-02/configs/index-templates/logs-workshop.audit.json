@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["logs-workshop.audit-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": [
+    "arch02-ecs-mappings",
+    "arch02-common-settings"
+  ],
+  "template": {
+    "settings": {
+      "index.default_pipeline": "logs-workshop.audit"
+    },
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "90d"
+    }
+  },
+  "_meta": {
+    "workshop": "arch-02",
+    "retention_class": "audit_security"
+  }
+}

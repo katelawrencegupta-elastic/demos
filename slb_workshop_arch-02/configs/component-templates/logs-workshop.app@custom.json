@@ -1,0 +1,18 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "slb": {
+          "properties": {
+            "well_id": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  },
+  "_meta": {
+    "owned_by": "domain-team",
+    "extends": "arch02-ecs-mappings",
+    "description": "Approved team extension. New fields go here — not in a forked base mapping."
+  }
+}

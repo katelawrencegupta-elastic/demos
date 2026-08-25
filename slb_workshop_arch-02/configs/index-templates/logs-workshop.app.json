@@ -1,0 +1,25 @@
+{
+  "index_patterns": ["logs-workshop.app-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": [
+    "arch02-ecs-mappings",
+    "arch02-common-settings",
+    "logs-workshop.app@custom"
+  ],
+  "ignore_missing_component_templates": ["logs-workshop.app@custom"],
+  "template": {
+    "settings": {
+      "index.default_pipeline": "logs-workshop.app"
+    },
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "30d"
+    }
+  },
+  "_meta": {
+    "workshop": "arch-02",
+    "retention_class": "application_logs",
+    "schema": "ecs"
+  }
+}

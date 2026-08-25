@@ -251,4 +251,8 @@ def run():
     pin_azure_openai_dashboards()
     print("== checking write access ==")
     check_write_access()
+    print("== inference token-usage template ==")
+    from src.generators.elastic_ai import _ensure_template
+    _ensure_template()
+    print("  [ok] logs-elastic.inference_token_usage-*")
     print("setup complete.")

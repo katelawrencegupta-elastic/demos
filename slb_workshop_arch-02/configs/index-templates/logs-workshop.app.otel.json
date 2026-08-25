@@ -1,0 +1,23 @@
+{
+  "index_patterns": ["logs-workshop.app.otel-*"],
+  "data_stream": {},
+  "priority": 510,
+  "composed_of": [
+    "arch02-otel-mappings",
+    "arch02-common-settings"
+  ],
+  "template": {
+    "settings": {
+      "index.default_pipeline": "logs-workshop.app.otel"
+    },
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "30d"
+    }
+  },
+  "_meta": {
+    "workshop": "arch-02",
+    "retention_class": "application_logs",
+    "schema": "otel"
+  }
+}

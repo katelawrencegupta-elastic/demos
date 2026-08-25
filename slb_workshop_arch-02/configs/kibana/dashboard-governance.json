@@ -1,0 +1,99 @@
+{
+  "title": "ARCH-02 Workshop — Governance evidence",
+  "time_range": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 0, "w": 12, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "ECS app logs",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.app-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 12, "y": 0, "w": 12, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "OTel app logs",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.app.otel-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 24, "y": 0, "w": 12, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Audit",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.audit-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 36, "y": 0, "w": 12, "h": 5 },
+      "config": {
+        "type": "metric",
+        "title": "Traces",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-workshop.app-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 5, "w": 24, "h": 10 },
+      "config": {
+        "type": "pie",
+        "title": "App logs by schema (ECS vs OTel)",
+        "styling": { "donut_hole": "m" },
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.app-prod, logs-workshop.app.otel-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY labels.schema"
+        },
+        "metrics": [{ "column": "count" }],
+        "group_by": [{ "column": "labels.schema" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 24, "y": 5, "w": 24, "h": 10 },
+      "config": {
+        "type": "bar_horizontal",
+        "title": "Docs by retention class",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.app-prod, logs-workshop.app.otel-prod, logs-workshop.audit-prod, metrics-workshop.platform-prod, traces-workshop.app-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | STATS count = COUNT(*) BY labels.retention_class"
+        },
+        "x": { "column": "count" },
+        "y": [{ "column": "labels.retention_class" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 15, "w": 48, "h": 8 },
+      "config": {
+        "type": "table",
+        "title": "Same incident, two schemas — ECS hits only on trace.id",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-workshop.app-prod | WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart | WHERE trace.id == \"4bf92f3577b34da6a3ce929d0e0e4736\" | KEEP @timestamp, message, log.level, service.name, trace.id, labels.schema | LIMIT 20"
+        }
+      }
+    }
+  ]
+}

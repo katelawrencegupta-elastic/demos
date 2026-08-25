@@ -1,0 +1,9 @@
+{
+  "template": {
+    "settings": {}
+  },
+  "_meta": {
+    "owned_by": "platform",
+    "description": "Shared settings placeholder. Pipelines are attached per index template so ECS and OTel streams do not share a translator."
+  }
+}

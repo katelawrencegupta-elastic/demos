@@ -1,0 +1,50 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic": true,
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "body": { "properties": { "text": { "type": "match_only_text" } } },
+        "severity_text": { "type": "keyword" },
+        "severity_number": { "type": "long" },
+        "trace_id": { "type": "keyword" },
+        "span_id": { "type": "keyword" },
+        "resource": {
+          "properties": {
+            "attributes": {
+              "properties": {
+                "service.name": { "type": "keyword" },
+                "service.version": { "type": "keyword" },
+                "deployment.environment": { "type": "keyword" }
+              }
+            }
+          }
+        },
+        "attributes": {
+          "properties": {
+            "http.request.method": { "type": "keyword" },
+            "http.response.status_code": { "type": "long" },
+            "url.path": { "type": "keyword" }
+          }
+        },
+        "event": { "properties": { "ingested": { "type": "date" } } },
+        "labels": {
+          "properties": {
+            "workshop": { "type": "keyword" },
+            "schema": { "type": "keyword" },
+            "team": { "type": "keyword" },
+            "retention_class": { "type": "keyword" }
+          }
+        },
+        "data_stream": {
+          "properties": {
+            "type": { "type": "constant_keyword" },
+            "dataset": { "type": "constant_keyword" },
+            "namespace": { "type": "constant_keyword" }
+          }
+        }
+      }
+    }
+  },
+  "_meta": { "owned_by": "platform", "workshop": "arch-02", "schema": "otel" }
+}

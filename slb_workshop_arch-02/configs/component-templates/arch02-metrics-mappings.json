@@ -1,0 +1,41 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic": true,
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "metricset": { "properties": { "name": { "type": "keyword" } } },
+        "host": { "properties": { "name": { "type": "keyword" } } },
+        "service": { "properties": { "name": { "type": "keyword" } } },
+        "system": {
+          "properties": {
+            "cpu": {
+              "properties": {
+                "total": {
+                  "properties": {
+                    "norm": { "properties": { "pct": { "type": "float" } } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "event": { "properties": { "ingested": { "type": "date" } } },
+        "labels": {
+          "properties": {
+            "workshop": { "type": "keyword" },
+            "retention_class": { "type": "keyword" }
+          }
+        },
+        "data_stream": {
+          "properties": {
+            "type": { "type": "constant_keyword" },
+            "dataset": { "type": "constant_keyword" },
+            "namespace": { "type": "constant_keyword" }
+          }
+        }
+      }
+    }
+  },
+  "_meta": { "owned_by": "platform", "workshop": "arch-02" }
+}

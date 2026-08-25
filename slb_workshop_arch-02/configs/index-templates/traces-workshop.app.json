@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["traces-workshop.app-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": [
+    "arch02-traces-mappings",
+    "arch02-common-settings"
+  ],
+  "template": {
+    "settings": {
+      "index.default_pipeline": "traces-workshop.app"
+    },
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "3d"
+    }
+  },
+  "_meta": {
+    "workshop": "arch-02",
+    "retention_class": "traces_sampled"
+  }
+}

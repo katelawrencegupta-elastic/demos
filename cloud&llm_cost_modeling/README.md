@@ -60,12 +60,14 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m src.cli sample --scope all
 .venv/bin/python -m src.cli backfill --days 30 --scope cloud
 .venv/bin/python -m src.cli backfill --days 30 --scope llm
+.venv/bin/python -m src.cli backfill --days 30 --scope elastic-ai
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
-.venv/bin/python -m src.cli dashboards   # publish FinOps + LLM Kibana dashboard
+.venv/bin/python -m src.cli dashboards   # FinOps + LLM + AI Assistant dashboards
+.venv/bin/python -m src.cli dashboards --variant ai-assistant
 ```
 
-`--scope` accepts `all` | `cloud` | `llm`.
+`--scope` accepts `all` | `cloud` | `llm` | `elastic-ai`.
 
 ## LLM factories
 
@@ -81,6 +83,8 @@ as the real integrations), so OOTB dashboards work:
 | `logs-gcp_vertexai.prompt_response_logs-default` / `metrics-gcp_vertexai.metrics-default` | gcp_vertexai |
 | `traces-apm-default` | apm (gen_ai spans) |
 | `metrics-aws_billing.cur-default` | aws_billing (CUR 2.0, incl. Bedrock lines) |
+| `traces-agent_builder.otel-default` | Elastic Agent Builder / AI Assistant OTel spans |
+| `logs-elastic.inference_token_usage-default` | Kibana inference token usage (feature, connector, EIS) |
 
 **Providers & models:** OpenAI (GPT-5.6 Sol, GPT-5.4/mini, GPT-4o/mini, o3, embeddings), Anthropic (Opus 5, Sonnet 5, Haiku 4.5), Google Gemini (3.1 Pro, 2.5 Flash, embeddings), AWS Bedrock (Claude Sonnet 5, Llama 4 Maverick), Azure OpenAI (GPT-5.4, GPT-4o-mini).
 
@@ -103,9 +107,10 @@ Notes:
 config/world.yaml          # org model: BUs, accounts, resources, tags, scenarios
 config/llm_models.yaml     # LLM providers, models, pricing, app workloads
 src/world/                 # inventory + scenarios + cloud costs + LLM catalog
-src/generators/            # cloud (9) + LLM (3) generators
+src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/cli.py                 # setup | sample | backfill | stream | verify | dashboards
 src/dashboards.py          # Kibana FinOps + LLM observability dashboard
+src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 ```

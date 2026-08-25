@@ -1,0 +1,9 @@
+{
+  "description": "Stamp ARCH-02 audit / security logs.",
+  "processors": [
+    { "set": { "field": "event.ingested", "value": "{{_ingest.timestamp}}" } },
+    { "set": { "field": "labels.workshop", "value": "arch-02" } },
+    { "set": { "field": "labels.schema", "value": "ecs" } },
+    { "set": { "field": "labels.retention_class", "value": "audit_security" } }
+  ]
+}

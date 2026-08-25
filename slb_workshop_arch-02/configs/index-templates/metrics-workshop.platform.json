@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["metrics-workshop.platform-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": [
+    "arch02-metrics-mappings",
+    "arch02-common-settings"
+  ],
+  "template": {
+    "settings": {
+      "index.default_pipeline": "metrics-workshop.platform"
+    },
+    "lifecycle": {
+      "enabled": true,
+      "data_retention": "7d"
+    }
+  },
+  "_meta": {
+    "workshop": "arch-02",
+    "retention_class": "platform_metrics"
+  }
+}
