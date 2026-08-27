@@ -1,0 +1,7 @@
+{
+  "index_patterns": ["logs-elasticco.k8s.event-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["logs-elasticco.k8s.event"],
+  "_meta": { "demo": "elastic-co" }
+}

@@ -1,0 +1,10 @@
+{
+  "index_patterns": ["logs-elasticco.orchestrator-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["logs-elasticco.orchestrator"],
+  "_meta": {
+    "description": "Elastic Co. orchestrator logs",
+    "demo": "elastic-co"
+  }
+}

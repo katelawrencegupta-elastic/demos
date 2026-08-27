@@ -1,0 +1,115 @@
+# Elastic Co. — fictional multi-tenant fulfillment SaaS.
+# All generators share this model so logs, traces, and K8s events correlate.
+company: Elastic Co.
+domain: elastic.co
+seed: 7
+
+tenants:
+  - id: acme-retail
+    name: Acme Retail
+    blast: true
+    slo_target_ms: 400
+  - id: globex-mart
+    name: Globex Mart
+    blast: false
+    slo_target_ms: 400
+  - id: initech-b2b
+    name: Initech B2B
+    blast: false
+    slo_target_ms: 500
+
+cluster:
+  name: eks-elastic-prod-usc1
+  cloud: aws
+  region: us-east-1
+  namespaces:
+    - fulfillment
+    - payments
+    - platform
+  nodes:
+    - name: ip-10-0-12-21.ec2.internal
+    - name: ip-10-0-14-44.ec2.internal
+    - name: ip-10-0-18-7.ec2.internal
+
+services:
+  - name: edge-gateway
+    namespace: fulfillment
+    language: go
+    type: gateway
+  - name: identity-service
+    namespace: platform
+    language: go
+    type: app
+  - name: checkout-api
+    namespace: fulfillment
+    language: java
+    type: app
+    deploy_good: "2.4.0"
+    deploy_bad: "2.4.1"
+    replicas: 3
+  - name: inventory-service
+    namespace: fulfillment
+    language: go
+    type: app
+  - name: fraud-service
+    namespace: payments
+    language: python
+    type: app
+  - name: payments-api
+    namespace: payments
+    language: go
+    type: app
+  - name: notification-service
+    namespace: platform
+    language: go
+    type: app
+  - name: orchestrator
+    namespace: platform
+    language: python
+    type: airflow
+  - name: orders-db
+    namespace: fulfillment
+    language: sql
+    type: db
+    system: postgresql
+  - name: inventory-db
+    namespace: fulfillment
+    language: sql
+    type: db
+    system: postgresql
+  - name: redis-cart
+    namespace: fulfillment
+    language: redis
+    type: cache
+  - name: kafka
+    namespace: platform
+    language: kafka
+    type: messaging
+
+orchestrator:
+  dag_id: fulfillment.checkout
+  task_ids:
+    - validate_cart
+    - reserve_inventory
+    - charge_payment
+    - emit_fulfillment
+
+incident:
+  name: acme-checkout-degradation
+  # Relative to backfill/stream anchor (utcnow). Incident occupies this window.
+  start_offset_minutes: 90
+  duration_minutes: 45
+  blast_tenant: acme-retail
+  bad_deploy_version: "2.4.1"
+  root_cause: >
+    checkout-api v2.4.1 memory leak → OOMKills → orchestrator retries amplify
+    DB lock contention → slow SELECT … FOR UPDATE on orders for acme-retail.
+  hero_trace_count: 8
+
+alerts:
+  noisy:
+    name: elasticco-noisy-node-cpu
+    description: CPU > 70% on any node (no service/tenant context)
+  quality:
+    name: elasticco-checkout-slo-burn
+    description: checkout-api restarts or error rate with acme-retail SLO burn

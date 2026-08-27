@@ -1,0 +1,4 @@
+{"attributes":{"title":"logs-elasticco.orchestrator-*","timeFieldName":"@timestamp","name":"Elastic Co. Orchestrator Logs"},"id":"elasticco-orchestrator","type":"index-pattern","references":[],"managed":false}
+{"attributes":{"title":"logs-elasticco.checkout-*","timeFieldName":"@timestamp","name":"Elastic Co. Checkout Logs"},"id":"elasticco-checkout","type":"index-pattern","references":[],"managed":false}
+{"attributes":{"title":"logs-elasticco.k8s.event-*,metrics-elasticco.k8s.pod-*","timeFieldName":"@timestamp","name":"Elastic Co. Kubernetes"},"id":"elasticco-k8s","type":"index-pattern","references":[],"managed":false}
+{"attributes":{"title":"logs-elasticco.*,metrics-elasticco.*,traces-apm*","timeFieldName":"@timestamp","name":"Elastic Co. All"},"id":"elasticco-all","type":"index-pattern","references":[],"managed":false}

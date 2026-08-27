@@ -1,0 +1,22 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "tenant.id": { "type": "keyword" },
+        "trace.id": { "type": "keyword" },
+        "order.id": { "type": "keyword" },
+        "service.name": { "type": "keyword" },
+        "service.version": { "type": "keyword" },
+        "kubernetes.pod.name": { "type": "keyword" },
+        "kubernetes.namespace": { "type": "keyword" },
+        "kubernetes.deployment.name": { "type": "keyword" },
+        "kubernetes.container.name": { "type": "keyword" },
+        "log.level": { "type": "keyword" },
+        "message": { "type": "match_only_text" },
+        "labels.demo": { "type": "keyword" }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

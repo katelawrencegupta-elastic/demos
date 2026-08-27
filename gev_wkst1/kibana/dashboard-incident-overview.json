@@ -1,0 +1,193 @@
+{
+  "title": "Elastic Co. — Incident Overview",
+  "description": "Orchestrator errors, OOMKilled events, pod memory, and slow DB spans for the acme-retail checkout incident.",
+  "time_range": { "from": "now-6h", "to": "now" },
+  "options": {
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_cursor": true,
+    "sync_tooltips": true,
+    "hide_panel_titles": false
+  },
+  "query": { "expression": "labels.demo: elastic-co", "language": "kql" },
+  "panels": [
+    {
+      "type": "markdown",
+      "grid": { "x": 0, "y": 0, "w": 48, "h": 3 },
+      "config": {
+        "title": "",
+        "hide_title": true,
+        "content": "## Elastic Co. incident overview\nTenant **acme-retail** · DAG `fulfillment.checkout` · checkout-api **v2.4.1** · cluster `eks-elastic-prod-usc1` · filter `labels.demo: elastic-co`. Set time to **Last 6 hours**."
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 3, "w": 12, "h": 6 },
+      "config": {
+        "type": "metric",
+        "title": "Orchestrator errors",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE log.level == \"error\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count", "subtitle": "log.level == error" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 12, "y": 3, "w": 12, "h": 6 },
+      "config": {
+        "type": "metric",
+        "title": "Orchestrator warnings",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE log.level == \"warning\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count", "subtitle": "log.level == warning" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 24, "y": 3, "w": 12, "h": 6 },
+      "config": {
+        "type": "metric",
+        "title": "OOMKilled events",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE kubernetes.event.reason == \"OOMKilled\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count", "subtitle": "checkout-api pods" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 36, "y": 3, "w": 12, "h": 6 },
+      "config": {
+        "type": "metric",
+        "title": "Slow DB spans (>2s)",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE span.type == \"db\" AND span.subtype == \"postgresql\"\n| WHERE span.duration.us > 2000000\n| STATS count = COUNT(*)"
+        },
+        "metrics": [{ "type": "primary", "column": "count", "subtitle": "postgres FOR UPDATE" }]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 9, "w": 48, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "Orchestrator log volume by level",
+        "axis": {
+          "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY BUCKET(@timestamp, 50, ?_tstart, ?_tend), log.level"
+            },
+            "x": { "column": "BUCKET(@timestamp, 50, ?_tstart, ?_tend)", "label": "@timestamp" },
+            "y": [{ "column": "count" }],
+            "breakdown_by": { "column": "log.level" }
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 21, "w": 24, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "Orchestrator issues by tenant",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE log.level IN (\"error\", \"warning\")\n| STATS count = COUNT(*) BY tenant.id\n| SORT count DESC\n| LIMIT 10"
+            },
+            "x": { "column": "tenant.id" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 24, "y": 21, "w": 24, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "Checkout pod memory (MiB)",
+        "axis": {
+          "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+          "y": { "title": { "visible": true } }
+        },
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS rss_mib = AVG(kubernetes.pod.memory.usage.bytes) / 1024 / 1024 BY BUCKET(@timestamp, 50, ?_tstart, ?_tend)"
+            },
+            "x": { "column": "BUCKET(@timestamp, 50, ?_tstart, ?_tend)", "label": "@timestamp" },
+            "y": [{ "column": "rss_mib", "label": "RSS MiB" }]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 0, "y": 33, "w": 24, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "Pod restart count (max)",
+        "axis": {
+          "x": { "title": { "visible": false }, "scale": "temporal", "domain": { "type": "fit", "rounding": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS restarts = MAX(kubernetes.pod.restart.count) BY BUCKET(@timestamp, 50, ?_tstart, ?_tend), kubernetes.pod.name"
+            },
+            "x": { "column": "BUCKET(@timestamp, 50, ?_tstart, ?_tend)", "label": "@timestamp" },
+            "y": [{ "column": "restarts" }],
+            "breakdown_by": { "column": "kubernetes.pod.name" }
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": { "x": 24, "y": 33, "w": 24, "h": 12 },
+      "config": {
+        "type": "xy",
+        "title": "Slow postgres spans by tenant",
+        "axis": {
+          "x": { "title": { "visible": false } },
+          "y": { "title": { "visible": false } }
+        },
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart\n| WHERE labels.demo == \"elastic-co\"\n| WHERE span.type == \"db\" AND span.subtype == \"postgresql\"\n| WHERE span.duration.us > 2000000\n| STATS count = COUNT(*), p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY tenant.id\n| SORT count DESC"
+            },
+            "x": { "column": "tenant.id" },
+            "y": [{ "column": "count" }]
+          }
+        ]
+      }
+    }
+  ]
+}

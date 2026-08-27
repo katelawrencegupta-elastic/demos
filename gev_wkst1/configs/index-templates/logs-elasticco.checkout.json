@@ -1,0 +1,7 @@
+{
+  "index_patterns": ["logs-elasticco.checkout-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["logs-elasticco.checkout"],
+  "_meta": { "demo": "elastic-co" }
+}

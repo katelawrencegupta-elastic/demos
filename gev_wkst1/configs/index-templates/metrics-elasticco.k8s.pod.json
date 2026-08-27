@@ -1,0 +1,7 @@
+{
+  "index_patterns": ["metrics-elasticco.k8s.pod-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["metrics-elasticco.k8s.pod"],
+  "_meta": { "demo": "elastic-co" }
+}

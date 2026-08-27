@@ -1,0 +1,23 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "kubernetes.pod.name": { "type": "keyword" },
+        "kubernetes.namespace": { "type": "keyword" },
+        "kubernetes.deployment.name": { "type": "keyword" },
+        "kubernetes.node.name": { "type": "keyword" },
+        "orchestrator.cluster.name": { "type": "keyword" },
+        "service.name": { "type": "keyword" },
+        "service.version": { "type": "keyword" },
+        "kubernetes.pod.memory.usage.bytes": { "type": "long" },
+        "kubernetes.pod.memory.limit.bytes": { "type": "long" },
+        "kubernetes.pod.cpu.usage.nanocores": { "type": "long" },
+        "kubernetes.pod.restart.count": { "type": "long" },
+        "metricset.name": { "type": "keyword" },
+        "labels.demo": { "type": "keyword" }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

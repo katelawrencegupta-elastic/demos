@@ -1,0 +1,64 @@
+[
+  {
+    "name": "elasticco-noisy-node-cpu",
+    "rule_type_id": "observability.rules.custom_threshold",
+    "consumer": "logs",
+    "enabled": true,
+    "schedule": { "interval": "5m" },
+    "tags": ["elastic-co", "noisy", "demo"],
+    "params": {
+      "criteria": [
+        {
+          "comparator": ">",
+          "threshold": [70],
+          "timeSize": 5,
+          "timeUnit": "m",
+          "metrics": [
+            {
+              "name": "A",
+              "aggType": "avg",
+              "field": "kubernetes.pod.cpu.usage.nanocores"
+            }
+          ]
+        }
+      ],
+      "alertOnNoData": false,
+      "alertOnGroupDisappear": false,
+      "searchConfiguration": {
+        "query": {
+          "query": "labels.demo: elastic-co",
+          "language": "kuery"
+        },
+        "index": "metrics-elasticco.k8s.pod-*"
+      }
+    },
+    "actions": [],
+    "notify_when": "onActionGroupChange"
+  },
+  {
+    "name": "elasticco-checkout-slo-burn",
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "enabled": true,
+    "schedule": { "interval": "1m" },
+    "tags": ["elastic-co", "quality", "demo", "checkout-api", "acme-retail"],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeField": "@timestamp",
+      "timeWindowSize": 15,
+      "timeWindowUnit": "m",
+      "size": 10,
+      "thresholdComparator": ">",
+      "threshold": [0],
+      "aggType": "count",
+      "groupBy": "all",
+      "termSize": 5,
+      "sourceFields": [],
+      "esqlQuery": {
+        "esql": "FROM logs-elasticco.k8s.event-default, logs-elasticco.checkout-default, traces-apm-default\n| WHERE @timestamp >= NOW() - 15 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason == \"OOMKilled\" OR (span.type == \"db\" AND tenant.id == \"acme-retail\" AND span.duration.us > 2000000) OR message LIKE \"*OutOfMemoryError*\"\n| STATS hits = COUNT(*)\n| WHERE hits > 0"
+      }
+    },
+    "actions": [],
+    "notify_when": "onActiveAlert"
+  }
+]

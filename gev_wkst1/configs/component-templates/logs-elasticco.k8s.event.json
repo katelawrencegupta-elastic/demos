@@ -1,0 +1,18 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "kubernetes.pod.name": { "type": "keyword" },
+        "kubernetes.namespace": { "type": "keyword" },
+        "kubernetes.event.reason": { "type": "keyword" },
+        "kubernetes.event.message": { "type": "text" },
+        "kubernetes.event.type": { "type": "keyword" },
+        "orchestrator.cluster.name": { "type": "keyword" },
+        "message": { "type": "match_only_text" },
+        "labels.demo": { "type": "keyword" }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

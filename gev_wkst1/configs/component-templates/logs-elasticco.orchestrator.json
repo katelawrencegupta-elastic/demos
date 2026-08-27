@@ -1,0 +1,28 @@
+{
+  "template": {
+    "settings": {
+      "index": {
+        "default_pipeline": "logs-elasticco.orchestrator"
+      }
+    },
+    "mappings": {
+      "properties": {
+        "tenant.id": { "type": "keyword" },
+        "trace.id": { "type": "keyword" },
+        "order.id": { "type": "keyword" },
+        "orchestrator.dag_id": { "type": "keyword" },
+        "orchestrator.task_id": { "type": "keyword" },
+        "orchestrator.ts": { "type": "keyword" },
+        "log.level": { "type": "keyword" },
+        "service.name": { "type": "keyword" },
+        "message": { "type": "match_only_text" },
+        "event.original": { "type": "keyword", "index": false, "doc_values": false },
+        "labels.demo": { "type": "keyword" }
+      }
+    }
+  },
+  "_meta": {
+    "description": "Elastic Co. orchestrator log mappings + default pipeline",
+    "demo": "elastic-co"
+  }
+}

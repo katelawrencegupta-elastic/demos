@@ -1,0 +1,111 @@
+{
+  "description": "Elastic Co.: parse unstructured Airflow-style orchestrator logs into ECS + tenant/trace fields.",
+  "processors": [
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.original",
+        "copy_from": "message",
+        "override": false,
+        "ignore_empty_value": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:orchestrator.ts} \\[%{DATA:orchestrator.dag_id}\\] %{WORD:orchestrator.task_id} tenant=%{DATA:tenant.id} order=%{DATA:order.id} trace_id=%{DATA:trace.id} %{LOGLEVEL:log.level}: %{GREEDYDATA:message}"
+        ],
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "event.original",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:orchestrator.ts} \\[%{DATA:orchestrator.dag_id}\\] %{WORD:orchestrator.task_id} tenant=%{DATA:tenant.id} order=%{DATA:order.id} trace_id=%{DATA:trace.id} %{LOGLEVEL:log.level}: %{GREEDYDATA:message}"
+        ],
+        "if": "ctx.trace?.id == null && ctx.event?.original != null",
+        "ignore_failure": true
+      }
+    },
+    {
+      "date": {
+        "field": "orchestrator.ts",
+        "target_field": "@timestamp",
+        "formats": ["ISO8601", "yyyy-MM-dd'T'HH:mm:ss.SSSSSS", "yyyy-MM-dd'T'HH:mm:ss.SSS"],
+        "ignore_failure": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "log.level",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.type",
+        "value": "logs"
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.dataset",
+        "value": "elasticco.orchestrator"
+      }
+    },
+    {
+      "set": {
+        "field": "data_stream.namespace",
+        "value": "default"
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "elasticco.orchestrator"
+      }
+    },
+    {
+      "set": {
+        "field": "service.name",
+        "value": "orchestrator",
+        "override": false
+      }
+    },
+    {
+      "set": {
+        "field": "labels.demo",
+        "value": "elastic-co"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "event",
+        "override": false
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.kind",
+        "value": "pipeline_error"
+      }
+    }
+  ]
+}

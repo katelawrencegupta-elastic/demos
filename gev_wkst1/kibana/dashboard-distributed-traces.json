@@ -1,0 +1,802 @@
+{
+  "title": "Elastic Co. \u2014 Distributed Traces",
+  "description": "Dynamic cross-service APM dashboard: gauges, treemaps, heatmaps, waffles, tag clouds, stacked areas, dual-axis volume vs latency.",
+  "time_range": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "options": {
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_cursor": true,
+    "sync_tooltips": true,
+    "hide_panel_titles": false
+  },
+  "query": {
+    "expression": "labels.demo: elastic-co",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 3
+      },
+      "type": "markdown",
+      "config": {
+        "content": "## Elastic Co. \u2014 Distributed traces (dynamic)\n\n**edge-gateway \u2192 checkout-api \u2192 payments-api** + **orders-db** (postgres). Treemaps, heatmaps, gauges, waffles, tag clouds, dual-axis volume vs latency. Filter `labels.demo: elastic-co` \u00b7 time **Last 6 hours**.",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 3,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Transactions",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "sparkline",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 3,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Failures",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND event.outcome == \"failure\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "sparkline",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 3,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Checkout p95 (ms)",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "p95_ms",
+            "subtitle": "sparkline",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 3,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Slow DB spans",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE span.type == \"db\" AND span.subtype == \"postgresql\"\n| WHERE span.duration.us > 2000000\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": ">2s postgres",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 12
+      },
+      "type": "vis",
+      "config": {
+        "type": "gauge",
+        "title": "Error rate",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS errors = COUNT(*) WHERE event.outcome == \"failure\", calls = COUNT(*)\n| EVAL error_rate = errors * 1.0 / calls, min = 0.0, max = 0.25, goal = 0.01"
+        },
+        "metric": {
+          "column": "error_rate",
+          "ticks": {
+            "visible": true,
+            "mode": "bands"
+          },
+          "subtitle": "failures / txns",
+          "min": {
+            "column": "min"
+          },
+          "max": {
+            "column": "max"
+          },
+          "goal": {
+            "column": "goal"
+          }
+        },
+        "styling": {
+          "shape": {
+            "type": "arc"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 12
+      },
+      "type": "vis",
+      "config": {
+        "type": "gauge",
+        "title": "Checkout p95",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000\n| EVAL min = 0.0, max = 5000.0, goal = 400.0"
+        },
+        "metric": {
+          "column": "p95_ms",
+          "ticks": {
+            "visible": true,
+            "mode": "bands"
+          },
+          "subtitle": "ms \u00b7 goal 400",
+          "min": {
+            "column": "min"
+          },
+          "max": {
+            "column": "max"
+          },
+          "goal": {
+            "column": "goal"
+          }
+        },
+        "styling": {
+          "shape": {
+            "type": "semi_circle"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 10,
+        "w": 12,
+        "h": 12
+      },
+      "type": "vis",
+      "config": {
+        "type": "gauge",
+        "title": "Postgres p95",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE span.type == \"db\" AND span.subtype == \"postgresql\"\n| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000\n| EVAL min = 0.0, max = 4000.0, goal = 100.0"
+        },
+        "metric": {
+          "column": "p95_ms",
+          "ticks": {
+            "visible": true,
+            "mode": "bands"
+          },
+          "subtitle": "ms \u00b7 goal 100",
+          "min": {
+            "column": "min"
+          },
+          "max": {
+            "column": "max"
+          },
+          "goal": {
+            "column": "goal"
+          }
+        },
+        "styling": {
+          "shape": {
+            "type": "arc"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 10,
+        "w": 12,
+        "h": 12
+      },
+      "type": "vis",
+      "config": {
+        "type": "waffle",
+        "title": "Outcome mix",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY event.outcome"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "event.outcome"
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 22,
+        "w": 28,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "treemap",
+        "title": "Traffic treemap \u2014 service \u00d7 tenant",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY service.name, tenant.id"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "service.name"
+          },
+          {
+            "column": "tenant.id"
+          }
+        ],
+        "styling": {
+          "labels": {
+            "visible": true
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        },
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 28,
+        "y": 22,
+        "w": 20,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "pie",
+        "title": "Txn share by service",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY service.name"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "service.name"
+          }
+        ],
+        "styling": {
+          "donut_hole": "m",
+          "labels": {
+            "visible": true,
+            "position": "inside"
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 38,
+        "w": 28,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "treemap",
+        "title": "Dependency treemap \u2014 caller \u2192 destination",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"span\"\n| WHERE destination.service.resource IS NOT NULL\n| STATS count = COUNT(*), p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY service.name, destination.service.resource"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "service.name"
+          },
+          {
+            "column": "destination.service.resource"
+          }
+        ],
+        "styling": {
+          "labels": {
+            "visible": true
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        },
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 28,
+        "y": 38,
+        "w": 20,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "tag_cloud",
+        "title": "Transaction names",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY transaction.name"
+        },
+        "metric": {
+          "column": "count"
+        },
+        "tag_by": {
+          "column": "transaction.name"
+        },
+        "styling": {
+          "font_size": {
+            "min": 14,
+            "max": 64
+          },
+          "caption": {
+            "visible": false
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 54,
+        "w": 48,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "p95 latency matrix \u2014 tenant \u00d7 service (ms)",
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 BY tenant.id, service.name"
+            },
+            "x": {
+              "column": "tenant.id"
+            },
+            "y": [
+              {
+                "column": "p95_ms"
+              }
+            ],
+            "breakdown_by": {
+              "column": "service.name"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 68,
+        "w": 48,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "p95 latency over time by service (ms)",
+        "layers": [
+          {
+            "type": "area",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 BY bucket = BUCKET(@timestamp, 24, ?_tstart, ?_tend), service.name"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "p95_ms"
+              }
+            ],
+            "breakdown_by": {
+              "column": "service.name"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 82,
+        "w": 48,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Transaction volume by service (stacked area)",
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\"\n| WHERE service.name IN (\"edge-gateway\", \"checkout-api\", \"payments-api\", \"identity-service\", \"inventory-service\", \"fraud-service\", \"notification-service\")\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 50, ?_tstart, ?_tend), service.name"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "service.name"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 96,
+        "w": 48,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Checkout volume vs p95 latency (dual axis)",
+        "layers": [
+          {
+            "type": "area",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count",
+                "axis": "y"
+              }
+            ]
+          },
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "p95_ms",
+                "axis": "y2"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal",
+            "domain": {
+              "type": "fit",
+              "rounding": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          },
+          "y2": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.55
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 110,
+        "w": 32,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Checkout p95 by tenant over time",
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), tenant.id"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "p95_ms"
+              }
+            ],
+            "breakdown_by": {
+              "column": "tenant.id"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 32,
+        "y": 110,
+        "w": 16,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Span subtype p95 (ms)",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"span\"\n| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000, n = COUNT(*) BY span.subtype\n| SORT p95_ms DESC"
+            },
+            "x": {
+              "column": "span.subtype"
+            },
+            "y": [
+              {
+                "column": "p95_ms"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}
