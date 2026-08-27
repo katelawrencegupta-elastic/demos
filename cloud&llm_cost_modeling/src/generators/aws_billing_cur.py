@@ -51,7 +51,7 @@ def _line(world, ts, day, acct, product_code, usage_type, description,
             "net_unblended_cost": amount,
             "currency_code": "USD",
             "type": "Usage",
-            "resource_id": resource_id,
+            **({"resource_id": resource_id} if resource_id else {}),
         },
         "product": {
             "product": product_code,

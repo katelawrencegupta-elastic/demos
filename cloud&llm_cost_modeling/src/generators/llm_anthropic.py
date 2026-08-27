@@ -1,13 +1,40 @@
-"""Anthropic Admin API metrics -> metrics-anthropic_metrics.usage / .cost."""
+"""Anthropic Admin API metrics -> usage, cost, and rate_limit data streams."""
+import json
 from collections import defaultdict
 from datetime import timedelta
 
 from src.generators.common import iso, metric_doc
 from src.world.llm_traffic import iter_events
-from src.world.llm import token_cost_usd
+from src.world.scenarios import rng_for
 
 SCOPE = "llm"
 
+# Organization rate-limit ceilings (Admin API /v1/organizations/rate_limits shape).
+# Panel "Rate Limit Ceilings — per Minute" filters group_type == model_group and
+# MV_EXPANDs models, then MAX(itpm_cache / otpm / rpm).
+_RATE_LIMIT_GROUPS = [
+    {
+        "models": ["claude-opus-5"],
+        "rpm": 4000,
+        "itpm": 400_000,
+        "itpm_cache": 400_000,
+        "otpm": 80_000,
+    },
+    {
+        "models": ["claude-sonnet-5"],
+        "rpm": 4000,
+        "itpm": 450_000,
+        "itpm_cache": 450_000,
+        "otpm": 90_000,
+    },
+    {
+        "models": ["claude-haiku-4.5"],
+        "rpm": 4000,
+        "itpm": 400_000,
+        "itpm_cache": 400_000,
+        "otpm": 80_000,
+    },
+]
 
 class _AnthropicUsage:
     DATA_STREAM = "metrics-anthropic_metrics.usage-default"
@@ -109,5 +136,43 @@ class _AnthropicCost:
                     yield doc
 
 
+class _AnthropicRateLimit:
+    """Organization rate-limit ceilings -> metrics-anthropic_metrics.rate_limit.
+
+    Emits Admin API JSON in `message` so the Fleet pipeline populates
+    anthropic.rate_limit.group_type / models / flattened limit fields.
+    """
+    DATA_STREAM = "metrics-anthropic_metrics.rate_limit-default"
+    DATASET = "anthropic_metrics.rate_limit"
+
+    def emit(self, world, t0, t1, anchor):
+        # Snapshot every 6 hours (ceilings are config, not high-cardinality traffic).
+        if t0.hour % 6 != 0:
+            return
+        rng = rng_for("anthrl", t0.date().isoformat())
+        for group in _RATE_LIMIT_GROUPS:
+            jitter = 1 + rng.uniform(-0.02, 0.02)
+            payload = {
+                "type": "rate_limit",
+                "group_type": "model_group",
+                "models": list(group["models"]),
+                "limits": [
+                    {"type": "requests_per_minute",
+                     "value": int(group["rpm"] * jitter)},
+                    {"type": "input_tokens_per_minute",
+                     "value": int(group["itpm"] * jitter)},
+                    {"type": "input_tokens_per_minute_cache_aware",
+                     "value": int(group["itpm_cache"] * jitter)},
+                    {"type": "output_tokens_per_minute",
+                     "value": int(group["otpm"] * jitter)},
+                ],
+            }
+            doc = metric_doc(self.DATASET, t0, "rate_limit", 6 * 3600 * 1000)
+            doc["message"] = json.dumps(payload)
+            doc["tags"] = ["synthetic", "anthropic"]
+            yield doc
+
+
 anthropic_usage = _AnthropicUsage()
 anthropic_cost = _AnthropicCost()
+anthropic_rate_limit = _AnthropicRateLimit()

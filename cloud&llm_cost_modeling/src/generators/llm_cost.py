@@ -1,5 +1,8 @@
 """Daily LLM cost rollups -> metrics-llm.cost-default.
 
+ORPHAN — not registered in src.generators.select() / ALL. Native provider
+billing + APM labels.llm_cost_usd cover the live demo.
+
 Billing-style docs: cost by provider, model, app, and cost_center for the
 prior UTC day — designed for correlation with cloud billing streams.
 """

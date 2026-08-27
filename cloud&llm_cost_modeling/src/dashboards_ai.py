@@ -1,17 +1,19 @@
 """Publish Meridian Elastic AI Assistant + inference usage dashboard."""
 from src.dashboards import (
-    DASHBOARD_ID, DASHBOARD_ID_AI, DASHBOARD_ID_DYNAMIC,
-    DASHBOARD_ID_INFERENCE_USAGE, TS, TIME_FROM,
+    DASHBOARD_ID, DASHBOARD_ID_AI, DASHBOARD_ID_CLASSIC, DASHBOARD_ID_DYNAMIC,
+    DASHBOARD_ID_INFERENCE_USAGE, TS,
     gauge, links_panel, markdown, metric, pie, section, table,
     treemap, waffle, xy, _put_dashboard, _ensure_data_view, _q,
 )
-TIME_TO_AI = "2026-08-26T00:00:00.000Z"
+from src.time_window import demo_window, window_label
 
 TRACES = "traces-agent_builder.otel-default"
 USAGE = "logs-elastic.inference_token_usage-default"
 
 
 def build_ai_assistant_dashboard():
+    win = demo_window(to_pad_days=1)
+    label = window_label(to_pad_days=1)
     chat = f'span.name LIKE "chat *"'
     chain = (
         'span.name LIKE "invoke_agent *" AND '
@@ -148,7 +150,9 @@ def build_ai_assistant_dashboard():
                      "plus **inference token usage** (`logs-elastic.inference_token_usage-default`) "
                      "for Observability / Security AI Assistant, Agent Builder copilots, "
                      "Search Playground, Streams, and EIS endpoints (chat, ELSER, e5, rerank).\n\n"
-                     "Same backfill window as the FinOps dashboard. EIS = Elastic Inference Service."),
+                     f"Time range: **{label}**. EIS = Elastic Inference Service.\n\n"
+                     f"[FinOps baseline](#/view/{DASHBOARD_ID}) · "
+                     f"[FinOps classic](#/view/{DASHBOARD_ID_CLASSIC})."),
             metric(0, 4, 8, 5, "Conversation rounds", rounds, "rounds"),
             metric(8, 4, 8, 5, "LLM requests", llm_reqs, "requests"),
             metric(16, 4, 8, 5, "Input tokens", tokens_in, "tokens"),
@@ -234,8 +238,9 @@ def build_ai_assistant_dashboard():
                      "Enable Kibana **GenAI Settings → Token usage tracking** for the "
                      "managed `[Elastic] Inference Token Usage` dashboard on live traffic."),
             links_panel(24, 0, 24, 8, "Meridian FinOps family", [
-                ("FinOps & LLM Observability", DASHBOARD_ID),
-                ("FinOps & LLM — dynamic", DASHBOARD_ID_DYNAMIC),
+                ("FinOps & LLM Observability (baseline)", DASHBOARD_ID),
+                ("FinOps & LLM — classic", DASHBOARD_ID_CLASSIC),
+                ("FinOps & LLM — dynamic alias", DASHBOARD_ID_DYNAMIC),
                 ("This AI Assistant dashboard", DASHBOARD_ID_AI),
                 ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
             ]),
@@ -249,7 +254,7 @@ def build_ai_assistant_dashboard():
             "(conversations, tokens, latency, tools) plus Elastic inference usage "
             "by feature, model, connector, EIS vs BYO, and estimated cost."
         ),
-        "time_range": {"from": TIME_FROM, "to": TIME_TO_AI},
+        "time_range": win,
         "options": {
             "use_margins": True,
             "sync_colors": True,

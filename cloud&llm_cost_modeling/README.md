@@ -2,9 +2,12 @@
 
 Generates correlated synthetic AWS / GCP / Azure activity, security, and
 billing data for a fictional company (**Meridian Dynamics**) and ships it into
-**native Elastic integration data streams** on an Elastic Cloud Serverless
-project, so out-of-the-box dashboards, Discover views, and detection content
-work against realistic-looking data.
+**native Elastic integration data streams** on **Elastic Cloud Serverless**,
+so out-of-the-box dashboards, Discover views, and detection content work
+against realistic-looking data.
+
+> **Target:** Elastic Cloud **Serverless** only for this workshop. Hosted
+> deployments with hot/warm/cold/frozen ILM are a separate future track.
 
 ## How it works
 
@@ -54,20 +57,29 @@ correlates across streams:
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
-# .env must contain ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
+# Copy .env.example → .env and set ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
 
-.venv/bin/python -m src.cli setup      # install integrations (Fleet), patch TSDS, check access
+.venv/bin/python -m src.cli setup      # install integrations (Fleet), patch TSDS, APM mappings
 .venv/bin/python -m src.cli sample --scope all
 .venv/bin/python -m src.cli backfill --days 30 --scope cloud
 .venv/bin/python -m src.cli backfill --days 30 --scope llm
 .venv/bin/python -m src.cli backfill --days 30 --scope elastic-ai
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
-.venv/bin/python -m src.cli dashboards   # FinOps + LLM + AI Assistant dashboards
+.venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
+.venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
+.venv/bin/python -m src.cli dashboards --variant classic    # legacy layout (+ security→cost)
 .venv/bin/python -m src.cli dashboards --variant ai-assistant
+.venv/bin/python -m src.cli backup     # snapshot Kibana/Fleet/ES objects → ./elastic
 ```
 
-`--scope` accepts `all` | `cloud` | `llm` | `elastic-ai`.
+`--scope` accepts `all` | `cloud` | `llm` | `openai-extra` | `elastic-ai`.
+
+`openai-extra` re-indexes only OpenAI images/audio/moderations/rate-limits (fills
+OOTB Usage panels without redoing completions/embeddings).
+
+**Dashboard time ranges** are computed at publish from `utcnow()` (same clock as
+backfill). After a fresh backfill, re-run `dashboards` so stored windows match.
 
 ## LLM factories
 
@@ -77,10 +89,10 @@ as the real integrations), so OOTB dashboards work:
 | Data stream | Package |
 |---|---|
 | `logs-openai.completions-default` / `logs-openai.embeddings-default` | openai |
-| `metrics-anthropic_metrics.usage-default` / `.cost-default` | anthropic_metrics |
+| `metrics-anthropic_metrics.usage-default` / `.cost-default` / `.rate_limit-default` | anthropic_metrics |
 | `logs-aws_bedrock.invocation-default` / `metrics-aws_bedrock.runtime-default` | aws_bedrock |
 | `logs-azure_openai.logs-default` / `metrics-azure.open_ai-default` | azure_openai |
-| `logs-gcp_vertexai.prompt_response_logs-default` / `metrics-gcp_vertexai.metrics-default` | gcp_vertexai |
+| `logs-gcp_vertexai.prompt_response_logs-default` / `metrics-gcp_vertexai.metrics-default` / `logs-gcp_vertexai.auditlogs-default` | gcp_vertexai |
 | `traces-apm-default` | apm (gen_ai spans) |
 | `metrics-aws_billing.cur-default` | aws_billing (CUR 2.0, incl. Bedrock lines) |
 | `traces-agent_builder.otel-default` | Elastic Agent Builder / AI Assistant OTel spans |
@@ -94,12 +106,15 @@ as the real integrations), so OOTB dashboards work:
 
 Notes:
 
-- `setup` installs cloud + LLM packages and removes TSDS mode from
-  `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so 30-day
-  metric backfill is accepted.
+- `setup` installs cloud + LLM packages, creates APM gen_ai mappings + 60d
+  retention, wires CUR alias / inference data-view Serverless workarounds, and
+  removes TSDS mode from `metrics-aws.ec2_metrics` and
+  `metrics-aws_bedrock.runtime` so 30-day metric backfill is accepted.
 - Generation is seeded and windows are pure functions of time, so backfill
   and `stream` produce one continuous, reproducible timeline.
 - ~1M cloud docs + ~120k native LLM/APM/CUR docs for a 30-day backfill.
+- Orphan modules `llm_invocation` / `llm_usage` / `llm_cost` are **not** in
+  `backfill --scope llm` (native provider streams + APM are used instead).
 
 ## Layout
 
@@ -110,7 +125,9 @@ src/world/                 # inventory + scenarios + cloud costs + LLM catalog
 src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
-src/cli.py                 # setup | sample | backfill | stream | verify | dashboards
-src/dashboards.py          # Kibana FinOps + LLM observability dashboard
+src/time_window.py         # shared demo time range (aligns with backfill)
+src/cli.py                 # setup | sample | backfill | stream | verify | dashboards | backup
+src/dashboards.py          # Kibana FinOps + LLM observability dashboards
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
+src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic
 ```

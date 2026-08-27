@@ -6,7 +6,7 @@ from datetime import timedelta
 
 import requests
 
-from src.config import ELASTIC_URL, ES_HEADERS, KIBANA_URL
+from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL
 from src.generators import select
 from src.sink.elastic import BulkSink, es_search
 from src.world.model import load_world
@@ -30,6 +30,12 @@ PARSE_CHECKS = {
     "aws_bedrock.invocation": ["aws_bedrock.invocation.model_id",
                                "gen_ai.usage.prompt_tokens"],
     "azure_openai.logs": ["azure.open_ai.category", "azure.resource.id"],
+    "gcp_vertexai.auditlogs": [
+        "event.action",
+        "gcp.vertexai.audit.service_name",
+        "gcp.vertexai.audit.resource_name",
+        "client.user.email",
+    ],
 }
 
 
@@ -167,7 +173,11 @@ def cmd_stream(tick: int, scope: str):
 
 
 def cmd_verify(scope: str):
+    from src.setup_cmd import CUR_ALIAS, INFERENCE_TOKEN_USAGE_DATA_VIEW_ID, INFERENCE_TOKEN_USAGE_INDEX
+    from src.time_window import demo_window
+
     gens = select(scope)
+    failed = False
     print("== per data stream: doc count, time range ==")
     total = 0
     for gen in gens:
@@ -182,6 +192,7 @@ def cmd_verify(scope: str):
             res = es_search(ds, body)
         except requests.HTTPError as e:
             print(f"  [fail] {ds}: {e}")
+            failed = True
             continue
         count = res["hits"]["total"]["value"]
         total += count
@@ -192,14 +203,53 @@ def cmd_verify(scope: str):
     print(f"  TOTAL: {total:,} docs")
 
     print("\n== scenario / integration spot-checks ==")
+    win = demo_window()
     if scope in ("all", "cloud"):
+        try:
+            r = es_search("logs-aws.cloudtrail-default", {
+                "size": 0, "track_total_hits": True})
+            n = r["hits"]["total"]["value"]
+            print(f"  CloudTrail events: {n:,}")
+            if n < 1:
+                print("  [fail] CloudTrail stream empty")
+                failed = True
+        except requests.HTTPError as e:
+            print(f"  CloudTrail: FAIL {e}")
+            failed = True
+
+        r = requests.get(f"{ELASTIC_URL}/_alias/{CUR_ALIAS}",
+                         headers=ES_HEADERS, timeout=30)
+        if r.status_code == 200:
+            print(f"  CUR alias {CUR_ALIAS}: ok")
+        else:
+            print(f"  [fail] CUR alias {CUR_ALIAS}: {r.status_code}")
+            failed = True
+
         try:
             r = es_search("logs-aws.guardduty-default", {
                 "size": 0, "track_total_hits": True,
                 "query": {"prefix": {"rule.name": "CryptoCurrency"}}})
-            print(f"  GuardDuty crypto findings: {r['hits']['total']['value']}")
-        except requests.HTTPError:
-            pass
+            n = r["hits"]["total"]["value"]
+            print(f"  GuardDuty crypto findings: {n}")
+            if n < 1:
+                print("  [fail] expected crypto findings")
+                failed = True
+        except requests.HTTPError as e:
+            print(f"  GuardDuty crypto: FAIL {e}")
+            failed = True
+
+        try:
+            r = es_search("logs-aws.guardduty-default", {
+                "size": 0, "track_total_hits": True,
+                "query": {"prefix": {"rule.name": "Policy:S3"}}})
+            n = r["hits"]["total"]["value"]
+            print(f"  GuardDuty S3 policy findings: {n}")
+            if n < 1:
+                print("  [fail] expected S3 exposure findings")
+                failed = True
+        except requests.HTTPError as e:
+            print(f"  GuardDuty S3: FAIL {e}")
+            failed = True
 
     if scope in ("all", "llm", "openai-extra"):
         checks = [
@@ -212,13 +262,16 @@ def cmd_verify(scope: str):
             ("logs-openai.rate_limits-default", "OpenAI rate limits"),
             ("metrics-anthropic_metrics.usage-default", "Anthropic usage"),
             ("metrics-anthropic_metrics.cost-default", "Anthropic cost"),
+            ("metrics-anthropic_metrics.rate_limit-default", "Anthropic rate limits"),
             ("logs-aws_bedrock.invocation-default", "Bedrock invocations"),
             ("metrics-aws_bedrock.runtime-default", "Bedrock runtime"),
+            ("metrics-aws_bedrock.guardrails-default", "Bedrock guardrails"),
             ("logs-azure_openai.logs-default", "Azure OpenAI logs"),
             ("metrics-azure.open_ai-default", "Azure OpenAI metrics"),
             ("metrics-azure.billing-default", "Azure billing (incl. OpenAI)"),
             ("logs-gcp_vertexai.prompt_response_logs-default", "Vertex prompt logs"),
             ("metrics-gcp_vertexai.metrics-default", "Vertex metrics"),
+            ("logs-gcp_vertexai.auditlogs-default", "Vertex audit logs"),
             ("traces-apm-default", "APM traces"),
         ]
         for ds, label in checks:
@@ -227,6 +280,46 @@ def cmd_verify(scope: str):
                 print(f"  {label}: {r['hits']['total']['value']:,}")
             except requests.HTTPError as e:
                 print(f"  {label}: FAIL {e}")
+                failed = True
+
+        # APM ES|QL columns required by FinOps LLM cost panels
+        print("\n== APM gen_ai ES|QL columns ==")
+        need = ("span.subtype", "gen_ai.usage.total_tokens", "labels.llm_cost_usd")
+        r = requests.post(
+            f"{ELASTIC_URL}/traces-apm-default/_field_caps",
+            headers=ES_HEADERS, timeout=60,
+            json={"fields": list(need)},
+        )
+        if r.status_code >= 300:
+            print(f"  [fail] field_caps: {r.status_code} {r.text[:200]}")
+            failed = True
+        else:
+            fields = r.json().get("fields") or {}
+            for f in need:
+                if f in fields:
+                    print(f"  [ok] {f}")
+                else:
+                    print(f"  [fail] missing column {f}")
+                    failed = True
+
+        q = (
+            f'FROM traces-apm-default\n'
+            f'| WHERE @timestamp >= "{win["from"]}" AND @timestamp <= "{win["to"]}" '
+            f'AND span.subtype == "gen_ai"\n'
+            f'| STATS calls = COUNT(*)'
+        )
+        r = requests.post(f"{ELASTIC_URL}/_query", headers=ES_HEADERS,
+                          timeout=60, json={"query": q})
+        if r.status_code >= 300:
+            print(f"  [fail] ES|QL gen_ai probe: {r.status_code} {r.text[:300]}")
+            failed = True
+        else:
+            vals = (r.json().get("values") or [[None]])[0]
+            calls = vals[0] if vals else None
+            print(f"  gen_ai spans in demo window: {calls}")
+            if not calls:
+                print("  [fail] no gen_ai spans in demo window")
+                failed = True
 
         try:
             r = es_search("logs-openai.completions-default", {
@@ -310,6 +403,7 @@ def cmd_verify(scope: str):
                   f"kinds={kinds}  agents={agents}")
         except requests.HTTPError as e:
             print(f"  Agent Builder traces: FAIL {e}")
+            failed = True
         try:
             r = es_search("logs-elastic.inference_token_usage-default", {
                 "size": 0, "track_total_hits": True,
@@ -323,11 +417,30 @@ def cmd_verify(scope: str):
                   f"cost=${r['aggregations']['cost']['value']:.2f}  features={features}")
         except requests.HTTPError as e:
             print(f"  Inference token usage: FAIL {e}")
+            failed = True
+
+        r = requests.get(
+            f"{KIBANA_URL}/api/data_views/data_view/{INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}",
+            headers=KBN_HEADERS, timeout=30)
+        if r.status_code != 200:
+            print(f"  [fail] inference data view: {r.status_code}")
+            failed = True
+        else:
+            title = r.json()["data_view"].get("title")
+            if title == INFERENCE_TOKEN_USAGE_INDEX:
+                print(f"  [ok] inference data view -> {title}")
+            else:
+                print(f"  [fail] inference data view title={title!r} "
+                      f"(expected {INFERENCE_TOKEN_USAGE_INDEX})")
+                failed = True
 
     print("\n== kibana ==")
     print(f"  Discover:   {KIBANA_URL}/app/discover")
     print(f"  Dashboards: {KIBANA_URL}/app/dashboards")
     print("  Search: OpenAI, Anthropic, Bedrock, Azure OpenAI, Vertex AI, APM")
+    print("  Note: log PARSE_CHECKS live in `sample`; metrics/APM use verify probes above.")
+    if failed:
+        raise SystemExit(1)
 
 
 def main():
@@ -335,12 +448,12 @@ def main():
         prog="synthcloud",
         description="Multi-cloud + LLM synthetic data factory for Elastic")
     sub = p.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("setup", help="install integrations, patch TSDS, check access")
+    sub.add_parser("setup", help="install integrations, APM mappings, patch TSDS, check access")
     s_sample = sub.add_parser("sample", help="validate one doc per log generator")
     s_sample.add_argument(
         "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     b = sub.add_parser("backfill", help="bulk-index historical data")
-    b.add_argument("--days", type=int, default=30)
+    b.add_argument("--days", type=int, default=120)
     b.add_argument(
         "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     s = sub.add_parser("stream", help="continuously emit live events")
@@ -351,8 +464,13 @@ def main():
     v.add_argument(
         "--scope", choices=["all", "cloud", "llm", "openai-extra", "elastic-ai"], default="all")
     d = sub.add_parser("dashboards", help="publish FinOps + LLM Kibana dashboards")
-    d.add_argument("--variant", choices=["original", "dynamic", "ai-assistant", "all"],
-                   default="dynamic")
+    d.add_argument(
+        "--variant",
+        choices=["baseline", "dynamic", "classic", "original", "ai-assistant", "all"],
+        default="baseline",
+        help="baseline=primary FinOps (default); dynamic=alias of baseline; "
+             "classic/original=legacy layout; all=baseline+classic+AI",
+    )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
@@ -369,10 +487,12 @@ def main():
         cmd_verify(args.scope)
     elif args.cmd == "dashboards":
         from src.dashboards import publish
+        v = args.variant
         publish(
-            include_original=args.variant in ("original", "all"),
-            include_dynamic=args.variant in ("dynamic", "all"),
-            include_ai=args.variant in ("ai-assistant", "dynamic", "all"),
+            include_baseline=v in ("baseline", "all"),
+            include_classic=v in ("classic", "original", "all"),
+            include_dynamic_alias=v in ("baseline", "dynamic", "all"),
+            include_ai=v in ("ai-assistant", "baseline", "dynamic", "all"),
         )
     elif args.cmd == "backup":
         from src.backup import run as backup_run

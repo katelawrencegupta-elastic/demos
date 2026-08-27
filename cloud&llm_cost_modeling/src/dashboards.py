@@ -8,13 +8,18 @@ import json
 import requests
 
 from src.config import KBN_HEADERS, KIBANA_URL
+from src.time_window import demo_window, window_label
 
 DASHBOARD_ID = "meridian-finops-llm-observability"
-DASHBOARD_ID_DYNAMIC = "meridian-finops-llm-observability-dynamic"
+DASHBOARD_ID_CLASSIC = "meridian-finops-llm-observability-classic"
+DASHBOARD_ID_DYNAMIC = "meridian-finops-llm-observability-dynamic"  # alias of baseline
 DASHBOARD_ID_AI = "meridian-ai-assistant-inference-usage"
 DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
-TIME_FROM = "2026-07-14T00:00:00.000Z"
-TIME_TO = "2026-08-14T00:00:00.000Z"
+
+# Resolved at publish time (see src.time_window); kept as module attrs for imports.
+_WINDOW = demo_window()
+TIME_FROM = _WINDOW["from"]
+TIME_TO = _WINDOW["to"]
 
 TS = "@timestamp >= ?_tstart AND @timestamp <= ?_tend"
 
@@ -28,6 +33,7 @@ OOTB = {
     "Azure OpenAI Billing": "azure_openai-f5bbc591-5e6b-4af7-b6c5-b02065a06455",
     "Azure OpenAI Overview": "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",
     "Amazon Bedrock Overview": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
+    "Amazon Bedrock Guardrails": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
     "GCP Vertex AI Metrics": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
     "APM Monitoring Overview": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
 }
@@ -116,6 +122,8 @@ def treemap(x, y, w, h, title, query, metric_col, group_cols):
 
 
 def heatmap(x, y, w, h, title, query, metric_col, x_col, y_col):
+    # ES|QL heatmaps need `y` (not breakdown_by — that is accepted then stripped).
+    # Vertical x labels avoid overlapping daily date ticks on ~30d windows.
     return {
         "grid": _grid(x, y, w, h),
         "type": "vis",
@@ -127,10 +135,16 @@ def heatmap(x, y, w, h, title, query, metric_col, x_col, y_col):
             "x": {"column": x_col},
             "y": {"column": y_col},
             "legend": {"visibility": "visible", "position": "right"},
-            "styling": {"cells": {"labels": {"visible": False}}},
             "axis": {
-                "x": {"labels": {"visible": True, "orientation": "horizontal"}},
-                "y": {"labels": {"visible": True}},
+                "x": {
+                    "title": {"text": "", "visible": False},
+                    "labels": {"visible": True, "orientation": "vertical"},
+                    "scale": "ordinal",
+                },
+                "y": {
+                    "labels": {"visible": True},
+                    "title": {"visible": False},
+                },
             },
         },
     }
@@ -321,7 +335,9 @@ def _ensure_data_view(view_id, title, time_field="@timestamp"):
         print(f"  [ok] data view {view_id} created")
 
 
-def build_dashboard():
+def build_classic_dashboard():
+    win = demo_window()
+    label = window_label()
     aws_cost = _q(
         "FROM metrics-aws_billing.cur-default",
         f"| WHERE {TS}",
@@ -374,7 +390,11 @@ def build_dashboard():
                 ("AI Assistant & inference usage", DASHBOARD_ID_AI),
                 ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
             ]),
-            links_panel(32, 0, 16, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
+            links_panel(32, 0, 16, 10, "Provider FinOps & LLM packs", [
+                *OOTB.items(),
+                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
+                ("AI Assistant & inference usage", DASHBOARD_ID_AI),
+            ]),
         ]),
         section("Overview — multi-cloud + LLM spend", 12, [
             markdown(0, 0, 48, 3,
@@ -382,7 +402,14 @@ def build_dashboard():
                      "Cost allocation across AWS accounts, GCP projects, and Azure subscriptions, "
                      "correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, "
                      "latency, quality) for every application flow.\n\n"
-                     "Time range is stored with the dashboard (14 Jul – 14 Aug 2026 backfill)."),
+                     f"Time range is stored with the dashboard (**{label}**). "
+                     "Republish after backfill to refresh.\n\n"
+                     f"**Baseline (stacked bars/areas):** "
+                     f"[FinOps & LLM Observability](#/view/{DASHBOARD_ID}).\n\n"
+                     "**Scenario callouts:** cost leak on `meridian-staging` · crypto mining (−12..−9, "
+                     "`meridian-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp "
+                     "(from −15) · LLM agent-loop (`checkout-assistant`) · model migration "
+                     "(`support-copilot` openai→anthropic) · cache-miss (`rag-research`)."),
             metric(0, 3, 12, 5, "AWS unblended cost (CUR)", aws_cost, "cost", "USD"),
             metric(12, 3, 12, 5, "GCP billing total", gcp_cost, "cost", "USD"),
             metric(24, 3, 12, 5, "Azure pretax cost", azure_cost, "cost", "USD"),
@@ -391,7 +418,58 @@ def build_dashboard():
             xy(18, 8, 30, 12, "Daily cost by cloud provider", daily_cloud,
                "day", ["cost"], layer="area", breakdown="provider"),
         ]),
-        section("Cost allocation — account, subscription, service, team, tag, region", 36, [
+        section("Security → cost — crypto mining & S3 exposure", 36, [
+            markdown(0, 0, 48, 3,
+                     "## Security incidents that move spend\n\n"
+                     "**Crypto-mining** (days −12..−9, `meridian-dev`): GuardDuty "
+                     "`CryptoCurrency:EC2/BitcoinTool.B`, CloudTrail brute-force from "
+                     "`185.220.101.34`, CPU pegged, EC2 cost spike.\n\n"
+                     "**S3 public exposure** (days −6..−4, fintech): "
+                     "`Policy:S3/BucketAnonymousAccessGranted`, `PutBucketPolicy`, anonymous scrapes "
+                     "of `meridian-fintech-exports`, data-transfer cost.\n\n"
+                     "Open OOTB GuardDuty / CloudTrail Discover with the same time range for drill-down."),
+            metric(0, 3, 12, 5, "GuardDuty findings",
+                   _q("FROM logs-aws.guardduty-default",
+                      f"| WHERE {TS}",
+                      "| STATS findings = COUNT(*)"),
+                   "findings"),
+            metric(12, 3, 12, 5, "Crypto findings",
+                   _q("FROM logs-aws.guardduty-default",
+                      f"| WHERE {TS} AND rule.name LIKE \"CryptoCurrency*\"",
+                      "| STATS crypto = COUNT(*)"),
+                   "crypto"),
+            metric(24, 3, 12, 5, "S3 policy findings",
+                   _q("FROM logs-aws.guardduty-default",
+                      f"| WHERE {TS} AND rule.name LIKE \"Policy:S3*\"",
+                      "| STATS s3_findings = COUNT(*)"),
+                   "s3_findings"),
+            metric(36, 3, 12, 5, "CloudTrail from attacker IP",
+                   _q("FROM logs-aws.cloudtrail-default",
+                      f"| WHERE {TS} AND source.ip == \"185.220.101.34\"",
+                      "| STATS events = COUNT(*)"),
+                   "events"),
+            xy(0, 8, 24, 12, "GuardDuty findings by type",
+               _q("FROM logs-aws.guardduty-default",
+                  f"| WHERE {TS}",
+                  "| STATS findings = COUNT(*) BY finding = rule.name",
+                  "| SORT findings DESC", "| LIMIT 12"),
+               "finding", ["findings"], layer="bar"),
+            xy(24, 8, 24, 12, "S3 / bucket CloudTrail actions",
+               _q("FROM logs-aws.cloudtrail-default",
+                  f"| WHERE {TS} AND (event.action LIKE \"*Bucket*\" OR event.action LIKE \"*Object*\")",
+                  "| STATS calls = COUNT(*) BY action = event.action",
+                  "| SORT calls DESC", "| LIMIT 12"),
+               "action", ["calls"], layer="bar"),
+            table(0, 20, 48, 10, "Recent high-severity GuardDuty findings",
+                  _q("FROM logs-aws.guardduty-default",
+                     f"| WHERE {TS}",
+                     "| SORT @timestamp DESC",
+                     "| KEEP @timestamp, rule.name, aws.guardduty.severity.value, cloud.account.id",
+                     "| LIMIT 40"),
+                  ["@timestamp", "rule.name", "cloud.account.id"],
+                  ["aws.guardduty.severity.value"]),
+        ]),
+        section("Cost allocation — account, subscription, service, team, tag, region", 64, [
             markdown(0, 0, 48, 2,
                      "Allocation dimensions from native billing integrations: AWS CUR "
                      "(`usage_account_name`, `product`, `resource_tags`, region), GCP project/service/"
@@ -452,7 +530,7 @@ def build_dashboard():
                   "| SORT cost DESC"),
                "region", ["cost"], layer="bar"),
         ]),
-        section("Engineering & Ops — usage correlated with cost", 90, [
+        section("Engineering & Ops — usage correlated with cost", 118, [
             markdown(0, 0, 48, 2,
                      "Infrastructure usage (EC2 network throughput, CloudTrail API volume) plotted "
                      "alongside CUR EC2 spend so ops can see whether cost moves with work. "
@@ -489,7 +567,7 @@ def build_dashboard():
                      "| SORT cost DESC", "| LIMIT 40"),
                   ["account", "service"], ["cost", "usage", "unit_cost"]),
         ]),
-        section("Historical cost & 7-day run-rate forecast", 128, [
+        section("Historical cost & 7-day run-rate forecast", 156, [
             markdown(0, 0, 48, 2,
                      "Daily CUR history plus a trailing 7-day average run-rate. "
                      "`projected_30d` = last-7-day daily average × 30 (not a statistical model — a FinOps run-rate)."),
@@ -528,11 +606,14 @@ def build_dashboard():
                   "| SORT day"),
                "day", ["cost"], layer="line"),
         ]),
-        section("LLM traces — end-to-end call, tokens, and cost", 156, [
+        section("LLM traces — end-to-end call, tokens, and cost", 184, [
             markdown(0, 0, 48, 2,
                      "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, "
                      "model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the "
-                     "request id — open APM to inspect the parent FastAPI transaction."),
+                     "request id — open APM to inspect the parent FastAPI transaction.\n\n"
+                     "**LLM scenarios:** agent-loop burn on `checkout-assistant` (−8..−6) · "
+                     "model migration on `support-copilot` (openai→anthropic at −14) · "
+                     "cache-miss storm on `rag-research` (−5..−3) · skunkworks GenAI ramp."),
             metric(0, 2, 12, 5, "LLM calls (sampled spans)",
                    _q("FROM traces-apm-default",
                       f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -565,7 +646,7 @@ def build_dashboard():
                   ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens",
                    "gen_ai.usage.total_tokens", "cost_usd", "latency_ms"]),
         ]),
-        section("Token usage per request — prompt, completion, total", 180, [
+        section("Token usage per request — prompt, completion, total", 208, [
             xy(0, 0, 32, 12, "Daily prompt vs completion tokens (APM spans)",
                _q("FROM traces-apm-default",
                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -593,7 +674,7 @@ def build_dashboard():
                   "| SORT day"),
                "day", ["prompt", "completion"], layer="area"),
         ]),
-        section("LLM cost — model, user, feature, team", 206, [
+        section("LLM cost — model, user, feature, team", 234, [
             xy(0, 0, 24, 12, "LLM cost by model",
                _q("FROM traces-apm-default",
                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -635,7 +716,7 @@ def build_dashboard():
                      "| SORT tokens DESC", "| LIMIT 30"),
                   ["user", "feature", "team"], ["calls", "tokens"]),
         ]),
-        section("LLM quality & latency", 246, [
+        section("LLM quality & latency", 274, [
             metric(0, 0, 12, 5, "p95 latency (ms)",
                    _q("FROM traces-apm-default",
                       f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -671,7 +752,7 @@ def build_dashboard():
                   "| SORT day"),
                "day", ["p95_ms"], layer="line"),
         ]),
-        section("Funnel — which user flows consume the most tokens", 278, [
+        section("Funnel — which user flows consume the most tokens", 306, [
             markdown(0, 0, 48, 3,
                      "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, "
                      "`rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. "
@@ -702,14 +783,13 @@ def build_dashboard():
     ]
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability",
+        "title": "[Meridian] FinOps & LLM Observability — classic",
         "description": (
-            "Cross-cloud cost allocation (account, subscription, service, team, tag, region), "
-            "usage-to-cost correlation, historical spend and 7-day run-rate forecast, native "
-            "provider FinOps links, and LLM observability: traces, tokens, cost, quality, "
-            "latency, and user-flow funnel."
+            "Classic layout: cross-cloud cost allocation tables and bars, security→cost "
+            "(crypto / S3), usage-to-cost correlation, and LLM observability tables. "
+            "The baseline dashboard is meridian-finops-llm-observability."
         ),
-        "time_range": {"from": TIME_FROM, "to": TIME_TO},
+        "time_range": win,
         "options": {
             "use_margins": True,
             "sync_colors": False,
@@ -722,8 +802,10 @@ def build_dashboard():
     }
 
 
-def build_dynamic_dashboard():
-    """Same data story as the original, with treemaps, heatmaps, gauges, waffles."""
+def build_dashboard():
+    """Baseline Meridian FinOps + LLM dashboard (stacked bars/areas, gauges, waffles)."""
+    win = demo_window()
+    label = window_label()
     aws_trend = _q(
         "FROM metrics-aws_billing.cur-default",
         f"| WHERE {TS}",
@@ -771,7 +853,7 @@ def build_dynamic_dashboard():
         "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product",
         "| SORT cost DESC", "| LIMIT 40",
     )
-    heat_acct = _q(
+    cost_by_acct_day = _q(
         "FROM metrics-aws_billing.cur-default",
         f"| WHERE {TS}",
         "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d), account = aws_billing.cur.line_item.usage_account_name",
@@ -822,13 +904,13 @@ def build_dynamic_dashboard():
         "| STATS tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost) BY flow = service.name, model = gen_ai.request.model",
         "| SORT tokens DESC", "| LIMIT 40",
     )
-    heat_flow = _q(
+    tokens_by_flow_day = _q(
         "FROM traces-apm-default",
         f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
         "| STATS tokens = SUM(gen_ai.usage.total_tokens) BY day = BUCKET(@timestamp, 1d), flow = service.name",
         "| SORT day",
     )
-    heat_lat = _q(
+    latency_by_model_day = _q(
         "FROM traces-apm-default",
         f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
         "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY day = BUCKET(@timestamp, 1d), model = gen_ai.request.model",
@@ -887,11 +969,14 @@ def build_dynamic_dashboard():
     panels = [
         section("Scoreboard — sparkline KPIs", 0, [
             markdown(0, 0, 48, 3,
-                     "## Meridian Dynamics — FinOps & LLM (dynamic)\n\n"
-                     "Same data as the original dashboard, recast as treemaps, heatmaps, gauges, "
-                     "waffles, tag clouds, stacked areas, and dual-axis usage vs cost.\n\n"
-                     f"[Open the original](#/view/{DASHBOARD_ID}) · "
-                     f"[Backup snapshot](#/view/{DASHBOARD_ID}-backup)"),
+                     "## Meridian Dynamics — FinOps & LLM Observability\n\n"
+                     "Baseline Meridian FinOps + LLM view: stacked bars/areas, gauges, "
+                     "waffles, tag clouds, and dual-axis usage vs cost.\n\n"
+                     f"Time range: **{label}**. "
+                     f"Security→cost (crypto / S3) lives on the "
+                     f"[classic](#/view/{DASHBOARD_ID_CLASSIC}).\n\n"
+                     f"[Open classic](#/view/{DASHBOARD_ID_CLASSIC}) · "
+                     f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss."),
             metric(0, 3, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
             metric(12, 3, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
             metric(24, 3, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),
@@ -900,16 +985,16 @@ def build_dynamic_dashboard():
             xy(16, 9, 32, 14, "Daily cost by cloud (stacked area)",
                daily_cloud, "day", ["cost"], layer="area_stacked", breakdown="provider"),
         ]),
-        section("Allocation — treemap, heatmap, waffle", 26, [
-            treemap(0, 0, 28, 16, "AWS cost treemap — account × service",
-                    acct_svc, "cost", ["account", "service"]),
+        section("Allocation — stacked bars, area, waffle", 26, [
+            xy(0, 0, 28, 16, "AWS cost by service — stacked by account",
+               acct_svc, "service", ["cost"], layer="bar_stacked", breakdown="account"),
             waffle(28, 0, 20, 16, "AWS cost_center tags", cc_tag, "cost", "tag"),
-            heatmap(0, 16, 48, 14, "AWS cost heatmap — account × day",
-                    heat_acct, "cost", "day", "account"),
-            treemap(0, 30, 24, 14, "GCP cost — project × service",
-                    gcp_proj_svc, "cost", ["project", "service"]),
-            treemap(24, 30, 24, 14, "Azure cost — department × product",
-                    azure_dept, "cost", ["team", "product"]),
+            xy(0, 16, 48, 14, "AWS cost by account over day (stacked area)",
+               cost_by_acct_day, "day", ["cost"], layer="area_stacked", breakdown="account"),
+            xy(0, 30, 24, 14, "GCP cost by service — stacked by project",
+               gcp_proj_svc, "service", ["cost"], layer="bar_stacked", breakdown="project"),
+            xy(24, 30, 24, 14, "Azure cost by product — stacked by department",
+               azure_dept, "product", ["cost"], layer="bar_stacked", breakdown="team"),
         ]),
         section("Usage vs cost — dual axis", 76, [
             xy_dual(
@@ -944,11 +1029,11 @@ def build_dynamic_dashboard():
             xy(28, 14, 20, 16, "Tokens by user flow",
                flow_tokens, "flow", ["tokens"], layer="bar_horizontal"),
         ]),
-        section("LLM heatmaps — time × flow × model", 140, [
-            heatmap(0, 0, 48, 14, "Tokens heatmap — flow × day",
-                    heat_flow, "tokens", "day", "flow"),
-            heatmap(0, 14, 48, 14, "p95 latency heatmap — model × day (ms)",
-                    heat_lat, "p95_ms", "day", "model"),
+        section("LLM tokens & latency over time", 140, [
+            xy(0, 0, 48, 14, "Tokens by flow over day (stacked area)",
+               tokens_by_flow_day, "day", ["tokens"], layer="area_stacked", breakdown="flow"),
+            xy(0, 14, 48, 14, "p95 latency by model over day (ms)",
+               latency_by_model_day, "day", ["p95_ms"], layer="line", breakdown="model"),
             xy(0, 28, 32, 12, "Prompt vs completion (stacked area)",
                tokens_day, "day", ["prompt", "completion"], layer="area_stacked"),
             xy(32, 28, 16, 12, "OpenAI tokens by user",
@@ -968,28 +1053,33 @@ def build_dynamic_dashboard():
             xy(0, 12, 24, 14, "Prompt vs completion by flow",
                flow_tokens, "flow", ["prompt", "completion"],
                layer="bar_horizontal_stacked"),
-            treemap(24, 12, 24, 14, "Cost funnel by flow × model",
-                    flow_model, "cost_usd", ["flow", "model"]),
+            xy(24, 12, 24, 14, "Cost by flow — stacked by model",
+               flow_model, "flow", ["cost_usd"],
+               layer="bar_horizontal_stacked", breakdown="model"),
         ]),
         section("Provider packs", 200, [
             links_panel(0, 0, 24, 10, "This family", [
-                ("Original dashboard", DASHBOARD_ID),
-                ("Backup snapshot", f"{DASHBOARD_ID}-backup"),
-                ("This dynamic copy", DASHBOARD_ID_DYNAMIC),
+                ("This baseline dashboard", DASHBOARD_ID),
+                ("Classic layout", DASHBOARD_ID_CLASSIC),
+                ("Dynamic alias (same as baseline)", DASHBOARD_ID_DYNAMIC),
                 ("AI Assistant & inference usage", DASHBOARD_ID_AI),
                 ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
             ]),
-            links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", list(OOTB.items())),
+            links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", [
+                *OOTB.items(),
+                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
+                ("AI Assistant & inference usage", DASHBOARD_ID_AI),
+            ]),
         ]),
     ]
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability — dynamic",
+        "title": "[Meridian] FinOps & LLM Observability",
         "description": (
-            "Visual remake of the Meridian FinOps + LLM dashboard: treemaps, heatmaps, "
-            "gauges, waffles, tag clouds, stacked areas, and dual-axis usage vs cost."
+            "Baseline Meridian FinOps + LLM dashboard: stacked bars and areas, "
+            "gauges, waffles, tag clouds, and dual-axis usage vs cost."
         ),
-        "time_range": {"from": TIME_FROM, "to": TIME_TO},
+        "time_range": win,
         "options": {
             "use_margins": True,
             "sync_colors": True,
@@ -1017,10 +1107,29 @@ def _put_dashboard(dash_id, body):
     )
     if r.status_code >= 300:
         err = r.text
-        if "pinned_panels" in err or "time_slider" in err:
+        # Only strip pinned_panels when that field itself is rejected (not when
+        # "time_slider_control" merely appears in the allowed-types list).
+        if "pinned_panels" in err and (
+            "Unrecognized" in err or "not allowed" in err
+            or '"path": [\n            "pinned_panels"' in err
+            or '"pinned_panels"' in err and "Invalid" in err
+        ):
             body = dict(body)
             body.pop("pinned_panels", None)
-            print(f"  retrying {dash_id} without time slider ...")
+            print(f"  retrying {dash_id} without pinned_panels ...")
+            r = requests.put(
+                f"{KIBANA_URL}/api/dashboards/{dash_id}",
+                headers=KBN_HEADERS, timeout=60, json=body,
+            )
+            err = r.text if r.status_code >= 300 else err
+        if r.status_code >= 300 and "styling" in err and "cells" in err:
+            body = json.loads(json.dumps(body))
+            for panel in body.get("panels") or []:
+                cfg = panel.get("config") or {}
+                cfg.pop("styling", None)
+                for child in panel.get("panels") or []:
+                    (child.get("config") or {}).pop("styling", None)
+            print(f"  retrying {dash_id} without vis styling ...")
             r = requests.put(
                 f"{KIBANA_URL}/api/dashboards/{dash_id}",
                 headers=KBN_HEADERS, timeout=60, json=body,
@@ -1038,18 +1147,30 @@ def _put_dashboard(dash_id, body):
     return url
 
 
-def publish(include_original=True, include_dynamic=True, include_ai=True):
+def publish(include_baseline=True, include_classic=False, include_dynamic_alias=True,
+            include_ai=True):
+    """Publish Meridian dashboards.
+
+    Baseline is the current stacked-bar/area layout (former \"dynamic\").
+    Classic is the older table/bar layout with the security→cost section.
+    The -dynamic Kibana id is kept as an alias of baseline for existing links.
+    """
     print("== data views ==")
     _ensure_data_view("traces-*", "traces-*")
     _ensure_data_view("metrics-*", "metrics-*")
     _ensure_data_view("logs-*", "logs-*")
     urls = []
-    if include_original:
-        print(f"== PUT dashboard {DASHBOARD_ID} ==")
-        urls.append(_put_dashboard(DASHBOARD_ID, build_dashboard()))
-    if include_dynamic:
-        print(f"== PUT dashboard {DASHBOARD_ID_DYNAMIC} ==")
-        urls.append(_put_dashboard(DASHBOARD_ID_DYNAMIC, build_dynamic_dashboard()))
+    baseline = build_dashboard()
+    if include_baseline:
+        print(f"== PUT dashboard {DASHBOARD_ID} (baseline) ==")
+        urls.append(_put_dashboard(DASHBOARD_ID, baseline))
+    if include_dynamic_alias:
+        # Same body/title as baseline so old bookmarks stay current.
+        print(f"== PUT dashboard {DASHBOARD_ID_DYNAMIC} (alias of baseline) ==")
+        urls.append(_put_dashboard(DASHBOARD_ID_DYNAMIC, baseline))
+    if include_classic:
+        print(f"== PUT dashboard {DASHBOARD_ID_CLASSIC} ==")
+        urls.append(_put_dashboard(DASHBOARD_ID_CLASSIC, build_classic_dashboard()))
     if include_ai:
         from src.dashboards_ai import publish_ai
         urls.append(publish_ai())

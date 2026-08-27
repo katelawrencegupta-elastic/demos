@@ -10,9 +10,9 @@ DATASET = "apm"
 SAMPLE = 0.25
 # Managed traces-apm mapping only ships span.duration.us / representative_count.
 # ES|QL errors with "Unknown column [span.subtype]" on an empty/rolled index
-# unless these fields are declared. 10d APM retention also drops the 30-day
-# dashboard window; keep traces long enough for the FinOps backfill.
-APM_RETENTION = "60d"
+# unless these fields are declared. Default APM retention is too short for a
+# multi-month FinOps backfill; keep traces for the full demo window.
+APM_RETENTION = "180d"
 CUSTOM_COMPONENT = "traces-apm@custom"
 
 PROVIDER_SYSTEM = {
@@ -56,7 +56,7 @@ GENAI_PROPERTIES = {
 _TEMPLATE_OK = False
 
 
-def ensure_apm_genai_mappings():
+def ensure_apm_genai_mappings(fail_loud: bool = False):
     """Declare gen_ai span fields and extend traces-apm retention for ES|QL."""
     global _TEMPLATE_OK
     if _TEMPLATE_OK:
@@ -70,7 +70,7 @@ def ensure_apm_genai_mappings():
             "mappings": {"properties": GENAI_PROPERTIES},
         },
         "_meta": {
-            "description": "Meridian gen_ai span fields + 60d retention for ES|QL dashboards",
+            "description": "Meridian gen_ai span fields + 180d retention for ES|QL dashboards",
             "managed": False,
         },
     }
@@ -78,7 +78,10 @@ def ensure_apm_genai_mappings():
         f"{ELASTIC_URL}/_component_template/{CUSTOM_COMPONENT}",
         headers=ES_HEADERS, json=body, timeout=30)
     if r.status_code >= 300:
-        print(f"  [warn] {CUSTOM_COMPONENT}: {r.status_code} {r.text[:240]}")
+        msg = f"  [fail] {CUSTOM_COMPONENT}: {r.status_code} {r.text[:240]}"
+        if fail_loud:
+            raise SystemExit(msg)
+        print(msg.replace("[fail]", "[warn]"))
     else:
         print(f"  [ok] component template {CUSTOM_COMPONENT} ({APM_RETENTION})")
 
@@ -87,6 +90,7 @@ def ensure_apm_genai_mappings():
         headers=ES_HEADERS, timeout=30,
         json={"properties": GENAI_PROPERTIES})
     if r.status_code >= 300:
+        # Stream may not exist until first backfill — template covers new indices.
         print(f"  [warn] {DATA_STREAM} mapping: {r.status_code} {r.text[:240]}")
     else:
         print(f"  [ok] {DATA_STREAM} mapping updated")

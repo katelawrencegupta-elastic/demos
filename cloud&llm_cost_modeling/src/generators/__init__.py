@@ -20,10 +20,13 @@ LLM = [
     llm_openai.openai_audio_speeches, llm_openai.openai_moderations,
     llm_openai.openai_rate_limits,
     llm_anthropic.anthropic_usage, llm_anthropic.anthropic_cost,
+    llm_anthropic.anthropic_rate_limit,
     llm_bedrock.bedrock_invocation, llm_bedrock.bedrock_runtime,
+    llm_bedrock.bedrock_guardrails,
     llm_azure_openai.azure_openai_logs, llm_azure_openai.azure_openai_metrics,
     llm_azure_openai.azure_openai_billing,
     llm_vertexai.vertex_prompt_logs, llm_vertexai.vertex_metrics,
+    llm_vertexai.vertex_audit_logs,
     llm_apm,
 ]
 

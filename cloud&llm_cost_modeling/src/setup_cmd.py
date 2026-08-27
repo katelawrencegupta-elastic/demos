@@ -5,6 +5,7 @@ import json
 import requests
 
 from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL
+from src.time_window import demo_window
 
 PACKAGES = [
     "aws", "gcp", "azure", "azure_billing",
@@ -14,7 +15,11 @@ PACKAGES = [
 ]
 
 # TSDS index templates that would reject backfilled timestamps
-TSDS_PATCH = ["metrics-aws.ec2_metrics", "metrics-aws_bedrock.runtime"]
+TSDS_PATCH = [
+    "metrics-aws.ec2_metrics",
+    "metrics-aws_bedrock.runtime",
+    "metrics-aws_bedrock.guardrails",
+]
 
 TEMPLATE_KEYS = ("index_patterns", "template", "composed_of", "priority",
                  "data_stream", "_meta", "ignore_missing_component_templates",
@@ -55,10 +60,9 @@ def patch_tsds_templates():
         r = requests.put(f"{ELASTIC_URL}/_index_template/{name}",
                          headers=ES_HEADERS, json=body, timeout=60)
         if r.status_code >= 300:
-            print(f"  [warn] could not patch {name}: {r.status_code} {r.text[:300]}")
-            continue
+            raise SystemExit(
+                f"  [fail] could not patch {name}: {r.status_code} {r.text[:300]}")
         print(f"  [ok] {name}: time_series mode removed (backfill enabled)")
-        # if the data stream already exists it was created TSDS; recreate it
         ds = f"{name}-default"
         r = requests.get(f"{ELASTIC_URL}/_data_stream/{ds}", headers=ES_HEADERS)
         if r.status_code == 200:
@@ -104,12 +108,16 @@ def ensure_cur_latest_alias():
     if r.status_code == 200:
         print(f"  [ok] alias {CUR_ALIAS} already exists")
         return
+    r_ds = requests.get(f"{ELASTIC_URL}/_data_stream/{target}", headers=ES_HEADERS, timeout=30)
+    if r_ds.status_code != 200:
+        print(f"  [warn] {target} not created yet — run backfill, then re-run setup for CUR alias")
+        return
     r = requests.post(f"{ELASTIC_URL}/_aliases", headers=ES_HEADERS, timeout=30, json={
         "actions": [{"add": {"index": target, "alias": CUR_ALIAS}}],
     })
     if r.status_code >= 300:
-        print(f"  [warn] could not create {CUR_ALIAS}: {r.status_code} {r.text[:300]}")
-        return
+        raise SystemExit(
+            f"  [fail] could not create {CUR_ALIAS}: {r.status_code} {r.text[:300]}")
     print(f"  [ok] alias {CUR_ALIAS} -> {target}")
 
 
@@ -141,7 +149,13 @@ def ensure_cur_data_view():
 
 
 def patch_aws_billing_dashboards():
-    """Point Payer / Linked Account ID controls at the real CUR data view."""
+    """Point Payer / Linked Account controls at the real CUR data view and pin
+    the demo time window.
+
+    Fleet ships these with no stored time_range; the picker defaults to
+    'Last 15 minutes' while CUR line items are daily (@timestamp at midnight),
+    so every ES|QL panel looks empty even when current-month billing data exists.
+    """
     for did in AWS_BILLING_DASHBOARDS:
         r = requests.get(f"{KIBANA_URL}/api/dashboards/{did}",
                          headers=KBN_HEADERS, timeout=30)
@@ -155,21 +169,21 @@ def patch_aws_billing_dashboards():
             if cfg.get("data_view_id") == CUR_PACKAGED_DATA_VIEW_ID:
                 cfg["data_view_id"] = CUR_DATA_VIEW_ID
                 changed += 1
-        if not changed:
-            print(f"  [ok] {body.get('title')}: controls already patched")
-            continue
+        body["time_range"] = _backfill_time_range()
         r = requests.put(f"{KIBANA_URL}/api/dashboards/{did}",
                          headers=KBN_HEADERS, json=body, timeout=60)
         if r.status_code >= 300:
             print(f"  [warn] could not patch {did}: {r.status_code} {r.text[:300]}")
             continue
-        print(f"  [ok] retargeted {changed} controls on {body.get('title')}")
+        bits = ["pinned time range"]
+        if changed:
+            bits.append(f"retargeted {changed} controls")
+        print(f"  [ok] {body.get('title')}: {', '.join(bits)}")
 
 
-BACKFILL_TIME_RANGE = {
-    "from": "2026-07-14T00:00:00.000Z",
-    "to": "2026-08-18T00:00:00.000Z",
-}
+def _backfill_time_range():
+    # Slight pad so OOTB packs still show streaming head of the window
+    return demo_window(to_pad_days=1)
 
 
 def patch_openai_usage_dashboard():
@@ -187,7 +201,7 @@ def patch_openai_usage_dashboard():
         json.dumps(r.json()["data"]).replace(
             "event.dataset", "data_stream.dataset")
     )
-    body["time_range"] = dict(BACKFILL_TIME_RANGE)
+    body["time_range"] = _backfill_time_range()
     r = requests.put(f"{KIBANA_URL}/api/dashboards/{did}",
                      headers=KBN_HEADERS, json=body, timeout=60)
     if r.status_code >= 300:
@@ -203,7 +217,7 @@ def _pin_dashboard_time_range(dash_id):
         print(f"  [warn] dashboard {dash_id}: {r.status_code}")
         return
     body = r.json()["data"]
-    body["time_range"] = dict(BACKFILL_TIME_RANGE)
+    body["time_range"] = _backfill_time_range()
     r = requests.put(f"{KIBANA_URL}/api/dashboards/{dash_id}",
                      headers=KBN_HEADERS, json=body, timeout=60)
     if r.status_code >= 300:
@@ -219,6 +233,21 @@ AZURE_OPENAI_DASHBOARDS = (
     "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",  # Overview
 )
 
+ANTHROPIC_METRICS_DASHBOARDS = (
+    "anthropic_metrics-602de168-1b42-4dd6-a463-9c4878e5db94",  # Usage & Rate Limit
+    "anthropic_metrics-2bd61c2c-4418-458f-a79e-12a74c34b2f0",  # Cost & Billing
+)
+
+VERTEX_AI_DASHBOARDS = (
+    "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",  # Metrics Overview
+    "gcp_vertexai-d566516f-06fd-47e0-aba1-44148598c59a",  # Prompt Response Logs
+)
+
+BEDROCK_DASHBOARDS = (
+    "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",  # Overview
+    "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",  # Guardrails
+)
+
 
 def pin_azure_openai_dashboards():
     """Store the backfill window on OOTB Azure OpenAI dashboards.
@@ -227,6 +256,24 @@ def pin_azure_openai_dashboards():
     stays on 'Last 15 minutes' and the 30-day backfill never appears.
     """
     for did in AZURE_OPENAI_DASHBOARDS:
+        _pin_dashboard_time_range(did)
+
+
+def pin_anthropic_metrics_dashboards():
+    """Pin OOTB Anthropic Usage/Cost dashboards to the demo backfill window."""
+    for did in ANTHROPIC_METRICS_DASHBOARDS:
+        _pin_dashboard_time_range(did)
+
+
+def pin_vertex_ai_dashboards():
+    """Pin OOTB GCP Vertex AI dashboards to the demo backfill window."""
+    for did in VERTEX_AI_DASHBOARDS:
+        _pin_dashboard_time_range(did)
+
+
+def pin_bedrock_dashboards():
+    """Pin OOTB Amazon Bedrock Overview + Guardrails to the demo window."""
+    for did in BEDROCK_DASHBOARDS:
         _pin_dashboard_time_range(did)
 
 
@@ -276,6 +323,10 @@ def patch_inference_token_usage_dashboard():
         n_fields = len(updated.get("fields") or {})
         print(f"  [ok] data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID} -> "
               f"{INFERENCE_TOKEN_USAGE_INDEX} ({n_fields} fields)")
+    _pin_dashboard_time_range(INFERENCE_TOKEN_USAGE_DASHBOARD_ID)
+
+
+def run():
     print("== checking Elasticsearch ==")
     r = requests.get(ELASTIC_URL, headers=ES_HEADERS, timeout=30)
     r.raise_for_status()
@@ -294,11 +345,17 @@ def patch_inference_token_usage_dashboard():
     patch_openai_usage_dashboard()
     print("== Azure OpenAI dashboards (time range) ==")
     pin_azure_openai_dashboards()
+    print("== Anthropic metrics dashboards (time range) ==")
+    pin_anthropic_metrics_dashboards()
+    print("== GCP Vertex AI dashboards (time range) ==")
+    pin_vertex_ai_dashboards()
+    print("== Amazon Bedrock dashboards (time range) ==")
+    pin_bedrock_dashboards()
     print("== checking write access ==")
     check_write_access()
     print("== APM gen_ai mappings + retention (ES|QL) ==")
     from src.generators.llm_apm import ensure_apm_genai_mappings
-    ensure_apm_genai_mappings()
+    ensure_apm_genai_mappings(fail_loud=True)
     print("== inference token-usage template ==")
     from src.generators.elastic_ai import _ensure_template
     _ensure_template()

@@ -1,5 +1,8 @@
 """Hourly LLM usage rollups -> metrics-llm.usage-default.
 
+ORPHAN — not registered in src.generators.select() / ALL. Native provider
+metrics + APM cover the live demo.
+
 One doc per (hour, app, provider, model) with summed tokens / requests /
 cost — useful for time-series dashboards without scanning every invocation.
 """
