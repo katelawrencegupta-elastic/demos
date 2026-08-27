@@ -434,6 +434,11 @@ def cmd_verify(scope: str):
                       f"(expected {INFERENCE_TOKEN_USAGE_INDEX})")
                 failed = True
 
+    print()
+    from src.budgets import verify_budgets
+    if not verify_budgets():
+        failed = True
+
     print("\n== kibana ==")
     print(f"  Discover:   {KIBANA_URL}/app/discover")
     print(f"  Dashboards: {KIBANA_URL}/app/dashboards")
@@ -471,6 +476,10 @@ def main():
         help="baseline=primary FinOps (default); dynamic=alias of baseline; "
              "classic/original=legacy layout; all=baseline+classic+AI",
     )
+    sub.add_parser(
+        "budgets",
+        help="provision FinOps spend SLOs + ES|QL budget alert rules",
+    )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
@@ -494,6 +503,9 @@ def main():
             include_dynamic_alias=v in ("baseline", "dynamic", "all"),
             include_ai=v in ("ai-assistant", "baseline", "dynamic", "all"),
         )
+    elif args.cmd == "budgets":
+        from src.budgets import ensure_budgets
+        ensure_budgets(fail_loud=True)
     elif args.cmd == "backup":
         from src.backup import run as backup_run
         backup_run()

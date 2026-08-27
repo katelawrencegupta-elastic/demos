@@ -236,6 +236,40 @@ def backup_alerting(counts: Counter) -> None:
     print(f"  alerting rules: {len(rules)}")
 
 
+def backup_slos(counts: Counter) -> None:
+    """Snapshot Observability SLO definitions (FinOps spend SLOs included)."""
+    slos = []
+    page = 1
+    per_page = 100
+    while True:
+        r = _kbn("GET", "/api/observability/slos",
+                 params={"page": page, "perPage": per_page})
+        if r.status_code == 404:
+            print("  [warn] SLO API not available")
+            return
+        if r.status_code >= 300:
+            print(f"  [warn] SLOs: {r.status_code} {r.text[:200]}")
+            return
+        body = r.json()
+        batch = body.get("results") or body.get("slos") or body.get("data") or []
+        if isinstance(body, list):
+            batch = body
+        slos.extend(batch)
+        total = body.get("total") if isinstance(body, dict) else len(batch)
+        if not batch or (total is not None and len(slos) >= total):
+            break
+        if len(batch) < per_page:
+            break
+        page += 1
+    dest = BACKUP_ROOT / "kibana" / "slos"
+    for slo in slos:
+        sid = slo.get("id") or slo.get("slo_id") or f"slo-{len(slos)}"
+        write_json(dest / f"{safe_name(sid)}.json", slo)
+    write_json(BACKUP_ROOT / "kibana" / "slos.json", slos)
+    counts["kibana.slos"] = len(slos)
+    print(f"  SLOs: {len(slos)}")
+
+
 def backup_connectors(counts: Counter) -> None:
     r = _kbn("GET", "/api/actions/connectors")
     r.raise_for_status()
@@ -415,6 +449,7 @@ def run() -> Path:
     backup_dashboards(counts)
     backup_saved_objects(counts)
     backup_alerting(counts)
+    backup_slos(counts)
     backup_connectors(counts)
 
     print("== fleet ==")

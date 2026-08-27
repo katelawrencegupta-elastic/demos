@@ -362,4 +362,7 @@ def run():
     print("  [ok] logs-elastic.inference_token_usage-*")
     print("== OOTB Inference Token Usage dashboard (data view + time range) ==")
     patch_inference_token_usage_dashboard()
+    print("== FinOps spend SLOs + budget alerts ==")
+    from src.budgets import ensure_budgets
+    ensure_budgets(fail_loud=False)
     print("setup complete.")

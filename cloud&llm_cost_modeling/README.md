@@ -59,13 +59,14 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 # Copy .env.example → .env and set ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
 
-.venv/bin/python -m src.cli setup      # install integrations (Fleet), patch TSDS, APM mappings
+.venv/bin/python -m src.cli setup      # integrations, APM, budgets/SLOs
 .venv/bin/python -m src.cli sample --scope all
 .venv/bin/python -m src.cli backfill --days 30 --scope cloud
 .venv/bin/python -m src.cli backfill --days 30 --scope llm
 .venv/bin/python -m src.cli backfill --days 30 --scope elastic-ai
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
+.venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
 .venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
 .venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
 .venv/bin/python -m src.cli dashboards --variant classic    # legacy layout (+ security→cost)
@@ -80,6 +81,23 @@ OOTB Usage panels without redoing completions/embeddings).
 
 **Dashboard time ranges** are computed at publish from `utcnow()` (same clock as
 backfill). After a fresh backfill, re-run `dashboards` so stored windows match.
+
+## Budget SLOs & alerts
+
+Meridian treats cloud + LLM spend as error budgets. `cli budgets` (also run at
+the end of `setup`) provisions:
+
+| Kind | Artifacts |
+|---|---|
+| Spend SLOs (timeslice, 30d rolling, 24h slices) | AWS daily CUR under ceiling · staging cost-leak healthy · `checkout-assistant` daily LLM cost |
+| SLO burn-rate rules | staging + checkout |
+| ES\|QL budget alerts | AWS trailing-30d vs monthly budget · staging daily · checkout 7d LLM · GCP `meridian-ml-prod` 7d |
+
+Thresholds live in [`config/budgets.yaml`](config/budgets.yaml) and are **intentionally
+tight** so the seeded timeline (cost leak, crypto/ML spikes, agent-loop) shows
+breached SLOs / Active alerts without waiting for a new incident. FinOps
+dashboards include a **Budget posture** section with the same ceilings and deep
+links to Observability SLOs / Alerts.
 
 ## LLM factories
 
@@ -106,10 +124,11 @@ as the real integrations), so OOTB dashboards work:
 
 Notes:
 
-- `setup` installs cloud + LLM packages, creates APM gen_ai mappings + 60d
-  retention, wires CUR alias / inference data-view Serverless workarounds, and
-  removes TSDS mode from `metrics-aws.ec2_metrics` and
-  `metrics-aws_bedrock.runtime` so 30-day metric backfill is accepted.
+- `setup` installs cloud + LLM packages, creates APM gen_ai mappings + 180d
+  retention, wires CUR alias / inference data-view Serverless workarounds,
+  provisions FinOps spend SLOs + budget alerts, and removes TSDS mode from
+  `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
+  metric backfill is accepted.
 - Generation is seeded and windows are pure functions of time, so backfill
   and `stream` produce one continuous, reproducible timeline.
 - ~1M cloud docs + ~120k native LLM/APM/CUR docs for a 30-day backfill.
@@ -126,8 +145,11 @@ src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/time_window.py         # shared demo time range (aligns with backfill)
-src/cli.py                 # setup | sample | backfill | stream | verify | dashboards | backup
+src/budgets.py             # FinOps spend SLOs + ES|QL budget alert provisioning
+src/cli.py                 # setup | sample | backfill | stream | verify | budgets | dashboards | backup
 src/dashboards.py          # Kibana FinOps + LLM observability dashboards
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic
 ```
+
+Also: `config/budgets.yaml` — spend ceilings and alert floors for workshop demos.

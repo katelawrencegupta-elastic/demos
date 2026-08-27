@@ -7,6 +7,7 @@ import json
 
 import requests
 
+from src.budgets import budget_numbers
 from src.config import KBN_HEADERS, KIBANA_URL
 from src.time_window import demo_window, window_label
 
@@ -313,6 +314,78 @@ def section(title, y, panels, collapsed=False):
     }
 
 
+def budget_posture_section(y: int):
+    """FinOps spend vs ceilings — mirrors config/budgets.yaml + SLO/alert deep links."""
+    b = budget_numbers()
+    aws_mtd = float(b["aws_monthly_usd"])
+    staging_ceil = float(b["staging_daily_ceiling_usd"])
+    checkout_7d = float(b["checkout_7d_alert_usd"])
+    aws_daily = float(b["aws_daily_ceiling_usd"])
+
+    mtd_vs_budget = _q(
+        "FROM metrics-aws_billing.cur-default",
+        f"| WHERE {TS}",
+        "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)",
+        f"| EVAL budget = {aws_mtd}, min = 0, max = budget * 2, goal = budget",
+    )
+    staging_vs_ceil = _q(
+        "FROM metrics-aws_billing.cur-default",
+        f"| WHERE {TS}",
+        '| WHERE aws_billing.cur.line_item.usage_account_name == "meridian-staging"',
+        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
+        "| SORT day DESC", "| LIMIT 1",
+        f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
+        "| KEEP spend, budget, min, max, goal",
+    )
+    checkout_vs_alert = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND span.subtype == \"gen_ai\" AND service.name == \"checkout-assistant\"",
+        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
+        "| STATS spend = SUM(cost)",
+        f"| EVAL budget = {checkout_7d}, min = 0, max = budget * 3, goal = budget",
+    )
+    aws_daily_vs_ceil = _q(
+        "FROM metrics-aws_billing.cur-default",
+        f"| WHERE {TS}",
+        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
+        "| SORT day DESC", "| LIMIT 1",
+        f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
+        "| KEEP spend, budget, min, max, goal",
+    )
+
+    return section("Budget posture — spend SLOs & alerts", y, [
+        markdown(
+            0, 0, 48, 4,
+            "## Budget posture\n\n"
+            "Meridian treats cloud + LLM spend as error budgets. Thresholds come from "
+            "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
+            f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
+            f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
+            f"- **checkout-assistant 7d alert floor:** ${checkout_7d:,.2f} (agent-loop)\n\n"
+            f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
+            f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
+            f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
+            "Provision / refresh: `python -m src.cli budgets`.",
+        ),
+        gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
+              mtd_vs_budget, "spend", shape="arc",
+              min_col="min", max_col="max", goal_col="goal",
+              subtitle="USD (goal = budget)"),
+        gauge(12, 4, 12, 12, "Latest AWS daily vs SLO ceiling",
+              aws_daily_vs_ceil, "spend", shape="arc",
+              min_col="min", max_col="max", goal_col="goal",
+              subtitle="USD / day"),
+        gauge(24, 4, 12, 12, "Staging latest day vs SLO ceiling",
+              staging_vs_ceil, "spend", shape="arc",
+              min_col="min", max_col="max", goal_col="goal",
+              subtitle="meridian-staging"),
+        gauge(36, 4, 12, 12, "checkout-assistant window vs alert",
+              checkout_vs_alert, "spend", shape="arc",
+              min_col="min", max_col="max", goal_col="goal",
+              subtitle="USD LLM (APM)"),
+    ])
+
+
 def _ensure_data_view(view_id, title, time_field="@timestamp"):
     r = requests.get(f"{KIBANA_URL}/api/data_views/data_view/{view_id}",
                      headers=KBN_HEADERS, timeout=30)
@@ -409,7 +482,9 @@ def build_classic_dashboard():
                      "**Scenario callouts:** cost leak on `meridian-staging` · crypto mining (−12..−9, "
                      "`meridian-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp "
                      "(from −15) · LLM agent-loop (`checkout-assistant`) · model migration "
-                     "(`support-copilot` openai→anthropic) · cache-miss (`rag-research`)."),
+                     "(`support-copilot` openai→anthropic) · cache-miss (`rag-research`).\n\n"
+                     "**Budget posture:** spend SLOs + ES|QL alerts — see the Budget posture section "
+                     f"or [Observability SLOs]({KIBANA_URL}/app/observability/slos)."),
             metric(0, 3, 12, 5, "AWS unblended cost (CUR)", aws_cost, "cost", "USD"),
             metric(12, 3, 12, 5, "GCP billing total", gcp_cost, "cost", "USD"),
             metric(24, 3, 12, 5, "Azure pretax cost", azure_cost, "cost", "USD"),
@@ -606,7 +681,8 @@ def build_classic_dashboard():
                   "| SORT day"),
                "day", ["cost"], layer="line"),
         ]),
-        section("LLM traces — end-to-end call, tokens, and cost", 184, [
+        budget_posture_section(184),
+        section("LLM traces — end-to-end call, tokens, and cost", 208, [
             markdown(0, 0, 48, 2,
                      "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, "
                      "model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the "
@@ -646,7 +722,7 @@ def build_classic_dashboard():
                   ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens",
                    "gen_ai.usage.total_tokens", "cost_usd", "latency_ms"]),
         ]),
-        section("Token usage per request — prompt, completion, total", 208, [
+        section("Token usage per request — prompt, completion, total", 232, [
             xy(0, 0, 32, 12, "Daily prompt vs completion tokens (APM spans)",
                _q("FROM traces-apm-default",
                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -674,7 +750,7 @@ def build_classic_dashboard():
                   "| SORT day"),
                "day", ["prompt", "completion"], layer="area"),
         ]),
-        section("LLM cost — model, user, feature, team", 234, [
+        section("LLM cost — model, user, feature, team", 258, [
             xy(0, 0, 24, 12, "LLM cost by model",
                _q("FROM traces-apm-default",
                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -716,7 +792,7 @@ def build_classic_dashboard():
                      "| SORT tokens DESC", "| LIMIT 30"),
                   ["user", "feature", "team"], ["calls", "tokens"]),
         ]),
-        section("LLM quality & latency", 274, [
+        section("LLM quality & latency", 298, [
             metric(0, 0, 12, 5, "p95 latency (ms)",
                    _q("FROM traces-apm-default",
                       f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
@@ -752,7 +828,7 @@ def build_classic_dashboard():
                   "| SORT day"),
                "day", ["p95_ms"], layer="line"),
         ]),
-        section("Funnel — which user flows consume the most tokens", 306, [
+        section("Funnel — which user flows consume the most tokens", 330, [
             markdown(0, 0, 48, 3,
                      "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, "
                      "`rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. "
@@ -976,7 +1052,9 @@ def build_dashboard():
                      f"Security→cost (crypto / S3) lives on the "
                      f"[classic](#/view/{DASHBOARD_ID_CLASSIC}).\n\n"
                      f"[Open classic](#/view/{DASHBOARD_ID_CLASSIC}) · "
-                     f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss."),
+                     f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n"
+                     f"**Budgets:** [Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
+                     f"`python -m src.cli budgets`."),
             metric(0, 3, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
             metric(12, 3, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
             metric(24, 3, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),
@@ -1019,7 +1097,8 @@ def build_dashboard():
                   min_col="min", max_col="max", goal_col="goal",
                   subtitle="USD projected"),
         ]),
-        section("LLM landscape — models, teams, flows", 106, [
+        budget_posture_section(106),
+        section("LLM landscape — models, teams, flows", 130, [
             tag_cloud(0, 0, 24, 14, "Models sized by tokens",
                       model_tokens, "tokens", "model"),
             waffle(24, 0, 24, 14, "LLM cost by team",
@@ -1029,7 +1108,7 @@ def build_dashboard():
             xy(28, 14, 20, 16, "Tokens by user flow",
                flow_tokens, "flow", ["tokens"], layer="bar_horizontal"),
         ]),
-        section("LLM tokens & latency over time", 140, [
+        section("LLM tokens & latency over time", 164, [
             xy(0, 0, 48, 14, "Tokens by flow over day (stacked area)",
                tokens_by_flow_day, "day", ["tokens"], layer="area_stacked", breakdown="flow"),
             xy(0, 14, 48, 14, "p95 latency by model over day (ms)",
@@ -1039,7 +1118,7 @@ def build_dashboard():
             xy(32, 28, 16, 12, "OpenAI tokens by user",
                users, "user", ["tokens"], layer="bar_horizontal"),
         ]),
-        section("Quality gauges & funnel", 170, [
+        section("Quality gauges & funnel", 194, [
             gauge(0, 0, 16, 12, "LLM error rate",
                   error_gauge, "error_rate", shape="arc",
                   min_col="min", max_col="max", goal_col="goal",
@@ -1057,7 +1136,7 @@ def build_dashboard():
                flow_model, "flow", ["cost_usd"],
                layer="bar_horizontal_stacked", breakdown="model"),
         ]),
-        section("Provider packs", 200, [
+        section("Provider packs", 224, [
             links_panel(0, 0, 24, 10, "This family", [
                 ("This baseline dashboard", DASHBOARD_ID),
                 ("Classic layout", DASHBOARD_ID_CLASSIC),
