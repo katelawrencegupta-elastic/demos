@@ -54,34 +54,46 @@ correlates across streams:
 
 ## Usage
 
+### Workshop quickstart
+
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 # Copy .env.example → .env and set ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
 
-.venv/bin/python -m src.cli setup      # integrations, APM, budgets/SLOs
+.venv/bin/python -m src.cli setup                           # Fleet, APM, budgets, agent
+.venv/bin/python -m src.cli backfill --scope all            # default 120 days
+.venv/bin/python -m src.cli verify --scope all
+.venv/bin/python -m src.cli dashboards --variant all
+```
+
+Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), **FinOps dashboard
+→ Budget posture** (gauges + SLO table), and **Agent Builder → chat** (`meridian-finops-ai-assistant`).
+
+### All commands
+
+```bash
+.venv/bin/python -m src.cli setup      # integrations, APM, budgets/SLOs, FinOps agent
 .venv/bin/python -m src.cli sample --scope all
-.venv/bin/python -m src.cli backfill --days 30 --scope cloud
-.venv/bin/python -m src.cli backfill --days 30 --scope llm
-.venv/bin/python -m src.cli backfill --days 30 --scope elastic-ai
+.venv/bin/python -m src.cli backfill --days 120 --scope cloud   # --days defaults to 120
+.venv/bin/python -m src.cli backfill --scope llm
+.venv/bin/python -m src.cli backfill --scope elastic-ai
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
 .venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
-.venv/bin/python -m src.cli agent               # Meridian FinOps AI Assistant (Agent Builder)
+.venv/bin/python -m src.cli agent                # Meridian FinOps AI Assistant (Agent Builder)
 .venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
 .venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
 .venv/bin/python -m src.cli dashboards --variant classic    # legacy layout (+ security→cost)
 .venv/bin/python -m src.cli dashboards --variant ai-assistant
-```
-
-**FinOps dashboard IDs:** `meridian-finops-llm-observability` (baseline — stacked bars/areas),
-`meridian-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
-`meridian-finops-llm-observability-classic` (legacy treemaps/tables).
-
-```bash
 .venv/bin/python -m src.cli backup     # snapshot Kibana/Fleet/ES objects → ./elastic
 ```
+
+**Dashboard IDs:** `meridian-finops-llm-observability` (baseline — stacked bars/areas),
+`meridian-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
+`meridian-finops-llm-observability-classic` (legacy treemaps/tables),
+`meridian-ai-assistant-inference-usage` (Agent Builder + inference token usage).
 
 `--scope` accepts `all` | `cloud` | `llm` | `openai-extra` | `elastic-ai`.
 
@@ -89,7 +101,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 OOTB Usage panels without redoing completions/embeddings).
 
 **Dashboard time ranges** are computed at publish from `utcnow()` (same clock as
-backfill). After a fresh backfill, re-run `dashboards` so stored windows match.
+backfill; default window is **120 days** via [`src/time_window.py`](src/time_window.py)).
+After a fresh backfill, re-run `dashboards` so stored windows match.
 
 ## Budget SLOs & alerts
 
@@ -102,11 +115,25 @@ the end of `setup`) provisions:
 | SLO burn-rate rules | staging + checkout |
 | ES\|QL budget alerts | AWS trailing-30d vs monthly budget · staging daily · checkout 7d LLM · GCP `meridian-ml-prod` 7d |
 
+| SLO ID | Workshop posture |
+|---|---|
+| `meridian-slo-aws-daily-spend` | **VIOLATED** — crypto + growth burn days exceed $5.2k/day ceiling |
+| `meridian-slo-staging-cost-leak` | **VIOLATED** — cost_leak ~$1k/day vs $150/day ceiling |
+| `meridian-slo-llm-checkout-spend` | **VIOLATED** — agent-loop spike days vs $0.50/day ceiling |
+
 Thresholds live in [`config/budgets.yaml`](config/budgets.yaml) and are **intentionally
-tight** so the seeded timeline (cost leak, crypto/ML spikes, agent-loop) shows
-breached SLOs / Active alerts without waiting for a new incident. FinOps
-dashboards include a **Budget posture** section with the same ceilings and deep
-links to Observability SLOs / Alerts.
+tight** so the seeded timeline shows breached SLOs and active budget alerts without
+waiting for a new incident.
+
+FinOps dashboards include a **Budget posture** section: spend gauges (vs monthly
+budget and SLO ceilings), a live **Meridian spend SLO posture** table (from
+`.slo-observability.summary-v3.6`), and deep links to Observability SLOs / Alerts /
+Agent Builder.
+
+**Recover SLOs:** If transforms break or you reset SLI state during prep, run
+`python -m src.cli recover-slos` to recreate transforms and reprocess history.
+After a reset, violations return once the 30d rolling window backfills (typically
+1–2 minutes). To refresh thresholds only, run `cli budgets` without reset.
 
 ## Meridian FinOps AI Assistant
 
@@ -114,15 +141,29 @@ links to Observability SLOs / Alerts.
 Assistant** in Elastic Agent Builder: seven custom ES|QL tools plus a public chat
 agent grounded in the seeded billing, SLO, and alert data.
 
+| Tool ID | Use for |
+|---|---|
+| `meridian-finops-aws-spend` | AWS CUR total / avg daily / % of monthly budget |
+| `meridian-finops-aws-top-accounts` | Top linked accounts by spend |
+| `meridian-finops-staging-leak` | meridian-staging vs SLO ceiling (cost leak) |
+| `meridian-finops-llm-spend-by-app` | LLM cost by `service.name` (APM gen_ai) |
+| `meridian-finops-cloud-mix` | AWS + GCP + Azure spend mix |
+| `meridian-finops-gcp-ml-burn` | meridian-ml-prod GCP burn |
+| `meridian-finops-slo-posture` | Error budget remaining / consumed |
+
 | Command | Purpose |
 |---|---|
-| `python -m src.cli agent` | Upsert tools + agent |
-| `python -m src.cli verify` | Checks tools, agent, and prints chat URL |
+| `python -m src.cli agent` | Upsert tools + agent (re-run after editing `config/finops_agent.yaml`) |
+| `python -m src.cli verify` | Checks tools, agent, budgets, and prints chat URL |
 
-**Chat:** `{KIBANA_URL}/app/agent_builder/chat` (select agent `meridian-finops-ai-assistant`).
+**Chat:** `{KIBANA_URL}/app/agent_builder/chat` — select agent `meridian-finops-ai-assistant`.
 
-Definitions live in [`config/finops_agent.yaml`](config/finops_agent.yaml). FinOps
-dashboards include an **Open in Agent Builder** link in the Budget posture section.
+Definitions live in [`config/finops_agent.yaml`](config/finops_agent.yaml). Tool queries
+use parameterized lookbacks (`?days` integer) with
+`TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))` — do not use `?days * 1 day` (invalid ES\|QL).
+
+Synthetic Agent Builder traces include `meridian-finops-ai-assistant` calling these tool IDs
+(`backfill --scope elastic-ai`).
 
 **Workshop prompts** (after backfill + `budgets` + `agent`):
 
@@ -157,15 +198,15 @@ as the real integrations), so OOTB dashboards work:
 
 Notes:
 
-- `setup` installs cloud + LLM packages, creates APM gen_ai mappings + 180d
-  retention, wires CUR alias / inference data-view Serverless workarounds,
+- `setup` installs cloud + LLM packages, creates APM gen_ai mappings + **180d**
+  trace retention, wires CUR alias / inference data-view Serverless workarounds,
   provisions FinOps spend SLOs + budget alerts, provisions the Meridian FinOps AI
   Assistant, and removes TSDS mode from
   `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
   metric backfill is accepted.
 - Generation is seeded and windows are pure functions of time, so backfill
   and `stream` produce one continuous, reproducible timeline.
-- ~1M cloud docs + ~120k native LLM/APM/CUR docs for a 30-day backfill.
+- Default backfill is **120 days** (~4.5M cloud docs + ~500k LLM/APM/CUR/Agent Builder docs).
 - Orphan modules `llm_invocation` / `llm_usage` / `llm_cost` are **not** in
   `backfill --scope llm` (native provider streams + APM are used instead).
 
@@ -179,9 +220,9 @@ src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/time_window.py         # shared demo time range (aligns with backfill)
-src/budgets.py             # FinOps spend SLOs + ES|QL budget alert provisioning
+src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
 src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)
-src/cli.py                 # setup | sample | backfill | stream | verify | budgets | agent | dashboards | backup
+src/cli.py                 # setup | sample | backfill | stream | verify | budgets | recover-slos | agent | dashboards | backup
 src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic
