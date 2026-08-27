@@ -26,7 +26,7 @@
       "ecs@mappings"
     ],
     "priority": 120,
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "default OpenTelemetry traces template installed by x-pack",
       "managed": true
@@ -41,6 +41,6 @@
       "traces-otel@custom"
     ],
     "created_date_millis": 1786555716059,
-    "modified_date_millis": 1786555716059
+    "modified_date_millis": 1787594298090
   }
 }

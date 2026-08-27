@@ -111,7 +111,8 @@
       }
     },
     "_meta": {
-      "managed": true
+      "managed": true,
+      "content_hash": "6d31bc50378220df"
     }
   }
 }

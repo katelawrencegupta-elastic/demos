@@ -30,7 +30,7 @@
       "ecs-tsdb@mappings"
     ],
     "priority": 120,
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "default OpenTelemetry metrics template installed by x-pack",
       "managed": true
@@ -45,6 +45,6 @@
       "metrics-otel@custom"
     ],
     "created_date_millis": 1786555715950,
-    "modified_date_millis": 1786555715950
+    "modified_date_millis": 1787594297889
   }
 }

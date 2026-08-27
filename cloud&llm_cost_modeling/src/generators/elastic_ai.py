@@ -44,7 +44,7 @@ AGENTS = [
         "bus": ["ecommerce", "mlplatform", "corpit", "fintech"],
     },
     {
-        "id": "finops-copilot", "name": "FinOps Copilot", "weight": 16,
+        "id": "meridian-finops-ai-assistant", "name": "Meridian FinOps AI Assistant", "weight": 16,
         "feature_id": "agent_builder",
         "parent_feature_id": "agent_builder_parent",
         "feature_name": "Agent Builder",
@@ -136,6 +136,17 @@ TOOLS = [
     ("load_skill", 0.08),
     ("ask_user_question", 0.04),
     ("custom", 0.12),
+]
+
+# Meridian FinOps AI Assistant custom ES|QL tools (match config/finops_agent.yaml ids).
+FINOPS_TOOLS = [
+    ("meridian-finops-aws-spend", 0.22),
+    ("meridian-finops-aws-top-accounts", 0.18),
+    ("meridian-finops-staging-leak", 0.16),
+    ("meridian-finops-llm-spend-by-app", 0.16),
+    ("meridian-finops-cloud-mix", 0.12),
+    ("meridian-finops-gcp-ml-burn", 0.10),
+    ("meridian-finops-slo-posture", 0.06),
 ]
 
 # Semantic search / rerank inference that sits behind platform.core.search
@@ -273,11 +284,12 @@ def iter_rounds(world, t0, t1, anchor):
         n_tools = rng.choices([0, 1, 2, 3, 4, 5], weights=[8, 22, 28, 22, 14, 6])[0]
         tools = []
         search_inf = []
+        tool_pool = FINOPS_TOOLS if agent["id"] == "meridian-finops-ai-assistant" else TOOLS
         for _ in range(n_tools):
-            name = rng.choices([t[0] for t in TOOLS], weights=[t[1] for t in TOOLS])[0]
+            name = rng.choices([t[0] for t in tool_pool], weights=[t[1] for t in tool_pool])[0]
             ok = rng.random() > (0.08 if name == "custom" else 0.025)
             dur = int(max(0.8, rng.gauss(180, 90)) * 1_000_000)  # ~ms → ns
-            if name == "platform.core.execute_esql":
+            if name in ("platform.core.execute_esql",) or name.startswith("meridian-finops-"):
                 dur = int(max(5, rng.gauss(420, 200)) * 1_000_000)
             tools.append((name, dur, ok))
             if name == "platform.core.search":
@@ -386,7 +398,7 @@ class AgentBuilderTraces:
                      "elastic.inference.span.kind": "TOOL",
                      "gen_ai.operation.name": "execute_tool",
                      "gen_ai.tool.name": tool,
-                     "gen_ai.tool.type": "builtin" if not tool.startswith("custom") else "extension",
+                     "gen_ai.tool.type": "builtin" if not tool.startswith(("custom", "meridian-finops-")) else "extension",
                      "kibana.inference.root": False},
                     extra_root=extra,
                 )

@@ -1,0 +1,72 @@
+{
+  "name": ".chat-tools",
+  "index_template": {
+    "index_patterns": [
+      ".chat-tools-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "45433d7b99f8822d33345b423f8392ac854c5dec"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "updated_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "configuration": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {}
+          },
+          "description": {
+            "type": "text"
+          },
+          "created_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "confirmation": {
+            "dynamic": false,
+            "type": "object",
+            "properties": {
+              "askUser": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "type": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "space": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "tags": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "aliases": {
+        ".chat-tools": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "45433d7b99f8822d33345b423f8392ac854c5dec"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1787866515336,
+    "modified_date_millis": 1787866515336
+  }
+}

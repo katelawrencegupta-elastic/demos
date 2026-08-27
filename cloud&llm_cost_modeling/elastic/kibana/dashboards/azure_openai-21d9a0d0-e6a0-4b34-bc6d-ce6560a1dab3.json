@@ -16,8 +16,8 @@
       "fleet-pkg-azure_openai-default"
     ],
     "time_range": {
-      "from": "2026-07-14T00:00:00.000Z",
-      "to": "2026-08-18T00:00:00.000Z"
+      "from": "2026-07-28T17:13:02.000Z",
+      "to": "2026-08-28T17:13:02.000Z"
     },
     "title": "[Azure OpenAI] Overview",
     "filters": [],
@@ -1122,7 +1122,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:25.861Z",
     "managed": true,
-    "updated_at": "2026-08-17T20:16:11.550Z",
-    "version": "WzUzNSwxXQ=="
+    "updated_at": "2026-08-27T17:13:03.129Z",
+    "version": "WzgyMywxXQ=="
   }
 }

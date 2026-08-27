@@ -382,6 +382,166 @@
         },
         "shortDotsEnable": false
       },
+      "anthropic.rate_limit.enqueued_batch_requests": {
+        "count": 0,
+        "name": "anthropic.rate_limit.enqueued_batch_requests",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.group_type": {
+        "count": 0,
+        "name": "anthropic.rate_limit.group_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.input_tokens_per_minute": {
+        "count": 0,
+        "name": "anthropic.rate_limit.input_tokens_per_minute",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.input_tokens_per_minute_cache_aware": {
+        "count": 0,
+        "name": "anthropic.rate_limit.input_tokens_per_minute_cache_aware",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.limits.type": {
+        "count": 0,
+        "name": "anthropic.rate_limit.limits.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.limits.value": {
+        "count": 0,
+        "name": "anthropic.rate_limit.limits.value",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.models": {
+        "count": 0,
+        "name": "anthropic.rate_limit.models",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.output_tokens_per_minute": {
+        "count": 0,
+        "name": "anthropic.rate_limit.output_tokens_per_minute",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.requests_per_minute": {
+        "count": 0,
+        "name": "anthropic.rate_limit.requests_per_minute",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "anthropic.rate_limit.type": {
+        "count": 0,
+        "name": "anthropic.rate_limit.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
       "anthropic.usage.api_key_id": {
         "count": 0,
         "name": "anthropic.usage.api_key_id",
@@ -1675,6 +1835,204 @@
         "readFromDocValues": true,
         "format": {
           "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.guardrail_arn": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.guardrail_arn",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.guardrail_content_source": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.guardrail_content_source",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.guardrail_policy_type": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.guardrail_policy_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.guardrail_version": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.guardrail_version",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.invocation_client_errors": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocation_client_errors",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.invocation_latency": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocation_latency",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "inputFormat": "milliseconds",
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "ms"
+      },
+      "aws_bedrock.guardrails.invocation_server_errors": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocation_server_errors",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.invocation_throttles": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocation_throttles",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.invocations": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocations",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.invocations_intervened": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.invocations_intervened",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.operation": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.operation",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "aws_bedrock.guardrails.text_unit_count": {
+        "count": 0,
+        "name": "aws_bedrock.guardrails.text_unit_count",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
         },
         "shortDotsEnable": false
       },

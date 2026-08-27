@@ -1,0 +1,135 @@
+{
+  "id": "slo-meridian-slo-staging-cost-leak-1",
+  "authorization": {
+    "api_key": {
+      "id": "sbAI958Bg0T5zecmeESb",
+      "name": "key"
+    }
+  },
+  "version": "10.0.0",
+  "create_time": 1787861659869,
+  "source": {
+    "index": [
+      "metrics-aws_billing.cur-default"
+    ],
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "range": {
+              "@timestamp": {
+                "gte": "now-7d"
+              }
+            }
+          },
+          {
+            "bool": {
+              "must": [],
+              "filter": [
+                {
+                  "bool": {
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "aws_billing.cur.line_item.usage_account_name": "meridian-staging"
+                        }
+                      }
+                    ],
+                    "minimum_should_match": 1
+                  }
+                }
+              ],
+              "should": [],
+              "must_not": []
+            }
+          }
+        ]
+      }
+    },
+    "project_routing": "_alias:*"
+  },
+  "dest": {
+    "index": ".slo-observability.sli-v3.6",
+    "pipeline": ".slo-observability.sli.pipeline-meridian-slo-staging-cost-leak-1"
+  },
+  "frequency": "1m",
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "1m"
+    }
+  },
+  "pivot": {
+    "group_by": {
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "fixed_interval": "24h"
+        }
+      }
+    },
+    "aggregations": {
+      "_A": {
+        "filter": {
+          "match_all": {}
+        },
+        "aggs": {
+          "metric": {
+            "sum": {
+              "field": "aws_billing.cur.line_item.unblended_cost"
+            }
+          }
+        }
+      },
+      "_metric": {
+        "bucket_script": {
+          "buckets_path": {
+            "A": "_A>metric"
+          },
+          "script": {
+            "source": "params.A",
+            "lang": "painless"
+          }
+        }
+      },
+      "slo.numerator": {
+        "bucket_script": {
+          "buckets_path": {
+            "value": "_metric>value"
+          },
+          "script": {
+            "source": "params.value <= params.threshold ? 1 : 0",
+            "params": {
+              "threshold": 150
+            }
+          }
+        }
+      },
+      "slo.denominator": {
+        "bucket_script": {
+          "buckets_path": {},
+          "script": "1"
+        }
+      },
+      "slo.isGoodSlice": {
+        "bucket_script": {
+          "buckets_path": {
+            "goodEvents": "slo.numerator>value"
+          },
+          "script": "params.goodEvents == 1 ? 1 : 0"
+        }
+      }
+    }
+  },
+  "description": "Rolled-up SLI data for SLO: [Meridian] Staging account daily spend healthy [id: meridian-slo-staging-cost-leak, revision: 1]",
+  "settings": {
+    "deduce_mappings": false,
+    "unattended": true
+  },
+  "_meta": {
+    "version": 3.6,
+    "managed": true,
+    "managed_by": "observability",
+    "deletion_protected": true
+  }
+}

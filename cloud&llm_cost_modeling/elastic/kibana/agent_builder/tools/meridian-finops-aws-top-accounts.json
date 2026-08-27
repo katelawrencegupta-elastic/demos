@@ -1,0 +1,24 @@
+{
+  "id": "meridian-finops-aws-top-accounts",
+  "type": "esql",
+  "description": "Top AWS linked accounts by CUR unblended cost over the last N days. Use for allocation / which account is driving spend.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n  BY account = aws_billing.cur.line_item.usage_account_name\n| SORT spend DESC\n| LIMIT 12",
+    "params": {
+      "days": {
+        "type": "integer",
+        "description": "Lookback window in days"
+      }
+    }
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

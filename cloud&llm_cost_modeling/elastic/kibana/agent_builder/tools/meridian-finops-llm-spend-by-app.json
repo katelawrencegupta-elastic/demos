@@ -1,0 +1,24 @@
+{
+  "id": "meridian-finops-llm-spend-by-app",
+  "type": "esql",
+  "description": "LLM cost from APM gen_ai spans by service.name over the last N days. Use for LLM burn, checkout-assistant, or app-level LLM FinOps.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM traces-apm-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS spend_usd = SUM(cost), calls = COUNT(*)\n  BY app = service.name, team = COALESCE(labels.team, \"untagged\")\n| SORT spend_usd DESC\n| LIMIT 15",
+    "params": {
+      "days": {
+        "type": "integer",
+        "description": "Lookback window in days (7 for agent-loop questions)"
+      }
+    }
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

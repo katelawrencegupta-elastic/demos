@@ -94,7 +94,7 @@
         }
       }
     },
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "Default mappings for all OpenTelemetry data streams",
       "managed": true

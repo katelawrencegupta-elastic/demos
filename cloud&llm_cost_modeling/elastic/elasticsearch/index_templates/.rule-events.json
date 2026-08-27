@@ -8,9 +8,6 @@
       "settings": {
         "index": {
           "hidden": "true",
-          "lifecycle": {
-            "prefer_ilm": "false"
-          },
           "mapping": {
             "total_fields": {
               "limit": "2500",

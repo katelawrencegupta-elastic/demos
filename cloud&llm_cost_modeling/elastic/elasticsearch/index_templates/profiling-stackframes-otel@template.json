@@ -1,0 +1,34 @@
+{
+  "name": "profiling-stackframes-otel@template",
+  "index_template": {
+    "index_patterns": [
+      "profiling-stackframes.otel-*"
+    ],
+    "template": {
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "60d"
+      }
+    },
+    "composed_of": [
+      "profiling-stackframes-otel@mappings",
+      "profiling-stackframes-otel@custom"
+    ],
+    "priority": 100,
+    "version": 20,
+    "_meta": {
+      "description": "OTel data stream template for eBPF Profiler stackframes",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "profiling-stackframes-otel@custom"
+    ],
+    "created_date_millis": 1787594298111,
+    "modified_date_millis": 1787594298111
+  }
+}

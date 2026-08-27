@@ -152,7 +152,7 @@
         }
       }
     },
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "Default mappings for the OpenTelemetry metrics index template installed by x-pack",
       "managed": true

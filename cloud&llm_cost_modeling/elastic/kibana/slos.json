@@ -1,0 +1,217 @@
+[
+  {
+    "name": "[Meridian] checkout-assistant daily LLM cost",
+    "description": "Daily gen_ai span cost for checkout-assistant under ceiling. The llm_agent_loop scenario (−8..−6, ×12) burns this budget.",
+    "indicator": {
+      "type": "sli.metric.timeslice",
+      "params": {
+        "index": "traces-apm-default",
+        "timestampField": "@timestamp",
+        "metric": {
+          "metrics": [
+            {
+              "name": "A",
+              "aggregation": "sum",
+              "field": "labels.llm_cost_usd"
+            }
+          ],
+          "equation": "A",
+          "comparator": "LTE",
+          "threshold": 0.8
+        },
+        "filter": "span.subtype : \"gen_ai\" and service.name : \"checkout-assistant\""
+      }
+    },
+    "budgetingMethod": "timeslices",
+    "timeWindow": {
+      "duration": "30d",
+      "type": "rolling"
+    },
+    "objective": {
+      "target": 0.95,
+      "timesliceTarget": 0.95,
+      "timesliceWindow": "24h"
+    },
+    "tags": [
+      "meridian",
+      "finops",
+      "workshop"
+    ],
+    "id": "meridian-slo-llm-checkout-spend",
+    "settings": {
+      "preventInitialBackfill": false,
+      "syncDelay": "1m",
+      "frequency": "1m"
+    },
+    "revision": 1,
+    "enabled": true,
+    "createdAt": "2026-08-27T20:14:25.806Z",
+    "updatedAt": "2026-08-27T20:14:25.806Z",
+    "createdBy": "719348788",
+    "updatedBy": "719348788",
+    "groupBy": "*",
+    "version": 2,
+    "artifacts": {
+      "dashboards": []
+    },
+    "instanceId": "*",
+    "summary": {
+      "errorBudget": {
+        "initial": 0.05,
+        "consumed": 0.666667,
+        "remaining": 0.333333,
+        "isEstimated": false
+      },
+      "sliValue": 0.966667,
+      "status": "HEALTHY",
+      "summaryUpdatedAt": "2026-08-27T20:16:28.304416747Z",
+      "fiveMinuteBurnRate": 0,
+      "oneHourBurnRate": 0,
+      "oneDayBurnRate": 0
+    },
+    "groupings": {}
+  },
+  {
+    "name": "[Meridian] AWS daily unblended under budget",
+    "description": "Daily AWS CUR unblended cost must stay at or below the FinOps ceiling. Crypto-mining (−12..−9) and organic growth burn error budget.",
+    "indicator": {
+      "type": "sli.metric.timeslice",
+      "params": {
+        "index": "metrics-aws_billing.cur-default",
+        "timestampField": "@timestamp",
+        "metric": {
+          "metrics": [
+            {
+              "name": "A",
+              "aggregation": "sum",
+              "field": "aws_billing.cur.line_item.unblended_cost"
+            }
+          ],
+          "equation": "A",
+          "comparator": "LTE",
+          "threshold": 5200
+        }
+      }
+    },
+    "budgetingMethod": "timeslices",
+    "timeWindow": {
+      "duration": "30d",
+      "type": "rolling"
+    },
+    "objective": {
+      "target": 0.95,
+      "timesliceTarget": 0.95,
+      "timesliceWindow": "24h"
+    },
+    "tags": [
+      "meridian",
+      "finops",
+      "workshop"
+    ],
+    "id": "meridian-slo-aws-daily-spend",
+    "settings": {
+      "preventInitialBackfill": false,
+      "syncDelay": "1m",
+      "frequency": "1m"
+    },
+    "revision": 1,
+    "enabled": true,
+    "createdAt": "2026-08-27T20:14:17.000Z",
+    "updatedAt": "2026-08-27T20:14:17.000Z",
+    "createdBy": "719348788",
+    "updatedBy": "719348788",
+    "groupBy": "*",
+    "version": 2,
+    "artifacts": {
+      "dashboards": []
+    },
+    "instanceId": "*",
+    "summary": {
+      "errorBudget": {
+        "initial": 0.05,
+        "consumed": 4,
+        "remaining": -3,
+        "isEstimated": false
+      },
+      "sliValue": 0.8,
+      "status": "VIOLATED",
+      "summaryUpdatedAt": "2026-08-27T20:16:20.375970123Z",
+      "fiveMinuteBurnRate": 0,
+      "oneHourBurnRate": 0,
+      "oneDayBurnRate": 20
+    },
+    "groupings": {}
+  },
+  {
+    "name": "[Meridian] Staging account daily spend healthy",
+    "description": "meridian-staging daily CUR spend under a healthy baseline. The ongoing cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.",
+    "indicator": {
+      "type": "sli.metric.timeslice",
+      "params": {
+        "index": "metrics-aws_billing.cur-default",
+        "timestampField": "@timestamp",
+        "metric": {
+          "metrics": [
+            {
+              "name": "A",
+              "aggregation": "sum",
+              "field": "aws_billing.cur.line_item.unblended_cost"
+            }
+          ],
+          "equation": "A",
+          "comparator": "LTE",
+          "threshold": 150
+        },
+        "filter": "aws_billing.cur.line_item.usage_account_name : \"meridian-staging\""
+      }
+    },
+    "budgetingMethod": "timeslices",
+    "timeWindow": {
+      "duration": "30d",
+      "type": "rolling"
+    },
+    "objective": {
+      "target": 0.95,
+      "timesliceTarget": 0.95,
+      "timesliceWindow": "24h"
+    },
+    "tags": [
+      "meridian",
+      "finops",
+      "workshop"
+    ],
+    "id": "meridian-slo-staging-cost-leak",
+    "settings": {
+      "preventInitialBackfill": false,
+      "syncDelay": "1m",
+      "frequency": "1m"
+    },
+    "revision": 1,
+    "enabled": true,
+    "createdAt": "2026-08-27T20:14:19.860Z",
+    "updatedAt": "2026-08-27T20:14:19.860Z",
+    "createdBy": "719348788",
+    "updatedBy": "719348788",
+    "groupBy": "*",
+    "version": 2,
+    "artifacts": {
+      "dashboards": []
+    },
+    "instanceId": "*",
+    "summary": {
+      "errorBudget": {
+        "initial": 0.05,
+        "consumed": 4,
+        "remaining": -3,
+        "isEstimated": false
+      },
+      "sliValue": 0.8,
+      "status": "VIOLATED",
+      "summaryUpdatedAt": "2026-08-27T20:16:24.321656923Z",
+      "fiveMinuteBurnRate": 0,
+      "oneHourBurnRate": 0,
+      "oneDayBurnRate": 20
+    },
+    "groupings": {}
+  }
+]

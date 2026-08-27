@@ -17,7 +17,7 @@ budgets:
   aws_daily_ceiling_usd: 5200      # ~0.7× 30d daily avg — crypto/growth burn days
   staging_daily_ceiling_usd: 150   # cost_leak ~$1k/day → chronically breached
   staging_daily_alert_usd: 200
-  checkout_daily_ceiling_usd: 0.80 # normal days <$0.60; agent-loop days $2–3.5
+  checkout_daily_ceiling_usd: 0.50 # agent-loop days $2–3.5; normal ~$0.45–0.58 → chronic breach
   checkout_7d_alert_usd: 4.0       # 7d sum ~$5.5
   gcp_ml_7d_alert_usd: 4000        # meridian-ml-prod 7d ~$7.2k
 

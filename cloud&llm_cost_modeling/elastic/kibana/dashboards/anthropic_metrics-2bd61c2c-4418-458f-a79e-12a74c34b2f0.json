@@ -20,8 +20,8 @@
       "fleet-pkg-anthropic_metrics-default"
     ],
     "time_range": {
-      "from": "now-3d",
-      "to": "now"
+      "from": "2026-04-29T19:20:43.000Z",
+      "to": "2026-08-28T19:20:43.000Z"
     },
     "title": "[Anthropic] Cost & Billing",
     "filters": [],
@@ -32,10 +32,10 @@
     "panels": [
       {
         "grid": {
-          "h": 2,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 2
         },
         "config": {
           "title": "",
@@ -68,10 +68,10 @@
       },
       {
         "grid": {
-          "h": 4,
-          "w": 48,
           "x": 0,
-          "y": 2
+          "y": 2,
+          "w": 48,
+          "h": 4
         },
         "config": {
           "content": "## Anthropic — Cost & Billing\nDetailed cost reporting across all workspaces, models, and inference geographies. Aligned with **Anthropic's billing line items** for invoice reconciliation. ",
@@ -84,10 +84,10 @@
       },
       {
         "grid": {
-          "h": 5,
-          "w": 16,
           "x": 0,
-          "y": 6
+          "y": 6,
+          "w": 16,
+          "h": 5
         },
         "config": {
           "type": "metric",
@@ -131,10 +131,10 @@
       },
       {
         "grid": {
-          "h": 5,
-          "w": 16,
           "x": 16,
-          "y": 6
+          "y": 6,
+          "w": 16,
+          "h": 5
         },
         "config": {
           "type": "metric",
@@ -174,10 +174,10 @@
       },
       {
         "grid": {
-          "h": 5,
-          "w": 16,
           "x": 32,
-          "y": 6
+          "y": 6,
+          "w": 16,
+          "h": 5
         },
         "config": {
           "type": "metric",
@@ -217,10 +217,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 48,
           "x": 0,
-          "y": 11
+          "y": 11,
+          "w": 48,
+          "h": 12
         },
         "config": {
           "type": "data_table",
@@ -318,10 +318,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 0,
-          "y": 23
+          "y": 23,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -381,10 +381,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 24,
-          "y": 23
+          "y": 23,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -444,10 +444,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 0,
-          "y": 35
+          "y": 35,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -506,10 +506,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 24,
-          "y": 35
+          "y": 35,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -628,10 +628,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 0,
-          "y": 47
+          "y": 47,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -750,10 +750,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 24,
-          "y": 47
+          "y": 47,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -872,10 +872,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 48,
           "x": 0,
-          "y": 59
+          "y": 59,
+          "w": 48,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -1040,7 +1040,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:19.516Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:21.393Z",
-    "version": "WzQ1MiwxXQ=="
+    "updated_at": "2026-08-27T19:20:43.736Z",
+    "version": "WzkwNiwxXQ=="
   }
 }

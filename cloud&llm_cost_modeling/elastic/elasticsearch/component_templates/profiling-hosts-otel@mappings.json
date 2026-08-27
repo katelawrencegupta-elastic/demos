@@ -1,0 +1,77 @@
+{
+  "name": "profiling-hosts-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "codec": "best_compression",
+          "refresh_interval": "10s",
+          "sort": {
+            "field": [
+              "resource.attributes.host.id",
+              "@timestamp"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "_source": {
+          "enabled": true
+        },
+        "dynamic": false,
+        "dynamic_templates": [
+          {
+            "resource_attributes_as_keyword": {
+              "path_match": "resource.attributes.*",
+              "mapping": {
+                "index": false,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "@timestamp": {
+            "format": "epoch_second",
+            "type": "date"
+          },
+          "resource": {
+            "properties": {
+              "attributes": {
+                "dynamic": true,
+                "type": "passthrough",
+                "priority": 40,
+                "properties": {
+                  "cloud.provider": {
+                    "type": "keyword"
+                  },
+                  "cloud.region": {
+                    "type": "keyword"
+                  },
+                  "host.arch": {
+                    "type": "keyword"
+                  },
+                  "os.type": {
+                    "type": "keyword"
+                  },
+                  "host.id": {
+                    "type": "keyword"
+                  },
+                  "host.type": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "version": 20,
+    "_meta": {
+      "description": "Mappings for eBPF Profiler hosts OTel data stream",
+      "managed": true
+    }
+  }
+}

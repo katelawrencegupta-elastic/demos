@@ -1,0 +1,111 @@
+{
+  "name": "meridian-inference-token-usage",
+  "index_template": {
+    "index_patterns": [
+      "logs-elastic.inference_token_usage-*"
+    ],
+    "template": {
+      "mappings": {
+        "properties": {
+          "token_usage": {
+            "properties": {
+              "completion_tokens": {
+                "type": "long"
+              },
+              "prompt_tokens": {
+                "type": "long"
+              },
+              "total_tokens": {
+                "type": "long"
+              },
+              "thinking_tokens": {
+                "type": "long"
+              },
+              "cached_tokens": {
+                "type": "long"
+              }
+            }
+          },
+          "@timestamp": {
+            "type": "date"
+          },
+          "inference": {
+            "properties": {
+              "feature_id": {
+                "type": "keyword"
+              },
+              "parent_feature_id": {
+                "type": "keyword"
+              },
+              "feature_name": {
+                "type": "keyword"
+              },
+              "service": {
+                "type": "keyword"
+              },
+              "connector_id": {
+                "type": "keyword"
+              },
+              "endpoint_id": {
+                "type": "keyword"
+              },
+              "task_type": {
+                "type": "keyword"
+              }
+            }
+          },
+          "model": {
+            "properties": {
+              "model_name": {
+                "type": "keyword"
+              },
+              "provider": {
+                "type": "keyword"
+              },
+              "model_creator": {
+                "type": "keyword"
+              },
+              "model_id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "user": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "labels": {
+            "properties": {
+              "cost_usd": {
+                "type": "double"
+              },
+              "role": {
+                "type": "keyword"
+              },
+              "team": {
+                "type": "keyword"
+              },
+              "eis": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "composed_of": [],
+    "priority": 210,
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "created_date_millis": 1787665345197,
+    "modified_date_millis": 1787665345197
+  }
+}

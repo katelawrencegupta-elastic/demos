@@ -1,0 +1,81 @@
+{
+  "id": "meridian-slo-llm-checkout-spend-burn",
+  "enabled": true,
+  "name": "[Meridian] checkout-assistant daily LLM cost — burn rate",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "rule_type_id": "slo.rules.burnRate",
+  "consumer": "slo",
+  "schedule": {
+    "interval": "1m"
+  },
+  "actions": [],
+  "params": {
+    "sloId": "meridian-slo-llm-checkout-spend",
+    "windows": [
+      {
+        "id": "ebc684fc-fa3a-45ac-9694-1c72afbbcea9",
+        "burnRateThreshold": 1,
+        "maxBurnRateThreshold": 10,
+        "longWindow": {
+          "value": 72,
+          "unit": "h"
+        },
+        "shortWindow": {
+          "value": 360,
+          "unit": "m"
+        },
+        "actionGroup": "slo.burnRate.low"
+      },
+      {
+        "id": "d978cf62-f723-4df5-a07a-f423fb99b638",
+        "burnRateThreshold": 3,
+        "maxBurnRateThreshold": 30,
+        "longWindow": {
+          "value": 24,
+          "unit": "h"
+        },
+        "shortWindow": {
+          "value": 120,
+          "unit": "m"
+        },
+        "actionGroup": "slo.burnRate.medium"
+      }
+    ],
+    "dependencies": []
+  },
+  "scheduled_task_id": "meridian-slo-llm-checkout-spend-burn",
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-27T20:14:27.850Z",
+  "updated_at": "2026-08-27T20:14:27.850Z",
+  "api_key_owner": "719348788",
+  "api_key_created_by_user": true,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "ok",
+    "last_execution_date": "2026-08-27T22:06:31.517Z",
+    "last_duration": 37
+  },
+  "last_run": {
+    "outcome": "succeeded",
+    "outcome_order": 0,
+    "warning": null,
+    "outcome_msg": null,
+    "alerts_count": {
+      "new": 0,
+      "ignored": 0,
+      "recovered": 0,
+      "active": 0
+    }
+  },
+  "next_run": "2026-08-27T22:07:31.171Z",
+  "revision": 0,
+  "running": false
+}

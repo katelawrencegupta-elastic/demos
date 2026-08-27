@@ -133,14 +133,34 @@
     "time_series": null
   },
   {
+    "name": "logs-elastic.inference_token_usage-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-elastic.inference_token_usage-default-2026.08.25-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "meridian-inference-token-usage",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
     "name": "logs-elastic_agent.status_change-default",
     "timestamp_field": {
       "name": "@timestamp"
     },
     "indices": [
-      ".ds-logs-elastic_agent.status_change-default-2026.08.12-000001"
+      ".ds-logs-elastic_agent.status_change-default-2026.08.12-000001",
+      ".ds-logs-elastic_agent.status_change-default-2026.08.19-000002"
     ],
-    "generation": 1,
+    "generation": 2,
     "status": "GREEN",
     "template": "logs-elastic_agent.status_change",
     "ilm_policy": null,
@@ -162,6 +182,25 @@
     "generation": 1,
     "status": "GREEN",
     "template": "logs-gcp.audit",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "logs-gcp_vertexai.auditlogs-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-logs-gcp_vertexai.auditlogs-default-2026.08.27-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "logs-gcp_vertexai.auditlogs",
     "ilm_policy": null,
     "hidden": false,
     "system": false,
@@ -361,6 +400,25 @@
     "time_series": null
   },
   {
+    "name": "metrics-anthropic_metrics.rate_limit-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-anthropic_metrics.rate_limit-default-2026.08.27-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-anthropic_metrics.rate_limit",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
     "name": "metrics-anthropic_metrics.usage-default",
     "timestamp_field": {
       "name": "@timestamp"
@@ -409,6 +467,25 @@
     "generation": 1,
     "status": "GREEN",
     "template": "metrics-aws.ec2_metrics",
+    "ilm_policy": null,
+    "hidden": false,
+    "system": false,
+    "allow_custom_routing": false,
+    "replicated": false,
+    "next_generation_managed_by": "Data stream lifecycle",
+    "time_series": null
+  },
+  {
+    "name": "metrics-aws_bedrock.guardrails-default",
+    "timestamp_field": {
+      "name": "@timestamp"
+    },
+    "indices": [
+      ".ds-metrics-aws_bedrock.guardrails-default-2026.08.27-000001"
+    ],
+    "generation": 1,
+    "status": "GREEN",
+    "template": "metrics-aws_bedrock.guardrails",
     "ilm_policy": null,
     "hidden": false,
     "system": false,
@@ -514,7 +591,7 @@
       "temporal_ranges": [
         {
           "start": "2026-08-12T16:16:55.000Z",
-          "end": "2026-08-18T19:13:07.000Z"
+          "end": "2026-08-27T22:18:58.000Z"
         }
       ]
     }
@@ -540,7 +617,7 @@
       "temporal_ranges": [
         {
           "start": "2026-08-12T16:16:57.000Z",
-          "end": "2026-08-18T19:13:07.000Z"
+          "end": "2026-08-27T22:18:58.000Z"
         }
       ]
     }
@@ -589,9 +666,10 @@
       "name": "@timestamp"
     },
     "indices": [
-      ".ds-traces-agent_builder.otel-default-2026.08.17-000001"
+      ".ds-traces-agent_builder.otel-default-2026.08.17-000001",
+      ".ds-traces-agent_builder.otel-default-2026.08.25-000002"
     ],
-    "generation": 1,
+    "generation": 2,
     "status": "GREEN",
     "template": "traces-otel@template",
     "ilm_policy": null,
@@ -608,10 +686,10 @@
       "name": "@timestamp"
     },
     "indices": [
-      ".ds-traces-apm-default-2026.08.13-000001",
-      ".ds-traces-apm-default-2026.08.14-000002"
+      ".ds-traces-apm-default-2026.08.14-000002",
+      ".ds-traces-apm-default-2026.08.25-000004"
     ],
-    "generation": 2,
+    "generation": 4,
     "status": "GREEN",
     "template": "traces-apm@template",
     "ilm_policy": null,

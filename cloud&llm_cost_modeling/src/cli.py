@@ -439,6 +439,11 @@ def cmd_verify(scope: str):
     if not verify_budgets():
         failed = True
 
+    print()
+    from src.agent_builder import verify_agent
+    if not verify_agent():
+        failed = True
+
     print("\n== kibana ==")
     print(f"  Discover:   {KIBANA_URL}/app/discover")
     print(f"  Dashboards: {KIBANA_URL}/app/dashboards")
@@ -480,6 +485,14 @@ def main():
         "budgets",
         help="provision FinOps spend SLOs + ES|QL budget alert rules",
     )
+    sub.add_parser(
+        "recover-slos",
+        help="reset all Meridian spend SLOs (recreate transforms + reprocess SLI)",
+    )
+    sub.add_parser(
+        "agent",
+        help="provision Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)",
+    )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
@@ -498,7 +511,7 @@ def main():
         from src.dashboards import publish
         v = args.variant
         publish(
-            include_baseline=v in ("baseline", "all"),
+            include_baseline=v in ("baseline", "dynamic", "all"),
             include_classic=v in ("classic", "original", "all"),
             include_dynamic_alias=v in ("baseline", "dynamic", "all"),
             include_ai=v in ("ai-assistant", "baseline", "dynamic", "all"),
@@ -506,6 +519,12 @@ def main():
     elif args.cmd == "budgets":
         from src.budgets import ensure_budgets
         ensure_budgets(fail_loud=True)
+    elif args.cmd == "recover-slos":
+        from src.budgets import recover_slos
+        recover_slos(fail_loud=True)
+    elif args.cmd == "agent":
+        from src.agent_builder import ensure_agent
+        ensure_agent(fail_loud=True)
     elif args.cmd == "backup":
         from src.backup import run as backup_run
         backup_run()

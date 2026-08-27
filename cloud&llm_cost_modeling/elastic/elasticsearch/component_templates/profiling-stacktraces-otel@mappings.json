@@ -1,0 +1,40 @@
+{
+  "name": "profiling-stacktraces-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "source": {
+              "mode": "synthetic"
+            }
+          },
+          "refresh_interval": "10s",
+          "sort": {
+            "field": [
+              "frame.ids"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "frame.types": {
+            "index": false,
+            "type": "keyword"
+          },
+          "frame.ids": {
+            "index": false,
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "version": 20,
+    "_meta": {
+      "description": "Mappings for eBPF Profiler stacktraces OTel data stream",
+      "managed": true
+    }
+  }
+}

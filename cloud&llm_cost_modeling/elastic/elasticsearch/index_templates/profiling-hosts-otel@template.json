@@ -1,0 +1,34 @@
+{
+  "name": "profiling-hosts-otel@template",
+  "index_template": {
+    "index_patterns": [
+      "profiling-hosts.otel-*"
+    ],
+    "template": {
+      "lifecycle": {
+        "enabled": true,
+        "data_retention": "60d"
+      }
+    },
+    "composed_of": [
+      "profiling-hosts-otel@mappings",
+      "profiling-hosts-otel@custom"
+    ],
+    "priority": 250,
+    "version": 20,
+    "_meta": {
+      "description": "OTel data stream template for eBPF Profiler hosts",
+      "managed": true
+    },
+    "data_stream": {
+      "hidden": false,
+      "allow_custom_routing": false
+    },
+    "allow_auto_create": true,
+    "ignore_missing_component_templates": [
+      "profiling-hosts-otel@custom"
+    ],
+    "created_date_millis": 1787594297945,
+    "modified_date_millis": 1787594297945
+  }
+}

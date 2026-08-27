@@ -15,6 +15,10 @@
       "fleet-managed-default",
       "fleet-pkg-gcp_vertexai-default"
     ],
+    "time_range": {
+      "from": "2026-04-29T18:14:35.000Z",
+      "to": "2026-08-28T18:14:35.000Z"
+    },
     "title": "[GCP VertexAI] Metrics Overview",
     "filters": [],
     "query": {
@@ -24,10 +28,10 @@
     "panels": [
       {
         "grid": {
-          "h": 6,
-          "w": 4,
           "x": 18,
-          "y": 2
+          "y": 2,
+          "w": 4,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -76,10 +80,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 4,
           "x": 22,
-          "y": 2
+          "y": 2,
+          "w": 4,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -133,10 +137,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 22,
           "x": 26,
-          "y": 2
+          "y": 2,
+          "w": 22,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -209,10 +213,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 4,
           "x": 18,
-          "y": 8
+          "y": 8,
+          "w": 4,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -264,10 +268,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 24,
           "x": 0,
-          "y": 14
+          "y": 14,
+          "w": 24,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -418,10 +422,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 24,
           "x": 24,
-          "y": 14
+          "y": 14,
+          "w": 24,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -568,10 +572,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 16,
           "x": 0,
-          "y": 27
+          "y": 27,
+          "w": 16,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -707,10 +711,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 15,
           "x": 16,
-          "y": 27
+          "y": 27,
+          "w": 15,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -845,10 +849,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 17,
           "x": 31,
-          "y": 27
+          "y": 27,
+          "w": 17,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -986,10 +990,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 16,
           "x": 0,
-          "y": 39
+          "y": 39,
+          "w": 16,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1122,10 +1126,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 15,
           "x": 16,
-          "y": 39
+          "y": 39,
+          "w": 15,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1258,10 +1262,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 17,
           "x": 31,
-          "y": 39
+          "y": 39,
+          "w": 17,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1396,10 +1400,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 12,
           "x": 0,
-          "y": 50
+          "y": 50,
+          "w": 12,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1511,10 +1515,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 13,
           "x": 12,
-          "y": 50
+          "y": 50,
+          "w": 13,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1630,10 +1634,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 23,
           "x": 25,
-          "y": 50
+          "y": 50,
+          "w": 23,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1765,12 +1769,13 @@
       },
       {
         "grid": {
-          "h": 2,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 2
         },
         "config": {
+          "title": "",
           "links": [
             {
               "type": "dashboardLink",
@@ -1827,41 +1832,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:37.740Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:39.296Z",
-    "version": "WzQ3NCwxXQ=="
-  },
-  "warnings": [
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "description": "",
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 10,
-            "markdown": "# GCP Vertex AI\n\nPrimary metrics from GCP Vertex AI service. This dashboard contains: \n\n- Invocation rates\n- Error rates\n- Token usage\n- Model Invocation latency\n- Prediction metrics\n- Resource Utilization",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    }
-  ]
+    "updated_at": "2026-08-27T18:14:35.806Z",
+    "version": "Wzg3OCwxXQ=="
+  }
 }

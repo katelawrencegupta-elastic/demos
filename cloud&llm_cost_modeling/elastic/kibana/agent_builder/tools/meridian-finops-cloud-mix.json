@@ -1,0 +1,24 @@
+{
+  "id": "meridian-finops-cloud-mix",
+  "type": "esql",
+  "description": "Total cloud billing spend by provider (AWS CUR, GCP billing, Azure billing) over the last N days. Use for multi-cloud spend mix questions.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n| EVAL spend = COALESCE(\n    aws_billing.cur.line_item.unblended_cost,\n    gcp.billing.total,\n    azure.billing.pretax_cost)\n| EVAL provider = CASE(\n    data_stream.dataset == \"aws_billing.cur\", \"aws\",\n    data_stream.dataset == \"gcp.billing\", \"gcp\",\n    data_stream.dataset == \"azure.billing\", \"azure\",\n    \"other\")\n| STATS total = SUM(spend) BY provider\n| SORT total DESC",
+    "params": {
+      "days": {
+        "type": "integer",
+        "description": "Lookback window in days"
+      }
+    }
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

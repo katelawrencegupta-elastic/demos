@@ -1,0 +1,49 @@
+{
+  "name": "profiling-stackframes-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "refresh_interval": "10s"
+        }
+      },
+      "mappings": {
+        "_source": {
+          "enabled": true
+        },
+        "dynamic": false,
+        "properties": {
+          "line.number": {
+            "index": false,
+            "store": false,
+            "type": "integer",
+            "doc_values": false
+          },
+          "function.name": {
+            "index": false,
+            "store": false,
+            "type": "keyword",
+            "doc_values": false
+          },
+          "function.filename": {
+            "index": false,
+            "store": false,
+            "type": "keyword",
+            "doc_values": false
+          },
+          "function.offset": {
+            "index": false,
+            "store": false,
+            "type": "integer",
+            "doc_values": false
+          }
+        }
+      }
+    },
+    "version": 20,
+    "_meta": {
+      "description": "Mappings for eBPF Profiler stackframes OTel data stream",
+      "managed": true
+    }
+  }
+}

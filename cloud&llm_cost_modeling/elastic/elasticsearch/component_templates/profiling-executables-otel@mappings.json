@@ -1,0 +1,50 @@
+{
+  "name": "profiling-executables-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mapping": {
+            "source": {
+              "mode": "synthetic"
+            }
+          },
+          "refresh_interval": "10s"
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "properties": {
+          "@timestamp": {
+            "format": "epoch_second",
+            "type": "date"
+          },
+          "resource": {
+            "properties": {
+              "attributes": {
+                "dynamic": true,
+                "type": "passthrough",
+                "priority": 40,
+                "properties": {
+                  "process.executable.build_id.htlhash": {
+                    "index": true,
+                    "type": "keyword"
+                  },
+                  "process.executable.name": {
+                    "index": false,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "version": 20,
+    "_meta": {
+      "description": "Mappings for eBPF Profiler executables OTel data stream",
+      "managed": true
+    }
+  }
+}

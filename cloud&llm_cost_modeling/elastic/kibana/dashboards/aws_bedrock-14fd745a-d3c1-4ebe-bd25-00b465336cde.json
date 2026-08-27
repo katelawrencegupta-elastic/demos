@@ -15,6 +15,10 @@
       "fleet-managed-default",
       "fleet-pkg-aws_bedrock-default"
     ],
+    "time_range": {
+      "from": "2026-04-29T19:20:04.000Z",
+      "to": "2026-08-28T19:20:04.000Z"
+    },
     "title": "[Amazon Bedrock] Guardrails",
     "filters": [],
     "query": {
@@ -24,13 +28,14 @@
     "panels": [
       {
         "grid": {
-          "h": 3,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 3
         },
         "config": {
           "hide_title": true,
+          "title": "",
           "links": [
             {
               "label": "Amazon Bedrock Overview",
@@ -60,10 +65,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 6,
           "x": 16,
-          "y": 3
+          "y": 3,
+          "w": 6,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -117,10 +122,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 6,
           "x": 22,
-          "y": 3
+          "y": 3,
+          "w": 6,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -175,10 +180,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 20,
           "x": 28,
-          "y": 3
+          "y": 3,
+          "w": 20,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -262,10 +267,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 6,
           "x": 16,
-          "y": 9
+          "y": 9,
+          "w": 6,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -319,10 +324,10 @@
       },
       {
         "grid": {
-          "h": 14,
-          "w": 28,
           "x": 0,
-          "y": 18
+          "y": 18,
+          "w": 28,
+          "h": 14
         },
         "config": {
           "type": "xy",
@@ -464,10 +469,10 @@
       },
       {
         "grid": {
-          "h": 27,
-          "w": 20,
           "x": 28,
-          "y": 18
+          "y": 18,
+          "w": 20,
+          "h": 27
         },
         "config": {
           "type": "tag_cloud",
@@ -527,10 +532,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 28,
           "x": 0,
-          "y": 32
+          "y": 32,
+          "w": 28,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -672,10 +677,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 23,
           "x": 0,
-          "y": 45
+          "y": 45,
+          "w": 23,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -817,10 +822,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 25,
           "x": 23,
-          "y": 45
+          "y": 45,
+          "w": 25,
+          "h": 12
         },
         "config": {
           "type": "xy",
@@ -962,10 +967,10 @@
       },
       {
         "grid": {
-          "h": 17,
-          "w": 48,
           "x": 0,
-          "y": 60
+          "y": 60,
+          "w": 48,
+          "h": 17
         },
         "config": {
           "description": "",
@@ -1027,10 +1032,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 12,
           "x": 0,
-          "y": 80
+          "y": 80,
+          "w": 12,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1173,10 +1178,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 12,
           "x": 12,
-          "y": 80
+          "y": 80,
+          "w": 12,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1319,10 +1324,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 12,
           "x": 24,
-          "y": 80
+          "y": 80,
+          "w": 12,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1465,10 +1470,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 12,
           "x": 36,
-          "y": 80
+          "y": 80,
+          "w": 12,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1613,10 +1618,10 @@
       },
       {
         "grid": {
-          "h": 16,
-          "w": 12,
           "x": 0,
-          "y": 96
+          "y": 96,
+          "w": 12,
+          "h": 16
         },
         "config": {
           "type": "xy",
@@ -1772,10 +1777,10 @@
       },
       {
         "grid": {
-          "h": 16,
-          "w": 12,
           "x": 12,
-          "y": 96
+          "y": 96,
+          "w": 12,
+          "h": 16
         },
         "config": {
           "type": "xy",
@@ -1933,10 +1938,10 @@
       },
       {
         "grid": {
-          "h": 16,
-          "w": 12,
           "x": 24,
-          "y": 96
+          "y": 96,
+          "w": 12,
+          "h": 16
         },
         "config": {
           "type": "xy",
@@ -2094,10 +2099,10 @@
       },
       {
         "grid": {
-          "h": 16,
-          "w": 12,
           "x": 36,
-          "y": 96
+          "y": 96,
+          "w": 12,
+          "h": 16
         },
         "config": {
           "type": "xy",
@@ -2312,164 +2317,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:31.647Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:33.390Z",
-    "version": "WzQ2OCwxXQ=="
-  },
-  "warnings": [
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "## Amazon Bedrock Guardrails\n\nThis dashboard provides insights into the following:\n- Guardrail invocations, invocation latency\n- Text units utilized by different guardrail policies\n- Policy types involved in guardrail interventions\n- Prompt and response where guardrails intervened\n",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "### Guardrail policy types for interventions",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "### Prompt and response where guardrails intervened",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "### Guardrail invocations by guardrail policy",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "### Guardrail invocations by content source (Input & Output)",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    }
-  ]
+    "updated_at": "2026-08-27T19:20:04.342Z",
+    "version": "WzkwMiwxXQ=="
+  }
 }

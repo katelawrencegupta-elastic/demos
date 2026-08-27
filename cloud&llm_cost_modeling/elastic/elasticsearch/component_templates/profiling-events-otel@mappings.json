@@ -1,0 +1,145 @@
+{
+  "name": "profiling-events-otel@mappings",
+  "component_template": {
+    "template": {
+      "settings": {
+        "index": {
+          "mode": "logsdb",
+          "codec": "best_compression",
+          "refresh_interval": "10s",
+          "sort": {
+            "field": [
+              "resource.attributes.k8s.namespace.name",
+              "resource.attributes.k8s.pod.name",
+              "resource.attributes.service.name",
+              "resource.attributes.host.name",
+              "resource.attributes.container.name",
+              "resource.attributes.process.executable.name",
+              "resource.attributes.thread.name",
+              "@timestamp"
+            ],
+            "order": [
+              "asc",
+              "asc",
+              "asc",
+              "asc",
+              "asc",
+              "asc",
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "mappings": {
+        "dynamic": false,
+        "dynamic_templates": [
+          {
+            "resource_attributes_as_keyword": {
+              "path_match": "resource.attributes.*",
+              "mapping": {
+                "index": false,
+                "type": "keyword"
+              },
+              "match_mapping_type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "orchestrator.resource.name": {
+            "path": "resource.attributes.k8s.pod.name",
+            "type": "alias"
+          },
+          "@timestamp": {
+            "format": "strict_date_optional_time_nanos||epoch_second",
+            "type": "date_nanos"
+          },
+          "Stacktrace.sampling_frequency": {
+            "path": "sampling_frequency",
+            "type": "alias"
+          },
+          "resource": {
+            "properties": {
+              "attributes": {
+                "dynamic": true,
+                "type": "passthrough",
+                "priority": 40,
+                "properties": {
+                  "host.ip": {
+                    "index": false,
+                    "type": "ip"
+                  },
+                  "k8s.namespace.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "container.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "k8s.pod.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "service.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "host.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "thread.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "host.id": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "container.id": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "process.executable.name": {
+                    "index": false,
+                    "type": "keyword"
+                  },
+                  "os.version": {
+                    "index": false,
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          },
+          "Stacktrace.id": {
+            "path": "stacktrace.id",
+            "type": "alias"
+          },
+          "stacktrace.id": {
+            "index": false,
+            "type": "keyword"
+          },
+          "count": {
+            "index": false,
+            "type": "short"
+          },
+          "sampling_frequency": {
+            "index": false,
+            "type": "long"
+          },
+          "process.thread.name": {
+            "path": "resource.attributes.thread.name",
+            "type": "alias"
+          }
+        }
+      }
+    },
+    "version": 20,
+    "_meta": {
+      "description": "Mappings for eBPF Profiler events OTel data stream",
+      "managed": true
+    }
+  }
+}

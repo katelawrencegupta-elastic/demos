@@ -1,0 +1,71 @@
+{
+  "name": "[Meridian] AWS daily unblended under budget",
+  "description": "Daily AWS CUR unblended cost must stay at or below the FinOps ceiling. Crypto-mining (−12..−9) and organic growth burn error budget.",
+  "indicator": {
+    "type": "sli.metric.timeslice",
+    "params": {
+      "index": "metrics-aws_billing.cur-default",
+      "timestampField": "@timestamp",
+      "metric": {
+        "metrics": [
+          {
+            "name": "A",
+            "aggregation": "sum",
+            "field": "aws_billing.cur.line_item.unblended_cost"
+          }
+        ],
+        "equation": "A",
+        "comparator": "LTE",
+        "threshold": 5200
+      }
+    }
+  },
+  "budgetingMethod": "timeslices",
+  "timeWindow": {
+    "duration": "30d",
+    "type": "rolling"
+  },
+  "objective": {
+    "target": 0.95,
+    "timesliceTarget": 0.95,
+    "timesliceWindow": "24h"
+  },
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "id": "meridian-slo-aws-daily-spend",
+  "settings": {
+    "preventInitialBackfill": false,
+    "syncDelay": "1m",
+    "frequency": "1m"
+  },
+  "revision": 1,
+  "enabled": true,
+  "createdAt": "2026-08-27T20:14:17.000Z",
+  "updatedAt": "2026-08-27T20:14:17.000Z",
+  "createdBy": "719348788",
+  "updatedBy": "719348788",
+  "groupBy": "*",
+  "version": 2,
+  "artifacts": {
+    "dashboards": []
+  },
+  "instanceId": "*",
+  "summary": {
+    "errorBudget": {
+      "initial": 0.05,
+      "consumed": 4,
+      "remaining": -3,
+      "isEstimated": false
+    },
+    "sliValue": 0.8,
+    "status": "VIOLATED",
+    "summaryUpdatedAt": "2026-08-27T20:16:20.375970123Z",
+    "fiveMinuteBurnRate": 0,
+    "oneHourBurnRate": 0,
+    "oneDayBurnRate": 20
+  },
+  "groupings": {}
+}

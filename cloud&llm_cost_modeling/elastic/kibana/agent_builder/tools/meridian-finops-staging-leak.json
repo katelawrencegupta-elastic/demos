@@ -1,0 +1,24 @@
+{
+  "id": "meridian-finops-staging-leak",
+  "type": "esql",
+  "description": "meridian-staging account spend over the last N days vs the daily SLO ceiling. Use when asked about staging cost leak, orphaned resources, or meridian-staging.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND aws_billing.cur.line_item.usage_account_name == \"meridian-staging\"\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| EVAL lookback_days = ?days::integer\n| EVAL avg_daily = spend / lookback_days\n| EVAL daily_slo_ceiling_usd = 150\n| EVAL daily_alert_floor_usd = 200\n| EVAL over_slo_ceiling = avg_daily > daily_slo_ceiling_usd",
+    "params": {
+      "days": {
+        "type": "integer",
+        "description": "Lookback window in days (7 recommended)"
+      }
+    }
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

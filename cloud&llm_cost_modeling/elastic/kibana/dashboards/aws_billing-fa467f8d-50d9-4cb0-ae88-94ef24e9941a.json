@@ -15,6 +15,10 @@
       "fleet-managed-default",
       "fleet-pkg-aws_billing-default"
     ],
+    "time_range": {
+      "from": "2026-04-29T18:54:22.000Z",
+      "to": "2026-08-28T18:54:22.000Z"
+    },
     "title": "[Metrics] AWS Cost and Usage Report - Last month",
     "filters": [],
     "query": {
@@ -678,7 +682,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:45.248Z",
     "managed": true,
-    "updated_at": "2026-08-17T20:24:06.495Z",
-    "version": "WzU0NCwxXQ=="
+    "updated_at": "2026-08-27T18:54:22.406Z",
+    "version": "Wzg4NSwxXQ=="
   }
 }

@@ -5,7 +5,7 @@
       "settings": {
         "index": {
           "codec": "best_compression",
-          "default_pipeline": "synthetics-browser-1.9.0",
+          "default_pipeline": "synthetics-browser-1.10.0",
           "mapping": {
             "total_fields": {
               "limit": "1000"

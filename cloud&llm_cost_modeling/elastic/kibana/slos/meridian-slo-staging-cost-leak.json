@@ -1,0 +1,72 @@
+{
+  "name": "[Meridian] Staging account daily spend healthy",
+  "description": "meridian-staging daily CUR spend under a healthy baseline. The ongoing cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.",
+  "indicator": {
+    "type": "sli.metric.timeslice",
+    "params": {
+      "index": "metrics-aws_billing.cur-default",
+      "timestampField": "@timestamp",
+      "metric": {
+        "metrics": [
+          {
+            "name": "A",
+            "aggregation": "sum",
+            "field": "aws_billing.cur.line_item.unblended_cost"
+          }
+        ],
+        "equation": "A",
+        "comparator": "LTE",
+        "threshold": 150
+      },
+      "filter": "aws_billing.cur.line_item.usage_account_name : \"meridian-staging\""
+    }
+  },
+  "budgetingMethod": "timeslices",
+  "timeWindow": {
+    "duration": "30d",
+    "type": "rolling"
+  },
+  "objective": {
+    "target": 0.95,
+    "timesliceTarget": 0.95,
+    "timesliceWindow": "24h"
+  },
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "id": "meridian-slo-staging-cost-leak",
+  "settings": {
+    "preventInitialBackfill": false,
+    "syncDelay": "1m",
+    "frequency": "1m"
+  },
+  "revision": 1,
+  "enabled": true,
+  "createdAt": "2026-08-27T20:14:19.860Z",
+  "updatedAt": "2026-08-27T20:14:19.860Z",
+  "createdBy": "719348788",
+  "updatedBy": "719348788",
+  "groupBy": "*",
+  "version": 2,
+  "artifacts": {
+    "dashboards": []
+  },
+  "instanceId": "*",
+  "summary": {
+    "errorBudget": {
+      "initial": 0.05,
+      "consumed": 4,
+      "remaining": -3,
+      "isEstimated": false
+    },
+    "sliValue": 0.8,
+    "status": "VIOLATED",
+    "summaryUpdatedAt": "2026-08-27T20:16:24.321656923Z",
+    "fiveMinuteBurnRate": 0,
+    "oneHourBurnRate": 0,
+    "oneDayBurnRate": 20
+  },
+  "groupings": {}
+}

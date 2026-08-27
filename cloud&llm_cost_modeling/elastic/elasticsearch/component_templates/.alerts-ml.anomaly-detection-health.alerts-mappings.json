@@ -20,6 +20,9 @@
                       "missed_docs_count": {
                         "type": "long"
                       },
+                      "missed_docs_percentage": {
+                        "type": "float"
+                      },
                       "end_timestamp": {
                         "type": "date"
                       },
@@ -93,7 +96,8 @@
       }
     },
     "_meta": {
-      "managed": true
+      "managed": true,
+      "content_hash": "4419d26497bda532"
     }
   }
 }

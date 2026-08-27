@@ -270,6 +270,35 @@ def backup_slos(counts: Counter) -> None:
     print(f"  SLOs: {len(slos)}")
 
 
+def backup_agent_builder(counts: Counter) -> None:
+    """Snapshot Meridian FinOps AI Assistant agent + custom ES|QL tools."""
+    r = _kbn("GET", "/api/agent_builder/tools")
+    if r.status_code >= 300:
+        print(f"  [warn] agent_builder tools: {r.status_code} {r.text[:200]}")
+        return
+    all_tools = r.json().get("results") or []
+    tools = [t for t in all_tools if t.get("id", "").startswith("meridian-finops-")]
+    dest = BACKUP_ROOT / "kibana" / "agent_builder" / "tools"
+    for tool in tools:
+        write_json(dest / f"{safe_name(tool['id'])}.json", tool)
+    write_json(BACKUP_ROOT / "kibana" / "agent_builder" / "tools.json", tools)
+    counts["kibana.agent_builder.tools"] = len(tools)
+    print(f"  agent_builder tools: {len(tools)}")
+
+    r = _kbn("GET", "/api/agent_builder/agents")
+    if r.status_code >= 300:
+        print(f"  [warn] agent_builder agents: {r.status_code} {r.text[:200]}")
+        return
+    all_agents = r.json().get("results") or []
+    agents = [a for a in all_agents if a.get("id", "").startswith("meridian-")]
+    dest = BACKUP_ROOT / "kibana" / "agent_builder" / "agents"
+    for agent in agents:
+        write_json(dest / f"{safe_name(agent['id'])}.json", agent)
+    write_json(BACKUP_ROOT / "kibana" / "agent_builder" / "agents.json", agents)
+    counts["kibana.agent_builder.agents"] = len(agents)
+    print(f"  agent_builder agents: {len(agents)}")
+
+
 def backup_connectors(counts: Counter) -> None:
     r = _kbn("GET", "/api/actions/connectors")
     r.raise_for_status()
@@ -450,6 +479,7 @@ def run() -> Path:
     backup_saved_objects(counts)
     backup_alerting(counts)
     backup_slos(counts)
+    backup_agent_builder(counts)
     backup_connectors(counts)
 
     print("== fleet ==")

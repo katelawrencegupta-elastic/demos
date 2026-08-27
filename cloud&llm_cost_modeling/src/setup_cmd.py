@@ -365,4 +365,7 @@ def run():
     print("== FinOps spend SLOs + budget alerts ==")
     from src.budgets import ensure_budgets
     ensure_budgets(fail_loud=False)
+    print("== Meridian FinOps AI Assistant ==")
+    from src.agent_builder import ensure_agent
+    ensure_agent(fail_loud=False)
     print("setup complete.")

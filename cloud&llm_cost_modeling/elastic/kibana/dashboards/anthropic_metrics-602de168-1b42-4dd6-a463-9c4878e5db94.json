@@ -20,8 +20,8 @@
       "fleet-pkg-anthropic_metrics-default"
     ],
     "time_range": {
-      "from": "now-3d",
-      "to": "now"
+      "from": "2026-04-29T19:20:42.000Z",
+      "to": "2026-08-28T19:20:42.000Z"
     },
     "title": "[Anthropic] Usage & Rate Limit Monitor",
     "filters": [],
@@ -32,10 +32,10 @@
     "panels": [
       {
         "grid": {
-          "h": 2,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 2
         },
         "config": {
           "title": "",
@@ -68,10 +68,10 @@
       },
       {
         "grid": {
-          "h": 3,
-          "w": 48,
           "x": 0,
-          "y": 2
+          "y": 2,
+          "w": 48,
+          "h": 3
         },
         "config": {
           "content": "## Anthropic — Usage & Rate Limit Monitor\nReal-time and historical visibility into **token consumption** and **rate limit headroom** across all Claude models, workspaces, and service tiers (`standard` · `batch` · `priority`).",
@@ -83,8 +83,8 @@
         "type": "markdown"
       },
       {
-        "collapsed": false,
         "title": "📊 Executive Overview",
+        "collapsed": false,
         "grid": {
           "y": 5
         },
@@ -92,10 +92,10 @@
         "panels": [
           {
             "grid": {
-              "h": 5,
-              "w": 12,
               "x": 0,
-              "y": 0
+              "y": 0,
+              "w": 12,
+              "h": 5
             },
             "config": {
               "type": "metric",
@@ -140,10 +140,10 @@
           },
           {
             "grid": {
-              "h": 5,
-              "w": 12,
               "x": 12,
-              "y": 0
+              "y": 0,
+              "w": 12,
+              "h": 5
             },
             "config": {
               "type": "metric",
@@ -187,10 +187,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 0,
-              "y": 5
+              "y": 5,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "xy",
@@ -305,10 +305,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 24,
-              "y": 5
+              "y": 5,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "xy",
@@ -419,10 +419,10 @@
           },
           {
             "grid": {
-              "h": 5,
-              "w": 12,
               "x": 24,
-              "y": 0
+              "y": 0,
+              "w": 12,
+              "h": 5
             },
             "config": {
               "type": "metric",
@@ -467,10 +467,10 @@
           },
           {
             "grid": {
-              "h": 5,
-              "w": 12,
               "x": 36,
-              "y": 0
+              "y": 0,
+              "w": 12,
+              "h": 5
             },
             "config": {
               "type": "metric",
@@ -516,8 +516,8 @@
         ]
       },
       {
-        "collapsed": false,
         "title": "🔢 Token Usage",
+        "collapsed": false,
         "grid": {
           "y": 6
         },
@@ -525,10 +525,10 @@
         "panels": [
           {
             "grid": {
-              "h": 14,
-              "w": 48,
               "x": 0,
-              "y": 10
+              "y": 10,
+              "w": 48,
+              "h": 14
             },
             "config": {
               "type": "xy",
@@ -659,10 +659,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 24,
-              "y": 24
+              "y": 24,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "xy",
@@ -777,10 +777,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 0,
-              "y": 36
+              "y": 36,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "pie",
@@ -834,10 +834,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 0,
-              "y": 24
+              "y": 24,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "xy",
@@ -969,10 +969,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 24,
-              "y": 36
+              "y": 36,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "pie",
@@ -1024,10 +1024,10 @@
           },
           {
             "grid": {
-              "h": 10,
-              "w": 48,
               "x": 0,
-              "y": 0
+              "y": 0,
+              "w": 48,
+              "h": 10
             },
             "config": {
               "type": "data_table",
@@ -1164,8 +1164,8 @@
         ]
       },
       {
-        "collapsed": false,
         "title": "🔴 Capacity Headroom — Actual Consumption vs Limit",
+        "collapsed": false,
         "grid": {
           "y": 7
         },
@@ -1173,10 +1173,10 @@
         "panels": [
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 0,
-              "y": 0
+              "y": 0,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "data_table",
@@ -1262,10 +1262,10 @@
           },
           {
             "grid": {
-              "h": 12,
-              "w": 24,
               "x": 24,
-              "y": 0
+              "y": 0,
+              "w": 24,
+              "h": 12
             },
             "config": {
               "type": "data_table",
@@ -1386,7 +1386,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:19.516Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:21.393Z",
-    "version": "WzQ1MywxXQ=="
+    "updated_at": "2026-08-27T19:20:42.507Z",
+    "version": "WzkwNSwxXQ=="
   }
 }

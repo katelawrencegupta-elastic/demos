@@ -669,7 +669,7 @@
   {
     "name": "synthetics",
     "title": "Elastic Synthetics",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "status": "installed",
     "type": null,
     "dataStreams": [
@@ -696,6 +696,14 @@
       {
         "name": "synthetics-tcp-*",
         "title": "tcp"
+      },
+      {
+        "name": "synthetics-api-*",
+        "title": "api"
+      },
+      {
+        "name": "synthetics-api.network-*",
+        "title": "api_network"
       }
     ],
     "installationInfo": null

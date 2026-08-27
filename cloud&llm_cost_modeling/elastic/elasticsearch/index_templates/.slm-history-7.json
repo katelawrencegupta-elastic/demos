@@ -5,12 +5,7 @@
       ".slm-history-7*"
     ],
     "template": {
-      "settings": {
-        "index": {
-          "number_of_shards": "1",
-          "auto_expand_replicas": "0-1"
-        }
-      },
+      "settings": {},
       "mappings": {
         "dynamic": false,
         "properties": {

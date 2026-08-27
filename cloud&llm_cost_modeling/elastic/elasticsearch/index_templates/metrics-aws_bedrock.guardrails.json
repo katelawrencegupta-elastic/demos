@@ -5,11 +5,7 @@
       "metrics-aws_bedrock.guardrails-*"
     ],
     "template": {
-      "settings": {
-        "index": {
-          "mode": "time_series"
-        }
-      },
+      "settings": {},
       "mappings": {
         "_meta": {
           "package": {
@@ -48,6 +44,6 @@
       "metrics-aws_bedrock.guardrails@custom"
     ],
     "created_date_millis": 1786643492733,
-    "modified_date_millis": 1786643492733
+    "modified_date_millis": 1787858402709
   }
 }

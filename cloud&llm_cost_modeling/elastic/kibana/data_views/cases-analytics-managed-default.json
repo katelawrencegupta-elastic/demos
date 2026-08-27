@@ -1,0 +1,1856 @@
+{
+  "data_view": {
+    "id": "cases-analytics-managed-default",
+    "version": "WzkyNywxXQ==",
+    "title": ".cases,.cases-activity,.cases-attachments",
+    "timeFieldName": "@timestamp",
+    "sourceFilters": [],
+    "fieldFormats": {},
+    "runtimeFieldMap": {},
+    "fieldAttrs": {},
+    "allowNoIndex": true,
+    "name": "Case Analytics",
+    "allowHidden": false,
+    "fields": {
+      "@timestamp": {
+        "count": 0,
+        "name": "@timestamp",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "_id": {
+        "count": 0,
+        "name": "_id",
+        "type": "string",
+        "esTypes": [
+          "_id"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_ignored": {
+        "count": 0,
+        "name": "_ignored",
+        "type": "string",
+        "esTypes": [
+          "_ignored"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_index": {
+        "count": 0,
+        "name": "_index",
+        "type": "string",
+        "esTypes": [
+          "_index"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_score": {
+        "count": 0,
+        "name": "_score",
+        "type": "number",
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "_source": {
+        "count": 0,
+        "name": "_source",
+        "type": "_source",
+        "esTypes": [
+          "_source"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "_source"
+        },
+        "shortDotsEnable": false
+      },
+      "action.assignees_changed": {
+        "count": 0,
+        "name": "action.assignees_changed",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.attachment_reference_id": {
+        "count": 0,
+        "name": "action.attachment_reference_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.connector_id_new": {
+        "count": 0,
+        "name": "action.connector_id_new",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.payload_json": {
+        "count": 0,
+        "name": "action.payload_json",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.severity_new": {
+        "count": 0,
+        "name": "action.severity_new",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.status_new": {
+        "count": 0,
+        "name": "action.status_new",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.tags_changed": {
+        "count": 0,
+        "name": "action.tags_changed",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.type": {
+        "count": 0,
+        "name": "action.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "action.verb": {
+        "count": 0,
+        "name": "action.verb",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "actor.email": {
+        "count": 0,
+        "name": "actor.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "actor.full_name": {
+        "count": 0,
+        "name": "actor.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "actor.profile_uid": {
+        "count": 0,
+        "name": "actor.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "actor.username": {
+        "count": 0,
+        "name": "actor.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.alert.indices": {
+        "count": 0,
+        "name": "attachment.alert.indices",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.alert.rule.id": {
+        "count": 0,
+        "name": "attachment.alert.rule.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.alert.rule.name": {
+        "count": 0,
+        "name": "attachment.alert.rule.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.attachment_id": {
+        "count": 0,
+        "name": "attachment.attachment_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.comment": {
+        "count": 0,
+        "name": "attachment.comment",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.comment.keyword": {
+        "count": 0,
+        "name": "attachment.comment.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "attachment.comment"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.data_json": {
+        "count": 0,
+        "name": "attachment.data_json",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.event.indices": {
+        "count": 0,
+        "name": "attachment.event.indices",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.metadata_json": {
+        "count": 0,
+        "name": "attachment.metadata_json",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attachment.type": {
+        "count": 0,
+        "name": "attachment.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.assignees.email": {
+        "count": 0,
+        "name": "case.assignees.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.assignees.full_name": {
+        "count": 0,
+        "name": "case.assignees.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.assignees.uid": {
+        "count": 0,
+        "name": "case.assignees.uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.assignees.username": {
+        "count": 0,
+        "name": "case.assignees.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.category": {
+        "count": 0,
+        "name": "case.category",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.closed_at": {
+        "count": 0,
+        "name": "case.closed_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.closed_by.email": {
+        "count": 0,
+        "name": "case.closed_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.closed_by.full_name": {
+        "count": 0,
+        "name": "case.closed_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.closed_by.profile_uid": {
+        "count": 0,
+        "name": "case.closed_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.closed_by.username": {
+        "count": 0,
+        "name": "case.closed_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.connector.id": {
+        "count": 0,
+        "name": "case.connector.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.connector.name": {
+        "count": 0,
+        "name": "case.connector.name",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.connector.type": {
+        "count": 0,
+        "name": "case.connector.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.created_at": {
+        "count": 0,
+        "name": "case.created_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.created_by.email": {
+        "count": 0,
+        "name": "case.created_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.created_by.full_name": {
+        "count": 0,
+        "name": "case.created_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.created_by.profile_uid": {
+        "count": 0,
+        "name": "case.created_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.created_by.username": {
+        "count": 0,
+        "name": "case.created_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.key": {
+        "count": 0,
+        "name": "case.customFields.key",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.type": {
+        "count": 0,
+        "name": "case.customFields.type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value": {
+        "count": 0,
+        "name": "case.customFields.value",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value.boolean": {
+        "count": 0,
+        "name": "case.customFields.value.boolean",
+        "type": "boolean",
+        "esTypes": [
+          "boolean"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.customFields.value"
+          },
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "boolean"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value.date": {
+        "count": 0,
+        "name": "case.customFields.value.date",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.customFields.value"
+          },
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value.ip": {
+        "count": 0,
+        "name": "case.customFields.value.ip",
+        "type": "ip",
+        "esTypes": [
+          "ip"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.customFields.value"
+          },
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "ip"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value.number": {
+        "count": 0,
+        "name": "case.customFields.value.number",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.customFields.value"
+          },
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.customFields.value.string": {
+        "count": 0,
+        "name": "case.customFields.value.string",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "case.customFields.value"
+          },
+          "nested": {
+            "path": "case.customFields"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.description": {
+        "count": 0,
+        "name": "case.description",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.duration": {
+        "count": 0,
+        "name": "case.duration",
+        "type": "number",
+        "esTypes": [
+          "unsigned_long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "s"
+      },
+      "case.extended_fields": {
+        "count": 0,
+        "name": "case.extended_fields",
+        "type": "flattened",
+        "esTypes": [
+          "flattened"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.connector_name": {
+        "count": 0,
+        "name": "case.external_service.connector_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.external_id": {
+        "count": 0,
+        "name": "case.external_service.external_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.external_title": {
+        "count": 0,
+        "name": "case.external_service.external_title",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.external_url": {
+        "count": 0,
+        "name": "case.external_service.external_url",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.pushed_at": {
+        "count": 0,
+        "name": "case.external_service.pushed_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.pushed_by.email": {
+        "count": 0,
+        "name": "case.external_service.pushed_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.pushed_by.full_name": {
+        "count": 0,
+        "name": "case.external_service.pushed_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.pushed_by.profile_uid": {
+        "count": 0,
+        "name": "case.external_service.pushed_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.external_service.pushed_by.username": {
+        "count": 0,
+        "name": "case.external_service.pushed_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.id": {
+        "count": 0,
+        "name": "case.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.in_progress_at": {
+        "count": 0,
+        "name": "case.in_progress_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.incremental_id": {
+        "count": 0,
+        "name": "case.incremental_id",
+        "type": "number",
+        "esTypes": [
+          "unsigned_long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.incremental_id.keyword": {
+        "count": 0,
+        "name": "case.incremental_id.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.incremental_id"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.incremental_id.text": {
+        "count": 0,
+        "name": "case.incremental_id.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "case.incremental_id"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.owner": {
+        "count": 0,
+        "name": "case.owner",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.severity": {
+        "count": 0,
+        "name": "case.severity",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.status": {
+        "count": 0,
+        "name": "case.status",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.tags": {
+        "count": 0,
+        "name": "case.tags",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.template.id": {
+        "count": 0,
+        "name": "case.template.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.template.version": {
+        "count": 0,
+        "name": "case.template.version",
+        "type": "number",
+        "esTypes": [
+          "integer"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.time_to_acknowledge": {
+        "count": 0,
+        "name": "case.time_to_acknowledge",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "s"
+      },
+      "case.time_to_investigate": {
+        "count": 0,
+        "name": "case.time_to_investigate",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "s"
+      },
+      "case.time_to_resolve": {
+        "count": 0,
+        "name": "case.time_to_resolve",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "duration",
+          "params": {
+            "outputFormat": "humanizePrecise",
+            "useShortSuffix": true
+          }
+        },
+        "shortDotsEnable": false,
+        "defaultFormatter": "s"
+      },
+      "case.title": {
+        "count": 0,
+        "name": "case.title",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.title.keyword": {
+        "count": 0,
+        "name": "case.title.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "case.title"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.total_alerts": {
+        "count": 0,
+        "name": "case.total_alerts",
+        "type": "number",
+        "esTypes": [
+          "integer"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.total_comments": {
+        "count": 0,
+        "name": "case.total_comments",
+        "type": "number",
+        "esTypes": [
+          "integer"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.total_events": {
+        "count": 0,
+        "name": "case.total_events",
+        "type": "number",
+        "esTypes": [
+          "integer"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.total_observables": {
+        "count": 0,
+        "name": "case.total_observables",
+        "type": "number",
+        "esTypes": [
+          "integer"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "case.updated_at": {
+        "count": 0,
+        "name": "case.updated_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "case.updated_by.email": {
+        "count": 0,
+        "name": "case.updated_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.updated_by.full_name": {
+        "count": 0,
+        "name": "case.updated_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.updated_by.profile_uid": {
+        "count": 0,
+        "name": "case.updated_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "case.updated_by.username": {
+        "count": 0,
+        "name": "case.updated_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "created_at": {
+        "count": 0,
+        "name": "created_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "created_by.email": {
+        "count": 0,
+        "name": "created_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "created_by.full_name": {
+        "count": 0,
+        "name": "created_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "created_by.profile_uid": {
+        "count": 0,
+        "name": "created_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "created_by.username": {
+        "count": 0,
+        "name": "created_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "owner": {
+        "count": 0,
+        "name": "owner",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "pushed_at": {
+        "count": 0,
+        "name": "pushed_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "pushed_by.email": {
+        "count": 0,
+        "name": "pushed_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "pushed_by.full_name": {
+        "count": 0,
+        "name": "pushed_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "pushed_by.profile_uid": {
+        "count": 0,
+        "name": "pushed_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "pushed_by.username": {
+        "count": 0,
+        "name": "pushed_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "space_id": {
+        "count": 0,
+        "name": "space_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "updated_at": {
+        "count": 0,
+        "name": "updated_at",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "updated_by.email": {
+        "count": 0,
+        "name": "updated_by.email",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "updated_by.full_name": {
+        "count": 0,
+        "name": "updated_by.full_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "updated_by.profile_uid": {
+        "count": 0,
+        "name": "updated_by.profile_uid",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "updated_by.username": {
+        "count": 0,
+        "name": "updated_by.username",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      }
+    },
+    "namespaces": [
+      "default"
+    ]
+  }
+}

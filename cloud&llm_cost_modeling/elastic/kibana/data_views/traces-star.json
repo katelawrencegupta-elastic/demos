@@ -658,6 +658,38 @@
         },
         "shortDotsEnable": false
       },
+      "attributes.labels.role": {
+        "count": 0,
+        "name": "attributes.labels.role",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attributes.labels.team": {
+        "count": 0,
+        "name": "attributes.labels.team",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
       "attributes.user.hash": {
         "count": 0,
         "name": "attributes.user.hash",
@@ -669,6 +701,43 @@
         "searchable": true,
         "aggregatable": true,
         "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attributes.user.name": {
+        "count": 0,
+        "name": "attributes.user.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "attributes.user.name.text": {
+        "count": 0,
+        "name": "attributes.user.name.text",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "subType": {
+          "multi": {
+            "parent": "attributes.user.name"
+          }
+        },
         "format": {
           "id": "string"
         },
@@ -1096,27 +1165,6 @@
         "searchable": true,
         "aggregatable": true,
         "readFromDocValues": true,
-        "format": {
-          "id": "string"
-        },
-        "shortDotsEnable": false
-      },
-      "gen_ai.operation.name.text": {
-        "count": 0,
-        "name": "gen_ai.operation.name.text",
-        "type": "string",
-        "esTypes": [
-          "text"
-        ],
-        "scripted": false,
-        "searchable": true,
-        "aggregatable": false,
-        "readFromDocValues": false,
-        "subType": {
-          "multi": {
-            "parent": "gen_ai.operation.name"
-          }
-        },
         "format": {
           "id": "string"
         },
@@ -2213,16 +2261,16 @@
       "labels.llm_cost_usd": {
         "count": 0,
         "name": "labels.llm_cost_usd",
-        "type": "string",
+        "type": "number",
         "esTypes": [
-          "keyword"
+          "double"
         ],
         "scripted": false,
         "searchable": true,
         "aggregatable": true,
         "readFromDocValues": true,
         "format": {
-          "id": "string"
+          "id": "number"
         },
         "shortDotsEnable": false
       },
@@ -2418,6 +2466,22 @@
         },
         "shortDotsEnable": false
       },
+      "labels.role": {
+        "count": 0,
+        "name": "labels.role",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
       "labels.team": {
         "count": 0,
         "name": "labels.team",
@@ -2511,6 +2575,22 @@
         "readFromDocValues": true,
         "format": {
           "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "numeric_labels.llm_cost_usd": {
+        "count": 0,
+        "name": "numeric_labels.llm_cost_usd",
+        "type": "number",
+        "esTypes": [
+          "scaled_float"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
         },
         "shortDotsEnable": false
       },
@@ -4553,27 +4633,6 @@
         },
         "shortDotsEnable": false
       },
-      "service.name.text": {
-        "count": 0,
-        "name": "service.name.text",
-        "type": "string",
-        "esTypes": [
-          "text"
-        ],
-        "scripted": false,
-        "searchable": true,
-        "aggregatable": false,
-        "readFromDocValues": false,
-        "subType": {
-          "multi": {
-            "parent": "service.name"
-          }
-        },
-        "format": {
-          "id": "string"
-        },
-        "shortDotsEnable": false
-      },
       "service.node.name": {
         "count": 0,
         "name": "service.node.name",
@@ -4703,27 +4762,6 @@
         "searchable": true,
         "aggregatable": true,
         "readFromDocValues": true,
-        "format": {
-          "id": "string"
-        },
-        "shortDotsEnable": false
-      },
-      "span.name.text": {
-        "count": 0,
-        "name": "span.name.text",
-        "type": "string",
-        "esTypes": [
-          "text"
-        ],
-        "scripted": false,
-        "searchable": true,
-        "aggregatable": false,
-        "readFromDocValues": false,
-        "subType": {
-          "multi": {
-            "parent": "span.name"
-          }
-        },
         "format": {
           "id": "string"
         },
@@ -4970,27 +5008,6 @@
         "searchable": true,
         "aggregatable": true,
         "readFromDocValues": true,
-        "format": {
-          "id": "string"
-        },
-        "shortDotsEnable": false
-      },
-      "transaction.name.text": {
-        "count": 0,
-        "name": "transaction.name.text",
-        "type": "string",
-        "esTypes": [
-          "text"
-        ],
-        "scripted": false,
-        "searchable": true,
-        "aggregatable": false,
-        "readFromDocValues": false,
-        "subType": {
-          "multi": {
-            "parent": "transaction.name"
-          }
-        },
         "format": {
           "id": "string"
         },

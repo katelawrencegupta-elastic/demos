@@ -43,7 +43,7 @@
       "ecs-tsdb@mappings"
     ],
     "priority": 130,
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "aggregated APM metrics template installed by x-pack",
       "managed": true
@@ -59,6 +59,6 @@
       "metrics-60m.otel@custom"
     ],
     "created_date_millis": 1786555716145,
-    "modified_date_millis": 1786555716145
+    "modified_date_millis": 1787594297901
   }
 }

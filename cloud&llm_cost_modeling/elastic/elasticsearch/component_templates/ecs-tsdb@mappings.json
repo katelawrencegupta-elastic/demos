@@ -29,7 +29,7 @@
         ]
       }
     },
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "Default mappings that can be changed by users for\nthe OpenTelemetry metrics index template installed by x-pack\n",
       "managed": true

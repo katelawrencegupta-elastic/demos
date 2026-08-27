@@ -8,7 +8,6 @@
       "settings": {
         "index": {
           "hidden": "true",
-          "auto_expand_replicas": "0-1",
           "mapping": {
             "total_fields": {
               "limit": "2800",

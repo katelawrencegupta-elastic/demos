@@ -15,6 +15,10 @@
       "fleet-managed-default",
       "fleet-pkg-aws_bedrock-default"
     ],
+    "time_range": {
+      "from": "2026-04-29T19:20:03.000Z",
+      "to": "2026-08-28T19:20:03.000Z"
+    },
     "title": "[Amazon Bedrock] Overview",
     "filters": [
       {
@@ -39,10 +43,10 @@
     "panels": [
       {
         "grid": {
-          "h": 3,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 3
         },
         "config": {
           "hide_title": true,
@@ -76,10 +80,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 5,
           "x": 14,
-          "y": 3
+          "y": 3,
+          "w": 5,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -133,10 +137,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 5,
           "x": 19,
-          "y": 3
+          "y": 3,
+          "w": 5,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -189,10 +193,10 @@
       },
       {
         "grid": {
-          "h": 12,
-          "w": 24,
           "x": 24,
-          "y": 3
+          "y": 3,
+          "w": 24,
+          "h": 12
         },
         "config": {
           "type": "pie",
@@ -260,10 +264,10 @@
       },
       {
         "grid": {
-          "h": 6,
-          "w": 5,
           "x": 14,
-          "y": 9
+          "y": 9,
+          "w": 5,
+          "h": 6
         },
         "config": {
           "type": "metric",
@@ -332,10 +336,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 0,
-          "y": 15
+          "y": 15,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -472,10 +476,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 24,
-          "y": 15
+          "y": 15,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -610,10 +614,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 0,
-          "y": 26
+          "y": 26,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -750,10 +754,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 24,
-          "y": 26
+          "y": 26,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -890,10 +894,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 0,
-          "y": 40
+          "y": 40,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1033,10 +1037,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 24,
-          "y": 40
+          "y": 40,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1197,10 +1201,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 0,
-          "y": 54
+          "y": 54,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1321,10 +1325,10 @@
       },
       {
         "grid": {
-          "h": 11,
-          "w": 24,
           "x": 24,
-          "y": 54
+          "y": 54,
+          "w": 24,
+          "h": 11
         },
         "config": {
           "type": "xy",
@@ -1466,10 +1470,10 @@
       },
       {
         "grid": {
-          "h": 15,
-          "w": 48,
           "x": 0,
-          "y": 68
+          "y": 68,
+          "w": 48,
+          "h": 15
         },
         "config": {
           "description": "",
@@ -1504,10 +1508,10 @@
       },
       {
         "grid": {
-          "h": 17,
-          "w": 48,
           "x": 0,
-          "y": 83
+          "y": 83,
+          "w": 48,
+          "h": 17
         },
         "config": {
           "description": "",
@@ -1545,10 +1549,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 24,
           "x": 0,
-          "y": 100
+          "y": 100,
+          "w": 24,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1699,10 +1703,10 @@
       },
       {
         "grid": {
-          "h": 13,
-          "w": 24,
           "x": 24,
-          "y": 100
+          "y": 100,
+          "w": 24,
+          "h": 13
         },
         "config": {
           "type": "xy",
@@ -1908,129 +1912,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:31.647Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:33.390Z",
-    "version": "WzQ2OSwxXQ=="
-  },
-  "warnings": [
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 10,
-            "markdown": "# Amazon Bedrock\n\n\nPrimary metrics and logs from Amazon Bedrock service. This dashboard contains:\n\n- Invocation rates\n- Error rates\n- Token usage\n- Latency information\n- LLM prompt, input and response",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "Amazon Bedrock",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "#### Text / Chat Metrics",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "id": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "#### Image Metrics",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "title": "",
-        "hide_title": true
-      }
-    },
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: legacy_vis. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "legacy_vis",
-      "panel_config": {
-        "savedVis": {
-          "data": {
-            "aggs": [],
-            "searchSource": {
-              "filter": [],
-              "query": {
-                "language": "kuery",
-                "query": ""
-              }
-            }
-          },
-          "description": "",
-          "params": {
-            "fontSize": 12,
-            "markdown": "#### Logs",
-            "openLinksInNewTab": false
-          },
-          "title": "",
-          "type": "markdown",
-          "uiState": {}
-        },
-        "hide_title": true
-      }
-    }
-  ]
+    "updated_at": "2026-08-27T19:20:03.466Z",
+    "version": "WzkwMSwxXQ=="
+  }
 }

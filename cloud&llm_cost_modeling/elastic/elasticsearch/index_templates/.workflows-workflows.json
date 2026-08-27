@@ -1,0 +1,134 @@
+{
+  "name": ".workflows-workflows",
+  "index_template": {
+    "index_patterns": [
+      ".workflows-workflows-*"
+    ],
+    "template": {
+      "mappings": {
+        "_meta": {
+          "version": "a6dda281dcf1a16c51f19ed9b7feb5bb65021bab"
+        },
+        "dynamic": "strict",
+        "properties": {
+          "lastUpdatedBy": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "managedVisibilityContexts": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "description": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "created_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "triggerTypes": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "billable": {
+            "index": false,
+            "type": "boolean"
+          },
+          "version": {
+            "index": false,
+            "type": "long"
+          },
+          "deleted_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "tags": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "lifecycle": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "spaceId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "originManagedWorkflowId": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "updated_at": {
+            "format": "strict_date_optional_time",
+            "type": "date"
+          },
+          "createdBy": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "managedBy": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "managed": {
+            "type": "boolean"
+          },
+          "name": {
+            "fields": {
+              "keyword": {
+                "ignore_above": 256,
+                "type": "keyword"
+              }
+            },
+            "type": "text"
+          },
+          "managedVersion": {
+            "index": false,
+            "type": "long"
+          },
+          "definition": {
+            "type": "object",
+            "enabled": false
+          },
+          "definitionHash": {
+            "ignore_above": 1024,
+            "index": false,
+            "type": "keyword"
+          },
+          "managedTemplateValues": {
+            "type": "object",
+            "enabled": false
+          },
+          "yaml": {
+            "index": false,
+            "type": "text"
+          }
+        }
+      },
+      "aliases": {
+        ".workflows-workflows": {
+          "is_write_index": true
+        }
+      }
+    },
+    "composed_of": [],
+    "_meta": {
+      "version": "a6dda281dcf1a16c51f19ed9b7feb5bb65021bab"
+    },
+    "allow_auto_create": false,
+    "created_date_millis": 1787743513865,
+    "modified_date_millis": 1787743513865
+  }
+}

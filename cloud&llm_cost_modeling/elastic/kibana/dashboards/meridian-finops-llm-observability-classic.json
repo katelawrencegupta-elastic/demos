@@ -1,0 +1,5199 @@
+{
+  "id": "meridian-finops-llm-observability-classic",
+  "data": {
+    "description": "Classic layout: cross-cloud cost allocation tables and bars, security→cost (crypto / S3), usage-to-cost correlation, and LLM observability tables. The baseline dashboard is meridian-finops-llm-observability.",
+    "options": {
+      "auto_apply_filters": true,
+      "hide_panel_titles": false,
+      "hide_panel_borders": false,
+      "use_margins": true,
+      "sync_colors": false,
+      "sync_tooltips": false,
+      "sync_cursor": true
+    },
+    "tags": [],
+    "time_range": {
+      "from": "2026-04-29T22:06:28.000Z",
+      "to": "2026-08-27T22:06:28.000Z"
+    },
+    "title": "[Meridian] FinOps & LLM Observability — classic",
+    "filters": [],
+    "query": {
+      "expression": "",
+      "language": "kql"
+    },
+    "panels": [
+      {
+        "title": "FinOps integration — native cloud provider dashboards",
+        "collapsed": false,
+        "grid": {
+          "y": 0
+        },
+        "id": "b2b27da3-604f-4d78-9985-43b972f0da33",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 20,
+              "h": 10
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.\n\nElastic AI Assistant / Agent Builder usage and the managed inference token dashboard are linked at right.",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "9c0507c6-0154-49ad-9c66-e33e3411fd5f",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 20,
+              "y": 0,
+              "w": 12,
+              "h": 10
+            },
+            "config": {
+              "title": "Elastic AI",
+              "links": [
+                {
+                  "label": "AI Assistant & inference usage",
+                  "type": "dashboardLink",
+                  "destination": "meridian-ai-assistant-inference-usage",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "[Elastic] Inference Token Usage",
+                  "type": "dashboardLink",
+                  "destination": "kibana-inference-token-usage",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                }
+              ]
+            },
+            "id": "d5e3590a-f0b2-4965-b82f-97cc71c01626",
+            "type": "links"
+          },
+          {
+            "grid": {
+              "x": 32,
+              "y": 0,
+              "w": 16,
+              "h": 10
+            },
+            "config": {
+              "title": "Provider FinOps & LLM packs",
+              "links": [
+                {
+                  "label": "AWS CUR — current month",
+                  "type": "dashboardLink",
+                  "destination": "aws_billing-01aace34-9219-4c6c-80a9-b903af48950f",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "AWS CUR — all time",
+                  "type": "dashboardLink",
+                  "destination": "aws_billing-81918d21-70c6-4bc0-a03e-9e298460a525",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "GCP Billing Overview",
+                  "type": "dashboardLink",
+                  "destination": "gcp-76c9e920-e890-11ea-bf8c-d13ebf358a78",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Azure Billing Overview",
+                  "type": "dashboardLink",
+                  "destination": "azure_billing-d3efeb30-c1c7-11ea-b7e7-0f48178cdb3c",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Anthropic Cost & Billing",
+                  "type": "dashboardLink",
+                  "destination": "anthropic_metrics-2bd61c2c-4418-458f-a79e-12a74c34b2f0",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "OpenAI Usage Overview",
+                  "type": "dashboardLink",
+                  "destination": "openai-651bb059-f606-44fc-b704-2078d0af26da",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Azure OpenAI Billing",
+                  "type": "dashboardLink",
+                  "destination": "azure_openai-f5bbc591-5e6b-4af7-b6c5-b02065a06455",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Azure OpenAI Overview",
+                  "type": "dashboardLink",
+                  "destination": "azure_openai-21d9a0d0-e6a0-4b34-bc6d-ce6560a1dab3",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Amazon Bedrock Overview",
+                  "type": "dashboardLink",
+                  "destination": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "Amazon Bedrock Guardrails",
+                  "type": "dashboardLink",
+                  "destination": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "GCP Vertex AI Metrics",
+                  "type": "dashboardLink",
+                  "destination": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "APM Monitoring Overview",
+                  "type": "dashboardLink",
+                  "destination": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "[Elastic] Inference Token Usage",
+                  "type": "dashboardLink",
+                  "destination": "kibana-inference-token-usage",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "AI Assistant & inference usage",
+                  "type": "dashboardLink",
+                  "destination": "meridian-ai-assistant-inference-usage",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                }
+              ]
+            },
+            "id": "114edac4-65cc-42ae-9b7c-bb8dc3345035",
+            "type": "links"
+          }
+        ]
+      },
+      {
+        "title": "Overview — multi-cloud + LLM spend",
+        "collapsed": false,
+        "grid": {
+          "y": 12
+        },
+        "id": "7d07b036-372f-4890-8324-4f454ef5bff6",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 3
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "## Meridian Dynamics — FinOps & LLM Observability\n\nCost allocation across AWS accounts, GCP projects, and Azure subscriptions, correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, latency, quality) for every application flow.\n\nTime range is stored with the dashboard (**2026-04-29 – 2026-08-27 (computed at publish)**). Republish after backfill to refresh.\n\n**Baseline (stacked bars/areas):** [FinOps & LLM Observability](#/view/meridian-finops-llm-observability).\n\n**Scenario callouts:** cost leak on `meridian-staging` · crypto mining (−12..−9, `meridian-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp (from −15) · LLM agent-loop (`checkout-assistant`) · model migration (`support-copilot` openai→anthropic) · cache-miss (`rag-research`).\n\n**Budget posture:** spend SLOs + ES|QL alerts — see the Budget posture section or [Observability SLOs](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/observability/slos).",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "eda5f20d-4fb2-423b-808d-300e253566e4",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "AWS unblended cost (CUR)",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "type": "primary",
+                  "subtitle": "USD",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "25b9473e-b68b-4ba3-896a-6eaf78a12342",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 12,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "GCP billing total",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(gcp.billing.total)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "type": "primary",
+                  "subtitle": "USD",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "6690ec40-5f48-47d2-b3b2-b6b63da7ddf9",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Azure pretax cost",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(azure.billing.pretax_cost)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "type": "primary",
+                  "subtitle": "USD",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "82c4c5c4-c3d0-4832-920d-a894f20f3855",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 36,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "LLM cost (APM traces)",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS cost = SUM(cost)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "type": "primary",
+                  "subtitle": "USD",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "638afe92-0375-4d23-a5f5-1bd8b9fa24fc",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 8,
+              "w": 18,
+              "h": 12
+            },
+            "config": {
+              "type": "pie",
+              "title": "Spend mix by billing dataset",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)\n| EVAL provider = data_stream.dataset\n| STATS cost = SUM(cost) BY provider\n| SORT cost DESC"
+              },
+              "legend": {
+                "nested": false,
+                "truncate_after_lines": 1,
+                "visibility": "visible",
+                "position": "right"
+              },
+              "styling": {
+                "values": {
+                  "visible": true,
+                  "mode": "percentage",
+                  "percent_decimals": 2
+                },
+                "labels": {
+                  "visible": true,
+                  "position": "inside"
+                },
+                "donut_hole": "m"
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "group_by": [
+                {
+                  "column": "provider",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                }
+              ]
+            },
+            "id": "64dc2162-42c1-43c5-b8aa-25c055b640e0",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 18,
+              "y": 8,
+              "w": 30,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "Daily cost by cloud provider",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                },
+                "areas": {
+                  "fill_opacity": 0.75,
+                  "fill": "gradient"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)\n| EVAL provider = data_stream.dataset\n| STATS cost = SUM(cost) BY day = BUCKET(@timestamp, 1d), provider\n| SORT day"
+                  },
+                  "type": "area",
+                  "breakdown_by": {
+                    "column": "provider",
+                    "color": {
+                      "mode": "categorical",
+                      "palette": "default",
+                      "mapping": []
+                    }
+                  },
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "159c05bc-4c92-4667-b291-1636f81819a3",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Security → cost — crypto mining & S3 exposure",
+        "collapsed": false,
+        "grid": {
+          "y": 36
+        },
+        "id": "0dbce07f-6141-49ce-9393-b60f256df0cb",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 3
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "## Security incidents that move spend\n\n**Crypto-mining** (days −12..−9, `meridian-dev`): GuardDuty `CryptoCurrency:EC2/BitcoinTool.B`, CloudTrail brute-force from `185.220.101.34`, CPU pegged, EC2 cost spike.\n\n**S3 public exposure** (days −6..−4, fintech): `Policy:S3/BucketAnonymousAccessGranted`, `PutBucketPolicy`, anonymous scrapes of `meridian-fintech-exports`, data-transfer cost.\n\nOpen OOTB GuardDuty / CloudTrail Discover with the same time range for drill-down.",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "c02a17d8-99ce-4ff5-911f-610dd31ee377",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "GuardDuty findings",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-aws.guardduty-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS findings = COUNT(*)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "findings",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "7d6fafa0-3f4b-4179-a89f-50fec6103150",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 12,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Crypto findings",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-aws.guardduty-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND rule.name LIKE \"CryptoCurrency*\"\n| STATS crypto = COUNT(*)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "crypto",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "2f0088fa-a76a-400e-8330-98328480ad8a",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "S3 policy findings",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-aws.guardduty-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND rule.name LIKE \"Policy:S3*\"\n| STATS s3_findings = COUNT(*)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "s3_findings",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "074f7457-44f8-4494-a732-ff76b6e40906",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 36,
+              "y": 3,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "CloudTrail from attacker IP",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-aws.cloudtrail-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND source.ip == \"185.220.101.34\"\n| STATS events = COUNT(*)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "events",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "11139642-b0c3-4310-b101-d842116ea58d",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 8,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "GuardDuty findings by type",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-aws.guardduty-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS findings = COUNT(*) BY finding = rule.name\n| SORT findings DESC\n| LIMIT 12"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "findings",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "finding"
+                  }
+                }
+              ]
+            },
+            "id": "72124ff3-876e-4e56-95c5-e7a2adee8615",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 8,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "S3 / bucket CloudTrail actions",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-aws.cloudtrail-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND (event.action LIKE \"*Bucket*\" OR event.action LIKE \"*Object*\")\n| STATS calls = COUNT(*) BY action = event.action\n| SORT calls DESC\n| LIMIT 12"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "calls",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "action"
+                  }
+                }
+              ]
+            },
+            "id": "469cdb49-e155-47a9-8d16-e96135e00bcd",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 20,
+              "w": 48,
+              "h": 10
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Recent high-severity GuardDuty findings",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-aws.guardduty-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| SORT @timestamp DESC\n| KEEP @timestamp, rule.name, aws.guardduty.severity.value, cloud.account.id\n| LIMIT 40"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "aws.guardduty.severity.value",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "@timestamp",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "rule.name",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "cloud.account.id",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "624fcb72-bf5b-4fb6-8653-4fedc13ccfce",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Cost allocation — account, subscription, service, team, tag, region",
+        "collapsed": false,
+        "grid": {
+          "y": 64
+        },
+        "id": "55e5f06d-e305-47f8-8565-b7452e576aad",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 2
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "Allocation dimensions from native billing integrations: AWS CUR (`usage_account_name`, `product`, `resource_tags`, region), GCP project/service/region, Azure subscription/department/product/region, and Cost Explorer `cost_center` tags (untagged bucket = `cost_center$`).",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "239c4416-34ca-4c25-842c-00b233411d16",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 2,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "AWS cost by linked account",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY account = aws_billing.cur.line_item.usage_account_name\n| SORT cost DESC\n| LIMIT 12"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "account"
+                  }
+                }
+              ]
+            },
+            "id": "5f1a3b83-daa5-4b9c-a30a-1b19c1e57c71",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 2,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "AWS cost by service",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY service = aws_billing.cur.product.product\n| SORT cost DESC\n| LIMIT 12"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "service"
+                  }
+                }
+              ]
+            },
+            "id": "c4847634-cc98-409a-8835-3fc70adefa0c",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 14,
+              "w": 16,
+              "h": 12
+            },
+            "config": {
+              "type": "pie",
+              "title": "AWS Cost Explorer by cost_center tag",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND aws.billing.group_definition.key == \"COST_CENTER\"\n| STATS cost = SUM(aws.billing.UnblendedCost.amount) BY tag = aws.billing.group_by.COST_CENTER\n| SORT cost DESC"
+              },
+              "legend": {
+                "nested": false,
+                "truncate_after_lines": 1,
+                "visibility": "visible",
+                "position": "right"
+              },
+              "styling": {
+                "values": {
+                  "visible": true,
+                  "mode": "percentage",
+                  "percent_decimals": 2
+                },
+                "labels": {
+                  "visible": true,
+                  "position": "inside"
+                },
+                "donut_hole": "m"
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "group_by": [
+                {
+                  "column": "tag",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                }
+              ]
+            },
+            "id": "4c69c3e9-9a7c-4c1b-bd15-2e90fe7e4a4d",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 16,
+              "y": 14,
+              "w": 16,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "GCP cost by project",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(gcp.billing.total) BY project = gcp.billing.project_name\n| SORT cost DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "project"
+                  }
+                }
+              ]
+            },
+            "id": "7cff877c-35c7-4042-abb9-98582c156d3d",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 32,
+              "y": 14,
+              "w": 16,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "Azure cost by subscription",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(azure.billing.pretax_cost) BY subscription = azure.subscription_id\n| SORT cost DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "subscription"
+                  }
+                }
+              ]
+            },
+            "id": "3384a67e-546e-4c67-8a70-b25d63ea839a",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 26,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "data_table",
+              "title": "AWS CUR allocation — account × service × tags",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost), usage = SUM(aws_billing.cur.line_item.usage_amount) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product, tag = aws_billing.cur.resource_tags\n| SORT cost DESC\n| LIMIT 50"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "usage",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "account",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "service",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "tag",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "f8c21e17-5f4a-451b-9ff2-335dfc250987",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 26,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Azure allocation — department × product × region",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(azure.billing.pretax_cost) BY team = azure.billing.department_name, product = azure.billing.product, region = cloud.region, rg = azure.resource.group\n| SORT cost DESC\n| LIMIT 50"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "team",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "product",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "region",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "rg",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "08424623-2fe4-4db5-a3e3-219369fffb37",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 38,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "GCP cost by service",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(gcp.billing.total) BY service = gcp.billing.service_description\n| SORT cost DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "service"
+                  }
+                }
+              ]
+            },
+            "id": "c5c3a1f7-6017-46cf-b2b4-155d5f4b8e32",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 38,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "GCP cost by region",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(gcp.billing.total) BY region = gcp.billing.location.region\n| SORT cost DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "region"
+                  }
+                }
+              ]
+            },
+            "id": "a478cf4c-b883-425a-a010-5b49e241175c",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Engineering & Ops — usage correlated with cost",
+        "collapsed": false,
+        "grid": {
+          "y": 118
+        },
+        "id": "1f172c02-781c-4e60-9ef3-f54ad47ffb3a",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 2
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "Infrastructure usage (EC2 network throughput, CloudTrail API volume) plotted alongside CUR EC2 spend so ops can see whether cost moves with work. Watch `meridian-staging` for the cost-leak pattern (spend without matching activity).",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "8d99a541-9315-40e2-93ab-cc2c4b2012d6",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 2,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "AWS EC2 daily unblended cost",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND aws_billing.cur.product.product == \"AmazonEC2\"\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "64cfd216-21fe-47d4-b814-ba420585a864",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 2,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "EC2 NetworkIn rate (usage proxy)",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws.ec2_metrics-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS network_in = SUM(aws.ec2.metrics.NetworkIn.rate) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "network_in",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "20ed0175-6be5-49ca-be0e-b45e91f9f6b9",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 13,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "CloudTrail API calls per day",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-aws.cloudtrail-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS api_calls = COUNT() BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "api_calls",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "ee8e1b6e-39b4-4206-934e-51cfcea2622a",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 13,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "EC2 network usage by account",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws.ec2_metrics-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS network_in = SUM(aws.ec2.metrics.NetworkIn.rate) BY account = cloud.account.name\n| SORT network_in DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "network_in",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "account"
+                  }
+                }
+              ]
+            },
+            "id": "21023d78-e4a9-4c0a-8502-f722da4e4bb7",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 24,
+              "w": 48,
+              "h": 11
+            },
+            "config": {
+              "type": "data_table",
+              "title": "AWS cost vs usage quantity by account and product",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost), usage = SUM(aws_billing.cur.line_item.usage_amount) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product\n| EVAL unit_cost = cost / usage\n| SORT cost DESC\n| LIMIT 40"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "cost",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "usage",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "unit_cost",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "account",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "service",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "803265e2-da88-47b2-ba97-b7d7602756db",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Historical cost & 7-day run-rate forecast",
+        "collapsed": false,
+        "grid": {
+          "y": 156
+        },
+        "id": "ab6cfac3-311d-4207-a65c-b75838776a37",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 2
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "Daily CUR history plus a trailing 7-day average run-rate. `projected_30d` = last-7-day daily average × 30 (not a statistical model — a FinOps run-rate).",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "9dc41bc7-5b86-4f88-9066-74034d5a7694",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 2,
+              "w": 32,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "AWS CUR daily unblended cost (history)",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "f23a51fc-e377-4d1b-be11-4a0431be883e",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 32,
+              "y": 2,
+              "w": 16,
+              "h": 6
+            },
+            "config": {
+              "type": "metric",
+              "title": "AWS 7-day avg daily cost",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day DESC\n| LIMIT 7\n| STATS avg_7d = AVG(daily)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "avg_7d",
+                  "type": "primary",
+                  "subtitle": "USD / day",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "34d11407-ddb0-4816-8464-f58a20542f36",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 32,
+              "y": 8,
+              "w": 16,
+              "h": 6
+            },
+            "config": {
+              "type": "metric",
+              "title": "Projected 30-day AWS run-rate",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day DESC\n| LIMIT 7\n| STATS avg_7d = AVG(daily)\n| EVAL projected_30d = avg_7d * 30\n| KEEP projected_30d"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "projected_30d",
+                  "type": "primary",
+                  "subtitle": "USD",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "5269a9a7-3bfd-4938-b168-73b7e8e99853",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 14,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "GCP daily cost",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(gcp.billing.total) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "b68d816a-42a5-46c6-a247-f60807a1c778",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 14,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "Azure daily pretax cost",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM metrics-azure.billing-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(azure.billing.pretax_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "cost",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "7805af2d-89e4-4a6c-ad9a-83eda71628c1",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Budget posture — spend SLOs & alerts",
+        "collapsed": false,
+        "grid": {
+          "y": 184
+        },
+        "id": "566be0f1-c011-410f-a12c-05e0ade6eab4",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 4
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "## Budget posture\n\nMeridian treats cloud + LLM spend as error budgets. Thresholds come from `config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n- **AWS monthly budget:** $150,000 · **AWS daily SLO ceiling:** $5,200\n- **Staging daily SLO ceiling:** $150 (cost_leak)\n- **checkout-assistant 7d alert floor:** $4.00 (agent-loop)\n\n[Observability SLOs](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/observability/slos) · [Observability Alerts](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/observability/alerts) · [Alerting rules](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/management/insightsAndAlerting/triggersActions/rules)\n\n**Meridian FinOps AI Assistant:** [Open in Agent Builder](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/agent_builder/chat) (agent `meridian-finops-ai-assistant`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "af72cfed-fb7e-41d3-9d5d-d3e04fb063ef",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 4,
+              "w": 12,
+              "h": 12
+            },
+            "config": {
+              "type": "gauge",
+              "title": "AWS window spend vs monthly budget",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| EVAL budget = 150000.0, min = 0, max = budget * 2, goal = budget"
+              },
+              "styling": {
+                "shape": {
+                  "type": "arc"
+                }
+              },
+              "metric": {
+                "column": "spend",
+                "title": {
+                  "visible": true
+                },
+                "subtitle": "USD (goal = budget)",
+                "color": {
+                  "type": "auto"
+                },
+                "ticks": {
+                  "visible": true,
+                  "mode": "bands"
+                },
+                "min": {
+                  "column": "min"
+                },
+                "max": {
+                  "column": "max"
+                },
+                "goal": {
+                  "column": "goal"
+                }
+              }
+            },
+            "id": "0128a364-5a18-4a8d-b056-f22a0d538bd9",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 12,
+              "y": 4,
+              "w": 12,
+              "h": 12
+            },
+            "config": {
+              "type": "gauge",
+              "title": "Latest AWS daily vs SLO ceiling",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day DESC\n| LIMIT 1\n| EVAL spend = daily, budget = 5200.0, min = 0, max = budget * 2, goal = budget\n| KEEP spend, budget, min, max, goal"
+              },
+              "styling": {
+                "shape": {
+                  "type": "arc"
+                }
+              },
+              "metric": {
+                "column": "spend",
+                "title": {
+                  "visible": true
+                },
+                "subtitle": "USD / day",
+                "color": {
+                  "type": "auto"
+                },
+                "ticks": {
+                  "visible": true,
+                  "mode": "bands"
+                },
+                "min": {
+                  "column": "min"
+                },
+                "max": {
+                  "column": "max"
+                },
+                "goal": {
+                  "column": "goal"
+                }
+              }
+            },
+            "id": "8d44bad9-654d-435e-b76b-495a8b582683",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 4,
+              "w": 12,
+              "h": 12
+            },
+            "config": {
+              "type": "gauge",
+              "title": "Staging latest day vs SLO ceiling",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| WHERE aws_billing.cur.line_item.usage_account_name == \"meridian-staging\"\n| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)\n| SORT day DESC\n| LIMIT 1\n| EVAL spend = daily, budget = 150.0, min = 0, max = budget * 8, goal = budget\n| KEEP spend, budget, min, max, goal"
+              },
+              "styling": {
+                "shape": {
+                  "type": "arc"
+                }
+              },
+              "metric": {
+                "column": "spend",
+                "title": {
+                  "visible": true
+                },
+                "subtitle": "meridian-staging",
+                "color": {
+                  "type": "auto"
+                },
+                "ticks": {
+                  "visible": true,
+                  "mode": "bands"
+                },
+                "min": {
+                  "column": "min"
+                },
+                "max": {
+                  "column": "max"
+                },
+                "goal": {
+                  "column": "goal"
+                }
+              }
+            },
+            "id": "0f23b369-e6f7-48a5-a489-42135d3a2f4a",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 36,
+              "y": 4,
+              "w": 12,
+              "h": 12
+            },
+            "config": {
+              "type": "gauge",
+              "title": "checkout-assistant window vs alert",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\" AND service.name == \"checkout-assistant\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS spend = SUM(cost)\n| EVAL budget = 4.0, min = 0, max = budget * 3, goal = budget"
+              },
+              "styling": {
+                "shape": {
+                  "type": "arc"
+                }
+              },
+              "metric": {
+                "column": "spend",
+                "title": {
+                  "visible": true
+                },
+                "subtitle": "USD LLM (APM)",
+                "color": {
+                  "type": "auto"
+                },
+                "ticks": {
+                  "visible": true,
+                  "mode": "bands"
+                },
+                "min": {
+                  "column": "min"
+                },
+                "max": {
+                  "column": "max"
+                },
+                "goal": {
+                  "column": "goal"
+                }
+              }
+            },
+            "id": "0b231894-0c58-4ca6-8cb2-02b2c41f5cbc",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "LLM traces — end-to-end call, tokens, and cost",
+        "collapsed": false,
+        "grid": {
+          "y": 208
+        },
+        "id": "5e44ba92-cfbd-4d59-9fe4-a86d9b648671",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 2
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the request id — open APM to inspect the parent FastAPI transaction.\n\n**LLM scenarios:** agent-loop burn on `checkout-assistant` (−8..−6) · model migration on `support-copilot` (openai→anthropic at −14) · cache-miss storm on `rag-research` (−5..−3) · skunkworks GenAI ramp.",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "e89393aa-e4e5-4d4a-ac88-62d99fc68bd6",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 2,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "LLM calls (sampled spans)",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS calls = COUNT(*)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "calls",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "294791f0-f147-4e3e-a273-10fdf91cdd4f",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 12,
+              "y": 2,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Total tokens",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS tokens = SUM(gen_ai.usage.total_tokens)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "tokens",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "04f68840-b62e-4736-8bbf-5bf60fa34ca1",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 2,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Prompt tokens",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS prompt = SUM(gen_ai.usage.input_tokens)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "prompt",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "04011005-60e7-480f-8f14-8d46791987c0",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 36,
+              "y": 2,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Completion tokens",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS completion = SUM(gen_ai.usage.output_tokens)"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "completion",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "60a9d824-8405-42fa-a4c9-da475f7c16a8",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 7,
+              "w": 48,
+              "h": 14
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Recent LLM calls — trace, model, tokens, cost, latency",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost_usd = TO_DOUBLE(labels.llm_cost_usd), latency_ms = span.duration.us / 1000.0\n| SORT @timestamp DESC\n| KEEP @timestamp, trace.id, service.name, gen_ai.request.model, gen_ai.system, gen_ai.usage.input_tokens, gen_ai.usage.output_tokens, gen_ai.usage.total_tokens, cost_usd, latency_ms, event.outcome, labels.team, labels.env\n| LIMIT 100"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "gen_ai.usage.input_tokens",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "gen_ai.usage.output_tokens",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "gen_ai.usage.total_tokens",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "cost_usd",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "latency_ms",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "@timestamp",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "trace.id",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "service.name",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "gen_ai.request.model",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "gen_ai.system",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "event.outcome",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "labels.team",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "labels.env",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "5458f513-70b2-48e7-a5f7-0f115ea1047a",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Token usage per request — prompt, completion, total",
+        "collapsed": false,
+        "grid": {
+          "y": 232
+        },
+        "id": "ba0e309a-df68-4df1-ac72-95587882e1b3",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "Daily prompt vs completion tokens (APM spans)",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                },
+                "areas": {
+                  "fill_opacity": 0.75,
+                  "fill": "gradient"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), total = SUM(gen_ai.usage.total_tokens) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "area",
+                  "y": [
+                    {
+                      "column": "prompt",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    },
+                    {
+                      "column": "completion",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    },
+                    {
+                      "column": "total",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "bb726c31-6b7f-48e1-b37c-9268e773d444",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 32,
+              "y": 0,
+              "w": 16,
+              "h": 12
+            },
+            "config": {
+              "type": "pie",
+              "title": "Prompt vs completion share",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| FORK\n    (STATS tokens = SUM(gen_ai.usage.input_tokens) | EVAL kind = \"prompt\")\n    (STATS tokens = SUM(gen_ai.usage.output_tokens) | EVAL kind = \"completion\")\n| KEEP kind, tokens"
+              },
+              "legend": {
+                "nested": false,
+                "truncate_after_lines": 1,
+                "visibility": "visible",
+                "position": "right"
+              },
+              "styling": {
+                "values": {
+                  "visible": true,
+                  "mode": "percentage",
+                  "percent_decimals": 2
+                },
+                "labels": {
+                  "visible": true,
+                  "position": "inside"
+                },
+                "donut_hole": "m"
+              },
+              "metrics": [
+                {
+                  "column": "tokens",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "group_by": [
+                {
+                  "column": "kind",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                }
+              ]
+            },
+            "id": "84cd43ba-b8e0-48b5-9c85-5727b90c3b6b",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 12,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "OpenAI completions — input vs output tokens",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                },
+                "areas": {
+                  "fill_opacity": 0.75,
+                  "fill": "gradient"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-openai.completions-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS prompt = SUM(openai.completions.input_tokens), completion = SUM(openai.completions.output_tokens) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "area",
+                  "y": [
+                    {
+                      "column": "prompt",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    },
+                    {
+                      "column": "completion",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "3f5217c5-29c0-4d7b-ac8c-8ffdef379a66",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 12,
+              "w": 24,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "Vertex AI — prompt vs candidate tokens",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                },
+                "areas": {
+                  "fill_opacity": 0.75,
+                  "fill": "gradient"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-gcp_vertexai.prompt_response_logs-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS prompt = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.prompt_token_count), completion = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.candidates_token_count) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "area",
+                  "y": [
+                    {
+                      "column": "prompt",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    },
+                    {
+                      "column": "completion",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "98c77b4a-55f5-4c02-b745-a205681c2a77",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "LLM cost — model, user, feature, team",
+        "collapsed": false,
+        "grid": {
+          "y": 258
+        },
+        "id": "182f4051-c086-4333-ac9e-a91a0b711254",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "LLM cost by model",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens), calls = COUNT(*) BY model = gen_ai.request.model\n| SORT cost_usd DESC\n| LIMIT 15"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost_usd",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "model"
+                  }
+                }
+              ]
+            },
+            "id": "a0748537-8668-4acf-8470-a6454c7c92f4",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 0,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "LLM cost by team",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens) BY team = COALESCE(labels.team, \"untagged\")\n| SORT cost_usd DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost_usd",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "team"
+                  }
+                }
+              ]
+            },
+            "id": "5ccc1ae2-09ae-4766-9b27-ac81cb5eeacb",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 12,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "LLM cost by feature / application",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens), calls = COUNT(*) BY feature = service.name\n| SORT cost_usd DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "cost_usd",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "feature"
+                  }
+                }
+              ]
+            },
+            "id": "1554fa28-594b-4198-ad25-d4d6af5cc03e",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 12,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "OpenAI tokens by user",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM logs-openai.completions-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(openai.base.usage_tokens), requests = SUM(openai.base.num_model_requests) BY user = openai.base.user_id\n| SORT tokens DESC\n| LIMIT 15"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "tokens",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "user"
+                  }
+                }
+              ]
+            },
+            "id": "e05cfc9d-54ea-4c87-bdda-93d9ef91406f",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 24,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Cost × tokens by model and provider",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS cost_usd = SUM(cost), prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), calls = COUNT(*) BY model = gen_ai.request.model, provider = gen_ai.system\n| SORT cost_usd DESC"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "calls",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "prompt",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "completion",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "cost_usd",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "provider",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "model",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "1fd5702d-6e05-462c-9c02-7ae8ee890b23",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 24,
+              "w": 24,
+              "h": 12
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Vertex AI tokens by user and app",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM logs-gcp_vertexai.prompt_response_logs-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.total_token_count), calls = COUNT(*) BY user = user.name, feature = service.name, team = labels.team\n| SORT tokens DESC\n| LIMIT 30"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "calls",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "tokens",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "user",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "feature",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "team",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "a82b14c9-42d4-43ce-983b-0f4861fd5e9d",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "LLM quality & latency",
+        "collapsed": false,
+        "grid": {
+          "y": 298
+        },
+        "id": "1d3b5c20-7df0-4d15-96a2-6c2fbeeb3317",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "p95 latency (ms)",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "p95_ms",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "6cab205c-854a-41ba-9429-1e2d856d0be7",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 12,
+              "y": 0,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "p50 latency (ms)",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS p50_ms = PERCENTILE(span.duration.us, 50) / 1000"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "p50_ms",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "d8fa86d4-ddab-48ae-9347-d76f07279d0f",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 24,
+              "y": 0,
+              "w": 12,
+              "h": 5
+            },
+            "config": {
+              "type": "metric",
+              "title": "Error rate",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS errors = COUNT(*) WHERE event.outcome == \"failure\", calls = COUNT(*)\n| EVAL error_rate = errors * 1.0 / calls\n| KEEP error_rate"
+              },
+              "styling": {
+                "density": "default",
+                "primary": {
+                  "position": "bottom",
+                  "labels": {
+                    "alignment": "left"
+                  },
+                  "value": {
+                    "alignment": "right",
+                    "sizing": "auto"
+                  }
+                }
+              },
+              "metrics": [
+                {
+                  "column": "error_rate",
+                  "type": "primary",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            "id": "ca31519b-10b8-41da-bf39-745a270e470d",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 36,
+              "y": 0,
+              "w": 12,
+              "h": 12
+            },
+            "config": {
+              "type": "pie",
+              "title": "Call outcome",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS calls = COUNT(*) BY outcome = event.outcome"
+              },
+              "legend": {
+                "nested": false,
+                "truncate_after_lines": 1,
+                "visibility": "visible",
+                "position": "right"
+              },
+              "styling": {
+                "values": {
+                  "visible": true,
+                  "mode": "percentage",
+                  "percent_decimals": 2
+                },
+                "labels": {
+                  "visible": true,
+                  "position": "inside"
+                },
+                "donut_hole": "m"
+              },
+              "metrics": [
+                {
+                  "column": "calls",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "group_by": [
+                {
+                  "column": "outcome",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                }
+              ]
+            },
+            "id": "af398564-12ea-411e-8f26-6ea743061af0",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 5,
+              "w": 36,
+              "h": 12
+            },
+            "config": {
+              "type": "xy",
+              "title": "Latency p95 by model (ms)",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000, p50_ms = PERCENTILE(span.duration.us, 50) / 1000 BY model = gen_ai.request.model\n| SORT p95_ms DESC\n| LIMIT 15"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "p50_ms",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    },
+                    {
+                      "column": "p95_ms",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "model"
+                  }
+                }
+              ]
+            },
+            "id": "d1eb31bc-5fbd-42d2-b465-13123b96d97b",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 17,
+              "w": 48,
+              "h": 11
+            },
+            "config": {
+              "type": "xy",
+              "title": "Daily p95 latency (ms)",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "smooth",
+                "points": {
+                  "visibility": "auto"
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                  },
+                  "type": "line",
+                  "y": [
+                    {
+                      "column": "p95_ms",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "day"
+                  }
+                }
+              ]
+            },
+            "id": "502e90f6-565b-41cf-98a0-9628d5b0d3c8",
+            "type": "vis"
+          }
+        ]
+      },
+      {
+        "title": "Funnel — which user flows consume the most tokens",
+        "collapsed": false,
+        "grid": {
+          "y": 330
+        },
+        "id": "5321d249-9841-4561-8d16-600ba11981a0",
+        "panels": [
+          {
+            "grid": {
+              "x": 0,
+              "y": 0,
+              "w": 48,
+              "h": 3
+            },
+            "config": {
+              "hide_title": true,
+              "title": "",
+              "content": "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, `rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. Shadow-IT (`skunk-agent-lab`, `prompt-playground`) and the agent-loop scenario show up here.",
+              "settings": {
+                "open_links_in_new_tab": true
+              }
+            },
+            "id": "a61b65e6-0022-49bb-8859-7c6b2ec7a8b5",
+            "type": "markdown"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 3,
+              "w": 28,
+              "h": 14
+            },
+            "config": {
+              "type": "xy",
+              "title": "Tokens consumed by user flow",
+              "legend": {
+                "visibility": "visible",
+                "placement": "outside",
+                "layout": {
+                  "type": "grid",
+                  "truncate": {
+                    "max_lines": 1
+                  }
+                },
+                "position": "right"
+              },
+              "axis": {
+                "x": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "ordinal",
+                  "domain": {
+                    "type": "fit",
+                    "rounding": false
+                  }
+                },
+                "y": {
+                  "title": {
+                    "text": "",
+                    "visible": true
+                  },
+                  "ticks": {
+                    "visible": true
+                  },
+                  "grid": {
+                    "visible": true
+                  },
+                  "labels": {
+                    "orientation": "horizontal"
+                  },
+                  "scale": "linear",
+                  "domain": {
+                    "type": "full",
+                    "rounding": true
+                  }
+                }
+              },
+              "styling": {
+                "overlays": {
+                  "partial_buckets": {
+                    "visible": false
+                  },
+                  "current_time_marker": {
+                    "visible": false
+                  }
+                },
+                "interpolation": "linear",
+                "bars": {
+                  "minimum_height": 1,
+                  "data_labels": {
+                    "visible": false
+                  }
+                }
+              },
+              "layers": [
+                {
+                  "sampling": 1,
+                  "ignore_global_filters": false,
+                  "data_source": {
+                    "type": "esql",
+                    "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost), calls = COUNT(*) BY flow = service.name\n| SORT tokens DESC"
+                  },
+                  "type": "bar",
+                  "y": [
+                    {
+                      "column": "tokens",
+                      "axis": "y",
+                      "color": {
+                        "type": "auto"
+                      }
+                    }
+                  ],
+                  "x": {
+                    "column": "flow"
+                  }
+                }
+              ]
+            },
+            "id": "b894b05f-321c-4a4d-bdb8-f6dd6040bfc6",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 28,
+              "y": 3,
+              "w": 20,
+              "h": 14
+            },
+            "config": {
+              "type": "pie",
+              "title": "Token share by flow",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| STATS tokens = SUM(gen_ai.usage.total_tokens) BY flow = service.name\n| SORT tokens DESC"
+              },
+              "legend": {
+                "nested": false,
+                "truncate_after_lines": 1,
+                "visibility": "visible",
+                "position": "right"
+              },
+              "styling": {
+                "values": {
+                  "visible": true,
+                  "mode": "percentage",
+                  "percent_decimals": 2
+                },
+                "labels": {
+                  "visible": true,
+                  "position": "inside"
+                },
+                "donut_hole": "m"
+              },
+              "metrics": [
+                {
+                  "column": "tokens",
+                  "color": {
+                    "type": "auto"
+                  }
+                }
+              ],
+              "group_by": [
+                {
+                  "column": "flow",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                }
+              ]
+            },
+            "id": "20e80961-331a-4e3d-8619-14805724d1f9",
+            "type": "vis"
+          },
+          {
+            "grid": {
+              "x": 0,
+              "y": 17,
+              "w": 48,
+              "h": 12
+            },
+            "config": {
+              "type": "data_table",
+              "title": "Flow funnel — tokens, prompt/completion split, cost, latency",
+              "sampling": 1,
+              "ignore_global_filters": false,
+              "data_source": {
+                "type": "esql",
+                "query": "FROM traces-apm-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.subtype == \"gen_ai\"\n| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)\n| STATS calls = COUNT(*), prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost), p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY flow = service.name, team = COALESCE(labels.team, \"untagged\"), env = COALESCE(labels.env, service.environment)\n| EVAL tokens_per_call = tokens / calls\n| SORT tokens DESC"
+              },
+              "styling": {
+                "paging": 20,
+                "row_numbers": {
+                  "visible": true
+                }
+              },
+              "metrics": [
+                {
+                  "column": "calls",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "prompt",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "completion",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "tokens",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "tokens_per_call",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "cost_usd",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                },
+                {
+                  "column": "p95_ms",
+                  "visible": true,
+                  "color": {
+                    "type": "auto"
+                  },
+                  "alignment": "right"
+                }
+              ],
+              "rows": [
+                {
+                  "column": "flow",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "team",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                },
+                {
+                  "column": "env",
+                  "visible": true,
+                  "alignment": "left",
+                  "color": {
+                    "type": "auto"
+                  },
+                  "click_filter": false
+                }
+              ]
+            },
+            "id": "36072733-2814-4b81-a5c4-1c445a7dd2b9",
+            "type": "vis"
+          }
+        ]
+      }
+    ],
+    "pinned_panels": []
+  },
+  "meta": {
+    "created_at": "2026-08-27T20:19:42.882Z",
+    "managed": false,
+    "updated_at": "2026-08-27T22:06:29.301Z",
+    "version": "Wzk0MCwxXQ=="
+  }
+}

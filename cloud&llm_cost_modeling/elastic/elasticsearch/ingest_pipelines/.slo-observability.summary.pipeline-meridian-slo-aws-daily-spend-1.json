@@ -1,0 +1,257 @@
+{
+  "name": ".slo-observability.summary.pipeline-meridian-slo-aws-daily-spend-1",
+  "description": "Ingest pipeline for SLO summary data [id: meridian-slo-aws-daily-spend, revision: 1]",
+  "_meta": {
+    "description": "Ingest pipeline for SLO summary data [id: meridian-slo-aws-daily-spend, revision: 1]",
+    "version": 3.6,
+    "managed_by": "observability",
+    "managed": true
+  },
+  "created_date_millis": 1787861657366,
+  "processors": [
+    {
+      "set": {
+        "description": "Set errorBudgetEstimated field",
+        "field": "errorBudgetEstimated",
+        "value": false
+      }
+    },
+    {
+      "set": {
+        "description": "Set isTempDoc field",
+        "field": "isTempDoc",
+        "value": false
+      }
+    },
+    {
+      "set": {
+        "description": "Set groupBy field",
+        "field": "slo.groupBy",
+        "value": "*"
+      }
+    },
+    {
+      "set": {
+        "description": "Set name field",
+        "field": "slo.name",
+        "value": "[Meridian] AWS daily unblended under budget"
+      }
+    },
+    {
+      "set": {
+        "description": "Set description field",
+        "field": "slo.description",
+        "value": "Daily AWS CUR unblended cost must stay at or below the FinOps ceiling. Crypto-mining (−12..−9) and organic growth burn error budget."
+      }
+    },
+    {
+      "set": {
+        "description": "Set tags field",
+        "field": "slo.tags",
+        "value": [
+          "meridian",
+          "finops",
+          "workshop"
+        ]
+      }
+    },
+    {
+      "set": {
+        "description": "Set indicator.type field",
+        "field": "slo.indicator.type",
+        "value": "sli.metric.timeslice"
+      }
+    },
+    {
+      "set": {
+        "description": "Set budgetingMethod field",
+        "field": "slo.budgetingMethod",
+        "value": "timeslices"
+      }
+    },
+    {
+      "set": {
+        "description": "Set timeWindow.duration field",
+        "field": "slo.timeWindow.duration",
+        "value": "30d"
+      }
+    },
+    {
+      "set": {
+        "description": "Set timeWindow.type field",
+        "field": "slo.timeWindow.type",
+        "value": "rolling"
+      }
+    },
+    {
+      "set": {
+        "description": "Set objective.target field",
+        "field": "slo.objective.target",
+        "value": 0.95
+      }
+    },
+    {
+      "set": {
+        "description": "Set objective.timesliceTarget field",
+        "field": "slo.objective.timesliceTarget",
+        "value": 0.95
+      }
+    },
+    {
+      "set": {
+        "description": "Set objective.timesliceWindow field",
+        "field": "slo.objective.timesliceWindow",
+        "value": "24h"
+      }
+    },
+    {
+      "set": {
+        "description": "if 'statusCode == 0', set status to NO_DATA",
+        "field": "status",
+        "if": "ctx.statusCode == 0",
+        "value": "NO_DATA"
+      }
+    },
+    {
+      "set": {
+        "description": "if 'statusCode == 1', set statusLabel to VIOLATED",
+        "field": "status",
+        "if": "ctx.statusCode == 1",
+        "value": "VIOLATED"
+      }
+    },
+    {
+      "set": {
+        "description": "if 'statusCode == 2', set status to DEGRADING",
+        "field": "status",
+        "if": "ctx.statusCode == 2",
+        "value": "DEGRADING"
+      }
+    },
+    {
+      "set": {
+        "description": "if 'statusCode == 4', set status to HEALTHY",
+        "field": "status",
+        "if": "ctx.statusCode == 4",
+        "value": "HEALTHY"
+      }
+    },
+    {
+      "set": {
+        "field": "summaryUpdatedAt",
+        "value": "{{{_ingest.timestamp}}}"
+      }
+    },
+    {
+      "set": {
+        "field": "spaceId",
+        "value": "default"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "description": "Store the indicator params",
+        "field": "slo.indicator.params",
+        "value": {
+          "index": "metrics-aws_billing.cur-default",
+          "timestampField": "@timestamp",
+          "metric": {
+            "comparator": "LTE",
+            "threshold": 5200,
+            "metrics": [
+              {
+                "name": "A",
+                "aggregation": "sum",
+                "field": "aws_billing.cur.line_item.unblended_cost"
+              }
+            ],
+            "equation": "A"
+          }
+        }
+      }
+    },
+    {
+      "set": {
+        "field": "slo.createdAt",
+        "value": "2026-08-27T20:14:17.000Z"
+      }
+    },
+    {
+      "set": {
+        "field": "slo.updatedAt",
+        "value": "2026-08-27T20:14:17.000Z"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "kibanaUrl",
+        "value": "https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud"
+      }
+    },
+    {
+      "script": {
+        "description": "Computes the last five minute burn rate value",
+        "source": "def totalEvents = ctx[\"fiveMinuteBurnRate\"][\"totalEvents\"];\n  def goodEvents = ctx[\"fiveMinuteBurnRate\"][\"goodEvents\"];\n  def errorBudgetInitial = ctx[\"errorBudgetInitial\"];\n\n  if (totalEvents == null || totalEvents == 0) {\n    ctx[\"fiveMinuteBurnRate\"][\"value\"] = 0.0;\n    return;\n  }\n\n  def totalSlicesInRange = params[\"totalSlicesInRange\"];\n  def isTimeslice = params[\"isTimeslice\"];\n  if (isTimeslice && totalSlicesInRange > 0) {\n    def badEvents = (double)totalEvents - (double)goodEvents;\n    def sliValue = 1.0 - (badEvents / (double)totalSlicesInRange);\n    ctx[\"fiveMinuteBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  } else {\n    def sliValue = (double)goodEvents / (double)totalEvents;\n    ctx[\"fiveMinuteBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  }",
+        "lang": "painless",
+        "params": {
+          "totalSlicesInRange": 0,
+          "isTimeslice": true
+        }
+      }
+    },
+    {
+      "script": {
+        "description": "Computes the last hour burn rate value",
+        "source": "def totalEvents = ctx[\"oneHourBurnRate\"][\"totalEvents\"];\n  def goodEvents = ctx[\"oneHourBurnRate\"][\"goodEvents\"];\n  def errorBudgetInitial = ctx[\"errorBudgetInitial\"];\n\n  if (totalEvents == null || totalEvents == 0) {\n    ctx[\"oneHourBurnRate\"][\"value\"] = 0.0;\n    return;\n  }\n\n  def totalSlicesInRange = params[\"totalSlicesInRange\"];\n  def isTimeslice = params[\"isTimeslice\"];\n  if (isTimeslice && totalSlicesInRange > 0) {\n    def badEvents = (double)totalEvents - (double)goodEvents;\n    def sliValue = 1.0 - (badEvents / (double)totalSlicesInRange);\n    ctx[\"oneHourBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  } else {\n    def sliValue = (double)goodEvents / (double)totalEvents;\n    ctx[\"oneHourBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  }",
+        "lang": "painless",
+        "params": {
+          "totalSlicesInRange": 0,
+          "isTimeslice": true
+        }
+      }
+    },
+    {
+      "script": {
+        "description": "Computes the last day burn rate value",
+        "source": "def totalEvents = ctx[\"oneDayBurnRate\"][\"totalEvents\"];\n  def goodEvents = ctx[\"oneDayBurnRate\"][\"goodEvents\"];\n  def errorBudgetInitial = ctx[\"errorBudgetInitial\"];\n\n  if (totalEvents == null || totalEvents == 0) {\n    ctx[\"oneDayBurnRate\"][\"value\"] = 0.0;\n    return;\n  }\n\n  def totalSlicesInRange = params[\"totalSlicesInRange\"];\n  def isTimeslice = params[\"isTimeslice\"];\n  if (isTimeslice && totalSlicesInRange > 0) {\n    def badEvents = (double)totalEvents - (double)goodEvents;\n    def sliValue = 1.0 - (badEvents / (double)totalSlicesInRange);\n    ctx[\"oneDayBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  } else {\n    def sliValue = (double)goodEvents / (double)totalEvents;\n    ctx[\"oneDayBurnRate\"][\"value\"] = (1.0 - sliValue) / errorBudgetInitial;\n  }",
+        "lang": "painless",
+        "params": {
+          "totalSlicesInRange": 1,
+          "isTimeslice": true
+        }
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "slo.updatedBy",
+        "value": "719348788"
+      }
+    },
+    {
+      "set": {
+        "ignore_failure": true,
+        "field": "slo.createdBy",
+        "value": "719348788"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "ignore_failure": true,
+        "name": "slo-summary-global@custom",
+        "description": "Global custom pipeline for all SLO summary data"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "ignore_failure": true,
+        "name": "slo-summary-meridian-slo-aws-daily-spend@custom"
+      }
+    }
+  ],
+  "modified_date_millis": 1787861657366
+}

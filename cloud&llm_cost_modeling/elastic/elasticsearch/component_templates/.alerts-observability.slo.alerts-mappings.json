@@ -83,7 +83,8 @@
       }
     },
     "_meta": {
-      "managed": true
+      "managed": true,
+      "content_hash": "9ddf4571e746ad5c"
     }
   }
 }

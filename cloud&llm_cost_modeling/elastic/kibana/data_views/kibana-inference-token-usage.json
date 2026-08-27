@@ -1,0 +1,629 @@
+{
+  "data_view": {
+    "id": "kibana-inference-token-usage",
+    "version": "WzgyNCwxXQ==",
+    "title": "logs-elastic.inference_token_usage-default",
+    "timeFieldName": "@timestamp",
+    "sourceFilters": [],
+    "fieldFormats": {},
+    "runtimeFieldMap": {},
+    "fieldAttrs": {},
+    "allowNoIndex": false,
+    "name": "Inference Token Usage",
+    "allowHidden": false,
+    "fields": {
+      "@timestamp": {
+        "count": 0,
+        "name": "@timestamp",
+        "type": "date",
+        "esTypes": [
+          "date"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "date"
+        },
+        "shortDotsEnable": false
+      },
+      "_id": {
+        "count": 0,
+        "name": "_id",
+        "type": "string",
+        "esTypes": [
+          "_id"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_ignored": {
+        "count": 0,
+        "name": "_ignored",
+        "type": "string",
+        "esTypes": [
+          "_ignored"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_index": {
+        "count": 0,
+        "name": "_index",
+        "type": "string",
+        "esTypes": [
+          "_index"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "_score": {
+        "count": 0,
+        "name": "_score",
+        "type": "number",
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "_source": {
+        "count": 0,
+        "name": "_source",
+        "type": "_source",
+        "esTypes": [
+          "_source"
+        ],
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "_source"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.dataset": {
+        "count": 0,
+        "name": "data_stream.dataset",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.dataset.keyword": {
+        "count": 0,
+        "name": "data_stream.dataset.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "data_stream.dataset"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.namespace": {
+        "count": 0,
+        "name": "data_stream.namespace",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.namespace.keyword": {
+        "count": 0,
+        "name": "data_stream.namespace.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "data_stream.namespace"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.type": {
+        "count": 0,
+        "name": "data_stream.type",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "data_stream.type.keyword": {
+        "count": 0,
+        "name": "data_stream.type.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "data_stream.type"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "host.name": {
+        "count": 0,
+        "name": "host.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.connector_id": {
+        "count": 0,
+        "name": "inference.connector_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.endpoint_id": {
+        "count": 0,
+        "name": "inference.endpoint_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.feature_id": {
+        "count": 0,
+        "name": "inference.feature_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.feature_name": {
+        "count": 0,
+        "name": "inference.feature_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.parent_feature_id": {
+        "count": 0,
+        "name": "inference.parent_feature_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.service": {
+        "count": 0,
+        "name": "inference.service",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "inference.task_type": {
+        "count": 0,
+        "name": "inference.task_type",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "labels.cost_usd": {
+        "count": 0,
+        "name": "labels.cost_usd",
+        "type": "number",
+        "esTypes": [
+          "double"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "labels.eis": {
+        "count": 0,
+        "name": "labels.eis",
+        "type": "boolean",
+        "esTypes": [
+          "boolean"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "boolean"
+        },
+        "shortDotsEnable": false
+      },
+      "labels.role": {
+        "count": 0,
+        "name": "labels.role",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "labels.team": {
+        "count": 0,
+        "name": "labels.team",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "model.model_creator": {
+        "count": 0,
+        "name": "model.model_creator",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "model.model_id": {
+        "count": 0,
+        "name": "model.model_id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "model.model_name": {
+        "count": 0,
+        "name": "model.model_name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "model.provider": {
+        "count": 0,
+        "name": "model.provider",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "tags": {
+        "count": 0,
+        "name": "tags",
+        "type": "string",
+        "esTypes": [
+          "text"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": false,
+        "readFromDocValues": false,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "tags.keyword": {
+        "count": 0,
+        "name": "tags.keyword",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "subType": {
+          "multi": {
+            "parent": "tags"
+          }
+        },
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "token_usage.cached_tokens": {
+        "count": 0,
+        "name": "token_usage.cached_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "token_usage.completion_tokens": {
+        "count": 0,
+        "name": "token_usage.completion_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "token_usage.prompt_tokens": {
+        "count": 0,
+        "name": "token_usage.prompt_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "token_usage.thinking_tokens": {
+        "count": 0,
+        "name": "token_usage.thinking_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "token_usage.total_tokens": {
+        "count": 0,
+        "name": "token_usage.total_tokens",
+        "type": "number",
+        "esTypes": [
+          "long"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "number"
+        },
+        "shortDotsEnable": false
+      },
+      "user.id": {
+        "count": 0,
+        "name": "user.id",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      },
+      "user.name": {
+        "count": 0,
+        "name": "user.name",
+        "type": "string",
+        "esTypes": [
+          "keyword"
+        ],
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true,
+        "format": {
+          "id": "string"
+        },
+        "shortDotsEnable": false
+      }
+    },
+    "namespaces": [
+      "default"
+    ]
+  }
+}

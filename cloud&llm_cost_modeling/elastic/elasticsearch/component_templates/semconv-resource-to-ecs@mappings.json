@@ -239,7 +239,7 @@
         }
       }
     },
-    "version": 19,
+    "version": 20,
     "_meta": {
       "description": "Aliases from OpenTelemetry SemConv resource attribute fields to ECS (and some non-ECS) fields",
       "managed": true

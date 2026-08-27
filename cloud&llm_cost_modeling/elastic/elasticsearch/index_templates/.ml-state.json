@@ -9,8 +9,7 @@
     "template": {
       "settings": {
         "index": {
-          "hidden": "true",
-          "auto_expand_replicas": "0-1"
+          "hidden": "true"
         }
       },
       "mappings": {

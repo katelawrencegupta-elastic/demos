@@ -7,6 +7,7 @@ import json
 
 import requests
 
+from src.agent_builder import AGENT_CHAT_URL, agent_id
 from src.budgets import budget_numbers
 from src.config import KBN_HEADERS, KIBANA_URL
 from src.time_window import demo_window, window_label
@@ -321,6 +322,7 @@ def budget_posture_section(y: int):
     staging_ceil = float(b["staging_daily_ceiling_usd"])
     checkout_7d = float(b["checkout_7d_alert_usd"])
     aws_daily = float(b["aws_daily_ceiling_usd"])
+    checkout_daily = float(b["checkout_daily_ceiling_usd"])
 
     mtd_vs_budget = _q(
         "FROM metrics-aws_billing.cur-default",
@@ -352,6 +354,14 @@ def budget_posture_section(y: int):
         f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
         "| KEEP spend, budget, min, max, goal",
     )
+    slo_posture = _q(
+        "FROM .slo-observability.summary-v3.6",
+        '| WHERE slo.id LIKE "meridian-*"',
+        '| EVAL status = CASE(errorBudgetRemaining < 0, "VIOLATED", "HEALTHY")',
+        "| EVAL eb_remaining_pct = ROUND(errorBudgetRemaining * 100, 1)",
+        "| KEEP slo.name, status, eb_remaining_pct, errorBudgetConsumed",
+        "| SORT status DESC, slo.name",
+    )
 
     return section("Budget posture — spend SLOs & alerts", y, [
         markdown(
@@ -361,11 +371,15 @@ def budget_posture_section(y: int):
             "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
             f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
             f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
-            f"- **checkout-assistant 7d alert floor:** ${checkout_7d:,.2f} (agent-loop)\n\n"
+            f"- **checkout-assistant daily SLO ceiling:** ${checkout_daily:.2f} · "
+            f"**7d alert floor:** ${checkout_7d:.2f} (agent-loop)\n\n"
+            "**Workshop posture:** AWS daily + staging cost-leak SLOs should show **VIOLATED**; "
+            "checkout-assistant breaches during the agent-loop window (−8..−6).\n\n"
             f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
             f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
             f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
-            "Provision / refresh: `python -m src.cli budgets`.",
+            f"**Meridian FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
+            f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
         ),
         gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
               mtd_vs_budget, "spend", shape="arc",
@@ -383,6 +397,10 @@ def budget_posture_section(y: int):
               checkout_vs_alert, "spend", shape="arc",
               min_col="min", max_col="max", goal_col="goal",
               subtitle="USD LLM (APM)"),
+        table(0, 16, 48, 10, "Meridian spend SLO posture (error budget)",
+              slo_posture,
+              rows=["slo.name", "status"],
+              metrics=["eb_remaining_pct", "errorBudgetConsumed"]),
     ])
 
 
@@ -1053,8 +1071,9 @@ def build_dashboard():
                      f"[classic](#/view/{DASHBOARD_ID_CLASSIC}).\n\n"
                      f"[Open classic](#/view/{DASHBOARD_ID_CLASSIC}) · "
                      f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n"
-                     f"**Budgets:** [Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
-                     f"`python -m src.cli budgets`."),
+                     f"**Budgets:** [Meridian FinOps AI Assistant]({AGENT_CHAT_URL}) · "
+                     f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
+                     f"`python -m src.cli agent`."),
             metric(0, 3, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
             metric(12, 3, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
             metric(24, 3, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),

@@ -15,6 +15,10 @@
       "fleet-managed-default",
       "fleet-pkg-gcp_vertexai-default"
     ],
+    "time_range": {
+      "from": "2026-04-29T18:14:36.000Z",
+      "to": "2026-08-28T18:14:36.000Z"
+    },
     "title": "[GCP VertexAI] AuditLogs",
     "filters": [],
     "query": {
@@ -24,10 +28,10 @@
     "panels": [
       {
         "grid": {
-          "h": 14,
-          "w": 12,
           "x": 0,
-          "y": 17
+          "y": 17,
+          "w": 12,
+          "h": 14
         },
         "config": {
           "type": "pie",
@@ -106,10 +110,10 @@
       },
       {
         "grid": {
-          "h": 14,
-          "w": 12,
           "x": 24,
-          "y": 17
+          "y": 17,
+          "w": 12,
+          "h": 14
         },
         "config": {
           "type": "pie",
@@ -188,10 +192,10 @@
       },
       {
         "grid": {
-          "h": 14,
-          "w": 12,
           "x": 36,
-          "y": 17
+          "y": 17,
+          "w": 12,
+          "h": 14
         },
         "config": {
           "type": "pie",
@@ -270,10 +274,10 @@
       },
       {
         "grid": {
-          "h": 14,
-          "w": 12,
           "x": 12,
-          "y": 17
+          "y": 17,
+          "w": 12,
+          "h": 14
         },
         "config": {
           "type": "pie",
@@ -352,10 +356,10 @@
       },
       {
         "grid": {
-          "h": 14,
-          "w": 48,
           "x": 0,
-          "y": 31
+          "y": 31,
+          "w": 48,
+          "h": 14
         },
         "config": {
           "description": "",
@@ -380,12 +384,13 @@
       },
       {
         "grid": {
-          "h": 2,
-          "w": 48,
           "x": 0,
-          "y": 0
+          "y": 0,
+          "w": 48,
+          "h": 2
         },
         "config": {
+          "title": "",
           "links": [
             {
               "type": "dashboardLink",
@@ -400,9 +405,9 @@
               "type": "dashboardLink",
               "destination": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
               "options": {
-                "open_in_new_tab": false,
+                "use_filters": true,
                 "use_time_range": true,
-                "use_filters": true
+                "open_in_new_tab": false
               }
             }
           ],
@@ -413,10 +418,10 @@
       },
       {
         "grid": {
-          "h": 15,
-          "w": 12,
           "x": 36,
-          "y": 2
+          "y": 2,
+          "w": 12,
+          "h": 15
         },
         "config": {
           "type": "data_table",
@@ -473,33 +478,7 @@
   "meta": {
     "created_at": "2026-08-13T17:51:37.740Z",
     "managed": true,
-    "updated_at": "2026-08-13T17:51:39.296Z",
-    "version": "WzQ3NSwxXQ=="
-  },
-  "warnings": [
-    {
-      "type": "dropped_panel",
-      "message": "Panel schema not available for panel type: map. Panels without schemas are not supported by dashboard REST endpoints",
-      "panel_type": "map",
-      "panel_config": {
-        "description": "",
-        "hiddenLayers": [],
-        "isLayerTOCOpen": false,
-        "mapBuffer": {
-          "maxLat": 85.05113,
-          "maxLon": 360,
-          "minLat": -66.51326,
-          "minLon": -270
-        },
-        "mapCenter": {
-          "lat": 44.53083,
-          "lon": 24.03939,
-          "zoom": 1.24
-        },
-        "openTOCDetails": [],
-        "savedObjectId": "gcp_vertexai-a60a5081-be88-4802-aea1-fd33bd008591",
-        "title": "VertexAI Audit source locations"
-      }
-    }
-  ]
+    "updated_at": "2026-08-27T18:14:37.090Z",
+    "version": "Wzg3OSwxXQ=="
+  }
 }

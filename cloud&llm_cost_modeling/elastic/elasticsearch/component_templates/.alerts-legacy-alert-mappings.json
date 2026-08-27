@@ -130,7 +130,8 @@
       }
     },
     "_meta": {
-      "managed": true
+      "managed": true,
+      "content_hash": "56b07de34c233986"
     }
   }
 }

@@ -219,10 +219,10 @@ def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
 def _upsert_rule(rule_id: str, body: dict, fail_loud: bool) -> bool:
     r = _kbn("GET", f"{RULE_API}/{rule_id}")
     if r.status_code == 200:
-        # Update payload omits rule_type_id / consumer
+        # Update payload omits rule_type_id / consumer; some rule types reject `enabled` on PUT.
         update = {
             k: body[k]
-            for k in ("name", "tags", "schedule", "params", "actions", "enabled")
+            for k in ("name", "tags", "schedule", "params", "actions")
             if k in body
         }
         r = _kbn("PUT", f"{RULE_API}/{rule_id}", json=update)
@@ -266,6 +266,37 @@ def ensure_budgets(fail_loud: bool = False) -> None:
     print("== FinOps budget ES|QL alerts ==")
     for spec in cfg.get("alerts") or []:
         _upsert_rule(spec["id"], _esql_rule_body(spec, nums), fail_loud)
+
+
+def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> None:
+    """Reset Meridian spend SLOs (recreate transforms + reprocess SLI data).
+
+    Uses POST /api/observability/slos/{id}/_reset. When *slo_ids* is omitted,
+    resets all Meridian SLOs from config plus any flagged outdated in definitions.
+    """
+    cfg = load_budgets()
+    ids = set(slo_ids or [])
+    if not ids:
+        ids = {s["id"] for s in cfg.get("slos") or []}
+        r = _kbn("GET", f"{SLO_API}/_definitions", params={"includeOutdatedOnly": 1})
+        if r.status_code == 200:
+            for spec in r.json().get("results") or []:
+                if spec.get("id"):
+                    ids.add(spec["id"])
+
+    print("== Recover Meridian SLOs (reset) ==")
+    for slo_id in sorted(ids):
+        r = _kbn("POST", f"{SLO_API}/{slo_id}/_reset")
+        if r.status_code >= 300:
+            msg = f"  [fail] SLO reset {slo_id}: {r.status_code} {r.text[:400]}"
+            if fail_loud:
+                raise SystemExit(msg)
+            print(msg.replace("[fail]", "[warn]"))
+            continue
+        summ = (r.json().get("summary") or {})
+        eb = summ.get("errorBudget") or {}
+        status = summ.get("status") or "pending"
+        print(f"  [ok] reset {slo_id} — status={status} eb_remaining={eb.get('remaining')}")
 
 
 def verify_budgets() -> bool:

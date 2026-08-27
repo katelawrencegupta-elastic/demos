@@ -42,7 +42,8 @@
       }
     },
     "_meta": {
-      "managed": true
+      "managed": true,
+      "content_hash": "728b3191cf3ebb89"
     }
   }
 }

@@ -11,8 +11,8 @@
   },
   "tags": [],
   "time_range": {
-    "from": "2026-07-14T00:00:00.000Z",
-    "to": "2026-08-26T00:00:00.000Z"
+    "from": "2026-04-29T22:06:18.000Z",
+    "to": "2026-08-28T22:06:18.000Z"
   },
   "title": "[Meridian] Elastic AI Assistant & inference usage",
   "filters": [],
@@ -27,7 +27,7 @@
       "grid": {
         "y": 0
       },
-      "id": "207ccf06-e0c5-4781-bc71-f1a23b69893d",
+      "id": "a971207c-67dd-456b-93bb-0972b6f7c31b",
       "panels": [
         {
           "grid": {
@@ -39,12 +39,12 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "## Meridian Dynamics — Elastic AI Assistant & inference usage\n\nNative **Agent Builder** OTel traces (`traces-agent_builder.otel-default`) plus **inference token usage** (`logs-elastic.inference_token_usage-default`) for Observability / Security AI Assistant, Agent Builder copilots, Search Playground, Streams, and EIS endpoints (chat, ELSER, e5, rerank).\n\nSame backfill window as the FinOps dashboard. EIS = Elastic Inference Service.",
+            "content": "## Meridian Dynamics — Elastic AI Assistant & inference usage\n\nNative **Agent Builder** OTel traces (`traces-agent_builder.otel-default`) plus **inference token usage** (`logs-elastic.inference_token_usage-default`) for Observability / Security AI Assistant, Agent Builder copilots, Search Playground, Streams, and EIS endpoints (chat, ELSER, e5, rerank).\n\nTime range: **2026-04-29 – 2026-08-28 (computed at publish)**. EIS = Elastic Inference Service.\n\n[FinOps baseline](#/view/meridian-finops-llm-observability) · [FinOps classic](#/view/meridian-finops-llm-observability-classic).",
             "settings": {
               "open_links_in_new_tab": true
             }
           },
-          "id": "d729059d-0131-49fb-a1a6-2bf6e5fd133d",
+          "id": "6b8218c7-62d4-40a1-b0d1-2ed8db907553",
           "type": "markdown"
         },
         {
@@ -86,7 +86,7 @@
               }
             ]
           },
-          "id": "1a56ee5a-20db-4118-976c-f3e3ad2a498e",
+          "id": "9456141e-1ec8-45f7-8cc1-9ec3e9cfbeb3",
           "type": "vis"
         },
         {
@@ -128,7 +128,7 @@
               }
             ]
           },
-          "id": "b9b9d890-bc1a-4e86-8d7e-da5527a016dc",
+          "id": "2c4dbc67-2556-419b-bda9-72ffed96e265",
           "type": "vis"
         },
         {
@@ -170,7 +170,7 @@
               }
             ]
           },
-          "id": "412ca94f-08c8-4623-b0af-e0d67d60fd65",
+          "id": "86c2eb1d-9694-4b7e-8048-400242761485",
           "type": "vis"
         },
         {
@@ -212,7 +212,7 @@
               }
             ]
           },
-          "id": "1213e3c2-3899-4ff2-8fa3-d6cc5bdf475e",
+          "id": "8f820179-f4b7-4703-bd89-bcdfb6c62aa2",
           "type": "vis"
         },
         {
@@ -255,7 +255,7 @@
               }
             ]
           },
-          "id": "61146abd-7f39-4b71-9e25-4f1efc350e1a",
+          "id": "87bf9268-ddf5-4ec5-9c7e-e158ceb638ab",
           "type": "vis"
         },
         {
@@ -303,7 +303,7 @@
               }
             }
           },
-          "id": "82a4cc83-f6e4-4e6c-a4d5-d85c21d13b72",
+          "id": "d5234bc8-371d-4f4c-8742-ce5a638fc0a5",
           "type": "vis"
         },
         {
@@ -418,7 +418,7 @@
               }
             ]
           },
-          "id": "3a5b2ef8-0e9e-46ec-9056-08bcd48915b0",
+          "id": "4d505177-9929-4098-93e1-2a19bb3b46b0",
           "type": "vis"
         },
         {
@@ -534,7 +534,7 @@
               }
             ]
           },
-          "id": "e04e198e-023b-4cd3-abb4-e4482b08d047",
+          "id": "7842d91b-0dd3-4359-bdf8-08d8885461e1",
           "type": "vis"
         }
       ]
@@ -545,7 +545,7 @@
       "grid": {
         "y": 26
       },
-      "id": "f40b1e77-a5db-4a0f-a818-088d4edc5b35",
+      "id": "a430fc10-3eeb-48fc-88d2-02b351c56cd6",
       "panels": [
         {
           "grid": {
@@ -562,7 +562,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "5f87bbd8-13d2-4032-88ca-fbe29bd55884",
+          "id": "5cba344b-2dc0-41fb-9b09-4a4a235fd781",
           "type": "markdown"
         },
         {
@@ -621,7 +621,7 @@
               }
             ]
           },
-          "id": "ffa32fd3-c297-442d-b577-a52181ab61fe",
+          "id": "57da940d-8255-4b51-a349-e1bd70aebc55",
           "type": "vis"
         },
         {
@@ -728,7 +728,7 @@
               }
             ]
           },
-          "id": "ce987898-b31c-41c2-bfdf-6d50583b58c0",
+          "id": "c3371912-2a44-4f58-b233-440890437643",
           "type": "vis"
         },
         {
@@ -799,7 +799,7 @@
               }
             ]
           },
-          "id": "5a5e7894-bb1f-47ba-8a9f-fcd24d9313b0",
+          "id": "d06a7c35-2b7b-4c53-9030-6859f3a6efb1",
           "type": "vis"
         },
         {
@@ -855,7 +855,7 @@
               }
             ]
           },
-          "id": "efed2541-a469-42d4-a602-559a25fe2a6d",
+          "id": "21ac7885-da36-4ff8-99d3-5fe5f4eeb767",
           "type": "vis"
         },
         {
@@ -971,7 +971,7 @@
               }
             ]
           },
-          "id": "74535134-a7d2-486e-8091-18b35ee55f2d",
+          "id": "f811aef3-ea56-4d0b-88bd-bc09585bd2c8",
           "type": "vis"
         },
         {
@@ -1078,7 +1078,7 @@
               }
             ]
           },
-          "id": "4f92b1a3-e801-412c-89e4-d342a6df5118",
+          "id": "46968f1d-d0ee-4d3c-b534-b790e5eb8b81",
           "type": "vis"
         },
         {
@@ -1126,7 +1126,7 @@
               }
             }
           },
-          "id": "0ae2caf5-6c52-4850-9022-80115c0fb0da",
+          "id": "7cfb7f00-1c09-419d-9760-a4c2f5e92ff3",
           "type": "vis"
         },
         {
@@ -1182,7 +1182,7 @@
               }
             ]
           },
-          "id": "5af995c2-c4ad-47d7-8ac5-af8a251d0ad5",
+          "id": "2e1cc23d-386c-46c4-a320-cada66764526",
           "type": "vis"
         },
         {
@@ -1238,7 +1238,7 @@
               }
             ]
           },
-          "id": "f3e46b3d-1bc5-4a89-8e1d-5eeb2d515f1c",
+          "id": "0d4049ea-a5d9-4697-97c2-aed5bdb90e73",
           "type": "vis"
         }
       ]
@@ -1249,7 +1249,7 @@
       "grid": {
         "y": 80
       },
-      "id": "719f7561-3fa5-4f68-b58a-0fb9b7952d64",
+      "id": "167ae97c-4d1e-4479-b68c-3f62256c76dc",
       "panels": [
         {
           "grid": {
@@ -1266,7 +1266,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "23f0b5bc-1830-4f4c-9a31-6086b19767ab",
+          "id": "6a3cdc37-8b92-42d4-897c-6ce97c042382",
           "type": "markdown"
         },
         {
@@ -1316,7 +1316,7 @@
               }
             ]
           },
-          "id": "bb958058-a361-48c3-b724-d1908605d0e3",
+          "id": "c6aeae83-e6ae-4eff-a847-ef7439efbce3",
           "type": "vis"
         },
         {
@@ -1432,7 +1432,7 @@
               }
             ]
           },
-          "id": "b54e4eda-30c2-4543-b921-dfbc546cca8a",
+          "id": "1fce7825-b1ad-400d-ae9b-55697484ee10",
           "type": "vis"
         },
         {
@@ -1539,7 +1539,7 @@
               }
             ]
           },
-          "id": "002524d4-0f57-490d-973e-16d5cc3342f9",
+          "id": "7bd8a1ce-f333-46e9-994b-fc432649f73b",
           "type": "vis"
         },
         {
@@ -1646,7 +1646,7 @@
               }
             ]
           },
-          "id": "ba27f958-5e9c-4ab9-880c-590d88d614dc",
+          "id": "c8efd3a6-a805-4f6f-9978-231b6726f152",
           "type": "vis"
         },
         {
@@ -1705,7 +1705,7 @@
               }
             ]
           },
-          "id": "c928928a-cafe-4bab-9620-f14c99722b98",
+          "id": "47144bcb-dd9f-4e05-947c-a430fe3041bb",
           "type": "vis"
         },
         {
@@ -1755,7 +1755,7 @@
               }
             ]
           },
-          "id": "5d6bf2a6-af55-49df-a276-3b5c9122e0b7",
+          "id": "ff167926-99b9-4b39-af12-1fa0db2bcb92",
           "type": "vis"
         },
         {
@@ -1836,7 +1836,7 @@
               }
             ]
           },
-          "id": "98e41527-be6a-4e58-930c-4043296fba1a",
+          "id": "bb88f480-8442-4533-ac44-076547ba8a46",
           "type": "vis"
         },
         {
@@ -1958,7 +1958,7 @@
               }
             ]
           },
-          "id": "cb98443a-91fe-4f3e-801c-4bbe2ab014e6",
+          "id": "9c6c1e96-fea1-4bdf-8800-50a287e50fd3",
           "type": "vis"
         }
       ]
@@ -1969,7 +1969,7 @@
       "grid": {
         "y": 146
       },
-      "id": "8b8861a8-241a-40db-b903-a8a53aa4a3fa",
+      "id": "f77691ae-420f-4b43-86f9-3a86fa0ae5a9",
       "panels": [
         {
           "grid": {
@@ -1986,7 +1986,7 @@
               "open_links_in_new_tab": true
             }
           },
-          "id": "437adde9-2188-4bfa-960b-4a7c9739060e",
+          "id": "d4e55505-1bba-41c8-854f-f85a0de4380b",
           "type": "markdown"
         },
         {
@@ -2000,7 +2000,7 @@
             "title": "Meridian FinOps family",
             "links": [
               {
-                "label": "FinOps & LLM Observability",
+                "label": "FinOps & LLM Observability (baseline)",
                 "type": "dashboardLink",
                 "destination": "meridian-finops-llm-observability",
                 "options": {
@@ -2010,7 +2010,17 @@
                 }
               },
               {
-                "label": "FinOps & LLM — dynamic",
+                "label": "FinOps & LLM — classic",
+                "type": "dashboardLink",
+                "destination": "meridian-finops-llm-observability-classic",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "FinOps & LLM — dynamic alias",
                 "type": "dashboardLink",
                 "destination": "meridian-finops-llm-observability-dynamic",
                 "options": {
@@ -2028,10 +2038,20 @@
                   "use_time_range": true,
                   "open_in_new_tab": true
                 }
+              },
+              {
+                "label": "[Elastic] Inference Token Usage",
+                "type": "dashboardLink",
+                "destination": "kibana-inference-token-usage",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
               }
             ]
           },
-          "id": "e774ba72-bac4-4ab2-8183-9e7fd8951881",
+          "id": "052da657-132a-4430-ab55-4f99a751ac4b",
           "type": "links"
         }
       ]

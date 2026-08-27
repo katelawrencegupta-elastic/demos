@@ -1,0 +1,24 @@
+{
+  "id": "meridian-finops-gcp-ml-burn",
+  "type": "esql",
+  "description": "GCP billing for meridian-ml-prod over the last N days. Use for ML platform burn or Vertex/GCE cost spike scenarios.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND gcp.billing.project_name == \"meridian-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| EVAL lookback_days = ?days::integer\n| EVAL alert_floor_usd = 4000\n| EVAL over_alert_floor = spend > alert_floor_usd",
+    "params": {
+      "days": {
+        "type": "integer",
+        "description": "Lookback window in days (7 recommended)"
+      }
+    }
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

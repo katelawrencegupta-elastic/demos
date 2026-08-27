@@ -1,0 +1,66 @@
+{
+  "id": "meridian-alert-gcp-ml-burn",
+  "enabled": true,
+  "name": "[Meridian] ML platform GCP project burn",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "rule_type_id": ".es-query",
+  "consumer": "stackAlerts",
+  "schedule": {
+    "interval": "1h"
+  },
+  "actions": [],
+  "params": {
+    "searchType": "esqlQuery",
+    "timeWindowSize": 7,
+    "timeWindowUnit": "d",
+    "threshold": [
+      0
+    ],
+    "thresholdComparator": ">",
+    "size": 10,
+    "esqlQuery": {
+      "esql": "FROM metrics-gcp.billing-default\n| WHERE gcp.billing.project_name == \"meridian-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| WHERE spend > 4000"
+    },
+    "aggType": "count",
+    "groupBy": "all",
+    "termSize": 5,
+    "sourceFields": [],
+    "timeField": "@timestamp",
+    "excludeHitsFromPreviousRun": true
+  },
+  "scheduled_task_id": "meridian-alert-gcp-ml-burn",
+  "created_by": "719348788",
+  "updated_by": "719348788",
+  "created_at": "2026-08-27T20:14:35.879Z",
+  "updated_at": "2026-08-27T20:14:35.879Z",
+  "api_key_owner": "719348788",
+  "api_key_created_by_user": true,
+  "throttle": null,
+  "mute_all": false,
+  "notify_when": null,
+  "muted_alert_ids": [],
+  "execution_status": {
+    "status": "active",
+    "last_execution_date": "2026-08-27T21:14:40.366Z",
+    "last_duration": 420
+  },
+  "last_run": {
+    "outcome": "succeeded",
+    "outcome_order": 0,
+    "warning": null,
+    "outcome_msg": null,
+    "alerts_count": {
+      "new": 0,
+      "ignored": 0,
+      "recovered": 0,
+      "active": 1
+    }
+  },
+  "next_run": "2026-08-27T22:14:40.035Z",
+  "revision": 0,
+  "running": false
+}

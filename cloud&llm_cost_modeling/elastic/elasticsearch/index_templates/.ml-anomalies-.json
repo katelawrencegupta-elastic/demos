@@ -10,7 +10,6 @@
       "settings": {
         "index": {
           "hidden": "true",
-          "auto_expand_replicas": "0-1",
           "query": {
             "default_field": "all_field_values"
           }

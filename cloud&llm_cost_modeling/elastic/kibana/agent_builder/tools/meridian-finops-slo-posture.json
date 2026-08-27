@@ -1,0 +1,19 @@
+{
+  "id": "meridian-finops-slo-posture",
+  "type": "esql",
+  "description": "Current Meridian spend SLO posture: error budget remaining and consumed. errorBudgetRemaining < 0 means violated. Use for SLO health questions.",
+  "tags": [
+    "meridian",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM .slo-observability.summary-v3.6\n| WHERE slo.id LIKE \"meridian-*\"\n| KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp\n| EVAL violated = errorBudgetRemaining < 0\n| SORT slo.name",
+    "params": {}
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

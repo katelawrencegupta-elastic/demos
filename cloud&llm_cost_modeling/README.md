@@ -67,10 +67,19 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
+.venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
+.venv/bin/python -m src.cli agent               # Meridian FinOps AI Assistant (Agent Builder)
 .venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
 .venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
 .venv/bin/python -m src.cli dashboards --variant classic    # legacy layout (+ security→cost)
 .venv/bin/python -m src.cli dashboards --variant ai-assistant
+```
+
+**FinOps dashboard IDs:** `meridian-finops-llm-observability` (baseline — stacked bars/areas),
+`meridian-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
+`meridian-finops-llm-observability-classic` (legacy treemaps/tables).
+
+```bash
 .venv/bin/python -m src.cli backup     # snapshot Kibana/Fleet/ES objects → ./elastic
 ```
 
@@ -99,6 +108,30 @@ breached SLOs / Active alerts without waiting for a new incident. FinOps
 dashboards include a **Budget posture** section with the same ceilings and deep
 links to Observability SLOs / Alerts.
 
+## Meridian FinOps AI Assistant
+
+`cli agent` (also run at the end of `setup`) provisions **Meridian FinOps AI
+Assistant** in Elastic Agent Builder: seven custom ES|QL tools plus a public chat
+agent grounded in the seeded billing, SLO, and alert data.
+
+| Command | Purpose |
+|---|---|
+| `python -m src.cli agent` | Upsert tools + agent |
+| `python -m src.cli verify` | Checks tools, agent, and prints chat URL |
+
+**Chat:** `{KIBANA_URL}/app/agent_builder/chat` (select agent `meridian-finops-ai-assistant`).
+
+Definitions live in [`config/finops_agent.yaml`](config/finops_agent.yaml). FinOps
+dashboards include an **Open in Agent Builder** link in the Budget posture section.
+
+**Workshop prompts** (after backfill + `budgets` + `agent`):
+
+1. *How much AWS spend in the last 30 days vs our monthly budget?*
+2. *Which AWS accounts drive the most spend this week?*
+3. *Is meridian-staging still leaking cost?*
+4. *Which LLM apps burned the most in the last 7 days?*
+5. *What's our multi-cloud spend mix and are any spend SLOs violated?*
+
 ## LLM factories
 
 Factories emit into **native Elastic LLM integration data streams** (same shapes
@@ -126,7 +159,8 @@ Notes:
 
 - `setup` installs cloud + LLM packages, creates APM gen_ai mappings + 180d
   retention, wires CUR alias / inference data-view Serverless workarounds,
-  provisions FinOps spend SLOs + budget alerts, and removes TSDS mode from
+  provisions FinOps spend SLOs + budget alerts, provisions the Meridian FinOps AI
+  Assistant, and removes TSDS mode from
   `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
   metric backfill is accepted.
 - Generation is seeded and windows are pure functions of time, so backfill
@@ -146,10 +180,12 @@ src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs + ES|QL budget alert provisioning
-src/cli.py                 # setup | sample | backfill | stream | verify | budgets | dashboards | backup
-src/dashboards.py          # Kibana FinOps + LLM observability dashboards
+src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)
+src/cli.py                 # setup | sample | backfill | stream | verify | budgets | agent | dashboards | backup
+src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic
 ```
 
 Also: `config/budgets.yaml` — spend ceilings and alert floors for workshop demos.
+Also: `config/finops_agent.yaml` — Agent Builder agent + ES|QL tool definitions.
