@@ -83,6 +83,7 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
 .venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
 .venv/bin/python -m src.cli agent                # Meridian FinOps AI Assistant (Agent Builder)
+.venv/bin/python -m src.cli reindex-elastic-ai   # wipe + re-backfill Agent Builder / inference traces
 .venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
 .venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
 .venv/bin/python -m src.cli dashboards --variant classic    # legacy layout (+ security→cost)
@@ -103,6 +104,17 @@ OOTB Usage panels without redoing completions/embeddings).
 **Dashboard time ranges** are computed at publish from `utcnow()` (same clock as
 backfill; default window is **120 days** via [`src/time_window.py`](src/time_window.py)).
 After a fresh backfill, re-run `dashboards` so stored windows match.
+
+### Pre-session checklist (~10 min)
+
+```bash
+.venv/bin/python -m src.cli reindex-elastic-ai   # align Agent Builder trace agent IDs
+.venv/bin/python -m src.cli verify --scope all
+.venv/bin/python -m src.cli dashboards --variant all   # refresh 120d time window if needed
+```
+
+Spot-check in Kibana: **SLOs** (3 violated), **Observability Alerts**, and one
+**Agent Builder** prompt (*"Which LLM apps burned the most in the last 7 days?"*).
 
 ## Budget SLOs & alerts
 
@@ -162,8 +174,11 @@ Definitions live in [`config/finops_agent.yaml`](config/finops_agent.yaml). Tool
 use parameterized lookbacks (`?days` integer) with
 `TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))` — do not use `?days * 1 day` (invalid ES\|QL).
 
-Synthetic Agent Builder traces include `meridian-finops-ai-assistant` calling these tool IDs
-(`backfill --scope elastic-ai`).
+Synthetic Agent Builder traces use agent id **`meridian-finops-ai-assistant`**
+and FinOps ES|QL tool names. After renaming the agent, run
+`python -m src.cli reindex-elastic-ai` (wipes non-`custom-*` Agent Builder traces
+and `tags:synthetic` inference usage, then re-backfills 120 days). `verify` fails
+if legacy `finops-copilot` traces remain.
 
 **Workshop prompts** (after backfill + `budgets` + `agent`):
 
@@ -222,7 +237,8 @@ src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
 src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)
-src/cli.py                 # setup | sample | backfill | stream | verify | budgets | recover-slos | agent | dashboards | backup
+src/elastic_ai_reindex.py  # wipe + re-backfill Agent Builder / inference synthetic data
+src/cli.py                 # setup | … | reindex-elastic-ai | agent | dashboards | backup
 src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic

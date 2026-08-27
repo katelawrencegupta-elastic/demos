@@ -399,8 +399,12 @@ def cmd_verify(scope: str):
                      for b in r["aggregations"]["kinds"]["buckets"]}
             agents = {b["key"]: b["doc_count"]
                       for b in r["aggregations"]["agents"]["buckets"]}
-            print(f"  Agent Builder traces: {r['hits']['total']['value']:,}  "
+            total = r["hits"]["total"]["value"]
+            print(f"  Agent Builder traces: {total:,}  "
                   f"kinds={kinds}  agents={agents}")
+            from src.elastic_ai_reindex import verify_finops_agent_traces
+            if not verify_finops_agent_traces(agents, total):
+                failed = True
         except requests.HTTPError as e:
             print(f"  Agent Builder traces: FAIL {e}")
             failed = True
@@ -493,6 +497,16 @@ def main():
         "agent",
         help="provision Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)",
     )
+    ri = sub.add_parser(
+        "reindex-elastic-ai",
+        help="wipe synthetic Agent Builder + inference usage docs, re-backfill elastic-ai",
+    )
+    ri.add_argument("--days", type=int, default=120)
+    ri.add_argument(
+        "--all",
+        action="store_true",
+        help="delete all docs in elastic-ai streams (default: synthetic / non-custom traces)",
+    )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     args = p.parse_args()
 
@@ -525,6 +539,9 @@ def main():
     elif args.cmd == "agent":
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=True)
+    elif args.cmd == "reindex-elastic-ai":
+        from src.elastic_ai_reindex import reindex_elastic_ai
+        reindex_elastic_ai(args.days, all_docs=args.all)
     elif args.cmd == "backup":
         from src.backup import run as backup_run
         backup_run()
