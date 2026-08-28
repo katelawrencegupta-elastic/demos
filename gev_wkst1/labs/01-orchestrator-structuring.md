@@ -1,4 +1,4 @@
-# Lab 01 — Orchestrator log structuring
+# Lab 01 — Orchestrator log structuring (U1)
 
 **Goal:** Prove the grok pipeline turns free-text Airflow lines into `tenant.id` + `trace.id`.
 

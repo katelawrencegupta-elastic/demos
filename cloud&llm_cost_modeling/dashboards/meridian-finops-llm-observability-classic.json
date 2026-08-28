@@ -39,7 +39,7 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.\n\nElastic AI Assistant / Agent Builder usage and the managed inference token dashboard are linked at right.",
+            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`ess_billing`, `aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis Meridian dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.\n\nElastic AI Assistant / Agent Builder usage and the managed inference token dashboard are linked at right.",
             "settings": {
               "open_links_in_new_tab": true
             }
@@ -92,6 +92,26 @@
           "config": {
             "title": "Provider FinOps & LLM packs",
             "links": [
+              {
+                "label": "[Metrics ESS Billing] Billing dashboard",
+                "type": "dashboardLink",
+                "destination": "ess_billing-billingdashboard",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "[Metrics ESS Billing] Credits dashboard",
+                "type": "dashboardLink",
+                "destination": "ess_billing-creditsdashboard",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
               {
                 "label": "AWS CUR — current month",
                 "type": "dashboardLink",

@@ -1,8 +1,25 @@
 {
   "template": {
     "mappings": {
+      "dynamic_templates": [
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
       "properties": {
+        "@timestamp": { "type": "date" },
+        "event.dataset": { "type": "keyword" },
+        "event.kind": { "type": "keyword" },
+        "event.type": { "type": "keyword" },
+        "service.name": { "type": "keyword" },
+        "service.version": { "type": "keyword" },
+        "host.name": { "type": "keyword" },
+        "host.hostname": { "type": "keyword" },
         "kubernetes.pod.name": { "type": "keyword" },
+        "kubernetes.pod.uid": { "type": "keyword" },
         "kubernetes.namespace": { "type": "keyword" },
         "kubernetes.event.reason": { "type": "keyword" },
         "kubernetes.event.message": { "type": "text" },

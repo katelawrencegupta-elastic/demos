@@ -1,0 +1,455 @@
+{
+  "title": "Elastic Co. \u2014 EKS Restarts",
+  "description": "Monitor checkout-api pod restarts on eks-elastic-prod-usc1: restart count, OOMKilled/BackOff events, and memory vs limit.",
+  "time_range": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "options": {
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_cursor": true,
+    "sync_tooltips": true,
+    "hide_panel_titles": false
+  },
+  "query": {
+    "expression": "labels.demo: elastic-co",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 4
+      },
+      "type": "markdown",
+      "config": {
+        "content": "## Elastic Co. \u2014 EKS restart monitor\n\nCluster **eks-elastic-prod-usc1** \u00b7 Deployment **checkout-api** \u00b7 `labels.demo: elastic-co`. Restarts are the symptom; **OOMKilled** + **v2.4.1** / `CartCache.retainAll` is the reason. Time range **Last 6 hours**.",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "OOMKilled events",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason == \"OOMKilled\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "k8s Warning",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "BackOff events",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason == \"BackOff\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "restart loop",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Max pod restarts",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS max_restarts = MAX(kubernetes.pod.restart.count)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "max_restarts",
+            "subtitle": "checkout-api"
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "gauge",
+        "title": "Memory vs limit",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS mem_pct = MAX(kubernetes.pod.memory.usage.limit.pct)\n| EVAL min = 0.0, max = 1.0, goal = 0.80"
+        },
+        "metric": {
+          "column": "mem_pct",
+          "ticks": {
+            "visible": true,
+            "mode": "bands"
+          },
+          "subtitle": "peak \u00b7 goal 80%",
+          "min": {
+            "column": "min"
+          },
+          "max": {
+            "column": "max"
+          },
+          "goal": {
+            "column": "goal"
+          }
+        },
+        "styling": {
+          "shape": {
+            "type": "arc"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Checkout-api memory vs limit (MiB)",
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS rss_mib = AVG(kubernetes.pod.memory.usage.bytes) / 1024 / 1024, limit_mib = MAX(kubernetes.pod.memory.limit.bytes) / 1024 / 1024 BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "rss_mib"
+              },
+              {
+                "column": "limit_mib"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 11,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Restart count by pod",
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS restarts = MAX(kubernetes.pod.restart.count) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), kubernetes.pod.name\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "restarts"
+              }
+            ],
+            "breakdown_by": {
+              "column": "kubernetes.pod.name"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 25,
+        "w": 32,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "OOMKilled / BackOff over time",
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason IN (\"OOMKilled\", \"BackOff\")\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), kubernetes.event.reason\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "kubernetes.event.reason"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 32,
+        "y": 25,
+        "w": 16,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "pie",
+        "title": "K8s event reasons",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason IS NOT NULL\n| STATS count = COUNT(*) BY kubernetes.event.reason"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "kubernetes.event.reason"
+          }
+        ],
+        "styling": {
+          "donut_hole": "m",
+          "labels": {
+            "visible": true,
+            "position": "inside"
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 39,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Restarts by checkout-api pod",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"checkout-api\"\n| STATS restarts = MAX(kubernetes.pod.restart.count), mem_pct = MAX(kubernetes.pod.memory.usage.limit.pct) BY kubernetes.pod.name\n| SORT restarts DESC"
+            },
+            "x": {
+              "column": "kubernetes.pod.name"
+            },
+            "y": [
+              {
+                "column": "restarts"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 39,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "OOM / BackOff events by pod",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.k8s.event-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason IN (\"OOMKilled\", \"BackOff\")\n| STATS events = COUNT(*) BY kubernetes.pod.name, kubernetes.event.reason, service.version\n| SORT events DESC"
+            },
+            "x": {
+              "column": "kubernetes.pod.name"
+            },
+            "y": [
+              {
+                "column": "events"
+              }
+            ],
+            "breakdown_by": {
+              "column": "kubernetes.event.reason"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}

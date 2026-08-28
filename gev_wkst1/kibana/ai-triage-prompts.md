@@ -35,11 +35,38 @@ Planted root cause the assistant should approximate:
 
 ## Knowledge-base note (optional lab)
 
-Add to Observability AI knowledge base:
+Add to Observability AI knowledge base — full runbook: [knowledge-base-checkout-oom.md](knowledge-base-checkout-oom.md)
 
+---
+
+# U5 — Application monitoring + RCA agent (automated incident response)
+
+Use after **`elasticco-app-checkout-error-rate`** fires, or run the CLI agent directly.
+
+## RCA agent prompt (Observability AI Assistant)
+
+> checkout-api is failing for tenant acme-retail. Using `labels.demo: elastic-co`, build an incident timeline for the last 2 hours. Correlate APM error rate on checkout-api, OOMKilled events, OutOfMemoryError logs, slow postgres spans, and orchestrator retries. Recommend a single remediation step and draft an email summary for kate.lawrencegupta@elastic.co with: incident id, root cause, blast radius, evidence bullets, and remediation actions taken.
+
+## CLI agent (automated workflow)
+
+```bash
+# Human approval
+python -m src.cli incident --email kate.lawrencegupta@elastic.co
+
+# Automatic remediation + Kibana case + email
+python -m src.cli incident --auto --email kate.lawrencegupta@elastic.co
 ```
-Elastic Co. runbook — checkout-api OOM
-If OOMKilled on checkout-api after a deploy, check service.version.
-v2.4.1 introduced CartCache.retainAll leak; roll back to 2.4.0.
-Correlate orchestrator DAG fulfillment.checkout retries with postgres FOR UPDATE spans by trace.id / tenant.id.
-```
+
+## Expected RCA
+
+Same planted root cause as U4, framed as an application monitoring incident:
+
+1. Alert: checkout-api error rate > 10%
+2. Agent correlates OOM + deploy v2.4.1 + DB lock contention
+3. Remediation: rollback to v2.4.0 (human-approved or `--auto`)
+4. Email summary to kate.lawrencegupta@elastic.co
+
+## Facilitator key — approval flow
+
+- **Manual:** pause for `Approve remediation? [y/N]` — good for customer demos showing human-in-the-loop
+- **Auto:** `--auto` flag — good for closing the loop quickly at end of session

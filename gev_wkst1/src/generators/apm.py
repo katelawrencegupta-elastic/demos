@@ -48,6 +48,9 @@ APM_PROPERTIES = {
     "span.destination.service.resource": {"type": "keyword"},
     "span.destination.service.type": {"type": "keyword"},
     "span.destination.service.name": {"type": "keyword"},
+    "destination.service.resource": {"type": "keyword"},
+    "destination.service.type": {"type": "keyword"},
+    "destination.service.name": {"type": "keyword"},
     "service.target.type": {"type": "keyword"},
     "service.target.name": {"type": "keyword"},
     "messaging.destination.name": {"type": "keyword"},
@@ -209,15 +212,16 @@ def _span(
         "action": subtype,
         "duration": {"us": duration_us},
     }
+    dest_root = None
     if dest:
-        # Critical for Elastic service map / dependencies table
-        span_body["destination"] = {
-            "service": {
-                "resource": dest,
-                "type": span_type,
-                "name": dest,
-            }
+        dest_svc = {
+            "resource": dest,
+            "type": span_type,
+            "name": dest,
         }
+        # Service map uses span.destination.*; ES|QL dashboards query destination.*
+        span_body["destination"] = {"service": dest_svc}
+        dest_root = {"service": dest_svc}
     if db:
         span_body["db"] = db
 
@@ -251,6 +255,8 @@ def _span(
         "labels": {**base_labels(), "tenant.id": tenant, "order.id": order},
         "tags": ["synthetic", "elasticco", "distributed"],
     }
+    if dest_root:
+        doc["destination"] = dest_root
     if messaging_dest:
         doc["messaging"] = {"destination": {"name": messaging_dest}}
     return doc
@@ -662,19 +668,32 @@ def emit(world: World, t0, t1, anchor):
         if t0 <= h.ts < t1:
             yield from _emit_checkout_trace(world, h, bad_ver, slow=True)
 
-    # Denser background traffic so service map stays busy
-    step = timedelta(minutes=2)
+    # One trace per tenant every 20s so treemaps, heatmaps, and time series fill.
+    # Blast tenant gets extra traces during the incident (slow DB + failures).
+    step = timedelta(seconds=20)
     cur = t0
+    seq = 0
     while cur < t1:
-        tenant = rng.choice(world.tenants)
-        slow = in_incident(cur, start, end) and tenant.get("blast") and rng.random() < 0.45
-        version = bad_ver if in_incident(cur, start, end) else good_ver
-        h = HeroTrace(
-            trace_id=stable_hex("bgapm", f"{cur.isoformat()}:{tenant['id']}", 32),
-            tenant_id=tenant["id"],
-            ts=cur,
-            order_id=f"ord-{stable_hex('bgord', cur.isoformat() + tenant['id'], 8)}",
-            slow_db=slow,
-        )
-        yield from _emit_checkout_trace(world, h, version, slow=slow)
+        incident = in_incident(cur, start, end)
+        version = bad_ver if incident else good_ver
+        for tenant in world.tenants:
+            copies = 3 if (incident and tenant.get("blast")) else 1
+            for k in range(copies):
+                slow = bool(
+                    incident and tenant.get("blast") and rng.random() < (0.6 if k else 0.4)
+                )
+                jitter_ms = rng.randint(0, 12_000) + k * 250
+                ts = cur + timedelta(milliseconds=jitter_ms)
+                if ts >= t1:
+                    continue
+                key = f"{cur.isoformat()}:{tenant['id']}:{k}:{seq}"
+                h = HeroTrace(
+                    trace_id=stable_hex("bgapm", key, 32),
+                    tenant_id=tenant["id"],
+                    ts=ts,
+                    order_id=f"ord-{stable_hex('bgord', key, 8)}",
+                    slow_db=slow,
+                )
+                yield from _emit_checkout_trace(world, h, version, slow=slow)
+                seq += 1
         cur += step

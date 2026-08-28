@@ -1,0 +1,42 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "event.dataset": { "type": "keyword" },
+        "event.module": { "type": "keyword" },
+        "metricset.name": { "type": "keyword" },
+        "labels.demo": { "type": "keyword" },
+        "host.name": { "type": "keyword" },
+        "host.hostname": { "type": "keyword" },
+        "host.id": { "type": "keyword" },
+        "cloud.provider": { "type": "keyword" },
+        "cloud.region": { "type": "keyword" },
+        "cloud.availability_zone": { "type": "keyword" },
+        "cloud.instance.id": { "type": "keyword" },
+        "orchestrator.cluster.name": { "type": "keyword" },
+        "kubernetes.node.name": { "type": "keyword" },
+        "kubernetes.node.cpu.usage.nanocores": { "type": "long" },
+        "kubernetes.node.cpu.usage.pct": { "type": "double" },
+        "kubernetes.node.cpu.capacity.cores": { "type": "long" },
+        "kubernetes.node.memory.usage.bytes": { "type": "long" },
+        "kubernetes.node.memory.usage.pct": { "type": "double" },
+        "kubernetes.node.memory.available.bytes": { "type": "long" },
+        "kubernetes.node.memory.capacity.bytes": { "type": "long" },
+        "kubernetes.node.fs.used.bytes": { "type": "long" },
+        "kubernetes.node.fs.capacity.bytes": { "type": "long" },
+        "kubernetes.node.pod.count": { "type": "long" }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

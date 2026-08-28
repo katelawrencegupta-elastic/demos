@@ -1,4 +1,4 @@
-# Lab 02 — Tenant traces and DB deep dive
+# Lab 02 — Tenant traces and DB deep dive (U2)
 
 **Goal:** Compare blast vs healthy tenants and inspect a slow Postgres span.
 

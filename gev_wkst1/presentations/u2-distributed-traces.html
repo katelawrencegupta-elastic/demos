@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U2 · Distributed Traces — Elastic Stack</title>
+  <style>
+    :root {
+      --bg: #0b0d0e;
+      --surface: #141619;
+      --surface-2: #1c1f24;
+      --border: #2a2f36;
+      --text: #e4e8ef;
+      --muted: #9aa3b2;
+      --accent: #00bfb3;
+      --accent-dim: rgba(0, 191, 179, 0.12);
+      --warn: #f5a524;
+      --success: #32d583;
+      --danger: #f97066;
+      --font: "Inter", "Segoe UI", system-ui, sans-serif;
+      --mono: "SF Mono", "Fira Code", "Consolas", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.55rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.82rem; display: flex; align-items: center; gap: 0.5rem;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: rgba(0,191,179,0.35); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+
+    .controls {
+      display: flex; flex-direction: column; gap: 0.45rem;
+      border-top: 1px solid var(--border); padding-top: 0.85rem;
+    }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: rgba(0,191,179,0.4); color: var(--accent); }
+
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+
+    .slide-header { margin-bottom: 1.5rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 52rem; line-height: 1.55; margin: 0; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+      font-size: 0.88rem; font-weight: 600;
+    }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(245,165,36,0.35); }
+    .badge.ok { color: var(--success); border-color: rgba(50,213,131,0.35); }
+    .badge.info { color: var(--accent); border-color: rgba(0,191,179,0.35); }
+    .badge.danger { color: var(--danger); border-color: rgba(249,112,102,0.35); }
+    .card-body { padding: 1rem; }
+
+    .flow-wrap { width: 100%; overflow-x: auto; }
+    .flow-node { cursor: pointer; }
+    .flow-node:hover rect { stroke: var(--accent); }
+    .flow-node.selected rect { stroke: var(--accent); stroke-width: 2; fill: var(--accent-dim); }
+    .flow-node.hot rect { stroke: var(--danger); fill: rgba(249,112,102,0.1); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: none; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: var(--surface-2); }
+    tr.clickable.selected td { background: var(--accent-dim); }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: #c9d4e3; }
+
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 8px;
+      font-family: var(--mono); font-size: 0.74rem; line-height: 1.55;
+      overflow-x: auto; white-space: pre-wrap;
+    }
+    .hl { color: var(--accent); }
+    .hl-warn { color: var(--warn); }
+    .hl-danger { color: var(--danger); }
+    .hl-ok { color: var(--success); }
+
+    .stat-grid { display: grid; gap: 0.65rem; }
+    .stat {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.75rem 0.85rem;
+    }
+    .stat label {
+      display: block; font-size: 0.68rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;
+    }
+    .stat span { font-family: var(--mono); font-size: 0.78rem; word-break: break-all; }
+
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .callout.success { border-color: var(--success); background: rgba(50,213,131,0.08); }
+    .callout.warn { border-color: var(--warn); background: rgba(245,165,36,0.08); }
+
+    .pipeline-controls {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; align-items: center;
+    }
+    .pipeline-controls .progress {
+      flex: 1; min-width: 140px; height: 6px; background: var(--surface-2);
+      border-radius: 999px; overflow: hidden;
+    }
+    .pipeline-controls .progress > span {
+      display: block; height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease;
+    }
+
+    .step-list { display: grid; gap: 0.35rem; }
+    .step-item {
+      display: grid; grid-template-columns: 2rem 7rem 1fr; gap: 0.65rem;
+      padding: 0.55rem 0.65rem; border-radius: 8px; border: 1px solid transparent;
+      font-size: 0.8rem; align-items: start;
+    }
+    .step-item.done { opacity: 0.55; }
+    .step-item.active { border-color: rgba(0,191,179,0.45); background: var(--accent-dim); }
+    .step-item.hot { border-color: rgba(249,112,102,0.45); background: rgba(249,112,102,0.08); }
+    .step-item .num { color: var(--muted); font-family: var(--mono); }
+    .step-item .svc { color: var(--accent); font-weight: 600; font-family: var(--mono); font-size: 0.74rem; }
+
+    .detail-panel {
+      margin-top: 1rem; padding: 0.85rem 1rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 10px; min-height: 4.5rem;
+    }
+    .detail-panel h4 { margin: 0 0 0.35rem; font-size: 0.85rem; }
+    .detail-panel p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: rgba(11,13,14,0.92);
+      border-top: 1px solid var(--border); backdrop-filter: blur(8px);
+    }
+    @media (max-width: 960px) { .toolbar { left: 0; } }
+
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button {
+      width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0;
+      background: var(--border); cursor: pointer;
+    }
+    .dots button.active { background: var(--accent); }
+
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;
+    }
+    .hero-stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem;
+    }
+    .hero-stat .num { font-size: 1.75rem; font-weight: 700; color: var(--accent); }
+    .hero-stat .lbl { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .filter-input {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 0.55rem 0.75rem;
+      font: inherit; font-size: 0.82rem; margin-bottom: 0.75rem;
+    }
+    .filter-input:focus { outline: none; border-color: var(--accent); }
+
+    .bar-chart { display: grid; gap: 0.65rem; }
+    .bar-row { display: grid; grid-template-columns: 7rem 1fr 3.5rem; gap: 0.65rem; align-items: center; font-size: 0.82rem; }
+    .bar-track { height: 22px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .bar-fill.accent { background: var(--accent); }
+    .bar-fill.danger { background: var(--danger); }
+    .bar-fill.ok { background: var(--success); }
+    .bar-val { text-align: right; font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+
+    .waterfall { display: grid; gap: 0.35rem; }
+    .wf-row {
+      display: grid; grid-template-columns: 8rem 1fr 4rem;
+      gap: 0.5rem; align-items: center; font-size: 0.78rem;
+    }
+    .wf-bar-wrap { height: 18px; background: var(--surface-2); border-radius: 3px; position: relative; }
+    .wf-bar {
+      position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px;
+      background: var(--accent); transition: width 0.4s ease, background 0.3s;
+    }
+    .wf-bar.slow { background: var(--danger); }
+    .wf-bar.mid { background: var(--warn); }
+
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Observability</div>
+      <h1>U2 · Distributed traces</h1>
+      <p>End-to-end APM waterfall, tenant context, and Postgres deep dive.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlayTrace">▶ Walk the waterfall</button>
+        <button id="btnFullscreen">Fullscreen</button>
+        <button id="btnCopyEsql">Copy ES|QL query</button>
+      </div>
+      <p style="font-size:0.72rem;color:var(--muted);margin:0;">
+        <kbd>←</kbd> <kbd>→</kbd> navigate · <kbd>F</kbd> fullscreen
+      </p>
+    </aside>
+
+    <main>
+      <div class="slides" id="slides">
+        <!-- Slide 0 -->
+        <section class="slide active" data-slide="0">
+          <div class="slide-header">
+            <span class="pill">Use case 2</span><span class="pill">Elastic APM</span>
+            <h2>End-to-end trace · tenant context · DB deep dive</h2>
+            <p>One checkout request crosses seven services. Every span carries tenant.id so you can name the blast radius. The Postgres FOR UPDATE span shows where time went — not just that something was slow.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">7</div><div class="lbl">Services in one checkout trace</div></div>
+            <div class="hero-stat"><div class="num">3</div><div class="lbl">Tenants with asymmetric latency</div></div>
+            <div class="hero-stat"><div class="num">1</div><div class="lbl">trace.id joins APM ↔ orchestrator logs</div></div>
+          </div>
+          <div class="callout" style="margin-top:2rem;">
+            <strong>Customer outcome</strong>
+            <p>Filter APM by tenant.id, open the waterfall, expand the DB span, and correlate the same trace.id back to orchestrator logs — without leaving Observability.</p>
+          </div>
+        </section>
+
+        <!-- Slide 1 -->
+        <section class="slide" data-slide="1">
+          <div class="slide-header">
+            <h2>Checkout request path</h2>
+            <p>Click a service to see its role in the distributed trace. The hot path during the incident runs through checkout-api → orders-db.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Service topology <span class="badge info">Interactive</span></div>
+            <div class="card-body flow-wrap">
+              <svg id="topoSvg" width="960" height="200" viewBox="0 0 960 200"></svg>
+              <div class="detail-panel" id="topoDetail">
+                <h4>Select a service</h4>
+                <p>Click any node to see span type, typical latency, and incident behavior.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide" data-slide="2">
+          <div class="slide-header">
+            <h2>Elastic APM resources</h2>
+            <p>Data streams and rolled-up metrics that power the waterfall, service map, dependencies, and traces list.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Resource inventory <span class="badge">8 assets</span></div>
+            <div class="card-body">
+              <input type="search" class="filter-input" id="assetFilter" placeholder="Filter resources…" />
+              <table id="assetTable">
+                <thead><tr><th>Component</th><th>Resource</th><th>Role</th><th>Where in Elastic</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide" data-slide="3">
+          <div class="slide-header">
+            <h2>Transaction vs span documents</h2>
+            <p>Toggle between the root transaction at edge-gateway and the slow Postgres span inside checkout-api. tenant.id is on every document.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Root transaction <span class="badge info">edge-gateway</span></div>
+              <div class="card-body"><pre class="doc" id="docTxn"></pre></div>
+            </div>
+            <div class="card">
+              <div class="card-head">DB span <span class="badge danger">checkout-api · slow</span></div>
+              <div class="card-body"><pre class="doc" id="docSpan"></pre></div>
+            </div>
+          </div>
+          <div class="toolbar" style="position:static;border:none;background:transparent;padding:1rem 0 0;">
+            <button id="btnToggleDoc">Toggle transaction / DB span</button>
+            <button id="btnHighlightTenant">Highlight tenant.id</button>
+          </div>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide" data-slide="4">
+          <div class="slide-header">
+            <h2>Waterfall walkthrough</h2>
+            <p>Step through each hop in trace <code>271f8e318871…</code> for tenant acme-retail. The orders-db span dominates latency during the incident.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Trace hops <span class="badge info">7 steps</span></div>
+              <div class="card-body">
+                <div class="pipeline-controls">
+                  <button id="btnStepBack">◀ Prev</button>
+                  <button id="btnStepFwd">Next ▶</button>
+                  <button id="btnStepReset">Reset</button>
+                  <div class="progress"><span id="hopProgress"></span></div>
+                </div>
+                <div class="step-list" id="hopList"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">Latency waterfall <span class="badge" id="hopLabel">Hop 0</span></div>
+              <div class="card-body">
+                <div class="waterfall" id="waterfall"></div>
+                <div class="detail-panel" id="hopDetail" style="margin-top:1rem;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide" data-slide="5">
+          <div class="slide-header">
+            <h2>Tenant asymmetry &amp; field mappings</h2>
+            <p>acme-retail p95 spikes while peer tenants stay healthy. Click a mapping row to highlight the field in the span document.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">p95 checkout latency by tenant <span class="badge warn">ES|QL</span></div>
+              <div class="card-body">
+                <div class="bar-chart" id="tenantBars"></div>
+                <p style="color:var(--muted);font-size:0.78rem;margin:0.75rem 0 0;">SLO target: 400 ms · acme-retail exceeds during incident window</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">APM custom fields <span class="badge">traces-apm@elasticco</span></div>
+              <div class="card-body">
+                <table id="mappingTable">
+                  <thead><tr><th>Field</th><th>Role in U2</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+                <pre class="doc" id="docMapping" style="margin-top:0.75rem;"></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 6 -->
+        <section class="slide" data-slide="6">
+          <div class="slide-header">
+            <h2>Kibana surfaces &amp; correlation</h2>
+            <p>Where to demo U2 in Kibana, and how trace.id links back to orchestrator logs from U1.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Kibana surfaces</div>
+              <div class="card-body">
+                <table id="kibanaTable">
+                  <thead><tr><th>Surface</th><th>U2 action</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><label>Trace data stream</label><span>traces-apm-default</span></div>
+              <div class="stat"><label>Hero trace.id</label><span>271f8e318871e99f577feb2cb22cd2d3</span></div>
+              <div class="stat"><label>Dashboard</label><span>elasticco-e2e-tracing</span></div>
+              <div class="callout success">
+                <strong>U1 ↔ U2 correlation</strong>
+                <p>Copy trace.id from APM waterfall → Discover orchestrator view → same checkout DAG lines for acme-retail.</p>
+              </div>
+              <div class="callout warn">
+                <strong>DB deep dive</strong>
+                <p>Expand span <code>SELECT … FOR UPDATE orders</code> · ~2.8 s · service.version 2.4.1 on checkout-api during incident.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="toolbar">
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button id="btnPrev">← Previous</button>
+          <button id="btnNext">Next →</button>
+        </div>
+        <div class="dots" id="dots"></div>
+        <span style="font-size:0.78rem;color:var(--muted);" id="slideCounter">1 / 7</span>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SLIDES = ["Overview", "Topology", "Resources", "Documents", "Waterfall", "Tenants", "Kibana"];
+
+    const HERO_TRACE = "271f8e318871e99f577feb2cb22cd2d3";
+
+    const TOPO_NODES = [
+      { id: "edge", title: "edge-gateway", sub: "POST /checkout", x: 20, y: 70,
+        detail: "Root transaction. Entry point for every checkout. p95 spikes to ~3 s for acme-retail during incident." },
+      { id: "identity", title: "identity-service", sub: "token introspect", x: 160, y: 20,
+        detail: "Auth hop — ~15 ms. Same latency across tenants; not on the hot path." },
+      { id: "checkout", title: "checkout-api", sub: "POST /v1/orders", x: 160, y: 120, hot: true,
+        detail: "Orchestrates checkout. Deploy v2.4.1 during incident. Owns the slow Postgres span." },
+      { id: "inventory", title: "inventory-service", sub: "POST /v1/reserve", x: 320, y: 20,
+        detail: "Inventory reservation — ~45 ms under normal conditions." },
+      { id: "fraud", title: "fraud-service", sub: "POST /v1/score", x: 320, y: 70,
+        detail: "Risk scoring — ~55 ms. Redis feature lookup." },
+      { id: "payments", title: "payments-api", sub: "POST /v1/charge", x: 320, y: 120,
+        detail: "Stripe + ledger-db — ~120 ms. Downstream of checkout-api." },
+      { id: "orders-db", title: "orders-db", sub: "FOR UPDATE", x: 480, y: 120, hot: true,
+        detail: "PostgreSQL span — SELECT … FOR UPDATE on orders. ~2.8 s for acme-retail (lock contention)." },
+      { id: "notify", title: "notification-service", sub: "kafka consumer", x: 640, y: 70,
+        detail: "Async fulfillment.events consumer — continues same trace.id after checkout completes." },
+    ];
+
+    const TOPO_EDGES = [
+      ["edge", "identity"], ["edge", "checkout"],
+      ["checkout", "inventory"], ["checkout", "fraud"], ["checkout", "payments"], ["checkout", "orders-db"],
+      ["checkout", "notify"],
+    ];
+
+    const ASSETS = [
+      ["Trace data stream", "traces-apm-default", "Transactions + spans", "APM waterfall / Discover"],
+      ["Component template", "traces-apm@elasticco", "tenant.id, span.destination.*", "PUT _component_template/…"],
+      ["Metric stream", "metrics-apm.service_destination.1m-default", "Service map edges", "APM Dependencies"],
+      ["Metric stream", "metrics-apm.service_summary.1m-default", "Service inventory", "APM Services"],
+      ["Metric stream", "metrics-apm.service_transaction.1m-default", "Throughput / latency", "Service detail pages"],
+      ["Metric stream", "metrics-apm.transaction.1m-default", "Root transactions", "APM Traces list"],
+      ["Dashboard", "elasticco-e2e-tracing", "Hop flow + tenant p95", "Kibana Dashboards"],
+      ["Dashboard", "elasticco-distributed-traces", "Treemap + heatmap", "Cross-service APM"],
+    ];
+
+    const HOPS = [
+      { n: 1, svc: "edge-gateway", span: "POST /checkout", ms: 2950, cum: 0,
+        detail: "Root transaction — acme-retail tenant.id on document. Total e2e ~3 s." },
+      { n: 2, svc: "identity-service", span: "POST /v1/token/introspect", ms: 15, cum: 15,
+        detail: "Auth validation — fast, same for all tenants." },
+      { n: 3, svc: "checkout-api", span: "POST /v1/orders", ms: 2800, cum: 30,
+        detail: "Checkout orchestration — service.version 2.4.1 during incident." },
+      { n: 4, svc: "inventory-service", span: "POST /v1/reserve", ms: 45, cum: 75,
+        detail: "SKU reservation — normal latency." },
+      { n: 5, svc: "orders-db", span: "SELECT … FOR UPDATE", ms: 2800, cum: 120, hot: true,
+        detail: "Postgres lock contention — dominant span. span.db.statement visible in waterfall." },
+      { n: 6, svc: "payments-api", span: "POST /v1/charge", ms: 90, cum: 2920,
+        detail: "Stripe charge + ledger insert — runs after DB lock releases." },
+      { n: 7, svc: "notification-service", span: "TOPIC fulfillment.events", ms: 33, cum: 3010,
+        detail: "Async kafka consumer — same trace.id, messaging transaction type." },
+    ];
+
+    const TENANTS = [
+      { id: "acme-retail", p95: 3120, slo: 400, blast: true },
+      { id: "globex-mart", p95: 180, slo: 400, blast: false },
+      { id: "initech-b2b", p95: 210, slo: 500, blast: false },
+    ];
+
+    const MAPPINGS = [
+      ["tenant.id", "Blast-radius filter on every span"],
+      ["trace.id", "Join APM ↔ orchestrator logs"],
+      ["labels.order.id", "Order correlation"],
+      ["service.name", "Waterfall service grouping"],
+      ["service.version", "Deploy correlation (2.4.1 incident)"],
+      ["span.type / span.subtype", "db · postgresql deep dive"],
+      ["span.db.statement", "SELECT … FOR UPDATE orders"],
+      ["span.duration.us", "Waterfall bar width"],
+      ["span.destination.service.resource", "Service map exit spans"],
+      ["processor.event", "transaction vs span routing"],
+    ];
+
+    const KIBANA = [
+      ["APM → Services", "checkout-api latency + error rate · filter tenant.id"],
+      ["APM → Traces", "Root POST /checkout transactions"],
+      ["APM → Trace sample", "Open waterfall · expand postgres span"],
+      ["Dashboard elasticco-e2e-tracing", "Hop treemap + tenant p95 comparison"],
+      ["Discover (elasticco-orchestrator)", "Filter trace.id from APM — U1 correlation"],
+      ["Dev Tools ES|QL", "Tenant p95 asymmetry query"],
+    ];
+
+    const TXN_DOC = {
+      "@timestamp": "2026-08-26T18:22:03.148Z",
+      "processor": { "event": "transaction" },
+      "service": { "name": "edge-gateway", "environment": "production", "version": "1.9.2" },
+      "transaction": { "name": "POST /checkout", "type": "request", "duration": { "us": 2950000 }, "sampled": true },
+      "trace": { "id": HERO_TRACE },
+      "tenant": { "id": "acme-retail" },
+      "labels": { "demo": "elastic-co", "tenant.id": "acme-retail", "order.id": "ord-59c78d11" },
+      "event": { "outcome": "success" },
+    };
+
+    const SPAN_DOC = {
+      "@timestamp": "2026-08-26T18:22:03.420Z",
+      "processor": { "event": "span" },
+      "service": { "name": "checkout-api", "environment": "production", "version": "2.4.1" },
+      "span": {
+        "name": "SELECT … FOR UPDATE orders",
+        "type": "db", "subtype": "postgresql",
+        "duration": { "us": 2800000 },
+        "db": { "statement": "SELECT * FROM orders WHERE tenant_id = $1 FOR UPDATE", "type": "sql" },
+      },
+      "trace": { "id": HERO_TRACE },
+      "tenant": { "id": "acme-retail" },
+      "labels": { "demo": "elastic-co", "tenant.id": "acme-retail" },
+      "parent": { "id": "cbe2b3e8f57ac652" },
+    };
+
+    const ESQL = `FROM traces-apm-default
+| WHERE @timestamp > NOW() - 2 hours
+| WHERE labels.demo == "elastic-co"
+| WHERE processor.event == "transaction" AND service.name == "checkout-api"
+| STATS p95 = PERCENTILE(transaction.duration.us, 95), n = COUNT(*) BY tenant.id
+| SORT p95 DESC`;
+
+    function formatDoc(d, highlightField) {
+      const lines = ["{"];
+      const keys = Object.keys(d).sort((a,b) => a === "@timestamp" ? -1 : a.localeCompare(b));
+      keys.forEach((k, i) => {
+        const val = d[k];
+        const cls = highlightField === k || (highlightField === "tenant.id" && (k === "tenant" || k === "labels"))
+          ? "hl" : (k === "span" && highlightField === "span.db.statement" ? "hl-danger" : "");
+        if (typeof val === "object" && val !== null) {
+          lines.push(`  <span class="${cls}">"${k}"</span>: ${JSON.stringify(val, null, 2).replace(/\n/g, "\n  ")}${i < keys.length - 1 ? "," : ""}`);
+        } else {
+          lines.push(`  <span class="${cls}">"${k}"</span>: ${JSON.stringify(val)}${i < keys.length - 1 ? "," : ""}`);
+        }
+      });
+      lines.push("}");
+      return lines.join("\n");
+    }
+
+    let currentSlide = 0;
+    let hopStep = -1;
+    let showSpan = false;
+    let playTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function buildTopo() {
+      const svg = document.getElementById("topoSvg");
+      TOPO_EDGES.forEach(([from, to]) => {
+        const a = TOPO_NODES.find(n => n.id === from);
+        const b = TOPO_NODES.find(n => n.id === to);
+        const x1 = a.x + 68, y1 = a.y + 24, x2 = b.x + 68, y2 = b.y + 24;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#2a2f36"); line.setAttribute("stroke-width", "1.5");
+        svg.appendChild(line);
+      });
+      TOPO_NODES.forEach(node => {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.classList.add("flow-node");
+        if (node.hot) g.classList.add("hot");
+        g.dataset.id = node.id;
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", node.x); rect.setAttribute("y", node.y);
+        rect.setAttribute("width", 136); rect.setAttribute("height", 48); rect.setAttribute("rx", "6");
+        rect.setAttribute("fill", node.hot ? "rgba(249,112,102,0.1)" : "#1c1f24");
+        rect.setAttribute("stroke", node.hot ? "#f97066" : "#2a2f36");
+        rect.setAttribute("stroke-width", node.hot ? "2" : "1");
+        const t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t1.setAttribute("x", node.x + 68); t1.setAttribute("y", node.y + 20);
+        t1.setAttribute("text-anchor", "middle"); t1.setAttribute("fill", "#e4e8ef");
+        t1.setAttribute("font-size", "10"); t1.setAttribute("font-weight", "600");
+        t1.textContent = node.title;
+        const t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t2.setAttribute("x", node.x + 68); t2.setAttribute("y", node.y + 36);
+        t2.setAttribute("text-anchor", "middle"); t2.setAttribute("fill", "#9aa3b2");
+        t2.setAttribute("font-size", "9");
+        t2.textContent = node.sub;
+        g.appendChild(rect); g.appendChild(t1); g.appendChild(t2);
+        g.addEventListener("click", () => selectTopo(node.id));
+        svg.appendChild(g);
+      });
+      selectTopo("orders-db");
+    }
+
+    function selectTopo(id) {
+      document.querySelectorAll("#topoSvg .flow-node").forEach(g => g.classList.toggle("selected", g.dataset.id === id));
+      const node = TOPO_NODES.find(n => n.id === id);
+      document.getElementById("topoDetail").innerHTML = `<h4>${node.title}</h4><p>${node.detail}</p>`;
+    }
+
+    function buildTables() {
+      const assetBody = document.querySelector("#assetTable tbody");
+      ASSETS.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = row.map(c => `<td>${c}</td>`).join("");
+        assetBody.appendChild(tr);
+      });
+      document.getElementById("assetFilter").addEventListener("input", e => {
+        const q = e.target.value.toLowerCase();
+        assetBody.querySelectorAll("tr").forEach(tr => {
+          tr.style.display = tr.textContent.toLowerCase().includes(q) ? "" : "none";
+        });
+      });
+
+      const mapBody = document.querySelector("#mappingTable tbody");
+      MAPPINGS.forEach(([field, desc]) => {
+        const tr = document.createElement("tr");
+        tr.classList.add("clickable");
+        tr.innerHTML = `<td><code>${field}</code></td><td>${desc}</td>`;
+        tr.addEventListener("click", () => {
+          document.querySelectorAll("#mappingTable tr").forEach(r => r.classList.remove("selected"));
+          tr.classList.add("selected");
+          document.getElementById("docMapping").innerHTML = formatDoc(SPAN_DOC, field.includes(".") ? field.split(".")[0] : field);
+        });
+        mapBody.appendChild(tr);
+      });
+
+      const kBody = document.querySelector("#kibanaTable tbody");
+      KIBANA.forEach(([a,b]) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+        kBody.appendChild(tr);
+      });
+    }
+
+    function buildTenantBars() {
+      const max = Math.max(...TENANTS.map(t => t.p95));
+      const container = document.getElementById("tenantBars");
+      TENANTS.forEach(t => {
+        const pct = (t.p95 / max) * 100;
+        const cls = t.blast ? "danger" : "ok";
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        row.innerHTML = `
+          <span>${t.id}</span>
+          <div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
+          <span class="bar-val">${t.p95} ms</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    function buildHops() {
+      const list = document.getElementById("hopList");
+      HOPS.forEach(hop => {
+        const div = document.createElement("div");
+        div.className = "step-item" + (hop.hot ? " hot" : "");
+        div.dataset.step = hop.n;
+        div.innerHTML = `<span class="num">${hop.n}</span><span class="svc">${hop.svc}</span><span>${hop.span} · ${hop.ms} ms</span>`;
+        list.appendChild(div);
+      });
+      buildWaterfall(-1);
+    }
+
+    function buildWaterfall(activeStep) {
+      const maxMs = 3000;
+      const container = document.getElementById("waterfall");
+      container.innerHTML = "";
+      HOPS.forEach((hop, i) => {
+        const visible = activeStep < 0 || i <= activeStep;
+        const row = document.createElement("div");
+        row.className = "wf-row";
+        row.style.opacity = visible ? "1" : "0.25";
+        const pct = (hop.ms / maxMs) * 100;
+        const barCls = hop.ms > 2000 ? "slow" : hop.ms > 200 ? "mid" : "";
+        row.innerHTML = `
+          <span>${hop.svc.replace("-service","").replace("-api","")}</span>
+          <div class="wf-bar-wrap"><div class="wf-bar ${barCls}" style="width:${visible ? pct : 0}%"></div></div>
+          <span class="mono">${hop.ms} ms</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    function updateHopUI() {
+      document.querySelectorAll(".step-item").forEach(el => {
+        const n = +el.dataset.step;
+        el.classList.toggle("active", n === hopStep + 1);
+        el.classList.toggle("done", n <= hopStep);
+      });
+      const pct = hopStep < 0 ? 0 : ((hopStep + 1) / HOPS.length) * 100;
+      document.getElementById("hopProgress").style.width = pct + "%";
+      document.getElementById("hopLabel").textContent = hopStep < 0 ? "All hops" : `Hop ${hopStep + 1} / ${HOPS.length}`;
+      buildWaterfall(hopStep);
+      const hop = hopStep >= 0 ? HOPS[hopStep] : null;
+      document.getElementById("hopDetail").innerHTML = hop
+        ? `<h4>${hop.svc} — ${hop.span}</h4><p>${hop.detail}</p>`
+        : `<h4>Full trace</h4><p>7 hops · trace.id ${HERO_TRACE.slice(0,16)}… · tenant acme-retail</p>`;
+    }
+
+    function updateDocPanels() {
+      document.getElementById("docTxn").innerHTML = formatDoc(TXN_DOC);
+      document.getElementById("docSpan").innerHTML = formatDoc(SPAN_DOC);
+      document.getElementById("docMapping").innerHTML = formatDoc(SPAN_DOC);
+      if (!showSpan) {
+        document.getElementById("docTxn").closest(".card").style.display = "block";
+        document.getElementById("docSpan").closest(".card").style.opacity = "0.45";
+      }
+    }
+
+    function playTrace() {
+      clearInterval(playTimer);
+      hopStep = -1;
+      updateHopUI();
+      goSlide(4);
+      let i = 0;
+      playTimer = setInterval(() => {
+        hopStep = i;
+        updateHopUI();
+        i++;
+        if (i >= HOPS.length) clearInterval(playTimer);
+      }, 900);
+    }
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnStepBack").addEventListener("click", () => { hopStep = Math.max(-1, hopStep - 1); updateHopUI(); });
+    document.getElementById("btnStepFwd").addEventListener("click", () => { hopStep = Math.min(HOPS.length - 1, hopStep + 1); updateHopUI(); });
+    document.getElementById("btnStepReset").addEventListener("click", () => { hopStep = -1; updateHopUI(); });
+    document.getElementById("btnPlayTrace").addEventListener("click", playTrace);
+    document.getElementById("btnToggleDoc").addEventListener("click", () => {
+      showSpan = !showSpan;
+      document.getElementById("docTxn").closest(".card").style.display = showSpan ? "none" : "block";
+      document.getElementById("docSpan").closest(".card").style.opacity = "1";
+      document.getElementById("docTxn").closest(".grid-2").style.gridTemplateColumns = showSpan ? "1fr" : "1fr 1fr";
+    });
+    document.getElementById("btnHighlightTenant").addEventListener("click", () => {
+      const doc = showSpan ? SPAN_DOC : TXN_DOC;
+      document.getElementById(showSpan ? "docSpan" : "docTxn").innerHTML = formatDoc(doc, "tenant.id");
+    });
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.getElementById("btnCopyEsql").addEventListener("click", () => {
+      navigator.clipboard.writeText(ESQL).then(() => {
+        const btn = document.getElementById("btnCopyEsql");
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = "Copy ES|QL query", 1500);
+      });
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+
+    buildNav();
+    buildTopo();
+    buildTables();
+    buildTenantBars();
+    buildHops();
+    updateHopUI();
+    updateDocPanels();
+    document.querySelector("#mappingTable tbody tr:first-child").click();
+  </script>
+</body>
+</html>

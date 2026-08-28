@@ -26,6 +26,8 @@ TIME_TO = _WINDOW["to"]
 TS = "@timestamp >= ?_tstart AND @timestamp <= ?_tend"
 
 OOTB = {
+    "[Metrics ESS Billing] Billing dashboard": "ess_billing-billingdashboard",
+    "[Metrics ESS Billing] Credits dashboard": "ess_billing-creditsdashboard",
     "AWS CUR — current month": "aws_billing-01aace34-9219-4c6c-80a9-b903af48950f",
     "AWS CUR — all time": "aws_billing-81918d21-70c6-4bc0-a03e-9e298460a525",
     "GCP Billing Overview": "gcp-76c9e920-e890-11ea-bf8c-d13ebf358a78",
@@ -471,7 +473,7 @@ def build_classic_dashboard():
         section("FinOps integration — native cloud provider dashboards", 0, [
             markdown(0, 0, 20, 10,
                      "These are the **out-of-the-box Elastic integration dashboards** installed from "
-                     "Fleet packages (`aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, "
+                     "Fleet packages (`ess_billing`, `aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, "
                      "`azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\n"
                      "This Meridian dashboard is the cross-provider overlay; provider packs remain "
                      "the source of truth for CUR line items, PTU, Guardrails, etc.\n\n"
@@ -1062,7 +1064,7 @@ def build_dashboard():
 
     panels = [
         section("Scoreboard — sparkline KPIs", 0, [
-            markdown(0, 0, 48, 3,
+            markdown(0, 0, 48, 4,
                      "## Meridian Dynamics — FinOps & LLM Observability\n\n"
                      "Baseline Meridian FinOps + LLM view: stacked bars/areas, gauges, "
                      "waffles, tag clouds, and dual-axis usage vs cost.\n\n"
@@ -1073,13 +1075,16 @@ def build_dashboard():
                      f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n"
                      f"**Budgets:** [Meridian FinOps AI Assistant]({AGENT_CHAT_URL}) · "
                      f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
-                     f"`python -m src.cli agent`."),
-            metric(0, 3, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
-            metric(12, 3, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
-            metric(24, 3, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),
-            metric(36, 3, 12, 6, "LLM cost (APM)", llm_trend, "cost", "USD · sparkline", trend=True),
-            waffle(0, 9, 16, 14, "Cloud spend mix", cloud_mix, "cost", "provider"),
-            xy(16, 9, 32, 14, "Daily cost by cloud (stacked area)",
+                     f"`python -m src.cli agent`.\n\n"
+                     f"**ESS billing:** "
+                     f"[Billing dashboard](#/view/ess_billing-billingdashboard) · "
+                     f"[Credits dashboard](#/view/ess_billing-creditsdashboard)."),
+            metric(0, 4, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
+            metric(12, 4, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
+            metric(24, 4, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),
+            metric(36, 4, 12, 6, "LLM cost (APM)", llm_trend, "cost", "USD · sparkline", trend=True),
+            waffle(0, 10, 16, 14, "Cloud spend mix", cloud_mix, "cost", "provider"),
+            xy(16, 10, 32, 14, "Daily cost by cloud (stacked area)",
                daily_cloud, "day", ["cost"], layer="area_stacked", breakdown="provider"),
         ]),
         section("Allocation — stacked bars, area, waffle", 26, [

@@ -248,8 +248,8 @@ def emit(world: World, t0: datetime, t1: datetime, anchor: datetime):
     while cur < t1:
         incident = in_incident(cur, start, end)
         checkout_ver = bad_ver if incident else good_ver
-        # ~1 checkout per 30s baseline → ~2/min; amplify during incident
-        base_calls = 2 + (6 if incident else 0)
+        # Match denser span traffic: ~9 traces/min baseline, more during incident
+        base_calls = 9 + (18 if incident else 0)
 
         for service in SERVICES:
             yield _summary_doc(cur, service, checkout_ver)

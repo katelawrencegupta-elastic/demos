@@ -1,0 +1,6 @@
+Subject: {subject}
+To: {to}
+
+{summary}
+
+(HTML body saved separately)

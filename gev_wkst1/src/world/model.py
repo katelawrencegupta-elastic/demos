@@ -30,6 +30,9 @@ class Pod:
     node: str
     version: str
     uid: str
+    language: str = "go"
+    kind: str = "app"
+    mem_limit: int = 512 * 1024 * 1024
 
 
 @dataclass
@@ -66,6 +69,32 @@ class World:
     def service(self, name: str) -> dict:
         return next(s for s in self.cfg["services"] if s["name"] == name)
 
+    def pods_for(self, service: str) -> list[Pod]:
+        return [p for p in self.pods if p.service == service]
+
+    def node_inventory(self) -> list[dict]:
+        """Derived host identity for the 3 EKS worker nodes."""
+        region = self.cluster.get("region", "us-east-1")
+        out = []
+        for i, n in enumerate(self.cluster["nodes"]):
+            name = n["name"]
+            host = name.split(".")[0]
+            parts = host.split("-")
+            ip = ".".join(parts[1:]) if len(parts) >= 4 else f"10.0.0.{10 + i}"
+            out.append(
+                {
+                    "name": name,
+                    "ip": ip,
+                    "az": n.get("az") or f"{region}{chr(ord('a') + i)}",
+                    "instance_id": n.get("instance_id") or f"i-{stable_hex('ec2', name, 17)}",
+                    "machine_type": n.get("machine_type") or "m6i.2xlarge",
+                    "cores": int(n.get("cores", 8)),
+                    "memory_bytes": int(n.get("memory_bytes", 32 * 1024 * 1024 * 1024)),
+                    "disk_bytes": int(n.get("disk_bytes", 200 * 1024 * 1024 * 1024)),
+                }
+            )
+        return out
+
     def incident_window(self, anchor: datetime) -> tuple[datetime, datetime]:
         # Floor to the minute so backfill and verify share the same window.
         anchor = anchor.astimezone(timezone.utc).replace(second=0, microsecond=0)
@@ -101,27 +130,46 @@ class World:
         return traces
 
 
+def _default_replicas(svc: dict) -> int:
+    if "replicas" in svc:
+        return int(svc["replicas"])
+    kind = svc.get("type")
+    if kind in ("db", "airflow"):
+        return 1
+    if kind == "messaging":
+        return 3
+    if kind == "cache":
+        return 2
+    return 2
+
+
 def load_world() -> World:
     with open(WORLD_CONFIG) as f:
         cfg = yaml.safe_load(f)
     rng = random.Random(cfg.get("seed", 7))
     world = World(cfg=cfg, rng=rng)
-    svc = world.service("checkout-api")
     nodes = world.cluster["nodes"]
-    replicas = int(svc.get("replicas", 3))
-    for i in range(replicas):
-        version = svc.get("deploy_good", "2.4.0")
-        name = f"checkout-api-{stable_hex('pod', str(i), 5)}-{stable_hex('rs', str(i), 5)}"
-        world.pods.append(
-            Pod(
-                name=name,
-                service="checkout-api",
-                namespace=svc["namespace"],
-                node=nodes[i % len(nodes)]["name"],
-                version=version,
-                uid=stable_hex("uid", name, 16),
+    for svc in world.cfg["services"]:
+        replicas = _default_replicas(svc)
+        version = svc.get("deploy_good") or svc.get("version") or "1.0.0"
+        mem_limit = int(svc.get("mem_limit_mi", 256)) * 1024 * 1024
+        for i in range(replicas):
+            # Keep checkout-api pod names stable (labs / prior backfills).
+            key = str(i) if svc["name"] == "checkout-api" else f"{svc['name']}:{i}"
+            name = f"{svc['name']}-{stable_hex('pod', key, 5)}-{stable_hex('rs', key, 5)}"
+            world.pods.append(
+                Pod(
+                    name=name,
+                    service=svc["name"],
+                    namespace=svc["namespace"],
+                    node=nodes[i % len(nodes)]["name"],
+                    version=version,
+                    uid=stable_hex("uid", name, 16),
+                    language=svc.get("language", "go"),
+                    kind=svc.get("type", "app"),
+                    mem_limit=mem_limit,
+                )
             )
-        )
     return world
 
 

@@ -600,6 +600,442 @@ def build_distributed_traces() -> dict:
     }
 
 
+def build_e2e_tracing() -> dict:
+    """Checkout request path: gateway → services → db/cache/kafka."""
+    hop = (
+        'EVAL hop = CASE('
+        'service.name == "edge-gateway", 1, '
+        'service.name == "identity-service", 2, '
+        'service.name == "checkout-api", 3, '
+        'service.name == "inventory-service", 4, '
+        'service.name == "fraud-service", 5, '
+        'service.name == "payments-api", 6, '
+        'service.name == "notification-service", 7, '
+        '99)'
+    )
+    traces_n = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    hops_n = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction"',
+        f"| WHERE service.name IN ({SVCS})",
+        "| STATS hops = COUNT_DISTINCT(service.name) BY trace.id",
+        "| STATS avg_hops = AVG(hops)",
+    )
+    e2e_p95 = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 "
+        "BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    slow_db = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE span.type == "db" AND span.subtype == "postgresql"',
+        "| WHERE span.duration.us > 2000000",
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    err_gauge = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        '| STATS errors = COUNT(*) WHERE event.outcome == "failure", calls = COUNT(*)',
+        "| EVAL error_rate = errors * 1.0 / calls, min = 0.0, max = 0.25, goal = 0.01",
+    )
+    e2e_gauge = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000",
+        "| EVAL min = 0.0, max = 5000.0, goal = 400.0",
+    )
+    db_gauge = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE span.type == "db" AND span.subtype == "postgresql"',
+        "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000",
+        "| EVAL min = 0.0, max = 4000.0, goal = 100.0",
+    )
+    outcome = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS count = COUNT(*) BY event.outcome",
+    )
+    hop_flow = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "span"',
+        "| WHERE destination.service.resource IS NOT NULL",
+        "| STATS n = COUNT(*), p95_ms = PERCENTILE(span.duration.us, 95) / 1000 "
+        "BY service.name, destination.service.resource",
+    )
+    hop_p95 = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction"',
+        f"| WHERE service.name IN ({SVCS})",
+        f"| {hop}",
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000, "
+        "n = COUNT(*) BY hop, service.name",
+        "| SORT hop",
+    )
+    span_p95 = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "span"',
+        "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000, n = COUNT(*) "
+        "BY span.name, service.name",
+        "| SORT p95_ms DESC",
+        "| LIMIT 12",
+    )
+    tenant_e2e = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 "
+        "BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), tenant.id",
+    )
+    tenant_bar = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000, "
+        "n = COUNT(*) BY tenant.id",
+        "| SORT p95_ms DESC",
+    )
+    fail_by_svc = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND event.outcome == "failure"',
+        f"| WHERE service.name IN ({SVCS})",
+        "| STATS fails = COUNT(*) BY service.name",
+        "| SORT fails DESC",
+    )
+    slow_traces = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS duration_ms = MAX(transaction.duration.us) / 1000 "
+        "BY trace.id, tenant.id, event.outcome",
+        "| SORT duration_ms DESC",
+        "| LIMIT 15",
+    )
+    orch_corr = _q(
+        "FROM logs-elasticco.orchestrator-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| WHERE trace.id IS NOT NULL",
+        "| STATS n = COUNT(*) BY tenant.id, orchestrator.task_id",
+    )
+    dual_count = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    dual_p95 = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "edge-gateway"',
+        "| STATS p95_ms = PERCENTILE(transaction.duration.us, 95) / 1000 "
+        "BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+
+    panels = [
+        markdown(
+            0,
+            0,
+            48,
+            4,
+            "## Elastic Co. — End-to-end checkout trace\n\n"
+            "**edge-gateway → identity-service → checkout-api → "
+            "inventory / fraud / payments → postgres + redis + kafka → "
+            "notification-service**\n\n"
+            "Root span `POST /checkout` · `labels.demo: elastic-co` · time **Last 6 hours**. "
+            "Copy a `trace.id` from the slow-traces chart into **APM → Traces** for the waterfall. "
+            "Hero example: `271f8e318871e99f577feb2cb22cd2d3` (acme-retail, correlated to orchestrator logs).",
+        ),
+        metric(0, 4, 12, 7, "Checkout traces", traces_n, "count", "root POST /checkout", trend=True),
+        metric(12, 4, 12, 7, "Services per trace", hops_n, "avg_hops", "distinct hops"),
+        metric(24, 4, 12, 7, "E2E p95 (ms)", e2e_p95, "p95_ms", "edge-gateway", trend=True),
+        metric(36, 4, 12, 7, "Slow DB spans", slow_db, "count", ">2s postgres", trend=True),
+        gauge(
+            0, 11, 12, 12, "E2E error rate", err_gauge, "error_rate",
+            shape="arc", min_col="min", max_col="max", goal_col="goal",
+            subtitle="gateway failures",
+        ),
+        gauge(
+            12, 11, 12, 12, "E2E p95", e2e_gauge, "p95_ms",
+            shape="semi_circle", min_col="min", max_col="max", goal_col="goal",
+            subtitle="ms · goal 400",
+        ),
+        gauge(
+            24, 11, 12, 12, "Postgres p95", db_gauge, "p95_ms",
+            shape="arc", min_col="min", max_col="max", goal_col="goal",
+            subtitle="ms · goal 100",
+        ),
+        waffle(36, 11, 12, 12, "Trace outcome", outcome, "count", "event.outcome"),
+        treemap(
+            0, 23, 28, 16,
+            "Trace flow — caller → destination",
+            hop_flow, "n",
+            ["service.name", "destination.service.resource"],
+        ),
+        pie(
+            28, 23, 20, 16,
+            "Destination share",
+            _q(
+                "FROM traces-apm-default",
+                f"| WHERE {TS} AND {DEMO}",
+                '| WHERE processor.event == "span"',
+                "| WHERE destination.service.resource IS NOT NULL",
+                "| STATS n = COUNT(*) BY destination.service.resource",
+            ),
+            "n",
+            "destination.service.resource",
+        ),
+        xy(
+            0, 39, 24, 14,
+            "p95 by hop (waterfall order, ms)",
+            hop_p95, "service.name", ["p95_ms"],
+            layer="bar_horizontal",
+        ),
+        xy(
+            24, 39, 24, 14,
+            "Slowest spans (p95 ms)",
+            span_p95, "span.name", ["p95_ms"],
+            layer="bar_horizontal",
+            breakdown="service.name",
+        ),
+        xy(
+            0, 53, 32, 14,
+            "E2E p95 by tenant over time (ms)",
+            tenant_e2e, "bucket", ["p95_ms"],
+            layer="line",
+            breakdown="tenant.id",
+        ),
+        xy(
+            32, 53, 16, 14,
+            "E2E p95 by tenant (ms)",
+            tenant_bar, "tenant.id", ["p95_ms"],
+            layer="bar_horizontal",
+        ),
+        xy_dual(
+            0, 67, 32, 14,
+            "Trace volume vs E2E p95 (dual axis)",
+            {
+                "type": "area",
+                "data_source": _esql(dual_count),
+                "x": {"column": "bucket"},
+                "y": [{"column": "count", "axis": "y"}],
+            },
+            {
+                "type": "line",
+                "data_source": _esql(dual_p95),
+                "x": {"column": "bucket"},
+                "y": [{"column": "p95_ms", "axis": "y2"}],
+            },
+        ),
+        xy(
+            32, 67, 16, 14,
+            "Failures by hop",
+            fail_by_svc, "service.name", ["fails"],
+            layer="bar_horizontal",
+        ),
+        xy(
+            0, 81, 32, 16,
+            "Slowest traces (ms) — copy trace.id into APM → Traces",
+            slow_traces,
+            "trace.id",
+            ["duration_ms"],
+            layer="bar_horizontal",
+            breakdown="tenant.id",
+        ),
+        treemap(
+            32, 81, 16, 16,
+            "Orchestrator tasks × tenant (same trace.id)",
+            orch_corr, "n",
+            ["tenant.id", "orchestrator.task_id"],
+        ),
+    ]
+    return {
+        "title": "Elastic Co. — End-to-End Tracing",
+        "description": (
+            "Checkout request path across 7 services: hop flow, waterfall latency, "
+            "tenant comparison, slow traces, and orchestrator correlation."
+        ),
+        "time_range": {"from": "now-6h", "to": "now"},
+        "options": {
+            "use_margins": True,
+            "sync_colors": True,
+            "sync_cursor": True,
+            "sync_tooltips": True,
+            "hide_panel_titles": False,
+        },
+        "query": {"expression": "labels.demo: elastic-co", "language": "kql"},
+        "panels": panels,
+    }
+
+
+def build_eks_restarts() -> dict:
+    """U3 monitor: EKS pod restarts → OOMKilled / BackOff → memory vs limit."""
+    oom_n = _q(
+        "FROM logs-elasticco.k8s.event-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE kubernetes.event.reason == "OOMKilled"',
+        "| STATS count = COUNT(*)",
+    )
+    backoff_n = _q(
+        "FROM logs-elasticco.k8s.event-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE kubernetes.event.reason == "BackOff"',
+        "| STATS count = COUNT(*)",
+    )
+    max_restarts = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "checkout-api"',
+        "| STATS max_restarts = MAX(kubernetes.pod.restart.count)",
+    )
+    mem_pct = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "checkout-api"',
+        "| STATS mem_pct = MAX(kubernetes.pod.memory.usage.limit.pct)",
+        "| EVAL min = 0.0, max = 1.0, goal = 0.80",
+    )
+    mem_trend = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "checkout-api"',
+        "| STATS rss_mib = AVG(kubernetes.pod.memory.usage.bytes) / 1024 / 1024, "
+        "limit_mib = MAX(kubernetes.pod.memory.limit.bytes) / 1024 / 1024 "
+        "BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    restart_trend = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "checkout-api"',
+        "| STATS restarts = MAX(kubernetes.pod.restart.count) "
+        "BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), kubernetes.pod.name",
+        "| SORT bucket",
+    )
+    event_trend = _q(
+        "FROM logs-elasticco.k8s.event-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE kubernetes.event.reason IN ("OOMKilled", "BackOff")',
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), "
+        "kubernetes.event.reason",
+        "| SORT bucket",
+    )
+    event_pie = _q(
+        "FROM logs-elasticco.k8s.event-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| WHERE kubernetes.event.reason IS NOT NULL",
+        "| STATS count = COUNT(*) BY kubernetes.event.reason",
+    )
+    by_pod = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "checkout-api"',
+        "| STATS restarts = MAX(kubernetes.pod.restart.count), "
+        "mem_pct = MAX(kubernetes.pod.memory.usage.limit.pct) "
+        "BY kubernetes.pod.name",
+        "| SORT restarts DESC",
+    )
+    oom_pods = _q(
+        "FROM logs-elasticco.k8s.event-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE kubernetes.event.reason IN ("OOMKilled", "BackOff")',
+        "| STATS events = COUNT(*) BY kubernetes.pod.name, kubernetes.event.reason, service.version",
+        "| SORT events DESC",
+    )
+
+    panels = [
+        markdown(
+            0,
+            0,
+            48,
+            4,
+            "## Elastic Co. — EKS restart monitor\n\n"
+            "Cluster **eks-elastic-prod-usc1** · Deployment **checkout-api** · "
+            "`labels.demo: elastic-co`. Restarts are the symptom; **OOMKilled** + "
+            "**v2.4.1** / `CartCache.retainAll` is the reason. Time range **Last 6 hours**.",
+        ),
+        metric(0, 4, 12, 7, "OOMKilled events", oom_n, "count", "k8s Warning", trend=True),
+        metric(12, 4, 12, 7, "BackOff events", backoff_n, "count", "restart loop", trend=True),
+        metric(24, 4, 12, 7, "Max pod restarts", max_restarts, "max_restarts", "checkout-api"),
+        gauge(
+            36, 4, 12, 7, "Memory vs limit", mem_pct, "mem_pct",
+            shape="arc", min_col="min", max_col="max", goal_col="goal",
+            subtitle="peak · goal 80%",
+        ),
+        xy(
+            0, 11, 24, 14,
+            "Checkout-api memory vs limit (MiB)",
+            mem_trend, "bucket", ["rss_mib", "limit_mib"],
+            layer="line",
+        ),
+        xy(
+            24, 11, 24, 14,
+            "Restart count by pod",
+            restart_trend, "bucket", ["restarts"],
+            layer="line",
+            breakdown="kubernetes.pod.name",
+        ),
+        xy(
+            0, 25, 32, 14,
+            "OOMKilled / BackOff over time",
+            event_trend, "bucket", ["count"],
+            layer="bar",
+            breakdown="kubernetes.event.reason",
+        ),
+        pie(32, 25, 16, 14, "K8s event reasons", event_pie, "count", "kubernetes.event.reason"),
+        xy(
+            0, 39, 24, 14,
+            "Restarts by checkout-api pod",
+            by_pod, "kubernetes.pod.name", ["restarts"],
+            layer="bar_horizontal",
+        ),
+        xy(
+            24, 39, 24, 14,
+            "OOM / BackOff events by pod",
+            oom_pods, "kubernetes.pod.name", ["events"],
+            layer="bar_horizontal",
+            breakdown="kubernetes.event.reason",
+        ),
+    ]
+    return {
+        "title": "Elastic Co. — EKS Restarts",
+        "description": (
+            "Monitor checkout-api pod restarts on eks-elastic-prod-usc1: "
+            "restart count, OOMKilled/BackOff events, and memory vs limit."
+        ),
+        "time_range": {"from": "now-6h", "to": "now"},
+        "options": {
+            "use_margins": True,
+            "sync_colors": True,
+            "sync_cursor": True,
+            "sync_tooltips": True,
+            "hide_panel_titles": False,
+        },
+        "query": {"expression": "labels.demo: elastic-co", "language": "kql"},
+        "panels": panels,
+    }
+
+
 def _put_dashboard(dash_id: str, body: dict) -> str:
     r = requests.put(
         f"{KIBANA_URL}/api/dashboards/{dash_id}",
@@ -618,11 +1054,14 @@ def _put_dashboard(dash_id: str, body: dict) -> str:
             print(f"[fail] dashboard {dash_id}: {r.status_code} {r.text[:800]}")
             print(f"       retry: {r2.status_code} {r2.text[:800]}")
             raise SystemExit(1)
-    # Persist JSON snapshot for the dynamic traces dashboard
-    if dash_id == "elasticco-distributed-traces":
-        (KIBANA_DIR / "dashboard-distributed-traces.json").write_text(
-            json.dumps(body, indent=2) + "\n"
-        )
+    # Persist JSON snapshots
+    snapshots = {
+        "elasticco-distributed-traces": "dashboard-distributed-traces.json",
+        "elasticco-e2e-tracing": "dashboard-e2e-tracing.json",
+        "elasticco-eks-restarts": "dashboard-eks-restarts.json",
+    }
+    if dash_id in snapshots:
+        (KIBANA_DIR / snapshots[dash_id]).write_text(json.dumps(body, indent=2) + "\n")
     url = f"{KIBANA_URL}/app/dashboards#/view/{dash_id}"
     print(f"[ok] dashboard {body['title']}")
     print(f"  {url}")
@@ -638,5 +1077,18 @@ def publish_distributed_traces() -> str:
     return _put_dashboard("elasticco-distributed-traces", build_distributed_traces())
 
 
+def publish_e2e_tracing() -> str:
+    return _put_dashboard("elasticco-e2e-tracing", build_e2e_tracing())
+
+
+def publish_eks_restarts() -> str:
+    return _put_dashboard("elasticco-eks-restarts", build_eks_restarts())
+
+
 def publish_all() -> list[str]:
-    return [publish_incident_overview(), publish_distributed_traces()]
+    return [
+        publish_incident_overview(),
+        publish_distributed_traces(),
+        publish_e2e_tracing(),
+        publish_eks_restarts(),
+    ]

@@ -19,14 +19,20 @@ COMPONENT_ORDER = [
     "logs-elasticco.orchestrator",
     "logs-elasticco.checkout",
     "logs-elasticco.k8s.event",
+    "logs-elasticco.incident",
     "metrics-elasticco.k8s.pod",
+    "metrics-elasticco.k8s.node",
+    "metrics-elasticco.host",
 ]
 
 INDEX_TEMPLATES = [
     "logs-elasticco.orchestrator",
     "logs-elasticco.checkout",
     "logs-elasticco.k8s.event",
+    "logs-elasticco.incident",
     "metrics-elasticco.k8s.pod",
+    "metrics-elasticco.k8s.node",
+    "metrics-elasticco.host",
 ]
 
 PIPELINES = ["logs-elasticco.orchestrator"]
@@ -46,13 +52,19 @@ DATA_VIEWS = [
     },
     {
         "id": "elasticco-k8s",
-        "title": "logs-elasticco.k8s.event-*,metrics-elasticco.k8s.pod-*",
+        "title": "logs-elasticco.k8s.event-*,metrics-elasticco.k8s.*,metrics-elasticco.host-*",
         "name": "Elastic Co. Kubernetes",
         "timeFieldName": "@timestamp",
     },
     {
+        "id": "elasticco-incidents",
+        "title": "logs-elasticco.incident-*",
+        "name": "Elastic Co. Incident Audit",
+        "timeFieldName": "@timestamp",
+    },
+    {
         "id": "elasticco-all",
-        "title": "logs-elasticco.*,metrics-elasticco.*,traces-apm*",
+        "title": "logs-elasticco.*,metrics-elasticco.*,metrics-apm*,traces-apm*",
         "name": "Elastic Co. All",
         "timeFieldName": "@timestamp",
     },
@@ -127,7 +139,35 @@ def ensure_data_views():
             or "already exists" in r.text.lower()
             or "duplicate data view" in r.text.lower()
         ):
-            print(f"  [ok] data view {dv['id']} already present")
+            r2 = requests.post(
+                f"{KIBANA_URL}/api/data_views/data_view/{dv['id']}",
+                headers=KBN_HEADERS,
+                json={
+                    "data_view": {
+                        "title": dv["title"],
+                        "name": dv["name"],
+                        "timeFieldName": dv["timeFieldName"],
+                    }
+                },
+                timeout=60,
+            )
+            if r2.status_code >= 300:
+                r2 = requests.put(
+                    f"{KIBANA_URL}/api/data_views/data_view/{dv['id']}",
+                    headers=KBN_HEADERS,
+                    json={
+                        "data_view": {
+                            "title": dv["title"],
+                            "name": dv["name"],
+                            "timeFieldName": dv["timeFieldName"],
+                        }
+                    },
+                    timeout=60,
+                )
+            if r2.status_code >= 300:
+                print(f"  [warn] update data view {dv['id']}: {r2.status_code} {r2.text[:200]}")
+            else:
+                print(f"  [ok] data view {dv['id']} updated")
             continue
         print(f"  [warn] data view {dv['id']}: {r.status_code} {r.text[:200]}")
 
@@ -155,7 +195,7 @@ def ensure_alert_rules():
             update_body = {
                 k: v
                 for k, v in rule.items()
-                if k not in ("id", "rule_type_id", "consumer")
+                if k not in ("id", "rule_type_id", "consumer", "enabled")
             }
             r2 = requests.put(
                 f"{KIBANA_URL}/api/alerting/rule/{rid}",
@@ -163,6 +203,18 @@ def ensure_alert_rules():
                 json=update_body,
                 timeout=60,
             )
+            if r2.status_code >= 300 and update_body.get("actions"):
+                print(
+                    f"  [warn] update rule {rule['name']} with Cases action: "
+                    f"{r2.status_code} {r2.text[:240]}"
+                )
+                update_body["actions"] = []
+                r2 = requests.put(
+                    f"{KIBANA_URL}/api/alerting/rule/{rid}",
+                    headers=KBN_HEADERS,
+                    json=update_body,
+                    timeout=60,
+                )
             if r2.status_code >= 300:
                 print(f"  [warn] update rule {rule['name']}: {r2.status_code} {r2.text[:240]}")
             else:
@@ -174,6 +226,18 @@ def ensure_alert_rules():
             json=rule,
             timeout=60,
         )
+        if r.status_code >= 300 and rule.get("actions"):
+            print(
+                f"  [warn] create rule {rule['name']} with Cases action: "
+                f"{r.status_code} {r.text[:300]}"
+            )
+            stripped = {**rule, "actions": []}
+            r = requests.post(
+                f"{KIBANA_URL}/api/alerting/rule",
+                headers=KBN_HEADERS,
+                json=stripped,
+                timeout=60,
+            )
         if r.status_code >= 300:
             print(f"  [warn] create rule {rule['name']}: {r.status_code} {r.text[:300]}")
         else:
@@ -235,4 +299,7 @@ def run_setup(include_alerts: bool = True):
     if include_alerts:
         print("== alert rules ==")
         ensure_alert_rules()
+    kb = KIBANA_DIR / "knowledge-base-checkout-oom.md"
+    if kb.exists():
+        print(f"  [info] U4 knowledge base export: {kb}")
     print("setup complete")

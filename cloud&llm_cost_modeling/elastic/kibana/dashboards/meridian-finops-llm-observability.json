@@ -41,7 +41,7 @@
             "config": {
               "hide_title": true,
               "title": "",
-              "content": "## Meridian Dynamics — FinOps & LLM Observability\n\nBaseline Meridian FinOps + LLM view: stacked bars/areas, gauges, waffles, tag clouds, and dual-axis usage vs cost.\n\nTime range: **2026-04-29 – 2026-08-27 (computed at publish)**. Security→cost (crypto / S3) lives on the [classic](#/view/meridian-finops-llm-observability-classic).\n\n[Open classic](#/view/meridian-finops-llm-observability-classic) · Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n**Budgets:** [Meridian FinOps AI Assistant](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/agent_builder/chat) · [Observability SLOs](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/observability/slos) · `python -m src.cli agent`.",
+              "content": "## Meridian Dynamics — FinOps & LLM Observability\n\nBaseline Meridian FinOps + LLM view: stacked bars/areas, gauges, waffles, tag clouds, and dual-axis usage vs cost.\n\nTime range: **2026-04-29 – 2026-08-27 (computed at publish)**. Security→cost (crypto / S3) lives on the [classic](#/view/meridian-finops-llm-observability-classic).\n\n[Open classic](#/view/meridian-finops-llm-observability-classic) · Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n**Budgets:** [Meridian FinOps AI Assistant](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/agent_builder/chat) · [Observability SLOs](https://klgllmobs-bb1595.kb.us-central1.gcp.elastic.cloud/app/observability/slos) · `python -m src.cli agent`.\n\n**ESS billing:** [Billing dashboard](#/view/ess_billing-billingdashboard) · [Credits dashboard](#/view/ess_billing-creditsdashboard).",
               "settings": {
                 "open_links_in_new_tab": true
               }
@@ -2658,6 +2658,26 @@
             "config": {
               "title": "Provider FinOps & LLM packs",
               "links": [
+                {
+                  "label": "[Metrics ESS Billing] Billing dashboard",
+                  "type": "dashboardLink",
+                  "destination": "ess_billing-billingdashboard",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
+                {
+                  "label": "[Metrics ESS Billing] Credits dashboard",
+                  "type": "dashboardLink",
+                  "destination": "ess_billing-creditsdashboard",
+                  "options": {
+                    "use_filters": false,
+                    "use_time_range": true,
+                    "open_in_new_tab": true
+                  }
+                },
                 {
                   "label": "AWS CUR — current month",
                   "type": "dashboardLink",

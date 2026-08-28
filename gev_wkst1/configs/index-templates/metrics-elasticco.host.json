@@ -1,0 +1,7 @@
+{
+  "index_patterns": ["metrics-elasticco.host-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["metrics-elasticco.host"],
+  "_meta": { "demo": "elastic-co" }
+}

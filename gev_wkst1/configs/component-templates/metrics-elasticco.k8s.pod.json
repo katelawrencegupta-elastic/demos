@@ -1,20 +1,52 @@
 {
   "template": {
     "mappings": {
+      "dynamic_templates": [
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
       "properties": {
-        "kubernetes.pod.name": { "type": "keyword" },
+        "@timestamp": { "type": "date" },
+        "event.dataset": { "type": "keyword" },
+        "event.module": { "type": "keyword" },
+        "metricset.name": { "type": "keyword" },
+        "labels.demo": { "type": "keyword" },
+        "service.name": { "type": "keyword" },
+        "service.version": { "type": "keyword" },
+        "host.name": { "type": "keyword" },
+        "host.hostname": { "type": "keyword" },
+        "host.id": { "type": "keyword" },
+        "host.ip": { "type": "keyword" },
+        "cloud.provider": { "type": "keyword" },
+        "cloud.region": { "type": "keyword" },
+        "orchestrator.cluster.name": { "type": "keyword" },
+        "orchestrator.type": { "type": "keyword" },
+        "container.id": { "type": "keyword" },
+        "container.name": { "type": "keyword" },
         "kubernetes.namespace": { "type": "keyword" },
         "kubernetes.deployment.name": { "type": "keyword" },
         "kubernetes.node.name": { "type": "keyword" },
-        "orchestrator.cluster.name": { "type": "keyword" },
-        "service.name": { "type": "keyword" },
-        "service.version": { "type": "keyword" },
+        "kubernetes.pod.name": { "type": "keyword" },
+        "kubernetes.pod.uid": { "type": "keyword" },
+        "kubernetes.pod.ip": { "type": "keyword" },
         "kubernetes.pod.memory.usage.bytes": { "type": "long" },
         "kubernetes.pod.memory.limit.bytes": { "type": "long" },
+        "kubernetes.pod.memory.working_set.bytes": { "type": "long" },
+        "kubernetes.pod.memory.usage.node.pct": { "type": "double" },
+        "kubernetes.pod.memory.usage.limit.pct": { "type": "double" },
         "kubernetes.pod.cpu.usage.nanocores": { "type": "long" },
+        "kubernetes.pod.cpu.usage.node.pct": { "type": "double" },
+        "kubernetes.pod.cpu.usage.limit.pct": { "type": "double" },
         "kubernetes.pod.restart.count": { "type": "long" },
-        "metricset.name": { "type": "keyword" },
-        "labels.demo": { "type": "keyword" }
+        "kubernetes.pod.network.rx.bytes": { "type": "long" },
+        "kubernetes.pod.network.tx.bytes": { "type": "long" },
+        "kubernetes.container.name": { "type": "keyword" },
+        "kubernetes.container.memory.usage.bytes": { "type": "long" },
+        "kubernetes.container.cpu.usage.nanocores": { "type": "long" }
       }
     },
     "lifecycle": { "data_retention": "30d" }

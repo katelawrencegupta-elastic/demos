@@ -1,0 +1,10 @@
+{
+  "index_patterns": ["logs-elasticco.incident-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["logs-elasticco.incident"],
+  "_meta": {
+    "description": "Elastic Co. RCA agent incident audit trail",
+    "demo": "elastic-co"
+  }
+}

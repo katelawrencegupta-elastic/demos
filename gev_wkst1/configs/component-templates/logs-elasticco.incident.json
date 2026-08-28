@@ -1,0 +1,24 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "incident.id": { "type": "keyword" },
+        "incident.status": { "type": "keyword" },
+        "incident.phase": { "type": "keyword" },
+        "incident.service": { "type": "keyword" },
+        "incident.tenant.id": { "type": "keyword" },
+        "incident.root_cause": { "type": "text" },
+        "incident.summary": { "type": "text" },
+        "incident.remediation": { "type": "text" },
+        "incident.approval.mode": { "type": "keyword" },
+        "incident.approval.approved_by": { "type": "keyword" },
+        "incident.email.to": { "type": "keyword" },
+        "incident.email.sent": { "type": "boolean" },
+        "labels.demo": { "type": "keyword" },
+        "message": { "type": "match_only_text" }
+      }
+    },
+    "lifecycle": { "data_retention": "90d" }
+  },
+  "_meta": { "demo": "elastic-co", "use_case": "U5" }
+}

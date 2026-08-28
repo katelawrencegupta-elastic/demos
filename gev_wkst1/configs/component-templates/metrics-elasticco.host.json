@@ -1,0 +1,56 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "event.dataset": { "type": "keyword" },
+        "event.module": { "type": "keyword" },
+        "metricset.name": { "type": "keyword" },
+        "labels.demo": { "type": "keyword" },
+        "host.name": { "type": "keyword" },
+        "host.hostname": { "type": "keyword" },
+        "host.id": { "type": "keyword" },
+        "host.ip": { "type": "keyword" },
+        "host.architecture": { "type": "keyword" },
+        "host.cpu.usage": { "type": "float" },
+        "host.memory.used.pct": { "type": "double" },
+        "system.cpu.cores": { "type": "long" },
+        "system.cpu.total.norm.pct": { "type": "float" },
+        "system.cpu.total.pct": { "type": "float" },
+        "system.cpu.user.norm.pct": { "type": "float" },
+        "system.cpu.user.pct": { "type": "float" },
+        "system.cpu.system.norm.pct": { "type": "float" },
+        "system.cpu.system.pct": { "type": "float" },
+        "system.memory.total": { "type": "long" },
+        "system.memory.used.bytes": { "type": "long" },
+        "system.memory.used.pct": { "type": "double" },
+        "system.memory.actual.used.bytes": { "type": "long" },
+        "system.memory.actual.used.pct": { "type": "double" },
+        "system.memory.actual.free": { "type": "long" },
+        "system.load.1": { "type": "double" },
+        "system.load.5": { "type": "double" },
+        "system.load.15": { "type": "double" },
+        "system.filesystem.used.pct": { "type": "double" },
+        "system.filesystem.total": { "type": "long" },
+        "system.network.in.bytes": { "type": "long" },
+        "system.network.out.bytes": { "type": "long" },
+        "cloud.provider": { "type": "keyword" },
+        "cloud.region": { "type": "keyword" },
+        "cloud.availability_zone": { "type": "keyword" },
+        "cloud.instance.id": { "type": "keyword" },
+        "cloud.machine.type": { "type": "keyword" },
+        "orchestrator.cluster.name": { "type": "keyword" }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

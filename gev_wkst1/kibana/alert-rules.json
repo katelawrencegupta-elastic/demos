@@ -60,5 +60,74 @@
     },
     "actions": [],
     "notify_when": "onActiveAlert"
+  },
+  {
+    "name": "elasticco-app-checkout-error-rate",
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "enabled": true,
+    "schedule": { "interval": "1m" },
+    "tags": ["elastic-co", "app-monitoring", "u5", "checkout-api", "acme-retail"],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeField": "@timestamp",
+      "timeWindowSize": 15,
+      "timeWindowUnit": "m",
+      "size": 10,
+      "thresholdComparator": ">",
+      "threshold": [0],
+      "aggType": "count",
+      "groupBy": "all",
+      "termSize": 5,
+      "sourceFields": [],
+      "esqlQuery": {
+        "esql": "FROM traces-apm-default\n| WHERE @timestamp >= NOW() - 15 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS total = COUNT(*), fails = COUNT(*) WHERE event.outcome == \"failure\"\n| EVAL error_rate = fails * 1.0 / total\n| WHERE total > 5 AND error_rate > 0.10"
+      }
+    },
+    "actions": [],
+    "notify_when": "onActiveAlert"
+  },
+  {
+    "name": "elasticco-eks-pod-restarts",
+    "rule_type_id": ".es-query",
+    "consumer": "alerts",
+    "enabled": true,
+    "schedule": { "interval": "1m" },
+    "tags": ["elastic-co", "eks", "quality", "demo", "checkout-api"],
+    "params": {
+      "searchType": "esqlQuery",
+      "timeField": "@timestamp",
+      "timeWindowSize": 120,
+      "timeWindowUnit": "m",
+      "size": 10,
+      "thresholdComparator": ">",
+      "threshold": [0],
+      "aggType": "count",
+      "groupBy": "all",
+      "termSize": 5,
+      "sourceFields": [],
+      "esqlQuery": {
+        "esql": "FROM logs-elasticco.k8s.event-default, metrics-elasticco.k8s.pod-default\n| WHERE @timestamp >= NOW() - 2 hours\n| WHERE labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason IN (\"OOMKilled\", \"BackOff\") OR (service.name == \"checkout-api\" AND kubernetes.pod.restart.count >= 1)\n| STATS hits = COUNT(*), pods = COUNT_DISTINCT(kubernetes.pod.name)\n| WHERE hits > 0"
+      }
+    },
+    "actions": [
+      {
+        "group": "query matched",
+        "id": "system-connector-.cases",
+        "params": {
+          "subAction": "run",
+          "subActionParams": {
+            "groupingBy": [],
+            "reopenClosedCases": true,
+            "timeWindow": "7d"
+          }
+        },
+        "frequency": {
+          "notify_when": "onActiveAlert",
+          "summary": false
+        }
+      }
+    ],
+    "notify_when": "onActiveAlert"
   }
 ]

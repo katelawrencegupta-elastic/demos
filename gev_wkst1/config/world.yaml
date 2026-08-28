@@ -28,18 +28,27 @@ cluster:
     - platform
   nodes:
     - name: ip-10-0-12-21.ec2.internal
+      az: us-east-1a
     - name: ip-10-0-14-44.ec2.internal
+      az: us-east-1b
     - name: ip-10-0-18-7.ec2.internal
+      az: us-east-1c
 
 services:
   - name: edge-gateway
     namespace: fulfillment
     language: go
     type: gateway
+    version: "1.9.2"
+    replicas: 2
+    mem_limit_mi: 256
   - name: identity-service
     namespace: platform
     language: go
     type: app
+    version: "2.3.1"
+    replicas: 2
+    mem_limit_mi: 256
   - name: checkout-api
     namespace: fulfillment
     language: java
@@ -47,44 +56,72 @@ services:
     deploy_good: "2.4.0"
     deploy_bad: "2.4.1"
     replicas: 3
+    mem_limit_mi: 512
   - name: inventory-service
     namespace: fulfillment
     language: go
     type: app
+    version: "4.0.8"
+    replicas: 2
+    mem_limit_mi: 256
   - name: fraud-service
     namespace: payments
     language: python
     type: app
+    version: "1.7.0"
+    replicas: 2
+    mem_limit_mi: 384
   - name: payments-api
     namespace: payments
     language: go
     type: app
+    version: "3.1.0"
+    replicas: 2
+    mem_limit_mi: 256
   - name: notification-service
     namespace: platform
     language: go
     type: app
+    version: "1.4.2"
+    replicas: 2
+    mem_limit_mi: 256
   - name: orchestrator
     namespace: platform
     language: python
     type: airflow
+    version: "2.8.1"
+    replicas: 1
+    mem_limit_mi: 512
   - name: orders-db
     namespace: fulfillment
     language: sql
     type: db
     system: postgresql
+    version: "16.2"
+    replicas: 1
+    mem_limit_mi: 2048
   - name: inventory-db
     namespace: fulfillment
     language: sql
     type: db
     system: postgresql
+    version: "16.2"
+    replicas: 1
+    mem_limit_mi: 2048
   - name: redis-cart
     namespace: fulfillment
     language: redis
     type: cache
+    version: "7.2.4"
+    replicas: 2
+    mem_limit_mi: 512
   - name: kafka
     namespace: platform
     language: kafka
     type: messaging
+    version: "3.7.0"
+    replicas: 3
+    mem_limit_mi: 1024
 
 orchestrator:
   dag_id: fulfillment.checkout
@@ -113,3 +150,25 @@ alerts:
   quality:
     name: elasticco-checkout-slo-burn
     description: checkout-api restarts or error rate with acme-retail SLO burn
+  eks_restarts:
+    name: elasticco-eks-pod-restarts
+    description: OOMKilled / BackOff / restart count on checkout-api (opens a case)
+  app_monitoring:
+    name: elasticco-app-checkout-error-rate
+    description: checkout-api transaction error rate > 10% with tenant context
+
+app_monitoring:
+  monitored_service: checkout-api
+  blast_tenant: acme-retail
+  error_rate_threshold: 0.10
+  slo_target_ms: 400
+  rca_agent:
+    name: elasticco-rca-agent
+    default_email: kate.lawrencegupta@elastic.co
+    approval_required: true
+  remediation:
+    rollback_version: "2.4.0"
+    actions:
+      - Roll back checkout-api Deployment to v2.4.0
+      - Pause orchestrator DAG fulfillment.checkout retries for acme-retail
+      - Verify acme-retail p95 checkout latency < 400ms
