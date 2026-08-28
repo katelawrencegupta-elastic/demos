@@ -37,6 +37,8 @@ INDEX_TEMPLATES = [
 
 PIPELINES = ["logs-elasticco.orchestrator"]
 
+RETIRED_ALERT_NAMES = ("elasticco-checkout-slo-burn",)
+
 DATA_VIEWS = [
     {
         "id": "elasticco-orchestrator",
@@ -63,12 +65,27 @@ DATA_VIEWS = [
         "timeFieldName": "@timestamp",
     },
     {
+        "id": "elasticco-logs",
+        "title": "logs-elasticco.*",
+        "name": "Elastic Co. Logs",
+        "timeFieldName": "@timestamp",
+    },
+    {
         "id": "elasticco-all",
         "title": "logs-elasticco.*,metrics-elasticco.*,metrics-apm*,traces-apm*",
         "name": "Elastic Co. All",
         "timeFieldName": "@timestamp",
     },
 ]
+
+# Fields Discover needs after backfill — used by verify + refresh guardrails.
+DATA_VIEW_REQUIRED_FIELDS: dict[str, list[str]] = {
+    "elasticco-orchestrator": ["tenant.id", "trace.id", "orchestrator.dag_id", "log.level"],
+    "elasticco-checkout": ["service.name", "service.version", "message"],
+    "elasticco-k8s": ["kubernetes.event.reason", "kubernetes.pod.name", "service.name"],
+    "elasticco-incidents": ["incident.id", "incident.phase", "message"],
+    "elasticco-logs": ["tenant.id", "trace.id", "service.name", "kubernetes.event.reason"],
+}
 
 
 def _put_json(path: str, body: dict):
@@ -100,6 +117,35 @@ def ensure_templates():
         print(f"  [ok] index template {name}")
 
 
+def _disable_retired_rules(names: tuple[str, ...] = RETIRED_ALERT_NAMES):
+    """Disable rules renamed out of the demo (e.g. fake SLO-burn)."""
+    for name in names:
+        r = requests.get(
+            f"{KIBANA_URL}/api/alerting/rules/_find",
+            headers=KBN_HEADERS,
+            params={"search": name, "search_fields": "name", "per_page": 20},
+            timeout=60,
+        )
+        if r.status_code != 200:
+            continue
+        for rule in r.json().get("data") or []:
+            if rule.get("name") != name:
+                continue
+            rid = rule.get("id")
+            if not rid or not rule.get("enabled", True):
+                print(f"  [ok] retired alert already off: {name}")
+                continue
+            r2 = requests.post(
+                f"{KIBANA_URL}/api/alerting/rule/{rid}/_disable",
+                headers=KBN_HEADERS,
+                timeout=60,
+            )
+            if r2.status_code >= 300:
+                print(f"  [warn] disable retired rule {name}: {r2.status_code} {r2.text[:160]}")
+            else:
+                print(f"  [ok] disabled retired alert: {name}")
+
+
 def check_write_access():
     probe = "logs-elasticco-probe"
     r = requests.post(
@@ -110,66 +156,112 @@ def check_write_access():
     )
     if r.status_code >= 300:
         raise SystemExit(f"cannot write: {r.status_code} {r.text[:300]}")
-    requests.delete(f"{ELASTIC_URL}/{probe}", headers=ES_HEADERS)
+    cleanup_probe_stream()
     print("  [ok] API key can create indices and write documents")
+
+
+def cleanup_probe_stream():
+    """Remove write-probe data stream if a prior setup left it behind."""
+    for target in ("logs-elasticco-probe",):
+        r = requests.delete(f"{ELASTIC_URL}/_data_stream/{target}", headers=ES_HEADERS, timeout=30)
+        if r.status_code < 300:
+            print(f"  [ok] removed probe data stream {target}")
+
+
+def _create_data_view(dv: dict) -> bool:
+    body = {
+        "data_view": {
+            "id": dv["id"],
+            "title": dv["title"],
+            "name": dv["name"],
+            "timeFieldName": dv["timeFieldName"],
+        }
+    }
+    r = requests.post(
+        f"{KIBANA_URL}/api/data_views/data_view",
+        headers=KBN_HEADERS,
+        json=body,
+        timeout=60,
+    )
+    if r.status_code in (200, 201):
+        fields = r.json().get("data_view", {}).get("fields", {})
+        print(f"  [ok] data view {dv['id']} ({len(fields)} fields)")
+        return True
+    if (
+        r.status_code == 409
+        or "already exists" in r.text.lower()
+        or "duplicate data view" in r.text.lower()
+    ):
+        return _update_data_view(dv)
+    print(f"  [warn] data view {dv['id']}: {r.status_code} {r.text[:200]}")
+    return False
+
+
+def _update_data_view(dv: dict) -> bool:
+    body = {
+        "data_view": {
+            "title": dv["title"],
+            "name": dv["name"],
+            "timeFieldName": dv["timeFieldName"],
+        }
+    }
+    for method, path in (
+        ("POST", f"/api/data_views/data_view/{dv['id']}"),
+        ("PUT", f"/api/data_views/data_view/{dv['id']}"),
+    ):
+        r = requests.request(method, f"{KIBANA_URL}{path}", headers=KBN_HEADERS, json=body, timeout=60)
+        if r.status_code < 300:
+            fields = r.json().get("data_view", {}).get("fields", {})
+            print(f"  [ok] data view {dv['id']} updated ({len(fields)} fields)")
+            return True
+    print(f"  [warn] update data view {dv['id']}: {r.status_code} {r.text[:200]}")
+    return False
 
 
 def ensure_data_views():
     for dv in DATA_VIEWS:
-        # Try create; if exists, update attributes
-        body = {
-            "data_view": {
-                "id": dv["id"],
-                "title": dv["title"],
-                "name": dv["name"],
-                "timeFieldName": dv["timeFieldName"],
-            }
-        }
-        r = requests.post(
-            f"{KIBANA_URL}/api/data_views/data_view",
-            headers=KBN_HEADERS,
-            json=body,
-            timeout=60,
-        )
-        if r.status_code in (200, 201):
-            print(f"  [ok] data view {dv['id']}")
-            continue
-        if (
-            r.status_code == 409
-            or "already exists" in r.text.lower()
-            or "duplicate data view" in r.text.lower()
-        ):
-            r2 = requests.post(
+        _create_data_view(dv)
+
+
+def refresh_data_views(*, force: bool = True):
+    """Recreate data views so Kibana reloads field caps from indexed documents.
+
+    Serverless has no fields/_refresh API; delete+create after backfill is required
+    when views were first created against empty indices or overwritten by ndjson import.
+    """
+    cleanup_probe_stream()
+    for dv in DATA_VIEWS:
+        if force:
+            requests.delete(
                 f"{KIBANA_URL}/api/data_views/data_view/{dv['id']}",
                 headers=KBN_HEADERS,
-                json={
-                    "data_view": {
-                        "title": dv["title"],
-                        "name": dv["name"],
-                        "timeFieldName": dv["timeFieldName"],
-                    }
-                },
-                timeout=60,
+                timeout=30,
             )
-            if r2.status_code >= 300:
-                r2 = requests.put(
-                    f"{KIBANA_URL}/api/data_views/data_view/{dv['id']}",
-                    headers=KBN_HEADERS,
-                    json={
-                        "data_view": {
-                            "title": dv["title"],
-                            "name": dv["name"],
-                            "timeFieldName": dv["timeFieldName"],
-                        }
-                    },
-                    timeout=60,
-                )
-            if r2.status_code >= 300:
-                print(f"  [warn] update data view {dv['id']}: {r2.status_code} {r2.text[:200]}")
-            else:
-                print(f"  [ok] data view {dv['id']} updated")
+        _create_data_view(dv)
+
+
+def verify_data_views() -> bool:
+    """Assert demo data views expose structured fields (not the managed logs-* view)."""
+    ok = True
+    for dv_id, required in DATA_VIEW_REQUIRED_FIELDS.items():
+        r = requests.get(
+            f"{KIBANA_URL}/api/data_views/data_view/{dv_id}",
+            headers=KBN_HEADERS,
+            timeout=60,
+        )
+        if r.status_code >= 300:
+            print(f"[fail] data view {dv_id}: {r.status_code}")
+            ok = False
             continue
-        print(f"  [warn] data view {dv['id']}: {r.status_code} {r.text[:200]}")
+        fields = r.json().get("data_view", {}).get("fields", {})
+        missing = [f for f in required if f not in fields]
+        if missing:
+            print(f"[fail] data view {dv_id} missing fields: {', '.join(missing)}")
+            print("       run: python -m src.cli dashboards   (after backfill)")
+            ok = False
+        else:
+            print(f"[ok] data view {dv_id}: {len(fields)} fields incl. {', '.join(required[:3])}")
+    return ok
 
 
 def ensure_alert_rules():
@@ -179,6 +271,7 @@ def ensure_alert_rules():
         print("  [warn] kibana/alert-rules.json missing; skip alerts")
         return
     rules = json.loads(rules_file.read_text())
+    _disable_retired_rules()
     for rule in rules:
         # List existing by name
         r = requests.get(
@@ -287,10 +380,10 @@ def run_setup(include_alerts: bool = True):
 
     print("== apm mappings ==")
     ensure_apm_mappings()
-    print("== data views ==")
-    ensure_data_views()
     print("== kibana saved objects ==")
     import_saved_objects()
+    print("== data views ==")
+    refresh_data_views(force=True)
     print("== incident dashboard (ES|QL) ==")
     try:
         publish_dashboard()
@@ -299,6 +392,18 @@ def run_setup(include_alerts: bool = True):
     if include_alerts:
         print("== alert rules ==")
         ensure_alert_rules()
+    print("== native SLOs ==")
+    try:
+        from src.slos import ensure_slos
+        ensure_slos(fail_loud=False)
+    except Exception as exc:
+        print(f"  [warn] SLO provision: {exc}")
+    print("== Agent Builder RCA agent ==")
+    try:
+        from src.agent_builder import ensure_agent
+        ensure_agent(fail_loud=False)
+    except Exception as exc:
+        print(f"  [warn] Agent Builder: {exc}")
     kb = KIBANA_DIR / "knowledge-base-checkout-oom.md"
     if kb.exists():
         print(f"  [info] U4 knowledge base export: {kb}")

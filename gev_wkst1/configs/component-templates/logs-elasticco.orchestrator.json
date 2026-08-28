@@ -7,17 +7,49 @@
     },
     "mappings": {
       "properties": {
-        "tenant.id": { "type": "keyword" },
-        "trace.id": { "type": "keyword" },
-        "order.id": { "type": "keyword" },
-        "orchestrator.dag_id": { "type": "keyword" },
-        "orchestrator.task_id": { "type": "keyword" },
-        "orchestrator.ts": { "type": "keyword" },
-        "log.level": { "type": "keyword" },
-        "service.name": { "type": "keyword" },
+        "tenant": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "trace": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "order": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "orchestrator": {
+          "properties": {
+            "dag_id": { "type": "keyword" },
+            "task_id": { "type": "keyword" },
+            "ts": { "type": "keyword" }
+          }
+        },
+        "log": {
+          "properties": {
+            "level": { "type": "keyword" }
+          }
+        },
+        "service": {
+          "properties": {
+            "name": { "type": "keyword" }
+          }
+        },
         "message": { "type": "match_only_text" },
-        "event.original": { "type": "keyword", "index": false, "doc_values": false },
-        "labels.demo": { "type": "keyword" }
+        "event": {
+          "properties": {
+            "original": { "type": "keyword", "index": false, "doc_values": false }
+          }
+        },
+        "labels": {
+          "properties": {
+            "demo": { "type": "keyword" }
+          }
+        }
       }
     }
   },

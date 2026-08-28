@@ -48,6 +48,7 @@ class IncidentReport:
     metrics: dict = field(default_factory=dict)
     case_id: str = ""
     case_url: str = ""
+    evidence_ok: bool = True
 
     def to_email_report(self) -> dict:
         d = asdict(self)
@@ -147,14 +148,22 @@ def _apm_error_stats(service: str, start: datetime, end: datetime) -> dict:
         return {"total": 0, "failures": 0, "error_rate": 0, "p95_ms": 0, "tenant_p95_ms": {}}
 
 
+def _evidence_supports_rca(
+    stats: dict, threshold: float, oom: int, oom_logs: int, slow_db: int
+) -> bool:
+    """Planted story needs OOM evidence and slow DB, or a real error-rate breach."""
+    has_oom = oom >= 1 or oom_logs >= 1
+    has_db = slow_db >= 1
+    has_errors = stats.get("error_rate", 0) >= threshold and stats.get("total", 0) > 5
+    return (has_oom and has_db) or has_errors
+
+
 def investigate(world: World, anchor: datetime | None = None) -> IncidentReport:
     """Query Elasticsearch and build a structured RCA report."""
     anchor = anchor or utcnow()
     start, end = world.incident_window(anchor)
-    # Seeded OOM/restart docs sit in the original backfill window; keep a 3h
-    # lookback so triage still sees them after the clock has moved.
-    evidence_start = min(start, anchor - timedelta(hours=3))
-    evidence_end = anchor
+    # Scope to the planted window so healthy recovery traffic does not dilute RCA.
+    evidence_start, evidence_end = start, min(end, anchor)
     am = world.cfg.get("app_monitoring", {})
     service = am.get("monitored_service", "checkout-api")
     tenant = am.get("blast_tenant", world.blast_tenant["id"])
@@ -221,6 +230,13 @@ def investigate(world: World, anchor: datetime | None = None) -> IncidentReport:
     if hero_tid:
         evidence.append(f"Correlated trace.id {hero_tid[:16]}… links orchestrator ↔ APM waterfall")
 
+    weak = not _evidence_supports_rca(stats, threshold, oom, oom_logs, slow_db)
+    if weak:
+        evidence.append(
+            "INSUFFICIENT EVIDENCE for planted RCA — re-run backfill; "
+            "incident window may have aged out of the last 60 minutes"
+        )
+
     root_cause = inc.get("root_cause", "").strip().replace("\n", " ")
     impact = (
         f"Tenant {tenant} checkout SLO burn: p95 {tenant_p95:.0f} ms vs target {slo} ms. "
@@ -266,6 +282,7 @@ def investigate(world: World, anchor: datetime | None = None) -> IncidentReport:
         metrics={**stats, "oom_events": oom, "backoff_events": backoff, "max_restarts": max_restarts},
         generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         email_to=am.get("rca_agent", {}).get("default_email", "kate.lawrencegupta@elastic.co"),
+        evidence_ok=not weak,
     )
 
 
@@ -479,6 +496,15 @@ def run_incident_workflow(
 
     print_report(report)
     _index_incident_event(report, "detected", f"RCA agent detected incident on {report.service}")
+
+    if not report.evidence_ok:
+        print(
+            "[fail] RCA evidence does not support the planted story "
+            "(need OOM + slow DB, or error rate above threshold). "
+            "Re-run: python -m src.cli backfill --hours 6"
+        )
+        if dry_run:
+            raise SystemExit(1)
 
     if dry_run:
         print("[dry-run] stopping before approval/remediation/email")

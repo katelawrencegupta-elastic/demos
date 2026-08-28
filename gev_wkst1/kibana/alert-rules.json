@@ -36,16 +36,16 @@
     "notify_when": "onActionGroupChange"
   },
   {
-    "name": "elasticco-checkout-slo-burn",
+    "name": "elasticco-checkout-correlated-rca",
     "rule_type_id": ".es-query",
     "consumer": "alerts",
     "enabled": true,
     "schedule": { "interval": "1m" },
-    "tags": ["elastic-co", "quality", "demo", "checkout-api", "acme-retail"],
+    "tags": ["elastic-co", "quality", "demo", "checkout-api", "acme-retail", "rca"],
     "params": {
       "searchType": "esqlQuery",
       "timeField": "@timestamp",
-      "timeWindowSize": 15,
+      "timeWindowSize": 60,
       "timeWindowUnit": "m",
       "size": 10,
       "thresholdComparator": ">",
@@ -55,10 +55,27 @@
       "termSize": 5,
       "sourceFields": [],
       "esqlQuery": {
-        "esql": "FROM logs-elasticco.k8s.event-default, logs-elasticco.checkout-default, traces-apm-default\n| WHERE @timestamp >= NOW() - 15 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason == \"OOMKilled\" OR (span.type == \"db\" AND tenant.id == \"acme-retail\" AND span.duration.us > 2000000) OR message LIKE \"*OutOfMemoryError*\"\n| STATS hits = COUNT(*)\n| WHERE hits > 0"
+        "esql": "FROM logs-elasticco.k8s.event-default, logs-elasticco.checkout-default, traces-apm-default\n| WHERE @timestamp >= NOW() - 60 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE kubernetes.event.reason == \"OOMKilled\" OR (span.type == \"db\" AND tenant.id == \"acme-retail\" AND span.duration.us > 2000000) OR message LIKE \"*OutOfMemoryError*\"\n| STATS hits = COUNT(*)\n| WHERE hits > 0"
       }
     },
-    "actions": [],
+    "actions": [
+      {
+        "group": "query matched",
+        "id": "system-connector-.cases",
+        "params": {
+          "subAction": "run",
+          "subActionParams": {
+            "groupingBy": [],
+            "reopenClosedCases": true,
+            "timeWindow": "7d"
+          }
+        },
+        "frequency": {
+          "notify_when": "onActiveAlert",
+          "summary": false
+        }
+      }
+    ],
     "notify_when": "onActiveAlert"
   },
   {
@@ -71,7 +88,7 @@
     "params": {
       "searchType": "esqlQuery",
       "timeField": "@timestamp",
-      "timeWindowSize": 15,
+      "timeWindowSize": 60,
       "timeWindowUnit": "m",
       "size": 10,
       "thresholdComparator": ">",
@@ -81,7 +98,7 @@
       "termSize": 5,
       "sourceFields": [],
       "esqlQuery": {
-        "esql": "FROM traces-apm-default\n| WHERE @timestamp >= NOW() - 15 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\"\n| STATS total = COUNT(*), fails = COUNT(*) WHERE event.outcome == \"failure\"\n| EVAL error_rate = fails * 1.0 / total\n| WHERE total > 5 AND error_rate > 0.10"
+        "esql": "FROM traces-apm-default\n| WHERE @timestamp >= NOW() - 60 minutes\n| WHERE labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"checkout-api\" AND tenant.id == \"acme-retail\"\n| STATS total = COUNT(*), fails = COUNT(*) WHERE event.outcome == \"failure\"\n| EVAL error_rate = fails * 1.0 / total\n| WHERE total > 5 AND error_rate > 0.10"
       }
     },
     "actions": [],

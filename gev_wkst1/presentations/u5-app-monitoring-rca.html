@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>U5 · Application Monitoring + RCA Agent — Elastic Stack</title>
+  <title>U5 · Application Monitoring + Agent Builder RCA — Elastic Stack</title>
   <style>
     :root {
       --bg: #0b0d0e; --surface: #141619; --surface-2: #1c1f24; --border: #2a2f36;
@@ -153,12 +153,12 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">Elastic Observability</div>
-      <h1>U5 · App monitoring + RCA agent</h1>
-      <p>Alert → correlate → approve → remediate → email on-call.</p>
+      <h1>U5 · App monitoring + Agent Builder</h1>
+      <p>Alert or SLO burn → tool-backed RCA in chat → approve rollback into the case.</p>
       <ul class="nav" id="nav"></ul>
       <div class="controls">
         <button class="primary" id="btnPlayFlow">▶ Walk the workflow</button>
-        <button id="btnCopyIncident">Copy incident command</button>
+        <button id="btnCopyIncident">Copy Agent Builder prompt</button>
         <button id="btnCopyEsql">Copy alert ES|QL</button>
         <button id="btnFullscreen">Fullscreen</button>
       </div>
@@ -169,25 +169,25 @@
       <div class="slides">
         <section class="slide active" data-slide="0">
           <div class="slide-header">
-            <span class="pill">Use case 5</span><span class="pill">RCA agent</span>
-            <h2>From application alert to approved remediation and on-call email</h2>
-            <p>When checkout-api error rate crosses 10%, the RCA agent correlates APM, Kubernetes, orchestrator logs, and checkout logs — posts triage to a Kibana case, waits for human approval (or runs auto), rolls back v2.4.1 → v2.4.0, and emails the incident summary.</p>
+            <span class="pill">Use case 5</span><span class="pill">Agent Builder</span>
+            <h2>From application alert to grounded RCA in Elastic</h2>
+            <p>When checkout-api fails for acme-retail, Agent Builder <code>elasticco-rca-agent</code> calls ES|QL tools (error rate, FOR UPDATE, OOM, orchestrator retries, SLO posture). The human says “approve rollback to v2.4.0.” If Cases/email capabilities exist, the agent writes the case; otherwise paste into the open Observability case. The Python CLI is a facilitator backup — not the customer close.</p>
           </div>
           <div class="hero-stats">
-            <div class="hero-stat"><div class="num">6</div><div class="lbl">Workflow phases (detect → notify)</div></div>
-            <div class="hero-stat"><div class="num">5</div><div class="lbl">Elasticsearch data streams queried</div></div>
-            <div class="hero-stat"><div class="num">1</div><div class="lbl">CLI closes the U1–U4 incident arc</div></div>
+            <div class="hero-stat"><div class="num">5</div><div class="lbl">ES|QL tools on the RCA agent</div></div>
+            <div class="hero-stat"><div class="num">1</div><div class="lbl">Remediation: roll back to v2.4.0</div></div>
+            <div class="hero-stat"><div class="num">0</div><div class="lbl">Terminals in the customer path</div></div>
           </div>
           <div class="callout" style="margin-top:2rem;">
             <strong>Customer outcome</strong>
-            <p>Application monitoring is not just a chart — it is an automated runbook that keeps humans in the loop, writes an audit trail, and notifies on-call with evidence.</p>
+            <p>Application monitoring is not another dashboard — it is a tool-backed RCA in Agent Builder that lands on the case without leaving Elastic.</p>
           </div>
         </section>
 
         <section class="slide" data-slide="1">
           <div class="slide-header">
             <h2>Application monitoring alert</h2>
-            <p><code>elasticco-app-checkout-error-rate</code> fires when checkout-api transaction failures exceed 10% over 15 minutes — service-level, not infrastructure noise.</p>
+            <p><code>elasticco-app-checkout-error-rate</code> or native SLO burn on <code>elasticco-slo-checkout-availability</code> — service-level, not infrastructure noise. The ES|QL rule <code>elasticco-checkout-correlated-rca</code> is the RCA starter, not an SLO.</p>
           </div>
           <div class="card">
             <div class="card-head">Alert rule ES|QL <span class="badge info">traces-apm-default</span></div>
@@ -201,21 +201,21 @@
             </div>
             <div class="callout success" style="margin:0;">
               <strong>vs U4 noisy rule</strong>
-              <p>Names the failing service and ties to SLO context. U4 quality rules correlate infra; U5 alert is pure application health on APM transactions.</p>
+              <p>Names the failing service. U4 taught noisy vs native SLO vs correlation. U5 closes in Agent Builder from this alert or the SLO.</p>
             </div>
           </div>
         </section>
 
         <section class="slide" data-slide="2">
           <div class="slide-header">
-            <h2>RCA agent · what it investigates</h2>
-            <p><code>src/rca_agent.py</code> queries Elasticsearch and builds a structured report before any remediation.</p>
+            <h2>Agent Builder · what the tools investigate</h2>
+            <p>ES|QL tools on <code>elasticco-rca-agent</code> (2h lookback, <code>labels.demo: elastic-co</code>). The agent must call tools — never invent counts.</p>
           </div>
           <div class="card">
             <div class="card-head">Evidence sources <span class="badge">5 streams</span></div>
             <div class="card-body">
               <table id="sourceTable">
-                <thead><tr><th>Data stream</th><th>What the agent checks</th></tr></thead>
+                <thead><tr><th>Tool</th><th>What the agent checks</th></tr></thead>
                 <tbody></tbody>
               </table>
             </div>
@@ -236,7 +236,7 @@
         <section class="slide" data-slide="3">
           <div class="slide-header">
             <h2>Workflow walkthrough</h2>
-            <p>Step through the full U5 path from alert to on-call notification. Same sequence as <code>python -m src.cli incident</code>.</p>
+            <p>Step through the U5 path from alert to case. Same sequence as Agent Builder chat — not <code>cli incident</code>.</p>
           </div>
           <div class="grid-2">
             <div class="card">
@@ -263,56 +263,55 @@
 
         <section class="slide" data-slide="4">
           <div class="slide-header">
-            <h2>Human approval vs automatic remediation</h2>
-            <p>Customer demos often show human-in-the-loop; scripted endings use <code>--auto</code>.</p>
+            <h2>Approve rollback · Cases if capabilities allow</h2>
+            <p>Human-in-the-loop in chat. If elastic capabilities are read-only, paste into the open case. CLI is facilitator-only.</p>
           </div>
           <div class="grid-2">
             <div class="compare-card manual">
-              <h3>Human approval (default)</h3>
-              <pre class="prompt" style="margin-bottom:0.75rem;">python -m src.cli incident \
-  --email kate.lawrencegupta@elastic.co</pre>
+              <h3>Customer path (Agent Builder)</h3>
+              <pre class="prompt" style="margin-bottom:0.75rem;">checkout-api is failing for acme-retail —
+reconstruct RCA and recommend one remediation.</pre>
               <ul>
-                <li>Agent prints RCA + remediation plan</li>
-                <li>Prompt: <code>Approve remediation? [y/N]</code></li>
-                <li>On <code>y</code>: rollback log, case closed, email sent</li>
-                <li>On <code>n</code>: case left open, no changes</li>
+                <li>Walk tool-backed p95 / OOM / FOR UPDATE</li>
+                <li>Say <code>approve rollback to v2.4.0</code></li>
+                <li>If Cases/email tools appear: agent writes the case</li>
+                <li>Else: paste comment + email into the open case</li>
               </ul>
             </div>
             <div class="compare-card auto">
-              <h3>Automatic (--auto)</h3>
-              <pre class="prompt" style="margin-bottom:0.75rem;">python -m src.cli incident \
-  --auto --email kate.lawrencegupta@elastic.co</pre>
+              <h3>Facilitator backup (CLI)</h3>
+              <pre class="prompt" style="margin-bottom:0.75rem;">python -m src.cli incident --dry-run</pre>
               <ul>
-                <li>Skips approval prompt</li>
-                <li>Records approver as <code>rca-agent-auto</code></li>
-                <li>Good for tight demo endings</li>
-                <li><code>--dry-run</code> investigates only — no side effects</li>
+                <li>Lab 05 / dry-run only — not the 25-min exit</li>
+                <li>Fails if evidence cannot support the planted RCA</li>
+                <li>Do not claim “without leaving Elastic” on this path</li>
+                <li>Never have the chat agent silently call this CLI</li>
               </ul>
             </div>
           </div>
           <div class="callout warn">
             <strong>Facilitator tip</strong>
-            <p>Run <code>--dry-run</code> first to show evidence without changing the cluster. Then run the live command for approval + email.</p>
+            <p>If Agent Builder is slow or returns 0% errors, skip to the open case + <code>elasticco-checkout-correlated-rca</code>. Never open a terminal in front of the customer unless they ask how it was seeded.</p>
           </div>
         </section>
 
         <section class="slide" data-slide="5">
           <div class="slide-header">
-            <h2>Audit trail · case · email</h2>
-            <p>Every phase is indexed to <code>logs-elasticco.incident-default</code>. Kibana case receives triage and resolution comments.</p>
+            <h2>Case thread is the audit</h2>
+            <p>Customer path: the Observability case already opened by the correlation or EKS-restarts alert. Agent Builder comments it (if capabilities allow) or you paste. Discover <code>elasticco-incidents</code> is a <strong>lab-only</strong> trail from <code>cli incident</code>.</p>
           </div>
           <div class="grid-2">
             <div class="card">
-              <div class="card-head">Incident audit document <span class="badge ok">elasticco-incidents</span></div>
+              <div class="card-head">Paste-ready case comment <span class="badge ok">if capabilities are read-only</span></div>
               <div class="card-body"><pre class="doc" id="auditDoc"></pre></div>
             </div>
             <div class="stat-grid">
-              <div class="stat"><label>Audit phases</label><span>detected → remediation → resolved → notified</span></div>
-              <div class="stat"><label>Case action</label><span>post_triage_to_case · post_resolution_to_case</span></div>
-              <div class="stat"><label>Email delivery</label><span>Kibana connector · SMTP · output/incident-emails/</span></div>
+              <div class="stat"><label>Customer audit</label><span>Observability case thread</span></div>
+              <div class="stat"><label>Write path</label><span>Agent capabilities (Cases / email) or SE paste</span></div>
+              <div class="stat"><label>CLI lab only</label><span>logs-elasticco.incident-default via incident --dry-run</span></div>
               <div class="callout success" style="margin:0;">
-                <strong>Email fallback</strong>
-                <p>If no connector/SMTP in <code>.env</code>, HTML is saved to <code>output/incident-emails/&lt;incident-id&gt;.html</code> — open in browser during the demo.</p>
+                <strong>Do not open a terminal</strong>
+                <p>If Agent Builder cannot write, paste the comment into the case already on screen. That is still “without leaving Elastic.”</p>
               </div>
             </div>
           </div>
@@ -335,11 +334,11 @@
             </div>
             <div class="stat-grid">
               <div class="stat"><label>Lab</label><span>labs/05-app-monitoring-rca.md</span></div>
-              <div class="stat"><label>CLI</label><span>python -m src.cli incident</span></div>
-              <div class="stat"><label>After U4</label><span>AI triage → agent closes loop</span></div>
+              <div class="stat"><label>Agent</label><span>elasticco-rca-agent</span></div>
+              <div class="stat"><label>CLI backup</label><span>python -m src.cli incident --dry-run</span></div>
               <div class="callout">
                 <strong>Exit line</strong>
-                <p>From alert to root cause to approved remediation to on-call notification — without leaving Elastic, and with a full audit trail.</p>
+                <p>From alert to grounded RCA to the case — without leaving Elastic.</p>
               </div>
             </div>
           </div>
@@ -358,24 +357,24 @@
   </div>
 
   <script>
-    const SLIDES = ["Overview", "Alert", "Investigate", "Workflow", "Approval", "Audit", "Kibana"];
+    const SLIDES = ["Overview", "Alert", "Investigate", "Workflow", "Approval", "Case audit", "Kibana"];
 
     const ALERT_ESQL = `FROM traces-apm-default
-| WHERE @timestamp >= NOW() - 15 minutes
+| WHERE @timestamp >= NOW() - 60 minutes
 | WHERE labels.demo == "elastic-co"
-| WHERE processor.event == "transaction" AND service.name == "checkout-api"
+| WHERE processor.event == "transaction" AND service.name == "checkout-api" AND tenant.id == "acme-retail"
 | STATS total = COUNT(*), fails = COUNT(*) WHERE event.outcome == "failure"
 | EVAL error_rate = fails * 1.0 / total
 | WHERE total > 5 AND error_rate > 0.10`;
 
-    const INCIDENT_CMD = `python -m src.cli incident --email kate.lawrencegupta@elastic.co`;
+    const INCIDENT_CMD = `checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.`;
 
     const SOURCES = [
-      ["traces-apm-default", "Transaction error rate, p95 by tenant, slow DB spans"],
-      ["logs-elasticco.k8s.event-default", "OOMKilled and BackOff events on checkout-api"],
-      ["metrics-elasticco.k8s.pod-default", "Max kubernetes.pod.restart.count"],
-      ["logs-elasticco.checkout-default", "OutOfMemoryError + deploy version in container logs"],
-      ["logs-elasticco.orchestrator-default", "Warning/error lines for acme-retail · DAG fulfillment.checkout"],
+      ["elasticco-rca-checkout-errors", "Error rate + p95 by tenant.id (checkout-api)"],
+      ["elasticco-rca-slow-postgres", "Slow FOR UPDATE spans for acme-retail"],
+      ["elasticco-rca-oom-restarts", "OOMKilled / BackOff / restart.count"],
+      ["elasticco-rca-orchestrator-retries", "DAG fulfillment.checkout for acme-retail"],
+      ["elasticco-rca-slo-posture", "Native SLO error budget (if summary index exists)"],
     ];
 
     const EVIDENCE = [
@@ -391,39 +390,35 @@
     ];
 
     const FLOW = [
-      { title: "Alert fires", detail: "elasticco-app-checkout-error-rate exceeds 10% failure rate on checkout-api transactions in 15 min window." },
-      { title: "Agent investigates", detail: "rca_agent.py queries APM, K8s events, pod metrics, checkout logs, orchestrator — builds evidence list and timeline." },
-      { title: "Case triage posted", detail: "Markdown RCA comment added to Observability case; status set to in-progress. Same case as U3/U4 eks-restarts rule." },
-      { title: "Human approval", detail: "CLI prompts Approve remediation? [y/N]. Customer sees the planned rollback to v2.4.0 before any change." },
-      { title: "Remediation applied", detail: "Rollback log indexed to logs-elasticco.checkout-default; incident.phase=remediation in audit stream." },
-      { title: "Case closed + email", detail: "Resolution comment on case; HTML email to kate.lawrencegupta@elastic.co (or saved locally); phase=notified." },
+      { title: "Alert or SLO burn", detail: "elasticco-app-checkout-error-rate or native SLO elasticco-slo-checkout-availability for checkout-api / acme-retail." },
+      { title: "Agent Builder investigates", detail: "elasticco-rca-agent calls ES|QL tools. Must show acme-retail p95 / OOM / FOR UPDATE — not 0% errors." },
+      { title: "Walk the evidence", detail: "v2.4.1 CartCache leak → OOM restart loop → orchestrator retries → slow SELECT … FOR UPDATE." },
+      { title: "Approve rollback", detail: "Human says approve rollback to v2.4.0 in chat. No silent CLI." },
+      { title: "Cases / email if capable", detail: "If enable_elastic_capabilities exposes Cases or email, the agent writes them. Else paste into the open case." },
+      { title: "Case thread is the audit", detail: "Discover incident stream only if a write path existed. Otherwise the Observability case is the record." },
     ];
 
     const PHASES = ["detected", "remediation", "resolved", "notified"];
 
-    const AUDIT_DOC = {
-      "@timestamp": "2026-08-26T20:15:00.000Z",
-      "incident.id": "INC-a1b2c3d4e5f6",
-      "incident.phase": "notified",
-      "incident.status": "resolved",
-      "incident.service": "checkout-api",
-      "incident.tenant.id": "acme-retail",
-      "incident.root_cause": "v2.4.1 CartCache.retainAll memory leak → OOMKilled → error rate spike",
-      "incident.approval.mode": "manual",
-      "incident.approval.approved_by": "demo-se",
-      "incident.email.to": "kate.lawrencegupta@elastic.co",
-      "incident.email.sent": true,
-      "incident.case.id": "…",
-      "labels": { "demo": "elastic-co" },
-    };
+    const AUDIT_DOC = `## RCA — checkout-api / acme-retail
+
+**Root cause:** v2.4.1 CartCache.retainAll leak → OOMKilled → orchestrator retries → slow SELECT … FOR UPDATE.
+
+**Evidence (from Agent Builder tools):**
+- acme-retail p95 vs peer tenants
+- OOMKilled / BackOff / restart.count on checkout-api
+- Slow postgresql spans >2s for acme-retail
+
+**Remediation (approved):** roll back checkout-api to **v2.4.0**.
+`;
 
     const KIBANA = [
-      ["Alerts → elasticco-app-checkout-error-rate", "Show service-level error rate rule + tags"],
-      ["Terminal → cli incident", "Live RCA + approval demo"],
-      ["Observability → Cases", "Triage comment + closed resolution"],
-      ["Discover → elasticco-incidents", "Audit trail by incident.id"],
-      ["APM → checkout-api", "Error rate context before running agent"],
-      ["output/incident-emails/", "Fallback HTML if SMTP not configured"],
+      ["Alerts or SLOs", "App error-rate or elasticco-slo-checkout-availability"],
+      ["Agent Builder chat", "elasticco-rca-agent — paste the scripted prompt"],
+      ["Observability → Cases", "Paste or agent-written RCA + rollback"],
+      ["Dashboard elasticco-e2e-tracing", "Seven hops + FOR UPDATE context if needed"],
+      ["Alerts → elasticco-checkout-correlated-rca", "Fallback if Agent Builder is empty"],
+      ["CLI incident --dry-run", "Facilitator backup only"],
       ["Lab 05", "labs/05-app-monitoring-rca.md"],
       ["After U4 deck", "presentations/u4-alerting-ai-triage.html"],
     ];
@@ -511,7 +506,7 @@
       const step = flowStep >= 0 ? FLOW[flowStep] : null;
       document.getElementById("flowDetail").innerHTML = step
         ? `<h4>${step.title}</h4><p>${step.detail}</p>`
-        : `<h4>Full workflow</h4><p>6 steps from application alert to on-call email · same as cli incident</p>`;
+        : `<h4>Full workflow</h4><p>6 steps from application alert to the Observability case · Agent Builder, not the CLI</p>`;
       document.querySelectorAll(".phase").forEach(el => {
         const idx = PHASES.indexOf(el.dataset.phase);
         const auditIdx = flowStep < 2 ? -1 : flowStep < 4 ? 0 : flowStep < 5 ? 1 : 3;
@@ -534,10 +529,6 @@
       }, 1100);
     }
 
-    function formatDoc(d) {
-      return JSON.stringify(d, null, 2);
-    }
-
     function copyText(text, btn, label) {
       navigator.clipboard.writeText(text).then(() => {
         const orig = btn.textContent;
@@ -547,7 +538,7 @@
     }
 
     document.getElementById("alertEsql").textContent = ALERT_ESQL;
-    document.getElementById("auditDoc").textContent = formatDoc(AUDIT_DOC);
+    document.getElementById("auditDoc").textContent = AUDIT_DOC;
     document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
     document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
     document.getElementById("btnStepBack").addEventListener("click", () => { flowStep = Math.max(-1, flowStep - 1); updateFlowUI(); });
@@ -555,7 +546,7 @@
     document.getElementById("btnStepReset").addEventListener("click", () => { flowStep = -1; updateFlowUI(); });
     document.getElementById("btnPlayFlow").addEventListener("click", playFlow);
     document.getElementById("btnCopyIncident").addEventListener("click", () =>
-      copyText(INCIDENT_CMD, document.getElementById("btnCopyIncident"), "Copy incident command"));
+      copyText(INCIDENT_CMD, document.getElementById("btnCopyIncident"), "Copy Agent Builder prompt"));
     document.getElementById("btnCopyEsql").addEventListener("click", () =>
       copyText(ALERT_ESQL, document.getElementById("btnCopyEsql"), "Copy alert ES|QL"));
     document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());

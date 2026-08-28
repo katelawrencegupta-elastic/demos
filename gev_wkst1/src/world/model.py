@@ -97,14 +97,16 @@ class World:
 
     def incident_window(self, anchor: datetime) -> tuple[datetime, datetime]:
         # Floor to the minute so backfill and verify share the same window.
+        # Clamp to `anchor` (now) so 60-minute alerts and SLO burn still fire.
         anchor = anchor.astimezone(timezone.utc).replace(second=0, microsecond=0)
         inc = self.cfg["incident"]
-        offset_start = anchor - timedelta(minutes=inc["start_offset_minutes"])
-        offset_end = offset_start + timedelta(minutes=inc["duration_minutes"])
-        if offset_end <= anchor:
-            return offset_start, offset_end
-        end = anchor - timedelta(minutes=15)
-        start = end - timedelta(minutes=inc["duration_minutes"])
+        start = anchor - timedelta(minutes=inc["start_offset_minutes"])
+        end = start + timedelta(minutes=inc["duration_minutes"])
+        if end > anchor:
+            end = anchor
+        if end <= start:
+            end = anchor
+            start = end - timedelta(minutes=inc["duration_minutes"])
         return start, end
 
     def hero_traces(self, anchor: datetime) -> list[HeroTrace]:

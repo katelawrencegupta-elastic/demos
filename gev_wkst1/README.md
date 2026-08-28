@@ -7,10 +7,10 @@ Synthetic multi-tenant fulfillment SaaS demo for Elastic Cloud Serverless. One c
 | # | Story | Kibana / CLI |
 |---|--------|----------------|
 | U1 | Unstructured orchestrator logs → structured, searchable, correlated | Discover · ingest pipeline |
-| U2 | End-to-end distributed trace with tenant context and DB deep dive | APM waterfall · E2E tracing dashboard |
-| U3 | EKS/pod incident root cause — restart to reason | K8s events · pod metrics · Inventory |
-| U4 | Alerting quality + AI-assisted triage | Alerts · Cases · AI Assistant |
-| U5 | Application monitoring + RCA agent → approval → email summary | `cli incident` · incident audit stream |
+| U2 | End-to-end distributed trace (7 hops) with tenant context and DB deep dive | APM waterfall · E2E tracing dashboard |
+| U3 | EKS/pod incident root cause — restart to reason | K8s events · pod metrics · Inventory (30s) |
+| U4 | Noisy vs native SLO vs correlated RCA | Alerts · SLOs · Cases · AI Assistant (opener) |
+| U5 | Agent Builder RCA → approve rollback into the case | Agent Builder `elasticco-rca-agent` · Cases |
 
 ## Prerequisites
 
@@ -33,21 +33,24 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m src.cli setup
 .venv/bin/python -m src.cli backfill --hours 6
 .venv/bin/python -m src.cli verify
-.venv/bin/python -m src.cli verify --alerts   # also check Kibana alert rules + Cases actions
+.venv/bin/python -m src.cli verify --alerts   # rules firing + Cases + native SLO + Agent Builder
 .venv/bin/python -m src.cli dashboards   # deep links + re-import assets
+.venv/bin/python -m src.cli agent --verify-only
 ```
 
-Optional live tick during a customer session:
+U4, U5, or the 25-minute arc — start a live tick in a **side terminal** before the room (`--live-incident` is the default):
 
 ```bash
 .venv/bin/python -m src.cli stream --tick 60
 ```
 
+U1–U3 historical Discover/APM/dashboards do not need the stream. Use `--no-live-incident` only if you want healthy recovery ticks.
+
 Narrow a reload with `--scope` (`orchestrator` | `apm` | `apm_deps` | `traces` | `k8s` | `infra`). `k8s` includes pod metrics plus host/node/APM-internal (`infra`).
 
 ## Incident (planted)
 
-**Tenant `acme-retail` checkout degradation** (~last 90 minutes of backfill):
+**Tenant `acme-retail` checkout degradation** (last ~60 minutes **through now**, so 60-minute alerts and SLO burn fire):
 
 - `checkout-api` **v2.4.1** memory leak → **OOMKilled** / restart loop on `eks-elastic-prod-usc1`
 - Orchestrator DAG `fulfillment.checkout` retries
@@ -55,6 +58,23 @@ Narrow a reload with `--scope` (`orchestrator` | `apm` | `apm_deps` | `traces` |
 - Hero `trace.id` values join orchestrator logs ↔ APM waterfall ↔ checkout logs
 
 Telemetry covers **12 services / 23 pods / 3 EKS nodes**. OOM remains checkout-only; other services emit healthy host, node, pod, and APM runtime metrics.
+
+Seven-hop checkout path: `edge-gateway` → `identity-service` → `checkout-api` → inventory / fraud / payments → postgres + redis + kafka → `notification-service`. Smoking gun: `SELECT … FOR UPDATE` on `orders` for `acme-retail`.
+
+## Alerts, SLO, Agent Builder
+
+| Object | Role |
+|--------|------|
+| `elasticco-noisy-node-cpu` | Anti-pattern — CPU threshold, no tenant/service |
+| `elasticco-slo-checkout-availability` | **Native SLO** — what you page on (`checkout-api` + `acme-retail`) |
+| `elasticco-checkout-correlated-rca` | ES\|QL **correlation** (OOM + slow DB + OOM logs) — RCA starter, not an SLO |
+| `elasticco-eks-pod-restarts` | Restart loop + Cases |
+| `elasticco-app-checkout-error-rate` | App error rate > 10% (U5 entry) |
+| `elasticco-rca-agent` | Agent Builder U5 close — ES\|QL tools, approve rollback into the case |
+
+Kibana: **SLOs**, **Agent Builder** (`/app/agent_builder/chat`), **Inventory** (U3 30s — skip if hosts do not render). Universal Profiling is talk-only after `CartCache.retainAll`; Synthetics is not in this demo.
+
+`logs-elasticco.incident-default` is written by the **facilitator CLI** (`incident`), not by Agent Builder. The customer audit is the Observability **case** thread.
 
 ## Data streams
 
@@ -70,7 +90,7 @@ Telemetry covers **12 services / 23 pods / 3 EKS nodes**. OOM remains checkout-o
 | `traces-apm-default` | Multi-service traces + DB spans + `tenant.id` |
 | `metrics-apm.service_destination.1m-default` | Service-map / Dependencies edges |
 | `metrics-apm.transaction.1m-default` | Root transaction aggregations |
-| `logs-elasticco.incident-default` | RCA agent audit trail (detected → remediated → notified) |
+| `logs-elasticco.incident-default` | CLI lab audit trail only (`cli incident`) |
 
 Filter everywhere with `labels.demo: elastic-co`.
 
@@ -91,7 +111,8 @@ Published by `setup` / `dashboards` (`src/dashboards.py`):
 - SE talk-tracks (5 min, per use case): [labs/talk-track-5.md](labs/talk-track-5.md)
 - Facilitator notes: [labs/facilitator.md](labs/facilitator.md)
 - Labs 01–05 (U1–U5): [labs/](labs/) · U5 walkthrough: [labs/05-app-monitoring-rca.md](labs/05-app-monitoring-rca.md)
-- AI triage prompts: [kibana/ai-triage-prompts.md](kibana/ai-triage-prompts.md)
+- AI / Agent Builder prompts: [kibana/ai-triage-prompts.md](kibana/ai-triage-prompts.md)
+- Agent Builder config: [config/rca_agent.yaml](config/rca_agent.yaml)
 - U4 knowledge base export: [kibana/knowledge-base-checkout-oom.md](kibana/knowledge-base-checkout-oom.md)
 
 HTML presentations (open in a browser; ← → navigate, F fullscreen):
@@ -108,10 +129,11 @@ HTML presentations (open in a browser; ← → navigate, F fullscreen):
 
 | Command | Purpose |
 |---------|---------|
-| `setup` | Pipelines, templates, data views, alerts, saved objects |
+| `setup` | Pipelines, templates, data views, alerts, native SLO, Agent Builder |
 | `sample` | Pipeline simulate / one-doc write check |
 | `backfill --hours N` | Plant history + incident (`--scope` to reload one stream family) |
-| `stream --tick N` | Live synthetic tick |
-| `verify` | Assert fields + `trace.id` correlation (`--alerts` for rule checks) |
+| `stream --tick N` | Live synthetic tick (`--live-incident` default pins the window through now; `--no-live-incident` for healthy recovery) |
+| `verify` | Assert fields + `trace.id` correlation (`--alerts` for rules/SLO/agent) |
 | `dashboards` | Re-import Kibana assets + print links |
-| `incident` | RCA agent: triage into a Kibana case, approve, remediate, email |
+| `agent` | Upsert Agent Builder RCA agent + ES\|QL tools (U5 close) |
+| `incident` | Facilitator backup: CLI RCA, case, email (not the customer close) |

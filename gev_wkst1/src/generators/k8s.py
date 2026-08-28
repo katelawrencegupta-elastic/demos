@@ -99,6 +99,7 @@ def emit_pod_metrics(world: World, t0, t1, anchor):
                 },
                 "container": {"id": pod.uid, "name": pod.service},
                 "kubernetes": {
+                    "cluster": {"name": cluster},
                     "namespace": pod.namespace,
                     "deployment": {"name": pod.service},
                     "pod": {
@@ -154,6 +155,7 @@ def emit_k8s_events(world: World, t0, t1, anchor):
             "orchestrator": {"cluster": {"name": cluster}},
             "host": {"name": pod.node, "hostname": pod.node},
             "kubernetes": {
+                "cluster": {"name": cluster},
                 "namespace": pod.namespace,
                 "pod": {"name": pod.name, "uid": pod.uid},
                 "node": {"name": pod.node},
@@ -180,6 +182,7 @@ def emit_k8s_events(world: World, t0, t1, anchor):
             "orchestrator": {"cluster": {"name": cluster}},
             "host": {"name": pod.node, "hostname": pod.node},
             "kubernetes": {
+                "cluster": {"name": cluster},
                 "namespace": pod.namespace,
                 "pod": {"name": pod.name, "uid": pod.uid},
                 "node": {"name": pod.node},
@@ -198,6 +201,7 @@ def emit_k8s_events(world: World, t0, t1, anchor):
 
 def emit_checkout_logs(world: World, t0, t1, anchor):
     start, end = world.incident_window(anchor)
+    cluster = world.cluster["name"]
     bad_ver = world.service("checkout-api").get("deploy_bad", "2.4.1")
     heroes = {h.trace_id: h for h in world.hero_traces(anchor)}
     rng = rng_for("coLogs", t0.isoformat())
@@ -220,6 +224,7 @@ def emit_checkout_logs(world: World, t0, t1, anchor):
             "trace": {"id": h.trace_id},
             "order": {"id": h.order_id},
             "kubernetes": {
+                "cluster": {"name": cluster},
                 "namespace": pod.namespace,
                 "deployment": {"name": "checkout-api"},
                 "pod": {"name": pod.name},
@@ -243,6 +248,7 @@ def emit_checkout_logs(world: World, t0, t1, anchor):
             "log": {"level": "fatal"},
             "service": {"name": "checkout-api", "version": bad_ver},
             "kubernetes": {
+                "cluster": {"name": cluster},
                 "namespace": pod.namespace,
                 "deployment": {"name": "checkout-api"},
                 "pod": {"name": pod.name},

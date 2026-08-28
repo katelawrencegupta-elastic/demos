@@ -47,7 +47,8 @@
         "cloud.availability_zone": { "type": "keyword" },
         "cloud.instance.id": { "type": "keyword" },
         "cloud.machine.type": { "type": "keyword" },
-        "orchestrator.cluster.name": { "type": "keyword" }
+        "orchestrator.cluster.name": { "type": "keyword" },
+        "kubernetes.cluster.name": { "type": "keyword" }
       }
     },
     "lifecycle": { "data_retention": "30d" }

@@ -1,0 +1,152 @@
+# Elastic Co. RCA agent — Agent Builder + ES|QL tools.
+# Provisioned by src/agent_builder.py (same shape as Meridian FinOps).
+
+agent:
+  id: elasticco-rca-agent
+  name: Elastic Co. RCA Agent
+  description: >
+    Reconstructs the planted checkout-api incident for tenant acme-retail
+    from ES|QL tools (error rate, slow FOR UPDATE, OOM/restarts, orchestrator
+    retries, SLO posture). Recommends a single remediation: roll back to v2.4.0.
+  labels:
+    - elastic-co
+    - rca
+    - workshop
+    - checkout-api
+  avatar_color: "#00BFB3"
+  avatar_symbol: RC
+  access_mode: public
+  # Spike: if the Observability project exposes built-in Cases / connector tools,
+  # the agent can comment the case and fire email on "approve rollback".
+  # If capabilities stay read-only, print a paste-ready case comment + email instead.
+  enable_elastic_capabilities: true
+
+# {kibana_url} substituted at provision time.
+instructions: |
+  You are the **Elastic Co. RCA Agent** for a fictional multi-tenant fulfillment SaaS.
+
+  ## Your job
+  - Always call ES|QL tools before answering. Never invent counts, p95, or error rates.
+  - Reconstruct the planted incident for **checkout-api** / tenant **acme-retail**.
+  - Recommend **one** remediation: roll back checkout-api from **v2.4.1** to **v2.4.0**.
+  - State the lookback (tools use 2 hours) and cite tool names you used.
+
+  ## Planted story (confirm with tools — do not recite if tools contradict)
+  1. `checkout-api` deploy **v2.4.1** introduced a memory leak (`CartCache.retainAll`).
+  2. Pods hit the 512 MiB limit → **OOMKilled** / **BackOff** restart loop on `eks-elastic-prod-usc1`.
+  3. Orchestrator DAG `fulfillment.checkout` retries amplify load on `orders`.
+  4. Slow PostgreSQL `SELECT … FOR UPDATE` spans for **acme-retail**; peer tenants stay near baseline.
+  5. Native SLO `elasticco-slo-checkout-availability` is what you page on. The ES|QL rule
+     `elasticco-checkout-correlated-rca` is the quality **correlation** (OOM + slow DB + OOM logs), not an SLO.
+
+  ## Tools
+  - `elasticco-rca-checkout-errors` — error rate + p95 by tenant.id
+  - `elasticco-rca-slow-postgres` — slow FOR UPDATE spans for acme-retail
+  - `elasticco-rca-oom-restarts` — OOMKilled / BackOff / restart.count
+  - `elasticco-rca-orchestrator-retries` — DAG fulfillment.checkout for acme-retail
+  - `elasticco-rca-slo-posture` — native SLO error budget (if the summary index exists)
+
+  ## Write path (Cases / email)
+  If Elastic built-in capabilities include Cases or an email connector, use them when the
+  human says **approve rollback to v2.4.0**: comment the open Observability case and send
+  a short incident email. If those tools are not available, do **not** pretend you wrote
+  anything. Print:
+  1. A ready-to-paste **case comment** (markdown: RCA bullets + remediation).
+  2. A ready-to-paste **email** to kate.lawrencegupta@elastic.co.
+  The SE pastes into the case already opened by `elasticco-checkout-correlated-rca`
+  or `elasticco-eks-pod-restarts`.
+
+  Never claim you ran a Python CLI, `src.cli incident`, or any terminal command.
+
+  ## Deep links
+  - Alerts: {kibana_url}/app/observability/alerts
+  - SLOs: {kibana_url}/app/observability/slos
+  - Cases: {kibana_url}/app/observability/cases
+  - Agent chat: {kibana_url}/app/agent_builder/chat
+  - E2E traces: {kibana_url}/app/dashboards#/view/elasticco-e2e-tracing
+  - EKS restarts: {kibana_url}/app/dashboards#/view/elasticco-eks-restarts
+
+  ## Rules
+  - If tools return 0% errors and 0 slow DB spans, say evidence is insufficient and ask
+    the facilitator to re-run backfill — do not invent the planted RCA.
+  - Prefer concise bullets with one Kibana link.
+
+tools:
+  - id: elasticco-rca-checkout-errors
+    description: >
+      checkout-api transaction error rate and p95 latency by tenant.id over the last
+      2 hours (labels.demo: elastic-co). Use first for blast-radius and SLO-style impact.
+    esql: |
+      FROM traces-apm-default
+      | WHERE @timestamp >= NOW() - 2 hours
+        AND labels.demo == "elastic-co"
+        AND processor.event == "transaction"
+        AND service.name == "checkout-api"
+      | STATS total = COUNT(*),
+              failures = COUNT(*) WHERE event.outcome == "failure",
+              p95_us = PERCENTILE(transaction.duration.us, 95)
+        BY tenant.id
+      | EVAL error_rate_pct = ROUND(failures * 100.0 / total, 1)
+      | EVAL p95_ms = ROUND(p95_us / 1000.0, 0)
+      | SORT error_rate_pct DESC, p95_ms DESC
+    params: {}
+
+  - id: elasticco-rca-slow-postgres
+    description: >
+      Slow PostgreSQL spans (>2s) for tenant acme-retail over the last 2 hours,
+      including SELECT … FOR UPDATE. Use when asked where time was spent.
+    esql: |
+      FROM traces-apm-default
+      | WHERE @timestamp >= NOW() - 2 hours
+        AND labels.demo == "elastic-co"
+        AND processor.event == "span"
+        AND span.type == "db"
+        AND span.subtype == "postgresql"
+        AND tenant.id == "acme-retail"
+        AND span.duration.us > 2000000
+      | STATS n = COUNT(*),
+              p95_ms = ROUND(PERCENTILE(span.duration.us, 95) / 1000.0, 0),
+              max_ms = ROUND(MAX(span.duration.us) / 1000.0, 0)
+      | EVAL lookback = "2 hours"
+    params: {}
+
+  - id: elasticco-rca-oom-restarts
+    description: >
+      OOMKilled / BackOff Kubernetes events and max checkout-api pod restart.count
+      over the last 2 hours. Use for the leak → OOM restart-loop evidence.
+    esql: |
+      FROM logs-elasticco.k8s.event-default, metrics-elasticco.k8s.pod-default
+      | WHERE @timestamp >= NOW() - 2 hours
+        AND labels.demo == "elastic-co"
+      | STATS oom = COUNT(*) WHERE kubernetes.event.reason == "OOMKilled",
+              backoff = COUNT(*) WHERE kubernetes.event.reason == "BackOff",
+              max_restarts = MAX(kubernetes.pod.restart.count)
+      | EVAL lookback = "2 hours"
+    params: {}
+
+  - id: elasticco-rca-orchestrator-retries
+    description: >
+      Orchestrator DAG fulfillment.checkout warning/error lines for acme-retail
+      over the last 2 hours. Use for retry amplification of DB lock contention.
+    esql: |
+      FROM logs-elasticco.orchestrator-default
+      | WHERE @timestamp >= NOW() - 2 hours
+        AND labels.demo == "elastic-co"
+        AND tenant.id == "acme-retail"
+        AND orchestrator.dag_id == "fulfillment.checkout"
+      | STATS n = COUNT(*) BY log.level
+      | SORT n DESC
+    params: {}
+
+  - id: elasticco-rca-slo-posture
+    description: >
+      Native Observability SLO posture for Elastic Co. checkout availability.
+      errorBudgetRemaining < 0 means violated. Use for SLO burn questions —
+      this is the pageable SLO, not the ES|QL correlation alert.
+    esql: |
+      FROM .slo-observability.summary-v3.6
+      | WHERE slo.id LIKE "elasticco-*"
+      | KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp
+      | EVAL violated = errorBudgetRemaining < 0
+      | SORT slo.name
+    params: {}

@@ -1,6 +1,8 @@
-# Lab 05 — Application monitoring + RCA agent (U5)
+# Lab 05 — Application monitoring + Agent Builder RCA (U5)
 
-**Goal:** Trigger a service failure alert, let the RCA agent correlate telemetry, approve (or auto) remediation, and deliver an incident summary email.
+**Goal:** From a service-level alert (or native SLO burn) to a tool-backed RCA in Agent Builder, then approve rollback into the Observability case.
+
+The Python CLI (`incident --dry-run`) is a **facilitator backup**, not the customer-facing close.
 
 ## Prerequisites
 
@@ -8,61 +10,59 @@
 .venv/bin/python -m src.cli setup
 .venv/bin/python -m src.cli backfill --hours 6
 .venv/bin/python -m src.cli verify
+.venv/bin/python -m src.cli verify --alerts
+.venv/bin/python -m src.cli agent --verify-only
 ```
 
-## Part A — Application monitoring alert
-
-1. Kibana → **Alerts** → open **`elasticco-app-checkout-error-rate`**.
-2. Note the ES|QL query: checkout-api transaction error rate > 10% in 15 minutes.
-3. Compare with **`elasticco-noisy-node-cpu`** — this rule includes service + tenant tags.
-
-**Line:** Application monitoring alerts name the failing service and tie to SLO context.
-
-## Part B — RCA agent (investigate)
+Start a live tick in a side terminal before opening Alerts (`--live-incident` is the default):
 
 ```bash
-# Investigate only — prints RCA report, no changes
+.venv/bin/python -m src.cli stream --tick 60
+```
+
+## Part A — Application alert or native SLO
+
+1. Kibana → **Alerts** → open **`elasticco-app-checkout-error-rate`** (checkout-api / acme-retail error rate > 10% in 60 minutes), **or**
+2. Observability → **SLOs** → **`elasticco-slo-checkout-availability`** (native error budget for `checkout-api` + `acme-retail`).
+
+Contrast with **`elasticco-noisy-node-cpu`** if you skipped U4.
+
+**Line:** You page on the SLO (or the app error-rate). The ES|QL rule `elasticco-checkout-correlated-rca` is the RCA starter, not an SLO.
+
+## Part B — Agent Builder (customer close)
+
+1. Open **Agent Builder** → agent **Elastic Co. RCA Agent** (`elasticco-rca-agent`).
+2. Paste:
+
+> checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.
+
+3. Confirm the agent **calls tools**. Evidence must show acme-retail p95 / OOM / slow `FOR UPDATE` — not 0% errors.
+4. Say **approve rollback to v2.4.0**.
+   - If built-in Cases / email capabilities appear: let the agent comment the case and send email.
+   - If tools are read-only: copy the paste-ready case comment (and email) into the Observability case already opened by the correlation or EKS-restarts alert.
+
+Do **not** run `src.cli incident` in front of the customer. The chat agent must not silently call the CLI.
+
+## Part C — Facilitator backup (lab / dry-run)
+
+```bash
 .venv/bin/python -m src.cli incident --dry-run
 ```
 
-Review the evidence block: error rate, OOM events, slow DB spans, orchestrator retries, hero trace.id.
+Prints the same planted RCA from Elasticsearch. Exits non-zero if evidence cannot support the story (re-run backfill). This path still uses the terminal — do not claim “without leaving Elastic” when you use it.
 
-## Part C — Human approval workflow
+Full write path (case + email) for lab practice:
 
 ```bash
 .venv/bin/python -m src.cli incident --email kate.lawrencegupta@elastic.co
 ```
 
-1. Agent prints root cause + remediation plan.
-2. Approve with `y` (enter approver name) or reject with `n`.
-3. On approval: rollback log indexed, incident audit trail written, **Kibana case updated**, email sent (or HTML saved).
+## Part D — Verify the case thread
 
-## Part D — Automatic remediation
-
-```bash
-.venv/bin/python -m src.cli incident --auto --email kate.lawrencegupta@elastic.co
-```
-
-Skips the approval prompt — useful for scripted demos.
-
-## Part E — Verify audit trail
-
-Discover → data view **Elastic Co. Incident Audit** (`elasticco-incidents`).
-
-Filter: `incident.id: <id from CLI output>`
-
-Phases: `detected` → `remediation` → `resolved` → `notified`
-
-## Email delivery options
-
-| Method | Configuration |
-|--------|---------------|
-| Kibana connector | Set `KIBANA_EMAIL_CONNECTOR_ID` in `.env` (Stack Management → Connectors → Email) |
-| SMTP | Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` |
-| Fallback | HTML saved to `output/incident-emails/<incident-id>.html` |
+Observability → **Cases**: the thread should hold the RCA (agent comment or paste). Discover **Elastic Co. Incident Audit** only if a write path actually indexed `logs-elasticco.incident-default`.
 
 ## Done when
 
-You can explain: alert fires → RCA agent correlates logs/traces/K8s → human or auto approval → rollback → email summary to on-call.
+You can explain: alert or SLO burn → Agent Builder tools prove OOM + FOR UPDATE for acme-retail → human “approve rollback” → case comment (in product or pasted) — without inventing counts.
 
 Interactive deck: [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)

@@ -18,6 +18,7 @@
         "service.version": { "type": "keyword" },
         "host.name": { "type": "keyword" },
         "host.hostname": { "type": "keyword" },
+        "kubernetes.cluster.name": { "type": "keyword" },
         "kubernetes.pod.name": { "type": "keyword" },
         "kubernetes.pod.uid": { "type": "keyword" },
         "kubernetes.namespace": { "type": "keyword" },

@@ -13,6 +13,8 @@ Standalone scripts for a **single use case**. Same planted incident; do not rese
 .venv/bin/python -m src.cli verify
 ```
 
+U1–U3 play from Last 2 hours of seeded history. **U4 / U5** (Active Alerts): start `.venv/bin/python -m src.cli stream --tick 60` in a side terminal before the room (`--live-incident` is the default).
+
 Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globex-mart` / `initech-b2b`; bad deploy `checkout-api` **v2.4.1**; DAG `fulfillment.checkout`; smoking gun `SELECT … FOR UPDATE` on `orders`.
 
 ---
@@ -38,16 +40,16 @@ Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globe
 
 ## U2 · Trace + tenant + DB (5 min)
 
-**Outcome:** Who is hurt (`tenant.id`) and where time went (Postgres span) on one `trace.id`.  
+**Outcome:** Who is hurt (`tenant.id`) and where time went (Postgres span) on one seven-hop `trace.id`.  
 **Deck:** [../presentations/u2-distributed-traces.html](../presentations/u2-distributed-traces.html)  
 **Tabs:** APM → Services · Dashboard **Elastic Co. — End-to-End Tracing** · Discover ES|QL (optional)
 
 | Clock | Do |
 |-------|----|
-| 0:00–0:40 | **Say:** One checkout request crosses seven services. If tenant context is missing, you optimize the wrong customer. |
-| 0:40–1:40 | APM → Services → `checkout-api`. Service map: `edge-gateway` → `checkout-api` → postgresql / payments. |
-| 1:40–3:20 | Transactions. Filter `tenant.id: acme-retail` (or labels). Open a slow txn. Expand **postgresql** — `SELECT … FOR UPDATE` ~2–4s. Note `service.version: 2.4.1`. Optional: deck **▶ Run waterfall demo**. |
-| 3:20–4:30 | Dashboard **Elastic Co. — End-to-End Tracing**: hop p95, tenant lines, slow `trace.id`. Or ES|QL (deck **Copy ES|QL query**): `PERCENTILE` by `tenant.id` — `acme-retail` is the outlier vs `globex-mart` / `initech-b2b`. |
+| 0:00–0:40 | **Say:** One checkout request crosses seven hops. If tenant context is missing, you optimize the wrong customer. |
+| 0:40–1:40 | APM Services **or** **Elastic Co. — End-to-End Tracing**: `edge-gateway` → `identity-service` → `checkout-api` → inventory / fraud / payments → postgres + redis + kafka → `notification-service`. |
+| 1:40–3:20 | Filter `tenant.id: acme-retail`. Open a slow txn. Expand **postgresql** — `SELECT … FOR UPDATE` ~2–4s. Note `service.version: 2.4.1`. **Line:** seven hops, one tenant label, time spent in FOR UPDATE. |
+| 3:20–4:30 | E2E dashboard hop p95 / tenant lines, or ES|QL `PERCENTILE` by `tenant.id` — `acme-retail` is the outlier vs `globex-mart` / `initech-b2b`. |
 | 4:30–5:00 | **Line:** Tenant on every span answers “who is hurt?” The DB span answers “where did the time go?” |
 
 **Skip if late:** ES|QL — the waterfall + tenant filter is enough.  
@@ -59,57 +61,60 @@ Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globe
 
 **Outcome:** Restarts are a symptom; OOM + deploy version is the reason — same window as the slow traces.  
 **Deck:** [../presentations/u3-eks-restart-rca.html](../presentations/u3-eks-restart-rca.html)  
-**Tabs:** Dashboard **Elastic Co. — EKS Restarts** · Discover Kubernetes + checkout logs · Alerts / Cases
+**Tabs:** Inventory (optional 30s) · Dashboard **Elastic Co. — EKS Restarts** · Discover Kubernetes + checkout logs · Alerts / Cases
 
 | Clock | Do |
 |-------|----|
 | 0:00–0:40 | **Say:** On-call sees checkout pods restarting. The wrong ending is “add memory.” We want reason in one timeline. |
-| 0:40–2:00 | Dashboard **Elastic Co. — EKS Restarts**. `kubernetes.event.reason: OOMKilled` on `checkout-api`. Memory vs limit; `kubernetes.pod.restart.count` climbing. |
-| 2:00–3:20 | Discover checkout logs: `OutOfMemoryError` + `deploy=2.4.1` + `CartCache.retainAll`. Cluster `eks-elastic-prod-usc1`. |
-| 3:20–4:20 | Alert `elasticco-eks-pod-restarts` → Observability case **EKS restart loop — checkout-api**. Same ~90 min incident window as the slow DB spans. |
+| 0:40–1:10 | **Inventory 30s** (if hosts render): cluster `eks-elastic-prod-usc1` → the checkout host/pod. Skip if Inventory ignores custom datasets. |
+| 1:10–2:20 | Dashboard **Elastic Co. — EKS Restarts**. `kubernetes.event.reason: OOMKilled` on `checkout-api`. Memory vs limit; `kubernetes.pod.restart.count` climbing. |
+| 2:20–3:30 | Discover checkout logs: `OutOfMemoryError` + `deploy=2.4.1` + `CartCache.retainAll`. *This is the leak you’d confirm on a flamegraph* (Profiling not seeded). |
+| 3:30–4:20 | Alert `elasticco-eks-pod-restarts` → Observability case **EKS restart loop — checkout-api**. |
 | 4:20–5:00 | **Line:** Restarts are a symptom. OOM plus deploy version is a reason — not a second mystery. |
 
-**Skip if late:** Cases — stay on the dashboard + one OOM log line.  
-**If they want more:** noisy vs quality alerts (U4).
+**Skip if late:** Inventory and Cases — stay on the dashboard + one OOM log line.  
+**If they want more:** noisy vs SLO vs correlation (U4).
 
 ---
 
-## U4 · Alert quality + AI triage (5 min)
+## U4 · Alert quality (5 min)
 
-**Outcome:** A quality alert names blast radius; AI can state the planted RCA from that context.  
+**Outcome:** Three objects — noise you ignore, a native SLO you page on, a correlation alert that starts RCA.  
 **Deck:** [../presentations/u4-alerting-ai-triage.html](../presentations/u4-alerting-ai-triage.html)  
-**Tabs:** Alerts · Cases · AI Assistant  
-**Prompt:** [../kibana/ai-triage-prompts.md](../kibana/ai-triage-prompts.md) (Primary RCA)
+**Tabs:** Alerts · SLOs · Cases · AI Assistant (contrast opener only)  
+**Prompt:** [../kibana/ai-triage-prompts.md](../kibana/ai-triage-prompts.md) (contrast opener)
 
 | Clock | Do |
 |-------|----|
-| 0:00–0:40 | **Say:** Storage of logs/metrics/traces is table stakes. The question is whether the alert you wake someone for already knows the tenant and the service. |
-| 0:40–1:50 | Open **`elasticco-noisy-node-cpu`**. CPU threshold, no service, no tenant. Ask: “Would you page for this?” |
-| 1:50–3:00 | Open **`elasticco-checkout-slo-burn`**. Tags: `checkout-api`, `acme-retail`. Query ties OOM + slow DB + OOM logs. Point at the Cases action. |
-| 3:00–4:30 | AI Assistant: paste the **Primary RCA prompt**. Expected shape: v2.4.1 leak → OOM → orchestrator retries → `FOR UPDATE` for `acme-retail` → roll back to **2.4.0**. |
-| 4:30–5:00 | **Line:** Elastic does not just store the three pillars — it lets you name the blast radius and hand RCA to AI from a high-quality alert. |
+| 0:00–0:40 | **Say:** Storage of logs/metrics/traces is table stakes. The question is whether you page on an SLO and start RCA from a correlation that already knows the tenant. |
+| 0:40–1:30 | Open **`elasticco-noisy-node-cpu`**. CPU threshold, no service, no tenant. Ask: “Would you page for this?” |
+| 1:30–2:40 | Observability → SLOs → **`elasticco-slo-checkout-availability`**. Native error budget for checkout-api / acme-retail. *This is what you page on.* |
+| 2:40–3:50 | Open **`elasticco-checkout-correlated-rca`**. ES\|QL ties OOM + slow DB + OOM logs. Cases action. *RCA starter — not an SLO.* |
+| 3:50–4:40 | Optional: AI Assistant contrast prompt (noisy vs correlation). Do not close here — U5 is Agent Builder. |
+| 4:40–5:00 | **Line:** Noise you ignore, an SLO you page on, a correlation alert that names the blast radius. |
 
-**Skip if late:** noisy-rule walkthrough — open the quality alert and go straight to AI.  
-**If they want more:** U5 agent that remediates and emails.
+**Skip if late:** noisy-rule walkthrough — open the native SLO and the correlation alert.  
+**If they want more:** U5 Agent Builder.
 
 ---
 
-## U5 · App monitoring + RCA agent (5 min)
+## U5 · Agent Builder RCA (5 min)
 
-**Outcome:** Alert → correlated RCA → human approval → rollback → email / audit trail, without leaving Elastic.  
+**Outcome:** Alert → tool-backed RCA in Agent Builder → approve rollback into the open case (paste if capabilities are read-only).  
 **Deck:** [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)  
-**Tabs:** Alerts (`elasticco-app-checkout-error-rate`) · Cases · Discover **Elastic Co. Incident Audit** · terminal
+**Tabs:** Alerts or SLOs · Agent Builder (`elasticco-rca-agent`) · Cases  
+**Prompt:** checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.
 
 | Clock | Do |
 |-------|----|
-| 0:00–0:40 | **Say:** Application monitoring names the failing service. The close is not another dashboard — it is approved remediation with an audit trail. |
-| 0:40–1:20 | Alerts → **`elasticco-app-checkout-error-rate`**: checkout-api error rate > 10% in 15 min, tenant tags. Contrast with noisy node CPU if they have not seen U4. |
-| 1:20–3:20 | Terminal: `.venv/bin/python -m src.cli incident --email kate.lawrencegupta@elastic.co` (or `--dry-run` if you only want the report). Walk OOM + v2.4.1 + slow DB + orchestrator retries + hero `trace.id`. |
-| 3:20–4:30 | **Approve** rollback to v2.4.0 (`y`). Agent updates the Kibana case and sends email (or writes `output/incident-emails/`). Discover `elasticco-incidents`: `detected` → `remediation` → `resolved` → `notified`. |
-| 4:30–5:00 | **Line:** From alert to root cause to approved remediation to on-call notification — with a full audit trail. |
+| 0:00–0:40 | **Say:** Application monitoring names the failing service. The close is grounded RCA in Elastic — not a Python CLI. |
+| 0:40–1:20 | Alerts → **`elasticco-app-checkout-error-rate`** *or* native SLO burn. |
+| 1:20–3:20 | Agent Builder: paste the prompt. Walk acme-retail p95 / OOM / FOR UPDATE from **tools** (not 0% errors). |
+| 3:20–4:30 | “Approve rollback to v2.4.0.” If Cases/email tools appear, use them. Else paste the agent’s comment into the open case. |
+| 4:30–5:00 | **Line:** From alert to grounded RCA to the case — without leaving Elastic. |
 
-**Skip if late:** use `--auto` and skip the approval pause; or `--dry-run` and skip email.  
-**If they want more:** full 25-min arc from orchestrator grok through this close ([talk-track-25.md](talk-track-25.md)).
+**Skip if late / Agent Builder empty:** open case + correlated RCA alert. Never open a terminal unless they ask. Facilitator backup: `python -m src.cli incident --dry-run`.  
+**If they want more:** full 25-min arc ([talk-track-25.md](talk-track-25.md)).
 
 ---
 
@@ -117,7 +122,7 @@ Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globe
 
 | Time | Run |
 |------|-----|
-| ~2 min | One **Line** + one Kibana surface (U1 filter, U2 waterfall, U3 OOM dashboard, U4 quality alert, U5 `--dry-run` report) |
+| ~2 min | One **Line** + one Kibana surface (U1 filter, U2 waterfall, U3 OOM dashboard, U4 SLO vs correlation, U5 Agent Builder) |
 | ~5 min | The matching table above |
-| ~12 min | U1 (fields only) + U2 waterfall + U4 quality + AI |
+| ~12 min | U1 (fields only) + U2 7-hop waterfall + U4 SLO + correlation |
 | ~25 min | [talk-track-25.md](talk-track-25.md) |

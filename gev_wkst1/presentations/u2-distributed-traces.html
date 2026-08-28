@@ -261,7 +261,7 @@
           <div class="slide-header">
             <span class="pill">Use case 2</span><span class="pill">Elastic APM</span>
             <h2>End-to-end trace · tenant context · DB deep dive</h2>
-            <p>One checkout request crosses seven services. Every span carries tenant.id so you can name the blast radius. The Postgres FOR UPDATE span shows where time went — not just that something was slow.</p>
+            <p>One checkout request crosses seven hops. Every span carries tenant.id so you can name the blast radius. Line: <strong>seven hops, one tenant label, time spent in FOR UPDATE.</strong></p>
           </div>
           <div class="hero-stats">
             <div class="hero-stat"><div class="num">7</div><div class="lbl">Services in one checkout trace</div></div>
@@ -336,7 +336,7 @@
         <section class="slide" data-slide="4">
           <div class="slide-header">
             <h2>Waterfall walkthrough</h2>
-            <p>Step through each hop in trace <code>271f8e318871…</code> for tenant acme-retail. The orders-db span dominates latency during the incident.</p>
+            <p>Step through each hop in trace <code>271f8e318871…</code> for tenant acme-retail. Open dashboard <strong>Elastic Co. — End-to-End Tracing</strong> in the live demo. The orders-db <code>FOR UPDATE</code> span dominates latency.</p>
           </div>
           <div class="grid-2">
             <div class="card">
@@ -510,10 +510,10 @@
     ];
 
     const KIBANA = [
+      ["Dashboard elasticco-e2e-tracing", "Seven hops + tenant p95 — primary U2 surface"],
       ["APM → Services", "checkout-api latency + error rate · filter tenant.id"],
       ["APM → Traces", "Root POST /checkout transactions"],
-      ["APM → Trace sample", "Open waterfall · expand postgres span"],
-      ["Dashboard elasticco-e2e-tracing", "Hop treemap + tenant p95 comparison"],
+      ["APM → Trace sample", "Open waterfall · expand postgres FOR UPDATE span"],
       ["Discover (elasticco-orchestrator)", "Filter trace.id from APM — U1 correlation"],
       ["Dev Tools ES|QL", "Tenant p95 asymmetry query"],
     ];

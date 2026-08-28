@@ -5,10 +5,10 @@
 | UC | Focus | Primary surfaces |
 |----|--------|------------------|
 | U1 | Orchestrator grok → Discover | Ingest pipeline · `elasticco-orchestrator` |
-| U2 | Distributed traces · tenant · DB span | APM · `traces-apm-default` |
-| U3 | EKS OOM restart → reason | K8s events · pod metrics · checkout logs |
-| U4 | Noisy vs quality alerts · AI triage | Alerts · Cases · AI Assistant |
-| U5 | App monitoring alert · RCA agent · approval · email | `cli incident` · `elasticco-incidents` |
+| U2 | Seven-hop traces · tenant · `FOR UPDATE` | APM · **End-to-End Tracing** dashboard |
+| U3 | EKS OOM restart → reason (+ Inventory 30s) | K8s events · pod metrics · checkout logs |
+| U4 | Noisy vs **native SLO** vs correlated RCA | Alerts · SLOs · Cases · AI Assistant (opener) |
+| U5 | Agent Builder RCA → case / email | Agent Builder `elasticco-rca-agent` · Cases |
 
 ## Story key (do not show early)
 
@@ -23,25 +23,30 @@
 | DAG | `fulfillment.checkout` |
 | DB smoking gun | `SELECT … FOR UPDATE` on `orders`, span ~2–4s |
 | Correlation key | `trace.id` (+ `tenant.id`, `order.id`) |
+| Native SLO | `elasticco-slo-checkout-availability` (page on this) |
+| Correlation alert | `elasticco-checkout-correlated-rca` (RCA starter, **not** an SLO) |
 
 ## Environment
 
 - Serverless Observability project; credentials in `.env`.
 - Fictional EKS — no real cluster. Metrics/events are synthetic but ECS-shaped.
 - Alert rule APIs differ slightly by stack version; if rule create warns, create manually from [../kibana/alert-rules.json](../kibana/alert-rules.json) and continue — talk-track still works on seeded data.
-- **U5 email:** configure `KIBANA_EMAIL_CONNECTOR_ID` or SMTP in `.env` (see [../.env.example](../.env.example)); otherwise HTML is saved under `output/incident-emails/`.
+- **Agent Builder write path:** `enable_elastic_capabilities: true` on `elasticco-rca-agent`. If Cases / email tools appear, “approve rollback” can comment the case. If capabilities stay read-only, paste the agent’s comment into the case the alert already opened.
+- **CLI backup:** `python -m src.cli incident --dry-run` (lab 05). Do not claim “without leaving Elastic” on a terminal path. Never have the chat agent silently call `src.cli incident`.
+- **U5 email (CLI only):** `KIBANA_EMAIL_CONNECTOR_ID` or SMTP in `.env`; otherwise HTML under `output/incident-emails/`.
 
 ## Pre-flight checklist
 
-- [ ] `python -m src.cli setup` succeeds (pipelines + templates + alerts)
+- [ ] `python -m src.cli setup` succeeds (pipelines + templates + alerts + native SLO + Agent Builder)
 - [ ] `backfill --hours 6` indexes without FAILED lines
 - [ ] `verify` all `[ok]` including hero trace correlation
-- [ ] `verify --alerts` — quality rules active; Cases on slo-burn + eks-restarts
+- [ ] `verify --alerts` — rules **exist, enabled, Cases on correlation + eks-restarts, firing**; native SLO present; Agent Builder tools + `elasticco-rca-agent`
+- [ ] Retired name `elasticco-checkout-slo-burn` is **disabled** (renamed to `elasticco-checkout-correlated-rca`)
 - [ ] Discover shows structured `tenant.id` on orchestrator (pipeline ran)
-- [ ] APM shows `checkout-api` / DB spans
-- [ ] AI Assistant connector configured on the project (LLM)
-- [ ] **U5:** `python -m src.cli incident --dry-run` prints RCA without errors
-- [ ] **U5:** email connector or SMTP configured (or accept HTML fallback)
+- [ ] APM / E2E dashboard shows seven hops + DB spans
+- [ ] Agent Builder chat opens; a test prompt returns **non-zero** acme-retail errors / slow DB (not 0%)
+- [ ] **U4 / U5 / 25-min:** `stream --tick 60` running in a side terminal (`--live-incident` is the default). U1–U3 historical path does not need it.
+- [ ] **Facilitator only:** `python -m src.cli incident --dry-run` prints RCA (fails if evidence is weak)
 
 ## Failure modes
 
@@ -49,10 +54,21 @@
 |---------|-----|
 | Orchestrator missing `tenant.id` | Re-run `setup`; confirm index template `default_pipeline`; re-backfill orchestrator scope |
 | APM empty | `ensure_apm_mappings` + backfill `--scope apm`; check API key has write to `traces-apm-default` |
+| Alerts not firing / RCA 0% errors | Incident window must cover **now**. Re-backfill; start `stream --tick 60` (live-incident default). `verify --alerts` checks last-60m hits |
 | Alert create 400 | Create `.es-query` rule manually with ES\|QL from `kibana/alert-rules.json` |
-| AI vague | Use prompts in `kibana/ai-triage-prompts.md`; narrow time to Last 2 hours; mention `labels.demo: elastic-co` |
-| U5 email not sent | Check connector/SMTP in `.env`; open `output/incident-emails/*.html` |
-| U5 case not updated | Re-run `setup` for Cases action; use `--no-case` only for dry demos |
+| Native SLO 403 | Soft-fail is OK; still teach SLO vs correlation using the SLO app if the object exists, or say “we provision via `/api/observability/slos`” |
+| Agent Builder empty / 0% errors | Do not invent. Skip to open case + `elasticco-checkout-correlated-rca`. Re-backfill. |
+| Agent Builder 403 | `python -m src.cli agent` after confirming Agent Builder is enabled on the project |
+| Inventory empty | Custom `metrics-elasticco.host-*` may not light Inventory. Skip the 30s beat; stay on EKS Restarts |
+| AI vague (U4 opener) | Use prompts in `kibana/ai-triage-prompts.md`; Last 2 hours; `labels.demo: elastic-co` |
+| CLI email not sent | Lab-only path — check connector/SMTP; open `output/incident-emails/*.html` |
+
+## Product surfaces we do **not** fake
+
+| Surface | Stance |
+|---------|--------|
+| Universal Profiling | Talk only after `CartCache.retainAll`. Do not synthesize `profiling-*` streams. |
+| Synthetics | Skip. No sixth use case; a full browser monitor is a large fake. |
 
 ## Lab flow (optional after SE path)
 

@@ -1,4 +1,4 @@
-"""CLI: setup | sample | backfill | stream | verify | dashboards."""
+"""CLI: setup | sample | backfill | stream | verify | dashboards | agent | incident."""
 from __future__ import annotations
 
 import argparse
@@ -131,10 +131,30 @@ def cmd_backfill(args: argparse.Namespace):
         print(f"  FAILED  {n:5d} -> {idx}: {errors.get(idx)}")
     if failed:
         raise SystemExit(1)
+    from src.setup_cmd import refresh_data_views
+
+    print("== refresh data views ==")
+    refresh_data_views(force=True)
 
 
 def cmd_stream(args: argparse.Namespace):
     world = load_world()
+    live_incident = getattr(args, "live_incident", True)
+    if live_incident:
+        # Keep the tick inside the planted window so a long session does not
+        # emit healthy recovery traffic that ages 60-minute alerts out.
+        duration = max(int(world.cfg["incident"].get("duration_minutes", 60)), 15)
+        world.cfg["incident"]["start_offset_minutes"] = duration
+        world.cfg["incident"]["duration_minutes"] = duration
+        print(
+            "  [live-incident] pinning incident window through now "
+            "so 60-minute alerts stay firing"
+        )
+    else:
+        print(
+            "  [warn] --no-live-incident: ticks are healthy recovery; "
+            "60-minute alerts will age out"
+        )
     gens = select(args.scope)
     ensure_apm_mappings()
     print(f"streaming scope={args.scope} tick={args.tick}s (Ctrl+C to stop)")
@@ -154,15 +174,51 @@ def cmd_stream(args: argparse.Namespace):
         time.sleep(args.tick)
 
 
+def _last_60m_correlation_hits() -> int:
+    """Hits that should keep the 60-minute correlation / error-rate rules firing."""
+    gte = {"range": {"@timestamp": {"gte": "now-60m"}}}
+    demo = {"term": {"labels.demo": "elastic-co"}}
+
+    def n(index: str, extra: dict) -> int:
+        try:
+            r = es_search(
+                index,
+                {
+                    "size": 0,
+                    "track_total_hits": True,
+                    "query": {"bool": {"filter": [gte, demo, extra]}},
+                },
+            )
+            return int(r["hits"]["total"]["value"])
+        except Exception:
+            return 0
+
+    oom = n(DS_K8S_EVENT, {"term": {"kubernetes.event.reason": "OOMKilled"}})
+    logs = n(DS_CHECKOUT, {"query_string": {"query": "*OutOfMemory*", "fields": ["message"]}})
+    slow = n(
+        DS_TRACES,
+        {
+            "bool": {
+                "must": [
+                    {"term": {"span.type": "db"}},
+                    {"term": {"tenant.id": "acme-retail"}},
+                    {"range": {"span.duration.us": {"gte": 2_000_000}}},
+                ]
+            }
+        },
+    )
+    return oom + logs + slow
+
+
 def verify_alert_rules() -> bool:
-    """Assert demo alert rules exist, are enabled, and quality rules have Cases actions."""
+    """Assert demo alert rules exist, are enabled, have Cases where claimed, and are firing."""
     rules_file = KIBANA_DIR / "alert-rules.json"
     if not rules_file.exists():
         print("[fail] kibana/alert-rules.json missing")
         return False
 
     expected = json.loads(rules_file.read_text())
-    rules_with_cases = {"elasticco-checkout-slo-burn", "elasticco-eks-pod-restarts"}
+    rules_with_cases = {"elasticco-checkout-correlated-rca", "elasticco-eks-pod-restarts"}
     ok = True
 
     try:
@@ -210,6 +266,28 @@ def verify_alert_rules() -> bool:
                     "(re-run setup or attach system-connector-.cases in Kibana)"
                 )
                 ok = False
+
+        status = (remote.get("execution_status") or {}).get("status", "")
+        if status == "active":
+            print(f"[ok] {name}: firing (execution_status=active)")
+        elif name in rules_with_cases or name == "elasticco-app-checkout-error-rate":
+            print(
+                f"[fail] {name}: not firing (execution_status={status or 'unknown'}) "
+                "— wait 1–2 min after backfill or start stream (live-incident default)"
+            )
+            ok = False
+        else:
+            print(f"[info] {name}: execution_status={status or 'unknown'}")
+
+    hits = _last_60m_correlation_hits()
+    if hits > 0:
+        print(f"[ok] last-60m correlation evidence: {hits} hits")
+    else:
+        print(
+            "[fail] last-60m correlation evidence: 0 hits "
+            "(incident window is not through now — re-run backfill or start stream)"
+        )
+        ok = False
 
     return ok
 
@@ -314,18 +392,57 @@ def cmd_verify(args: argparse.Namespace):
             print(f"[fail] correlation hero trace {tid[:12]}… logs={n_log} traces={n_tr}")
             ok = False
 
+    print("== data views ==")
+    from src.setup_cmd import verify_data_views
+
+    if not verify_data_views():
+        ok = False
+
     if getattr(args, "alerts", False):
         print("== alert rules ==")
         if not verify_alert_rules():
             ok = False
+        print("== native SLO ==")
+        try:
+            from src.slos import SLO_ID, SLO_API, _kbn as slo_kbn
+
+            r = slo_kbn("GET", f"{SLO_API}/{SLO_ID}")
+            if r.status_code == 200:
+                print(f"[ok] SLO {SLO_ID}")
+            elif r.status_code in (403, 404):
+                print(f"[warn] SLO {SLO_ID}: {r.status_code} (soft-fail)")
+            else:
+                print(f"[fail] SLO {SLO_ID}: {r.status_code}")
+                ok = False
+        except Exception as exc:
+            print(f"[warn] SLO check: {exc}")
+        print("== Agent Builder ==")
+        try:
+            from src.agent_builder import verify_agent
+
+            if not verify_agent():
+                ok = False
+        except Exception as exc:
+            print(f"[warn] Agent Builder check: {exc}")
 
     print(f"Kibana: {KIBANA_URL}")
     if not ok:
         raise SystemExit(1)
 
 
+def cmd_agent(args: argparse.Namespace):
+    """Provision or re-print the Agent Builder RCA agent (customer-facing U5 close)."""
+    from src.agent_builder import ensure_agent, verify_agent
+
+    if getattr(args, "verify_only", False):
+        if not verify_agent():
+            raise SystemExit(1)
+        return
+    ensure_agent(fail_loud=getattr(args, "fail_loud", False))
+
+
 def cmd_incident(args: argparse.Namespace):
-    """U5: RCA agent — investigate, approve, remediate, email summary."""
+    """Facilitator backup: CLI RCA — investigate, approve, remediate, email summary."""
     from src.rca_agent import run_incident_workflow
 
     run_incident_workflow(
@@ -339,18 +456,23 @@ def cmd_incident(args: argparse.Namespace):
 
 def cmd_dashboards(_: argparse.Namespace):
     """Re-import Kibana saved objects + publish ES|QL incident dashboard."""
-    from src.setup_cmd import ensure_alert_rules, ensure_data_views, import_saved_objects, publish_dashboard
+    from src.setup_cmd import ensure_alert_rules, import_saved_objects, publish_dashboard, refresh_data_views
 
-    ensure_data_views()
     import_saved_objects()
+    print("== data views ==")
+    refresh_data_views(force=True)
     publish_dashboard()
     ensure_alert_rules()
     print("Deep links:")
     print(f"  Discover orchestrator: {KIBANA_URL}/app/discover#/?_a=(dataSource:(dataViewId:elasticco-orchestrator))")
+    print(f"  Discover logs (all):   {KIBANA_URL}/app/discover#/?_a=(dataSource:(dataViewId:elasticco-logs))")
     print(f"  APM services:          {KIBANA_URL}/app/apm/services")
     print(f"  Alerts:                {KIBANA_URL}/app/observability/alerts")
     print(f"  Cases:                 {KIBANA_URL}/app/observability/cases")
     print(f"  AI Assistant:          {KIBANA_URL}/app/observabilityAIAssistant")
+    print(f"  Agent Builder:         {KIBANA_URL}/app/agent_builder/chat")
+    print(f"  SLOs:                  {KIBANA_URL}/app/observability/slos")
+    print(f"  Inventory:             {KIBANA_URL}/app/observability/inventory")
     print(f"  Dashboard (incident):  {KIBANA_URL}/app/dashboards#/view/elasticco-incident-overview")
     print(f"  Dashboard (eks):       {KIBANA_URL}/app/dashboards#/view/elasticco-eks-restarts")
     print(f"  Dashboard (traces):    {KIBANA_URL}/app/dashboards#/view/elasticco-distributed-traces")
@@ -362,7 +484,7 @@ def main():
     p = argparse.ArgumentParser(description="Elastic Co. observability demo")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("setup", help="pipelines, templates, data views, alerts").set_defaults(
+    sub.add_parser("setup", help="pipelines, templates, alerts, native SLO, Agent Builder").set_defaults(
         func=cmd_setup
     )
 
@@ -390,22 +512,42 @@ def main():
         default="all",
         choices=["all", "orchestrator", "apm", "apm_deps", "traces", "k8s", "infra"],
     )
+    st.add_argument(
+        "--live-incident",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="keep the planted incident window through now so 60-minute alerts stay firing "
+        "(default: on; --no-live-incident for healthy recovery ticks)",
+    )
     st.set_defaults(func=cmd_stream)
 
     v = sub.add_parser("verify", help="assert correlation + field presence")
     v.add_argument(
         "--alerts",
         action="store_true",
-        help="also verify Kibana alert rules exist and Cases actions are attached",
+        help="verify alert rules (exist, enabled, Cases, firing) plus native SLO and Agent Builder",
     )
     v.set_defaults(func=cmd_verify)
     sub.add_parser("dashboards", help="import Kibana assets + print links").set_defaults(
         func=cmd_dashboards
     )
 
+    ag = sub.add_parser("agent", help="provision Agent Builder RCA agent (U5 close)")
+    ag.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="check tools + agent exist; do not upsert",
+    )
+    ag.add_argument(
+        "--fail-loud",
+        action="store_true",
+        help="exit non-zero if Agent Builder APIs reject the upsert",
+    )
+    ag.set_defaults(func=cmd_agent)
+
     inc = sub.add_parser(
         "incident",
-        help="U5 RCA agent: investigate, approve remediation, email summary",
+        help="facilitator backup: CLI RCA investigate / approve / email (not the customer close)",
     )
     inc.add_argument(
         "--auto",

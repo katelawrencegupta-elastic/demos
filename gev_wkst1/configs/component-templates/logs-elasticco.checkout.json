@@ -2,18 +2,63 @@
   "template": {
     "mappings": {
       "properties": {
-        "tenant.id": { "type": "keyword" },
-        "trace.id": { "type": "keyword" },
-        "order.id": { "type": "keyword" },
-        "service.name": { "type": "keyword" },
-        "service.version": { "type": "keyword" },
-        "kubernetes.pod.name": { "type": "keyword" },
-        "kubernetes.namespace": { "type": "keyword" },
-        "kubernetes.deployment.name": { "type": "keyword" },
-        "kubernetes.container.name": { "type": "keyword" },
-        "log.level": { "type": "keyword" },
+        "tenant": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "trace": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "order": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "service": {
+          "properties": {
+            "name": { "type": "keyword" },
+            "version": { "type": "keyword" }
+          }
+        },
+        "kubernetes": {
+          "properties": {
+            "cluster": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "pod": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "namespace": { "type": "keyword" },
+            "deployment": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "container": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            }
+          }
+        },
+        "log": {
+          "properties": {
+            "level": { "type": "keyword" }
+          }
+        },
         "message": { "type": "match_only_text" },
-        "labels.demo": { "type": "keyword" }
+        "labels": {
+          "properties": {
+            "demo": { "type": "keyword" }
+          }
+        }
       }
     },
     "lifecycle": { "data_retention": "30d" }

@@ -27,6 +27,7 @@
         "orchestrator.type": { "type": "keyword" },
         "container.id": { "type": "keyword" },
         "container.name": { "type": "keyword" },
+        "kubernetes.cluster.name": { "type": "keyword" },
         "kubernetes.namespace": { "type": "keyword" },
         "kubernetes.deployment.name": { "type": "keyword" },
         "kubernetes.node.name": { "type": "keyword" },

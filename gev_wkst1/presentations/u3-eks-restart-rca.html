@@ -178,7 +178,7 @@
     <aside class="sidebar">
       <div class="brand">Elastic Observability</div>
       <h1>U3 · EKS restart to reason</h1>
-      <p>From pod restart count to OOMKilled, deploy version, and the cache leak.</p>
+      <p>From pod restart count to OOMKilled, deploy version, and the cache leak. Inventory 30s if hosts render.</p>
       <ul class="nav" id="nav"></ul>
       <div class="controls">
         <button class="primary" id="btnPlay">▶ Walk restart → reason</button>
@@ -194,7 +194,7 @@
           <div class="slide-header">
             <span class="pill">Use case 3</span><span class="pill">Kubernetes</span>
             <h2>Restarts are a symptom. OOM + deploy version is the reason.</h2>
-            <p>checkout-api pods on <code>eks-elastic-prod-usc1</code> enter a restart loop. Reconstruct the timeline from metrics, Kubernetes events, and container logs — no kubectl required.</p>
+            <p>checkout-api pods on <code>eks-elastic-prod-usc1</code> enter a restart loop. Optional 30s on Observability Inventory (skip if custom host metrics do not render), then reconstruct the timeline from metrics, Kubernetes events, and container logs — no kubectl required.</p>
           </div>
           <div class="hero-stats">
             <div class="hero-stat"><div class="num">3</div><div class="lbl">checkout-api pods OOMKilled</div></div>
@@ -336,12 +336,12 @@
                 <div class="stat"><label>Title</label><span>EKS restart loop — checkout-api (eks-elastic-prod-usc1)</span></div>
                 <div class="stat"><label>Owner</label><span>observability</span></div>
                 <div class="stat"><label>Action</label><span>system-connector-.cases</span></div>
-                <div class="stat"><label>RCA agent</label><span>python -m src.cli incident --auto</span></div>
+                <div class="stat"><label>RCA close</label><span>Agent Builder elasticco-rca-agent (U5)</span></div>
               </div>
             </div>
             <div class="callout success" style="margin:0;">
               <strong>U3 → U4 / U5</strong>
-              <p>U3 proves restart → reason from telemetry. U4 contrasts this quality rule with noisy CPU. U5 has the RCA agent post the same evidence onto the case and roll back to v2.4.0.</p>
+              <p>U3 proves restart → reason from telemetry. Optional 30s on Inventory if hosts render. U4 contrasts noisy CPU vs native SLO vs this quality restart/correlation path. U5 Agent Builder lands the RCA on the case.</p>
             </div>
           </div>
         </section>
@@ -349,7 +349,7 @@
         <section class="slide" data-slide="6">
           <div class="slide-header">
             <h2>Kibana surfaces &amp; resources</h2>
-            <p>Where to demo U3. Filter time to Last 6 hours after backfill.</p>
+            <p>Where to demo U3. Filter time to <strong>Last 2 hours</strong> after backfill (incident window is through now).</p>
           </div>
           <div class="grid-2">
             <div class="card">
@@ -419,7 +419,7 @@
         detail: "RSS walks toward the limit. kubernetes.pod.memory.usage.limit.pct approaches 0.80–0.95.",
         mem: [28, 34, 40, 48, 55, 62, 70, 76, 82, 88, 92, 95] },
       { n: 3, when: "t+25m", title: "OutOfMemoryError", hot: true,
-        detail: "Checkout log: FATAL java.lang.OutOfMemoryError: Java heap space deploy=2.4.1 suspected_leak=CartCache.retainAll",
+        detail: "Checkout log: FATAL java.lang.OutOfMemoryError: Java heap space deploy=2.4.1 suspected_leak=CartCache.retainAll. This is the leak you’d confirm on a flamegraph — Universal Profiling is not seeded (talk only).",
         mem: [40, 48, 58, 68, 76, 84, 90, 94, 97, 98, 98, 98] },
       { n: 4, when: "t+25m", title: "OOMKilled", hot: true,
         detail: "Kubernetes Warning event. kubernetes.event.reason: OOMKilled — kubelet killed the container at the cgroup limit.",
@@ -501,6 +501,7 @@
     ];
 
     const KIBANA = [
+      ["Observability → Inventory", "30s: host for eks-elastic-prod-usc1 → same checkout pod (skip if empty)"],
       ["Dashboard elasticco-eks-restarts", "Memory vs limit, restart count by pod, event reasons"],
       ["Discover · Elastic Co. Kubernetes", "Filter kubernetes.event.reason: OOMKilled"],
       ["Saved search EKS OOMKilled / BackOff", "Open the planted kill + BackOff events"],

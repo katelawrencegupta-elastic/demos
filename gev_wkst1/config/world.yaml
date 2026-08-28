@@ -133,9 +133,10 @@ orchestrator:
 
 incident:
   name: acme-checkout-degradation
-  # Relative to backfill/stream anchor (utcnow). Incident occupies this window.
-  start_offset_minutes: 90
-  duration_minutes: 45
+  # Relative to backfill/stream anchor (utcnow). Occupies the last 60 minutes
+  # through "now" so 60-minute alerts and SLO burn still fire after backfill.
+  start_offset_minutes: 60
+  duration_minutes: 60
   blast_tenant: acme-retail
   bad_deploy_version: "2.4.1"
   root_cause: >
@@ -148,8 +149,8 @@ alerts:
     name: elasticco-noisy-node-cpu
     description: CPU > 70% on any node (no service/tenant context)
   quality:
-    name: elasticco-checkout-slo-burn
-    description: checkout-api restarts or error rate with acme-retail SLO burn
+    name: elasticco-checkout-correlated-rca
+    description: OOM + slow DB + OOM logs for acme-retail (RCA starter, not an SLO)
   eks_restarts:
     name: elasticco-eks-pod-restarts
     description: OOMKilled / BackOff / restart count on checkout-api (opens a case)

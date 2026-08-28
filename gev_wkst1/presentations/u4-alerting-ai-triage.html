@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>U4 · Alert Quality + AI Triage — Elastic Stack</title>
+  <title>U4 · Noisy vs SLO vs Correlated RCA — Elastic Stack</title>
   <style>
     :root {
       --bg: #0b0d0e; --surface: #141619; --surface-2: #1c1f24; --border: #2a2f36;
@@ -126,11 +126,11 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">Elastic Observability</div>
-      <h1>U4 · Alert quality + AI triage</h1>
-      <p>Noisy vs contextual alerts, Cases connector, and Observability AI RCA.</p>
+      <h1>U4 · Noisy vs SLO vs correlation</h1>
+      <p>Noisy vs native SLO vs correlated RCA — then Agent Builder in U5.</p>
       <ul class="nav" id="nav"></ul>
       <div class="controls">
-        <button class="primary" id="btnCopyPrompt">Copy RCA prompt</button>
+        <button class="primary" id="btnCopyPrompt">Copy contrast prompt</button>
         <button id="btnCopyEsql">Copy quality rule ES|QL</button>
         <button id="btnFullscreen">Fullscreen</button>
       </div>
@@ -141,18 +141,18 @@
       <div class="slides">
         <section class="slide active" data-slide="0">
           <div class="slide-header">
-            <span class="pill">Use case 4</span><span class="pill">Alerting + AI</span>
-            <h2>Bad alerts waste on-call time · good alerts hand off to AI</h2>
-            <p>Contrast a threshold-only CPU rule with an ES|QL rule that ties OOM, slow Postgres spans, and checkout logs for tenant acme-retail — then let Observability AI reconstruct the planted RCA.</p>
+            <span class="pill">Use case 4</span><span class="pill">Alerts · SLO</span>
+            <h2>Bad alerts waste on-call time · page on an SLO · start RCA from correlation</h2>
+            <p>Three objects: a threshold-only CPU rule (anti-pattern), a <strong>native</strong> checkout SLO you page on, and an ES|QL correlation alert that ties OOM + slow Postgres + checkout logs for acme-retail. U5 closes in Agent Builder — not a pasted AI Assistant prompt.</p>
           </div>
           <div class="hero-stats">
-            <div class="hero-stat"><div class="num">2</div><div class="lbl">Alert rules side-by-side (noisy vs quality)</div></div>
-            <div class="hero-stat"><div class="num">1</div><div class="lbl">ES|QL query spans logs + traces + events</div></div>
-            <div class="hero-stat"><div class="num">4</div><div class="lbl">RCA chain steps AI should surface</div></div>
+            <div class="hero-stat"><div class="num">3</div><div class="lbl">Objects: noisy · native SLO · correlated RCA</div></div>
+            <div class="hero-stat"><div class="num">1</div><div class="lbl">ES|QL correlation spans logs + traces + events</div></div>
+            <div class="hero-stat"><div class="num">1</div><div class="lbl">Native SLO elasticco-slo-checkout-availability</div></div>
           </div>
           <div class="callout" style="margin-top:2rem;">
             <strong>Customer outcome</strong>
-            <p>On-call opens one quality alert, AI names v2.4.1 → OOM → orchestrator retries → FOR UPDATE lock contention for acme-retail — without opening five dashboards.</p>
+            <p>On-call ignores noisy CPU, pages on native SLO burn, and starts RCA from a correlation alert that already names tenant and service.</p>
           </div>
         </section>
 
@@ -189,8 +189,8 @@
 
         <section class="slide" data-slide="2">
           <div class="slide-header">
-            <h2>Quality alert · elasticco-checkout-slo-burn</h2>
-            <p>ES|QL correlates Kubernetes OOM, slow DB spans for acme-retail, and OutOfMemoryError logs in one rule.</p>
+            <h2>Correlated RCA · elasticco-checkout-correlated-rca</h2>
+            <p>ES|QL quality <strong>correlation</strong> — OOM + slow DB for acme-retail + OutOfMemoryError logs. This is the RCA starter, <strong>not</strong> an SLO. Page on native SLO <code>elasticco-slo-checkout-availability</code>.</p>
           </div>
           <div class="card">
             <div class="card-head">Rule query <span class="badge ok">ES|QL · multi-stream</span></div>
@@ -200,9 +200,10 @@
             <div class="card">
               <div class="card-head">Tags &amp; context</div>
               <div class="card-body stat-grid">
-                <div class="stat"><label>Tags</label><span>checkout-api · acme-retail · quality</span></div>
-                <div class="stat"><label>Window</label><span>15 minutes</span></div>
+                <div class="stat"><label>Tags</label><span>checkout-api · acme-retail · rca</span></div>
+                <div class="stat"><label>Window</label><span>60 minutes</span></div>
                 <div class="stat"><label>Cases action</label><span>system-connector-.cases</span></div>
+                <div class="stat"><label>Native SLO (page on)</label><span>elasticco-slo-checkout-availability</span></div>
               </div>
             </div>
             <div class="callout success" style="margin:0;">
@@ -218,10 +219,10 @@
             <p>Click a row to highlight. Use this table in the customer conversation before opening Kibana Alerts.</p>
           </div>
           <div class="card">
-            <div class="card-head">Noisy vs quality <span class="badge info">Interactive</span></div>
+            <div class="card-head">Noisy vs SLO vs correlation <span class="badge info">Interactive</span></div>
             <div class="card-body">
               <table id="compareTable">
-                <thead><tr><th>Dimension</th><th>elasticco-noisy-node-cpu</th><th>elasticco-checkout-slo-burn</th></tr></thead>
+                <thead><tr><th>Dimension</th><th>Noisy CPU</th><th>Native SLO</th><th>Correlated RCA</th></tr></thead>
                 <tbody></tbody>
               </table>
               <div class="detail-panel" id="compareDetail" style="margin-top:1rem;padding:0.85rem;background:var(--surface-2);border-radius:10px;border:1px solid var(--border);">
@@ -253,7 +254,7 @@
               <div class="stat"><label>Verify</label><span>python -m src.cli verify --alerts</span></div>
               <div class="callout">
                 <strong>U5 overlap</strong>
-                <p>RCA agent (<code>cli incident</code>) also posts triage comments to the same case — U4 sets up alert → case; U5 closes the loop with remediation + email.</p>
+                <p>RCA Agent Builder (U5) comments this case — or the SE pastes the tool-backed RCA. U4 sets up alert → case; U5 closes without a terminal.</p>
               </div>
             </div>
           </div>
@@ -261,12 +262,12 @@
 
         <section class="slide" data-slide="5">
           <div class="slide-header">
-            <h2>AI triage · prompts + knowledge base</h2>
-            <p>Paste the primary RCA prompt into Observability AI Assistant. Optional: import the runbook KB export first.</p>
+            <h2>Contrast opener · optional AI Assistant</h2>
+            <p>Optional contrast opener in Observability AI Assistant. The U5 close is Agent Builder, not this paste.</p>
           </div>
           <div class="grid-2">
             <div class="card">
-              <div class="card-head">Primary RCA prompt <span class="badge info">Copy from sidebar</span></div>
+              <div class="card-head">Optional RCA prompt <span class="badge info">Copy from sidebar</span></div>
               <div class="card-body"><pre class="prompt" id="rcaPrompt"></pre></div>
             </div>
             <div class="card">
@@ -310,7 +311,7 @@
               <div class="stat"><label>Verify alerts</label><span>python -m src.cli verify --alerts</span></div>
               <div class="callout success">
                 <strong>Exit line</strong>
-                <p>Elastic does not just store the three pillars — it lets you name the blast radius and hand the RCA to AI from a high-quality alert.</p>
+                <p>Elastic does not just store the three pillars — it lets you ignore noise, page on an SLO, and start RCA from a correlation that already names the blast radius.</p>
               </div>
             </div>
           </div>
@@ -329,10 +330,10 @@
   </div>
 
   <script>
-    const SLIDES = ["Overview", "Noisy rule", "Quality rule", "Compare", "Cases", "AI triage", "Kibana"];
+    const SLIDES = ["Overview", "Noisy rule", "Correlation", "Compare", "Cases", "Contrast opener", "Kibana"];
 
     const QUALITY_ESQL = `FROM logs-elasticco.k8s.event-default, logs-elasticco.checkout-default, traces-apm-default
-| WHERE @timestamp >= NOW() - 15 minutes
+| WHERE @timestamp >= NOW() - 60 minutes
 | WHERE labels.demo == "elastic-co"
 | WHERE kubernetes.event.reason == "OOMKilled"
     OR (span.type == "db" AND tenant.id == "acme-retail" AND span.duration.us > 2000000)
@@ -348,29 +349,28 @@
 Return: blast radius (tenants/services), most likely root cause, and the single best next remediation step.`;
 
     const COMPARE = [
-      ["Signal source", "Pod CPU metric only", "OOM events + APM DB spans + app logs"],
-      ["Query language", "KQL + threshold", "ES|QL across 3 data streams"],
-      ["Tenant context", "None", "acme-retail in span filter + tags"],
-      ["Service context", "None", "checkout-api in tags"],
-      ["Blast radius", "Unknown — any pod", "Named tenant + checkout path"],
-      ["Cases action", "None", "system-connector-.cases"],
-      ["AI-ready?", "Needs 5 dashboards first", "Enough context to start RCA"],
+      ["What it is", "Threshold on any pod CPU", "Native Observability SLO (error budget)", "ES|QL correlation across 3 streams"],
+      ["Name", "elasticco-noisy-node-cpu", "elasticco-slo-checkout-availability", "elasticco-checkout-correlated-rca"],
+      ["Tenant / service", "None", "checkout-api + acme-retail", "acme-retail in span filter + tags"],
+      ["Page on this?", "No — anti-pattern", "Yes — error budget / burn", "No — RCA starter, not an SLO"],
+      ["Cases action", "None", "Burn-rate rule (optional)", "system-connector-.cases"],
+      ["AI / agent ready?", "Needs 5 dashboards first", "Shows impact, not the leak", "Enough context to start RCA"],
     ];
 
     const CASES_RULES = [
-      ["elasticco-checkout-slo-burn", "Opens/updates case on SLO-burn correlation"],
+      ["elasticco-checkout-correlated-rca", "Opens/updates case on OOM + slow DB + OOM logs"],
       ["elasticco-eks-pod-restarts", "Opens case on restart loop (OOM/BackOff)"],
     ];
 
     const KIBANA = [
-      ["Alerts → Rules", "Open noisy vs quality rules; read tags and ES|QL"],
-      ["Alerts → Active", "Show firing during backfill window"],
-      ["Observability → Cases", "Case from alert connector or RCA agent"],
-      ["Observability AI Assistant", "Paste primary RCA prompt"],
+      ["Alerts → Rules", "Open noisy vs correlated RCA; read tags and ES|QL"],
+      ["Observability → SLOs", "elasticco-slo-checkout-availability — what you page on"],
+      ["Alerts → Active", "Show firing during the through-now incident window"],
+      ["Observability → Cases", "Case from correlation or eks-restarts"],
+      ["Observability AI Assistant", "Optional contrast opener only"],
+      ["Agent Builder (U5)", "elasticco-rca-agent — customer-facing close"],
       ["Knowledge base", "Import knowledge-base-checkout-oom.md"],
       ["Dashboard elasticco-incident-overview", "Optional timeline context"],
-      ["CLI incident (U5)", "python -m src.cli incident — RCA, approval, case, email"],
-      ["U5 deck", "presentations/u5-app-monitoring-rca.html"],
       ["Lab 05", "labs/05-app-monitoring-rca.md"],
     ];
 
@@ -403,16 +403,16 @@ Return: blast radius (tenants/services), most likely root cause, and the single 
 
     function buildCompare() {
       const body = document.querySelector("#compareTable tbody");
-      COMPARE.forEach(([dim, noisy, quality], i) => {
+      COMPARE.forEach(([dim, noisy, slo, quality], i) => {
         const tr = document.createElement("tr");
         tr.classList.add("clickable");
-        tr.innerHTML = `<td>${dim}</td><td>${noisy}</td><td>${quality}</td>`;
+        tr.innerHTML = `<td>${dim}</td><td>${noisy}</td><td>${slo}</td><td>${quality}</td>`;
         tr.addEventListener("click", () => {
           document.querySelectorAll("#compareTable tr").forEach(r => r.classList.remove("selected"));
           tr.classList.add("selected");
           document.getElementById("compareDetail").innerHTML =
             `<h4 style="margin:0 0 0.35rem;font-size:0.85rem;">${dim}</h4>
-             <p style="margin:0;color:var(--muted);font-size:0.82rem;"><strong style="color:var(--warn)">Noisy:</strong> ${noisy}<br><strong style="color:var(--success)">Quality:</strong> ${quality}</p>`;
+             <p style="margin:0;color:var(--muted);font-size:0.82rem;"><strong style="color:var(--warn)">Noisy:</strong> ${noisy}<br><strong style="color:var(--accent)">Native SLO:</strong> ${slo}<br><strong style="color:var(--success)">Correlated RCA:</strong> ${quality}</p>`;
         });
         body.appendChild(tr);
         if (i === 0) tr.click();
@@ -447,7 +447,7 @@ Return: blast radius (tenants/services), most likely root cause, and the single 
     document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
     document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
     document.getElementById("btnCopyPrompt").addEventListener("click", () =>
-      copyText(RCA_PROMPT, document.getElementById("btnCopyPrompt"), "Copy RCA prompt"));
+      copyText(RCA_PROMPT, document.getElementById("btnCopyPrompt"), "Copy contrast prompt"));
     document.getElementById("btnCopyEsql").addEventListener("click", () =>
       copyText(QUALITY_ESQL, document.getElementById("btnCopyEsql"), "Copy quality rule ES|QL"));
     document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());

@@ -1,12 +1,13 @@
 # Lab 02 — Tenant traces and DB deep dive (U2)
 
-**Goal:** Compare blast vs healthy tenants and inspect a slow Postgres span.
+**Goal:** Compare blast vs healthy tenants and inspect a slow Postgres span on the **seven-hop** checkout path.
 
 ## Steps
 
-1. APM → Transactions for `checkout-api`. Filter `tenant.id: "acme-retail"` (or labels).
-2. Open a slow transaction → expand the span `SELECT … FOR UPDATE orders`. Note duration and `service.version`.
-3. Run ES|QL (Discover ES|QL mode or Dev Tools `_query`):
+1. APM → Services **or** dashboard **Elastic Co. — End-to-End Tracing**. Hop list: `edge-gateway` → `identity-service` → `checkout-api` → inventory / fraud / payments → postgres + redis + kafka → `notification-service`.
+2. APM → Transactions for `checkout-api`. Filter `tenant.id: "acme-retail"` (or labels).
+3. Open a slow transaction → expand the span `SELECT … FOR UPDATE orders`. Note duration and `service.version` (2.4.1 in the incident window).
+4. Run ES|QL (Discover ES|QL mode or Dev Tools `_query`):
 
 ```esql
 FROM traces-apm-default
@@ -17,8 +18,8 @@ FROM traces-apm-default
 | SORT p95 DESC
 ```
 
-4. Confirm `acme-retail` is slower / higher than `globex-mart` and `initech-b2b`.
-5. Pick a `trace.id` from a slow trace. In Discover orchestrator view, filter `trace.id: <id>` — you should see DAG task lines for the same checkout.
+5. Confirm `acme-retail` is slower / higher than `globex-mart` and `initech-b2b`.
+6. Pick a `trace.id` from a slow trace. In Discover orchestrator view, filter `trace.id: <id>` — you should see DAG task lines for the same checkout.
 
 ## Done when
 

@@ -124,6 +124,7 @@ def emit_host_metrics(world: World, t0, t1, anchor):
                     "machine": {"type": node["machine_type"]},
                 },
                 "orchestrator": {"cluster": {"name": cluster}, "type": "kubernetes"},
+                "kubernetes": {"cluster": {"name": cluster}},
                 "labels": base_labels(),
                 "tags": ["synthetic", "infrastructure", "host"],
             }
@@ -170,6 +171,7 @@ def emit_node_metrics(world: World, t0, t1, anchor):
                 },
                 "host": {"name": name, "hostname": name, "id": node["instance_id"]},
                 "kubernetes": {
+                    "cluster": {"name": cluster},
                     "node": {
                         "name": name,
                         "cpu": {
@@ -259,6 +261,7 @@ def emit_apm_internal(world: World, t0, t1, anchor):
                 "cloud": {"provider": "aws", "region": region},
                 "container": {"id": pod.uid, "name": pod.service},
                 "kubernetes": {
+                    "cluster": {"name": cluster},
                     "namespace": pod.namespace,
                     "pod": {"name": pod.name, "uid": pod.uid},
                     "node": {"name": pod.node},
