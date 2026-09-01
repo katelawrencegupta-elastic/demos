@@ -246,7 +246,9 @@ as the real integrations), so OOTB dashboards work:
 Notes:
 
 - `setup` installs cloud + LLM packages, creates APM gen_ai mappings + **180d**
-  trace retention, wires CUR alias / inference data-view Serverless workarounds,
+  trace retention, enables **GenAI Settings → Token usage tracking** (and the
+  managed inference dashboard when the API allows), wires CUR alias /
+  inference data-view Serverless workarounds,
   provisions FinOps spend SLOs + budget alerts, provisions the Meridian FinOps AI
   Assistant, and removes TSDS mode from
   `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
@@ -266,6 +268,7 @@ src/world/                 # inventory + scenarios + cloud costs + LLM catalog
 src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
+src/genai_settings.py      # GenAI token usage tracking + OOTB dashboard install
 src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
 src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)

@@ -43,7 +43,13 @@ def ensure_packages():
         print(f"  installing package {pkg} ...")
         r = requests.post(f"{KIBANA_URL}/api/fleet/epm/packages/{pkg}",
                           headers=KBN_HEADERS, json={}, timeout=600)
-        r.raise_for_status()
+        if r.status_code >= 300:
+            # APM is often unavailable via Fleet on Serverless (built-in OTel).
+            if pkg == "apm":
+                print(f"  [warn] package {pkg} install failed ({r.status_code}) — "
+                      "continuing (gen_ai traces index on first backfill)")
+                continue
+            r.raise_for_status()
         print(f"  [ok] package {pkg} installed")
 
 
@@ -315,6 +321,28 @@ def patch_inference_token_usage_dashboard():
     r = requests.get(
         f"{KIBANA_URL}/api/data_views/data_view/{INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}",
         headers=KBN_HEADERS, timeout=30)
+    if r.status_code == 404:
+        r = requests.post(
+            f"{KIBANA_URL}/api/data_views/data_view",
+            headers=KBN_HEADERS, timeout=30, json={
+                "override": True,
+                "data_view": {
+                    "id": INFERENCE_TOKEN_USAGE_DATA_VIEW_ID,
+                    "title": INFERENCE_TOKEN_USAGE_INDEX,
+                    "name": "Inference Token Usage",
+                    "timeFieldName": "@timestamp",
+                    "allowNoIndex": True,
+                },
+            })
+        if r.status_code >= 300:
+            print(f"  [warn] could not create data view: {r.status_code} {r.text[:400]}")
+            return
+        updated = r.json().get("data_view") or r.json()
+        n_fields = len(updated.get("fields") or {})
+        print(f"  [ok] created data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID} -> "
+              f"{INFERENCE_TOKEN_USAGE_INDEX} ({n_fields} fields)")
+        _pin_dashboard_time_range(INFERENCE_TOKEN_USAGE_DASHBOARD_ID)
+        return
     if r.status_code != 200:
         print(f"  [warn] data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}: {r.status_code}")
         return
@@ -393,6 +421,9 @@ def run():
         from src.generators.llm_apm import ensure_apm_genai_mappings
         ensure_apm_genai_mappings(fail_loud=True)
     if v.setup_enabled("inference"):
+        print("== GenAI Settings: token usage tracking ==")
+        from src.genai_settings import ensure_genai_token_usage_tracking
+        ensure_genai_token_usage_tracking(fail_loud=False)
         print("== inference token-usage template ==")
         from src.generators.elastic_ai import _ensure_template
         _ensure_template()
