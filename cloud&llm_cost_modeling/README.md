@@ -52,6 +52,38 @@ correlates across streams:
 | `logs-azure.activitylogs-default` | Azure activity log records |
 | `metrics-azure.billing-default` | Per-VM + per-resource-group daily usage costs |
 
+## Workshop forks (per cloud / integration)
+
+The master project (`cloud&llm_cost_modeling`) supports **variant profiles** that scope
+generators, Fleet packages, setup steps, and dashboards to one cloud or LLM integration pack.
+
+Materialize self-contained copies (sibling directories under `demos/`):
+
+```bash
+python scripts/fork_project.py --list          # variant ids + destination dirs
+python scripts/fork_project.py --all           # fork every variant
+python scripts/fork_project.py aws gcp azure   # fork selected variants
+python scripts/fork_project.py --force openai  # replace an existing fork
+```
+
+| Variant | Directory | Focus |
+|---|---|---|
+| `all` | `cloud-llm-cost-modeling-all` | Full multi-cloud + all LLM + Elastic AI |
+| `aws` | `cloud-llm-cost-modeling-aws` | CloudTrail, GuardDuty, S3, EC2, CUR, Bedrock, ESS credits |
+| `gcp` | `cloud-llm-cost-modeling-gcp` | GCP audit/billing + Vertex AI |
+| `azure` | `cloud-llm-cost-modeling-azure` | Azure activity/billing + Azure OpenAI |
+| `openai` | `cloud-llm-cost-modeling-openai` | OpenAI completions/embeddings/usage streams |
+| `anthropic` | `cloud-llm-cost-modeling-anthropic` | Anthropic usage/cost/rate-limit metrics |
+| `bedrock` | `cloud-llm-cost-modeling-bedrock` | Amazon Bedrock invocation/runtime/guardrails |
+| `vertexai` | `cloud-llm-cost-modeling-vertexai` | Vertex prompt logs, metrics, audit logs |
+| `azure-openai` | `cloud-llm-cost-modeling-azure-openai` | Azure OpenAI logs/metrics/billing |
+| `elastic-ai` | `cloud-llm-cost-modeling-elastic-ai` | Agent Builder traces + inference token usage |
+
+Each fork ships with `config/active_variant.yaml` and a `FORK.md` quickstart. Re-run
+`fork_project.py` from the master tree after code changes to refresh forks (`--force`).
+
+Active variant in any tree: `python -m src.cli variants` (or set `MERIDIAN_VARIANT`).
+
 ## Usage
 
 ### Workshop quickstart
@@ -238,7 +270,9 @@ src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
 src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)
 src/elastic_ai_reindex.py  # wipe + re-backfill Agent Builder / inference synthetic data
-src/cli.py                 # setup | … | reindex-elastic-ai | agent | dashboards | backup
+src/cli.py                 # setup | … | variants | dashboards | backup
+src/variant.py             # workshop fork profiles (config/variants.yaml)
+scripts/fork_project.py    # materialize per-cloud/integration forks
 src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic

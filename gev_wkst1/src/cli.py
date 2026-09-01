@@ -268,7 +268,10 @@ def verify_alert_rules() -> bool:
                 ok = False
 
         status = (remote.get("execution_status") or {}).get("status", "")
-        if status == "active":
+        if status == "error":
+            print(f"[fail] {name}: execution_status=error")
+            ok = False
+        elif status == "active":
             print(f"[ok] {name}: firing (execution_status=active)")
         elif name in rules_with_cases or name == "elasticco-app-checkout-error-rate":
             print(
@@ -410,12 +413,14 @@ def cmd_verify(args: argparse.Namespace):
             if r.status_code == 200:
                 print(f"[ok] SLO {SLO_ID}")
             elif r.status_code in (403, 404):
-                print(f"[warn] SLO {SLO_ID}: {r.status_code} (soft-fail)")
+                print(f"[fail] SLO {SLO_ID}: {r.status_code}")
+                ok = False
             else:
                 print(f"[fail] SLO {SLO_ID}: {r.status_code}")
                 ok = False
         except Exception as exc:
-            print(f"[warn] SLO check: {exc}")
+            print(f"[fail] SLO check: {exc}")
+            ok = False
         print("== Agent Builder ==")
         try:
             from src.agent_builder import verify_agent
@@ -423,7 +428,8 @@ def cmd_verify(args: argparse.Namespace):
             if not verify_agent():
                 ok = False
         except Exception as exc:
-            print(f"[warn] Agent Builder check: {exc}")
+            print(f"[fail] Agent Builder check: {exc}")
+            ok = False
 
     print(f"Kibana: {KIBANA_URL}")
     if not ok:
@@ -472,7 +478,6 @@ def cmd_dashboards(_: argparse.Namespace):
     print(f"  AI Assistant:          {KIBANA_URL}/app/observabilityAIAssistant")
     print(f"  Agent Builder:         {KIBANA_URL}/app/agent_builder/chat")
     print(f"  SLOs:                  {KIBANA_URL}/app/observability/slos")
-    print(f"  Inventory:             {KIBANA_URL}/app/observability/inventory")
     print(f"  Dashboard (incident):  {KIBANA_URL}/app/dashboards#/view/elasticco-incident-overview")
     print(f"  Dashboard (eks):       {KIBANA_URL}/app/dashboards#/view/elasticco-eks-restarts")
     print(f"  Dashboard (traces):    {KIBANA_URL}/app/dashboards#/view/elasticco-distributed-traces")
@@ -556,7 +561,7 @@ def main():
     )
     inc.add_argument(
         "--email",
-        default="kate.lawrencegupta@elastic.co",
+        default="oncall@elastic.co",
         help="incident summary recipient",
     )
     inc.add_argument(

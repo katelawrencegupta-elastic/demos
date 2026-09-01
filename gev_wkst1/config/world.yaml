@@ -134,7 +134,7 @@ orchestrator:
 incident:
   name: acme-checkout-degradation
   # Relative to backfill/stream anchor (utcnow). Occupies the last 60 minutes
-  # through "now" so 60-minute alerts and SLO burn still fire after backfill.
+  # through "now" so 60-minute alerts still fire after backfill.
   start_offset_minutes: 60
   duration_minutes: 60
   blast_tenant: acme-retail
@@ -147,7 +147,7 @@ incident:
 alerts:
   noisy:
     name: elasticco-noisy-node-cpu
-    description: CPU > 70% on any node (no service/tenant context)
+    description: CPU > 25% on any host (no service/tenant context)
   quality:
     name: elasticco-checkout-correlated-rca
     description: OOM + slow DB + OOM logs for acme-retail (RCA starter, not an SLO)
@@ -165,7 +165,7 @@ app_monitoring:
   slo_target_ms: 400
   rca_agent:
     name: elasticco-rca-agent
-    default_email: kate.lawrencegupta@elastic.co
+    default_email: oncall@elastic.co
     approval_required: true
   remediation:
     rollback_version: "2.4.0"

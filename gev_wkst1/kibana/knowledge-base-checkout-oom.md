@@ -48,7 +48,7 @@ Orchestrator DAG **`fulfillment.checkout`** retries amplify load on the `orders`
 | Object | Role |
 |------|------|
 | `elasticco-noisy-node-cpu` | **Anti-pattern** — high CPU on any pod, no service/tenant context |
-| `elasticco-slo-checkout-availability` | **Native SLO** — what you page on (error budget / burn for checkout-api + acme-retail) |
+| `elasticco-slo-checkout-availability` | **Native SLO** — what you page on (error budget for checkout-api + acme-retail) |
 | `elasticco-checkout-correlated-rca` | **Quality correlation** — ES\|QL ties OOM + slow DB spans + OOM logs (not an SLO) |
 | `elasticco-eks-pod-restarts` | **Quality** — restart loop with Cases action |
 | `elasticco-rca-agent` | **U5 close** — Agent Builder tools reconstruct RCA; approve rollback into the case |

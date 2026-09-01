@@ -1,0 +1,343 @@
+# Workshop fork profiles — each variant scopes generators, Fleet packages,
+# setup steps, and dashboard publishing to one cloud or integration pack.
+#
+# Materialize forks:  python scripts/fork_project.py --all
+# Active fork:         config/active_variant.yaml  (or MERIDIAN_VARIANT env)
+
+variants:
+  all:
+    title: "Meridian FinOps & LLM Observability — full multi-cloud"
+    fork_dir: cloud-llm-cost-modeling-all
+    default_scope: all
+    generators: all
+    packages:
+      - aws
+      - gcp
+      - azure
+      - azure_billing
+      - openai
+      - anthropic
+      - anthropic_metrics
+      - azure_openai
+      - aws_bedrock
+      - gcp_vertexai
+      - aws_billing
+      - apm
+    setup:
+      tsds: true
+      cur: true
+      aws_billing: true
+      openai: true
+      azure_openai: true
+      anthropic: true
+      vertexai: true
+      bedrock: true
+      ess_billing: true
+      apm: true
+      inference: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: true
+      dynamic: true
+      ai: true
+    ootb_links:
+      - ess_billing
+      - aws_cur
+      - gcp_billing
+      - azure_billing
+      - anthropic
+      - openai
+      - azure_openai
+      - bedrock
+      - vertexai
+      - apm
+
+  aws:
+    title: "Meridian FinOps — AWS"
+    fork_dir: cloud-llm-cost-modeling-aws
+    default_scope: all
+    generators:
+      - aws_cloudtrail
+      - aws_guardduty
+      - aws_s3access
+      - aws_ec2_metrics
+      - aws_billing
+      - aws_billing_cur
+      - ess_billing_credits
+      - bedrock_invocation
+      - bedrock_runtime
+      - bedrock_guardrails
+      - llm_apm
+    packages:
+      - aws
+      - aws_bedrock
+      - aws_billing
+      - apm
+    setup:
+      tsds: true
+      cur: true
+      aws_billing: true
+      bedrock: true
+      ess_billing: true
+      apm: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: true
+      dynamic: true
+      ai: false
+    ootb_links:
+      - ess_billing
+      - aws_cur
+      - bedrock
+      - apm
+
+  gcp:
+    title: "Meridian FinOps — GCP"
+    fork_dir: cloud-llm-cost-modeling-gcp
+    default_scope: all
+    generators:
+      - gcp_audit
+      - gcp_billing
+      - vertex_prompt_logs
+      - vertex_metrics
+      - vertex_audit_logs
+      - llm_apm
+    packages:
+      - gcp
+      - gcp_vertexai
+      - apm
+    setup:
+      vertexai: true
+      apm: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: true
+      ai: false
+    ootb_links:
+      - gcp_billing
+      - vertexai
+      - apm
+
+  azure:
+    title: "Meridian FinOps — Azure"
+    fork_dir: cloud-llm-cost-modeling-azure
+    default_scope: all
+    generators:
+      - azure_activity
+      - azure_billing
+      - azure_openai_logs
+      - azure_openai_metrics
+      - azure_openai_billing
+      - llm_apm
+    packages:
+      - azure
+      - azure_billing
+      - azure_openai
+      - apm
+    setup:
+      azure_openai: true
+      apm: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: true
+      ai: false
+    ootb_links:
+      - azure_billing
+      - azure_openai
+      - apm
+
+  openai:
+    title: "Meridian LLM Observability — OpenAI"
+    fork_dir: cloud-llm-cost-modeling-openai
+    default_scope: all
+    generators:
+      - openai_completions
+      - openai_embeddings
+      - openai_images
+      - openai_audio_transcriptions
+      - openai_audio_speeches
+      - openai_moderations
+      - openai_rate_limits
+      - llm_apm
+    packages:
+      - openai
+      - apm
+    setup:
+      openai: true
+      apm: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: false
+      ai: false
+    ootb_links:
+      - openai
+      - apm
+
+  anthropic:
+    title: "Meridian LLM Observability — Anthropic"
+    fork_dir: cloud-llm-cost-modeling-anthropic
+    default_scope: all
+    generators:
+      - anthropic_usage
+      - anthropic_cost
+      - anthropic_rate_limit
+      - llm_apm
+    packages:
+      - anthropic
+      - anthropic_metrics
+      - apm
+    setup:
+      anthropic: true
+      apm: true
+      budgets: true
+      agent: true
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: false
+      ai: false
+    ootb_links:
+      - anthropic
+      - apm
+
+  bedrock:
+    title: "Meridian LLM Observability — Amazon Bedrock"
+    fork_dir: cloud-llm-cost-modeling-bedrock
+    default_scope: all
+    generators:
+      - bedrock_invocation
+      - bedrock_runtime
+      - bedrock_guardrails
+      - llm_apm
+    packages:
+      - aws_bedrock
+      - apm
+    setup:
+      tsds: true
+      bedrock: true
+      apm: true
+      budgets: false
+      agent: false
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: false
+      ai: false
+    ootb_links:
+      - bedrock
+      - apm
+
+  vertexai:
+    title: "Meridian LLM Observability — GCP Vertex AI"
+    fork_dir: cloud-llm-cost-modeling-vertexai
+    default_scope: all
+    generators:
+      - vertex_prompt_logs
+      - vertex_metrics
+      - vertex_audit_logs
+      - llm_apm
+    packages:
+      - gcp_vertexai
+      - apm
+    setup:
+      vertexai: true
+      apm: true
+      budgets: false
+      agent: false
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: false
+      ai: false
+    ootb_links:
+      - vertexai
+      - apm
+
+  azure-openai:
+    title: "Meridian LLM Observability — Azure OpenAI"
+    fork_dir: cloud-llm-cost-modeling-azure-openai
+    default_scope: all
+    generators:
+      - azure_openai_logs
+      - azure_openai_metrics
+      - azure_openai_billing
+      - llm_apm
+    packages:
+      - azure_openai
+      - azure_billing
+      - apm
+    setup:
+      azure_openai: true
+      apm: true
+      budgets: false
+      agent: false
+    dashboards:
+      baseline: true
+      classic: false
+      dynamic: false
+      ai: false
+    ootb_links:
+      - azure_openai
+      - apm
+
+  elastic-ai:
+    title: "Meridian Elastic AI Assistant & inference usage"
+    fork_dir: cloud-llm-cost-modeling-elastic-ai
+    default_scope: all
+    generators:
+      - agent_builder_traces
+      - inference_token_usage
+    packages: []
+    setup:
+      inference: true
+      budgets: false
+      agent: false
+    dashboards:
+      baseline: false
+      classic: false
+      dynamic: false
+      ai: true
+    ootb_links:
+      - inference
+
+# Keys used in ootb_links → dashboard link labels in dashboards.py
+ootb_groups:
+  ess_billing:
+    - "[Metrics ESS Billing] Billing dashboard"
+    - "[Metrics ESS Billing] Credits dashboard"
+  aws_cur:
+    - "AWS CUR — current month"
+    - "AWS CUR — all time"
+  gcp_billing:
+    - "GCP Billing Overview"
+  azure_billing:
+    - "Azure Billing Overview"
+  anthropic:
+    - "Anthropic Cost & Billing"
+  openai:
+    - "OpenAI Usage Overview"
+  azure_openai:
+    - "Azure OpenAI Billing"
+    - "Azure OpenAI Overview"
+  bedrock:
+    - "Amazon Bedrock Overview"
+    - "Amazon Bedrock Guardrails"
+  vertexai:
+    - "GCP Vertex AI Metrics"
+  apm:
+    - "APM Monitoring Overview"
+  inference:
+    - "[Elastic] Inference Token Usage"

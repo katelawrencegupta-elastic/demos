@@ -152,21 +152,21 @@
           </div>
           <div class="callout" style="margin-top:2rem;">
             <strong>Customer outcome</strong>
-            <p>On-call ignores noisy CPU, pages on native SLO burn, and starts RCA from a correlation alert that already names tenant and service.</p>
+            <p>On-call ignores noisy CPU, pages on the native SLO (error budget), and starts RCA from a correlation alert that already names tenant and service.</p>
           </div>
         </section>
 
         <section class="slide" data-slide="1">
           <div class="slide-header">
             <h2>Noisy alert · elasticco-noisy-node-cpu</h2>
-            <p>Custom threshold on pod CPU nanocores — fires on any demo pod. No service, tenant, or deploy context.</p>
+            <p>Custom threshold on host CPU percent — fires on any demo host. No service, tenant, or deploy context.</p>
           </div>
           <div class="grid-2">
             <div class="compare-card noisy">
               <h3>Why it fails on-call</h3>
               <ul>
-                <li>Metric: avg <code>kubernetes.pod.cpu.usage.nanocores</code> &gt; 70</li>
-                <li>Scope: all pods with <code>labels.demo: elastic-co</code></li>
+                <li>Metric: avg <code>system.cpu.total.norm.pct</code> &gt; 0.25</li>
+                <li>Scope: all hosts with <code>labels.demo: elastic-co</code></li>
                 <li>No <code>service.name</code>, <code>tenant.id</code>, or deploy version</li>
                 <li>No Cases action — alert stops at notification</li>
               </ul>
@@ -349,11 +349,11 @@
 Return: blast radius (tenants/services), most likely root cause, and the single best next remediation step.`;
 
     const COMPARE = [
-      ["What it is", "Threshold on any pod CPU", "Native Observability SLO (error budget)", "ES|QL correlation across 3 streams"],
+      ["What it is", "Threshold on any host CPU", "Native Observability SLO (error budget)", "ES|QL correlation across 3 streams"],
       ["Name", "elasticco-noisy-node-cpu", "elasticco-slo-checkout-availability", "elasticco-checkout-correlated-rca"],
       ["Tenant / service", "None", "checkout-api + acme-retail", "acme-retail in span filter + tags"],
-      ["Page on this?", "No — anti-pattern", "Yes — error budget / burn", "No — RCA starter, not an SLO"],
-      ["Cases action", "None", "Burn-rate rule (optional)", "system-connector-.cases"],
+      ["Page on this?", "No — anti-pattern", "Yes — native SLO / error budget", "No — RCA starter, not an SLO"],
+      ["Cases action", "None", "None (demo the SLO app)", "system-connector-.cases"],
       ["AI / agent ready?", "Needs 5 dashboards first", "Shows impact, not the leak", "Enough context to start RCA"],
     ];
 

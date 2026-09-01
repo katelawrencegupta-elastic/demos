@@ -1,0 +1,2061 @@
+{
+  "description": "Observability / Security AI Assistant and Agent Builder operations (conversations, tokens, latency, tools) plus Elastic inference usage by feature, model, connector, EIS vs BYO, and estimated cost.",
+  "options": {
+    "auto_apply_filters": true,
+    "hide_panel_titles": false,
+    "hide_panel_borders": false,
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_tooltips": true,
+    "sync_cursor": true
+  },
+  "tags": [],
+  "time_range": {
+    "from": "2026-04-29T22:06:18.000Z",
+    "to": "2026-08-28T22:06:18.000Z"
+  },
+  "title": "[Meridian] Elastic AI Assistant & inference usage",
+  "filters": [],
+  "query": {
+    "expression": "",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "title": "Elastic AI — Assistant, Agent Builder, and inference",
+      "collapsed": false,
+      "grid": {
+        "y": 0
+      },
+      "id": "a971207c-67dd-456b-93bb-0972b6f7c31b",
+      "panels": [
+        {
+          "grid": {
+            "x": 0,
+            "y": 0,
+            "w": 48,
+            "h": 4
+          },
+          "config": {
+            "hide_title": true,
+            "title": "",
+            "content": "## Meridian Dynamics — Elastic AI Assistant & inference usage\n\nNative **Agent Builder** OTel traces (`traces-agent_builder.otel-default`) plus **inference token usage** (`logs-elastic.inference_token_usage-default`) for Observability / Security AI Assistant, Agent Builder copilots, Search Playground, Streams, and EIS endpoints (chat, ELSER, e5, rerank).\n\nTime range: **2026-04-29 – 2026-08-28 (computed at publish)**. EIS = Elastic Inference Service.\n\n[FinOps baseline](#/view/meridian-finops-llm-observability) · [FinOps classic](#/view/meridian-finops-llm-observability-classic).",
+            "settings": {
+              "open_links_in_new_tab": true
+            }
+          },
+          "id": "6b8218c7-62d4-40a1-b0d1-2ed8db907553",
+          "type": "markdown"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 4,
+            "w": 8,
+            "h": 5
+          },
+          "config": {
+            "type": "metric",
+            "title": "Conversation rounds",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"CHAIN\"\n| STATS rounds = COUNT(*)"
+            },
+            "styling": {
+              "density": "default",
+              "primary": {
+                "position": "bottom",
+                "labels": {
+                  "alignment": "left"
+                },
+                "value": {
+                  "alignment": "right",
+                  "sizing": "auto"
+                }
+              }
+            },
+            "metrics": [
+              {
+                "column": "rounds",
+                "type": "primary",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          "id": "9456141e-1ec8-45f7-8cc1-9ec3e9cfbeb3",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 8,
+            "y": 4,
+            "w": 8,
+            "h": 5
+          },
+          "config": {
+            "type": "metric",
+            "title": "LLM requests",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS requests = COUNT(*)"
+            },
+            "styling": {
+              "density": "default",
+              "primary": {
+                "position": "bottom",
+                "labels": {
+                  "alignment": "left"
+                },
+                "value": {
+                  "alignment": "right",
+                  "sizing": "auto"
+                }
+              }
+            },
+            "metrics": [
+              {
+                "column": "requests",
+                "type": "primary",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          "id": "2c4dbc67-2556-419b-bda9-72ffed96e265",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 16,
+            "y": 4,
+            "w": 8,
+            "h": 5
+          },
+          "config": {
+            "type": "metric",
+            "title": "Input tokens",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS tokens = SUM(TO_LONG(attributes.gen_ai.usage.input_tokens))"
+            },
+            "styling": {
+              "density": "default",
+              "primary": {
+                "position": "bottom",
+                "labels": {
+                  "alignment": "left"
+                },
+                "value": {
+                  "alignment": "right",
+                  "sizing": "auto"
+                }
+              }
+            },
+            "metrics": [
+              {
+                "column": "tokens",
+                "type": "primary",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          "id": "86c2eb1d-9694-4b7e-8048-400242761485",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 4,
+            "w": 8,
+            "h": 5
+          },
+          "config": {
+            "type": "metric",
+            "title": "Output tokens",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS tokens = SUM(TO_LONG(attributes.gen_ai.usage.output_tokens))"
+            },
+            "styling": {
+              "density": "default",
+              "primary": {
+                "position": "bottom",
+                "labels": {
+                  "alignment": "left"
+                },
+                "value": {
+                  "alignment": "right",
+                  "sizing": "auto"
+                }
+              }
+            },
+            "metrics": [
+              {
+                "column": "tokens",
+                "type": "primary",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          "id": "8f820179-f4b7-4703-bd89-bcdfb6c62aa2",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 32,
+            "y": 4,
+            "w": 8,
+            "h": 5
+          },
+          "config": {
+            "type": "metric",
+            "title": "Estimated inference cost",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(labels.cost_usd)"
+            },
+            "styling": {
+              "density": "default",
+              "primary": {
+                "position": "bottom",
+                "labels": {
+                  "alignment": "left"
+                },
+                "value": {
+                  "alignment": "right",
+                  "sizing": "auto"
+                }
+              }
+            },
+            "metrics": [
+              {
+                "column": "cost",
+                "type": "primary",
+                "subtitle": "USD",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ]
+          },
+          "id": "87bf9268-ddf5-4ec5-9c7e-e158ceb638ab",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 40,
+            "y": 4,
+            "w": 8,
+            "h": 10
+          },
+          "config": {
+            "type": "gauge",
+            "title": "Tool error rate",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"execute_tool *\"\n| STATS errors = COUNT(*) WHERE status.code == \"Error\", calls = COUNT(*)\n| EVAL error_rate = errors * 1.0 / calls, min = 0, max = 0.12, goal = 0.02"
+            },
+            "styling": {
+              "shape": {
+                "type": "arc"
+              }
+            },
+            "metric": {
+              "column": "error_rate",
+              "title": {
+                "visible": true
+              },
+              "subtitle": "failures / tool calls",
+              "color": {
+                "type": "auto"
+              },
+              "ticks": {
+                "visible": true,
+                "mode": "bands"
+              },
+              "min": {
+                "column": "min"
+              },
+              "max": {
+                "column": "max"
+              },
+              "goal": {
+                "column": "goal"
+              }
+            }
+          },
+          "id": "d5234bc8-371d-4f4c-8742-ce5a638fc0a5",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 9,
+            "w": 24,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Daily input vs output tokens (chat spans)",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "smooth",
+              "points": {
+                "visibility": "auto"
+              },
+              "areas": {
+                "fill_opacity": 0.75,
+                "fill": "gradient"
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS input = SUM(TO_LONG(attributes.gen_ai.usage.input_tokens)), output = SUM(TO_LONG(attributes.gen_ai.usage.output_tokens)) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                },
+                "type": "area",
+                "y": [
+                  {
+                    "column": "input",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  },
+                  {
+                    "column": "output",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "day"
+                }
+              }
+            ]
+          },
+          "id": "4d505177-9929-4098-93e1-2a19bb3b46b0",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 9,
+            "w": 16,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Daily conversation rounds by agent",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "smooth",
+              "points": {
+                "visibility": "auto"
+              },
+              "areas": {
+                "fill_opacity": 0.75,
+                "fill": "gradient"
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"CHAIN\"\n| STATS rounds = COUNT(*) BY day = BUCKET(@timestamp, 1d), agent = attributes.gen_ai.agent.name\n| SORT day"
+                },
+                "type": "area_stacked",
+                "breakdown_by": {
+                  "column": "agent",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                },
+                "y": [
+                  {
+                    "column": "rounds",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "day"
+                }
+              }
+            ]
+          },
+          "id": "7842d91b-0dd3-4359-bdf8-08d8885461e1",
+          "type": "vis"
+        }
+      ]
+    },
+    {
+      "title": "AI Assistant & Agent Builder — agents, models, tools",
+      "collapsed": false,
+      "grid": {
+        "y": 26
+      },
+      "id": "a430fc10-3eeb-48fc-88d2-02b351c56cd6",
+      "panels": [
+        {
+          "grid": {
+            "x": 0,
+            "y": 0,
+            "w": 48,
+            "h": 2
+          },
+          "config": {
+            "hide_title": true,
+            "title": "",
+            "content": "Operational view from Agent Builder traces: `chat *` spans carry tokens and model, `invoke_agent *` + `CHAIN`/`AGENT` span kinds are conversation rounds vs executions, `execute_tool *` is tool use (ES|QL, search, mappings, skills).",
+            "settings": {
+              "open_links_in_new_tab": true
+            }
+          },
+          "id": "5cba344b-2dc0-41fb-9b09-4a4a235fd781",
+          "type": "markdown"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 2,
+            "w": 24,
+            "h": 14
+          },
+          "config": {
+            "type": "treemap",
+            "title": "Tokens by model × provider",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS input = SUM(TO_LONG(attributes.gen_ai.usage.input_tokens)), output = SUM(TO_LONG(attributes.gen_ai.usage.output_tokens)), requests = COUNT(*) BY model = attributes.gen_ai.request.model, provider = attributes.gen_ai.provider.name\n| SORT input DESC"
+            },
+            "legend": {
+              "nested": false,
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              }
+            },
+            "metrics": [
+              {
+                "column": "input",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "provider",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              },
+              {
+                "column": "model",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "57da940d-8255-4b51-a349-e1bd70aebc55",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 2,
+            "w": 24,
+            "h": 14
+          },
+          "config": {
+            "type": "xy",
+            "title": "Agent executions",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "linear",
+              "bars": {
+                "minimum_height": 1,
+                "data_labels": {
+                  "visible": false
+                }
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"AGENT\"\n| STATS runs = COUNT(*), p95_s = PERCENTILE(duration, 95) / 1000000000.0 BY agent = attributes.gen_ai.agent.name\n| SORT runs DESC"
+                },
+                "type": "bar_horizontal",
+                "y": [
+                  {
+                    "column": "runs",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "agent"
+                }
+              }
+            ]
+          },
+          "id": "c3371912-2a44-4f58-b233-440890437643",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 16,
+            "w": 28,
+            "h": 12
+          },
+          "config": {
+            "type": "data_table",
+            "title": "Tool calls — volume, errors, latency",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"execute_tool *\"\n| STATS calls = COUNT(*), errors = COUNT(*) WHERE status.code == \"Error\", avg_ms = AVG(duration) / 1000000.0 BY tool = attributes.gen_ai.tool.name\n| EVAL error_rate = errors * 1.0 / calls\n| SORT calls DESC"
+            },
+            "styling": {
+              "paging": 20,
+              "row_numbers": {
+                "visible": true
+              }
+            },
+            "metrics": [
+              {
+                "column": "calls",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              },
+              {
+                "column": "errors",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              },
+              {
+                "column": "error_rate",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              },
+              {
+                "column": "avg_ms",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              }
+            ],
+            "rows": [
+              {
+                "column": "tool",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              }
+            ]
+          },
+          "id": "d06a7c35-2b7b-4c53-9030-6859f3a6efb1",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 28,
+            "y": 16,
+            "w": 20,
+            "h": 12
+          },
+          "config": {
+            "type": "data_table",
+            "title": "Top users by conversation rounds",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"CHAIN\"\n| STATS rounds = COUNT(*) BY user = COALESCE(user.name, user.hash), team = COALESCE(labels.team, \"untagged\")\n| SORT rounds DESC\n| LIMIT 20"
+            },
+            "styling": {
+              "paging": 20,
+              "row_numbers": {
+                "visible": true
+              }
+            },
+            "metrics": [
+              {
+                "column": "rounds",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              }
+            ],
+            "rows": [
+              {
+                "column": "user",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              },
+              {
+                "column": "team",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              }
+            ]
+          },
+          "id": "21ac7885-da36-4ff8-99d3-5fe5f4eeb767",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 28,
+            "w": 24,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Daily conversation rounds by agent",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "smooth",
+              "points": {
+                "visibility": "auto"
+              },
+              "areas": {
+                "fill_opacity": 0.75,
+                "fill": "gradient"
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"CHAIN\"\n| STATS rounds = COUNT(*) BY day = BUCKET(@timestamp, 1d), agent = attributes.gen_ai.agent.name\n| SORT day"
+                },
+                "type": "area_stacked",
+                "breakdown_by": {
+                  "column": "agent",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                },
+                "y": [
+                  {
+                    "column": "rounds",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "day"
+                }
+              }
+            ]
+          },
+          "id": "f811aef3-ea56-4d0b-88bd-bc09585bd2c8",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 28,
+            "w": 24,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "LLM requests by model",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "linear",
+              "bars": {
+                "minimum_height": 1,
+                "data_labels": {
+                  "visible": false
+                }
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS requests = COUNT(*) BY model = attributes.gen_ai.request.model\n| SORT requests DESC\n| LIMIT 12"
+                },
+                "type": "bar_horizontal",
+                "y": [
+                  {
+                    "column": "requests",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "model"
+                }
+              }
+            ]
+          },
+          "id": "46968f1d-d0ee-4d3c-b534-b790e5eb8b81",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 40,
+            "w": 16,
+            "h": 10
+          },
+          "config": {
+            "type": "gauge",
+            "title": "Conversation round p95",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"invoke_agent *\" AND attributes.elastic.inference.span.kind == \"CHAIN\"\n| STATS p95_s = PERCENTILE(duration, 95) / 1000000000.0\n| EVAL min = 0, max = 60, goal = 8"
+            },
+            "styling": {
+              "shape": {
+                "type": "semi_circle"
+              }
+            },
+            "metric": {
+              "column": "p95_s",
+              "title": {
+                "visible": true
+              },
+              "subtitle": "seconds",
+              "color": {
+                "type": "auto"
+              },
+              "ticks": {
+                "visible": true,
+                "mode": "bands"
+              },
+              "min": {
+                "column": "min"
+              },
+              "max": {
+                "column": "max"
+              },
+              "goal": {
+                "column": "goal"
+              }
+            }
+          },
+          "id": "7cfb7f00-1c09-419d-9760-a4c2f5e92ff3",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 16,
+            "y": 40,
+            "w": 16,
+            "h": 10
+          },
+          "config": {
+            "type": "pie",
+            "title": "LLM requests by provider",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS requests = COUNT(*) BY provider = attributes.gen_ai.provider.name"
+            },
+            "legend": {
+              "nested": false,
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              },
+              "labels": {
+                "visible": true,
+                "position": "inside"
+              },
+              "donut_hole": "m"
+            },
+            "metrics": [
+              {
+                "column": "requests",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "provider",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "2e1cc23d-386c-46c4-a320-cada66764526",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 32,
+            "y": 40,
+            "w": 16,
+            "h": 10
+          },
+          "config": {
+            "type": "pie",
+            "title": "Tokens by model",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-agent_builder.otel-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND span.name LIKE \"chat *\"\n| STATS tokens = SUM(TO_LONG(attributes.gen_ai.usage.input_tokens)) BY model = attributes.gen_ai.request.model\n| SORT tokens DESC\n| LIMIT 8"
+            },
+            "legend": {
+              "nested": false,
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              },
+              "labels": {
+                "visible": true,
+                "position": "inside"
+              },
+              "donut_hole": "m"
+            },
+            "metrics": [
+              {
+                "column": "tokens",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "model",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "0d4049ea-a5d9-4697-97c2-aed5bdb90e73",
+          "type": "vis"
+        }
+      ]
+    },
+    {
+      "title": "Inference token usage — features, EIS, connectors",
+      "collapsed": false,
+      "grid": {
+        "y": 80
+      },
+      "id": "167ae97c-4d1e-4479-b68c-3f62256c76dc",
+      "panels": [
+        {
+          "grid": {
+            "x": 0,
+            "y": 0,
+            "w": 48,
+            "h": 2
+          },
+          "config": {
+            "hide_title": true,
+            "title": "",
+            "content": "Kibana inference-plugin shape: `token_usage.*`, `model.*`, `inference.feature_id` / `connector_id`. Features include Observability AI Assistant, Agent Builder, Security AI Assistant, Search Playground, and Streams Significant Events. Chat completions plus ELSER / e5 / rerank task types.",
+            "settings": {
+              "open_links_in_new_tab": true
+            }
+          },
+          "id": "6a3cdc37-8b92-42d4-897c-6ce97c042382",
+          "type": "markdown"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 2,
+            "w": 16,
+            "h": 12
+          },
+          "config": {
+            "type": "waffle",
+            "title": "Tokens: EIS vs BYO connectors",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| EVAL origin = CASE(inference.service == \"elastic\", \"Elastic Inference Service\", \"BYO / external\")\n| STATS tokens = SUM(token_usage.total_tokens), cost = SUM(labels.cost_usd) BY origin\n| SORT tokens DESC"
+            },
+            "legend": {
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              }
+            },
+            "metrics": [
+              {
+                "column": "tokens",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "origin",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "c6aeae83-e6ae-4eff-a847-ef7439efbce3",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 16,
+            "y": 2,
+            "w": 32,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Daily tokens by Kibana AI feature",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "smooth",
+              "points": {
+                "visibility": "auto"
+              },
+              "areas": {
+                "fill_opacity": 0.75,
+                "fill": "gradient"
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(token_usage.total_tokens) BY day = BUCKET(@timestamp, 1d), feature = inference.feature_name\n| SORT day"
+                },
+                "type": "area_stacked",
+                "breakdown_by": {
+                  "column": "feature",
+                  "color": {
+                    "mode": "categorical",
+                    "palette": "default",
+                    "mapping": []
+                  }
+                },
+                "y": [
+                  {
+                    "column": "tokens",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "day"
+                }
+              }
+            ]
+          },
+          "id": "1fce7825-b1ad-400d-ae9b-55697484ee10",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 14,
+            "w": 24,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Tokens by feature",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "linear",
+              "bars": {
+                "minimum_height": 1,
+                "data_labels": {
+                  "visible": false
+                }
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(token_usage.total_tokens), prompt = SUM(token_usage.prompt_tokens), completion = SUM(token_usage.completion_tokens), requests = COUNT(*), cost = SUM(labels.cost_usd) BY feature = inference.feature_name\n| SORT tokens DESC"
+                },
+                "type": "bar_horizontal",
+                "y": [
+                  {
+                    "column": "tokens",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "feature"
+                }
+              }
+            ]
+          },
+          "id": "7bd8a1ce-f333-46e9-994b-fc432649f73b",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 14,
+            "w": 24,
+            "h": 12
+          },
+          "config": {
+            "type": "xy",
+            "title": "Estimated cost by team",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "linear",
+              "bars": {
+                "minimum_height": 1,
+                "data_labels": {
+                  "visible": false
+                }
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS cost = SUM(labels.cost_usd), tokens = SUM(token_usage.total_tokens) BY team = labels.team\n| SORT cost DESC"
+                },
+                "type": "bar",
+                "y": [
+                  {
+                    "column": "cost",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "team"
+                }
+              }
+            ]
+          },
+          "id": "c8efd3a6-a805-4f6f-9978-231b6726f152",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 26,
+            "w": 28,
+            "h": 14
+          },
+          "config": {
+            "type": "treemap",
+            "title": "Tokens — feature × connector",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(token_usage.total_tokens), cost = SUM(labels.cost_usd) BY feature = inference.feature_name, connector = inference.connector_id\n| SORT tokens DESC\n| LIMIT 40"
+            },
+            "legend": {
+              "nested": false,
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              }
+            },
+            "metrics": [
+              {
+                "column": "tokens",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "feature",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              },
+              {
+                "column": "connector",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "47144bcb-dd9f-4e05-947c-a430fe3041bb",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 28,
+            "y": 26,
+            "w": 20,
+            "h": 14
+          },
+          "config": {
+            "type": "waffle",
+            "title": "Requests by inference task type",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS requests = COUNT(*) BY task = inference.task_type\n| SORT requests DESC"
+            },
+            "legend": {
+              "truncate_after_lines": 1,
+              "visibility": "visible",
+              "position": "right"
+            },
+            "styling": {
+              "values": {
+                "visible": true,
+                "mode": "percentage",
+                "percent_decimals": 2
+              }
+            },
+            "metrics": [
+              {
+                "column": "requests",
+                "color": {
+                  "type": "auto"
+                }
+              }
+            ],
+            "group_by": [
+              {
+                "column": "task",
+                "color": {
+                  "mode": "categorical",
+                  "palette": "default",
+                  "mapping": []
+                }
+              }
+            ]
+          },
+          "id": "ff167926-99b9-4b39-af12-1fa0db2bcb92",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 40,
+            "w": 48,
+            "h": 12
+          },
+          "config": {
+            "type": "data_table",
+            "title": "Model × provider × task — tokens, cost, requests",
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS tokens = SUM(token_usage.total_tokens), cost = SUM(labels.cost_usd), requests = COUNT(*) BY model = model.model_id, provider = model.provider, task = inference.task_type\n| SORT cost DESC\n| LIMIT 20"
+            },
+            "styling": {
+              "paging": 20,
+              "row_numbers": {
+                "visible": true
+              }
+            },
+            "metrics": [
+              {
+                "column": "requests",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              },
+              {
+                "column": "tokens",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              },
+              {
+                "column": "cost",
+                "visible": true,
+                "color": {
+                  "type": "auto"
+                },
+                "alignment": "right"
+              }
+            ],
+            "rows": [
+              {
+                "column": "provider",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              },
+              {
+                "column": "model",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              },
+              {
+                "column": "task",
+                "visible": true,
+                "alignment": "left",
+                "color": {
+                  "type": "auto"
+                },
+                "click_filter": false
+              }
+            ]
+          },
+          "id": "bb88f480-8442-4533-ac44-076547ba8a46",
+          "type": "vis"
+        },
+        {
+          "grid": {
+            "x": 0,
+            "y": 52,
+            "w": 48,
+            "h": 11
+          },
+          "config": {
+            "type": "xy",
+            "title": "Prompt vs cached vs thinking tokens (daily)",
+            "legend": {
+              "visibility": "visible",
+              "placement": "outside",
+              "layout": {
+                "type": "grid",
+                "truncate": {
+                  "max_lines": 1
+                }
+              },
+              "position": "right"
+            },
+            "axis": {
+              "x": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "ordinal",
+                "domain": {
+                  "type": "fit",
+                  "rounding": false
+                }
+              },
+              "y": {
+                "title": {
+                  "text": "",
+                  "visible": true
+                },
+                "ticks": {
+                  "visible": true
+                },
+                "grid": {
+                  "visible": true
+                },
+                "labels": {
+                  "orientation": "horizontal"
+                },
+                "scale": "linear",
+                "domain": {
+                  "type": "full",
+                  "rounding": true
+                }
+              }
+            },
+            "styling": {
+              "overlays": {
+                "partial_buckets": {
+                  "visible": false
+                },
+                "current_time_marker": {
+                  "visible": false
+                }
+              },
+              "interpolation": "smooth",
+              "points": {
+                "visibility": "auto"
+              },
+              "areas": {
+                "fill_opacity": 0.75,
+                "fill": "gradient"
+              }
+            },
+            "layers": [
+              {
+                "sampling": 1,
+                "ignore_global_filters": false,
+                "data_source": {
+                  "type": "esql",
+                  "query": "FROM logs-elastic.inference_token_usage-default\n| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend\n| STATS thinking = SUM(token_usage.thinking_tokens), cached = SUM(token_usage.cached_tokens), prompt = SUM(token_usage.prompt_tokens) BY day = BUCKET(@timestamp, 1d)\n| SORT day"
+                },
+                "type": "area_stacked",
+                "y": [
+                  {
+                    "column": "prompt",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  },
+                  {
+                    "column": "cached",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  },
+                  {
+                    "column": "thinking",
+                    "axis": "y",
+                    "color": {
+                      "type": "auto"
+                    }
+                  }
+                ],
+                "x": {
+                  "column": "day"
+                }
+              }
+            ]
+          },
+          "id": "9c6c1e96-fea1-4bdf-8800-50a287e50fd3",
+          "type": "vis"
+        }
+      ]
+    },
+    {
+      "title": "Related dashboards",
+      "collapsed": false,
+      "grid": {
+        "y": 146
+      },
+      "id": "f77691ae-420f-4b43-86f9-3a86fa0ae5a9",
+      "panels": [
+        {
+          "grid": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 8
+          },
+          "config": {
+            "hide_title": true,
+            "title": "",
+            "content": "**Streams**\n\n- `traces-agent_builder.otel-default` — Agent Builder OTel spans\n- `logs-elastic.inference_token_usage-default` — feature-attributed tokens\n\nEnable Kibana **GenAI Settings → Token usage tracking** for the managed `[Elastic] Inference Token Usage` dashboard on live traffic.",
+            "settings": {
+              "open_links_in_new_tab": true
+            }
+          },
+          "id": "d4e55505-1bba-41c8-854f-f85a0de4380b",
+          "type": "markdown"
+        },
+        {
+          "grid": {
+            "x": 24,
+            "y": 0,
+            "w": 24,
+            "h": 8
+          },
+          "config": {
+            "title": "Meridian FinOps family",
+            "links": [
+              {
+                "label": "FinOps & LLM Observability (baseline)",
+                "type": "dashboardLink",
+                "destination": "meridian-finops-llm-observability",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "FinOps & LLM — classic",
+                "type": "dashboardLink",
+                "destination": "meridian-finops-llm-observability-classic",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "FinOps & LLM — dynamic alias",
+                "type": "dashboardLink",
+                "destination": "meridian-finops-llm-observability-dynamic",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "This AI Assistant dashboard",
+                "type": "dashboardLink",
+                "destination": "meridian-ai-assistant-inference-usage",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              },
+              {
+                "label": "[Elastic] Inference Token Usage",
+                "type": "dashboardLink",
+                "destination": "kibana-inference-token-usage",
+                "options": {
+                  "use_filters": false,
+                  "use_time_range": true,
+                  "open_in_new_tab": true
+                }
+              }
+            ]
+          },
+          "id": "052da657-132a-4430-ab55-4f99a751ac4b",
+          "type": "links"
+        }
+      ]
+    }
+  ],
+  "pinned_panels": []
+}

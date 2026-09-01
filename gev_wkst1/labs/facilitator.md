@@ -6,7 +6,7 @@
 |----|--------|------------------|
 | U1 | Orchestrator grok → Discover | Ingest pipeline · `elasticco-orchestrator` |
 | U2 | Seven-hop traces · tenant · `FOR UPDATE` | APM · **End-to-End Tracing** dashboard |
-| U3 | EKS OOM restart → reason (+ Inventory 30s) | K8s events · pod metrics · checkout logs |
+| U3 | EKS OOM restart → reason | K8s events · pod metrics · checkout logs |
 | U4 | Noisy vs **native SLO** vs correlated RCA | Alerts · SLOs · Cases · AI Assistant (opener) |
 | U5 | Agent Builder RCA → case / email | Agent Builder `elasticco-rca-agent` · Cases |
 
@@ -31,7 +31,7 @@
 - Serverless Observability project; credentials in `.env`.
 - Fictional EKS — no real cluster. Metrics/events are synthetic but ECS-shaped.
 - Alert rule APIs differ slightly by stack version; if rule create warns, create manually from [../kibana/alert-rules.json](../kibana/alert-rules.json) and continue — talk-track still works on seeded data.
-- **Agent Builder write path:** `enable_elastic_capabilities: true` on `elasticco-rca-agent`. If Cases / email tools appear, “approve rollback” can comment the case. If capabilities stay read-only, paste the agent’s comment into the case the alert already opened.
+- **Agent Builder write path:** Paste the agent’s comment into the case the alert already opened. If `enable_elastic_capabilities` exposes Cases / email tools, “approve rollback” can use those too.
 - **CLI backup:** `python -m src.cli incident --dry-run` (lab 05). Do not claim “without leaving Elastic” on a terminal path. Never have the chat agent silently call `src.cli incident`.
 - **U5 email (CLI only):** `KIBANA_EMAIL_CONNECTOR_ID` or SMTP in `.env`; otherwise HTML under `output/incident-emails/`.
 

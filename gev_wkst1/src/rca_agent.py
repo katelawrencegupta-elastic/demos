@@ -281,7 +281,7 @@ def investigate(world: World, anchor: datetime | None = None) -> IncidentReport:
         hero_trace_id=hero_tid,
         metrics={**stats, "oom_events": oom, "backoff_events": backoff, "max_restarts": max_restarts},
         generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        email_to=am.get("rca_agent", {}).get("default_email", "kate.lawrencegupta@elastic.co"),
+        email_to=am.get("rca_agent", {}).get("default_email", "oncall@elastic.co"),
         evidence_ok=not weak,
     )
 

@@ -16,6 +16,6 @@ Interactive deck: [../presentations/u4-alerting-ai-triage.html](../presentations
 
 ## Done when
 
-You can name three objects: anti-pattern CPU, native SLO burn, correlated RCA alert — and you have **not** called the ES|QL rule an SLO.
+You can name three objects: anti-pattern CPU, native SLO (error budget), correlated RCA alert — and you have **not** called the ES|QL rule an SLO.
 
 **Next:** [Lab 05 — Agent Builder RCA](05-app-monitoring-rca.md) (U5) · Deck: [u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)

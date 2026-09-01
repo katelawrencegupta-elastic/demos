@@ -184,7 +184,8 @@ def verify_agent() -> bool:
         if r.status_code == 200:
             print(f"  [ok] tool {spec['id']}")
         elif r.status_code in (403, 404):
-            print(f"  [warn] tool {spec['id']}: {r.status_code}")
+            print(f"  [fail] tool {spec['id']}: {r.status_code}")
+            ok = False
         else:
             print(f"  [fail] tool {spec['id']}: {r.status_code}")
             ok = False
@@ -197,7 +198,8 @@ def verify_agent() -> bool:
         caps = r.json().get("configuration", {}).get("enable_elastic_capabilities")
         print(f"  [ok] agent {agent_id} ({name}, {n_tools} tools, capabilities={caps})")
     elif r.status_code in (403, 404):
-        print(f"  [warn] agent {agent_id}: {r.status_code} (Agent Builder may be unavailable)")
+        print(f"  [fail] agent {agent_id}: {r.status_code} (Agent Builder may be unavailable)")
+        ok = False
     else:
         print(f"  [fail] agent {agent_id}: {r.status_code}")
         ok = False

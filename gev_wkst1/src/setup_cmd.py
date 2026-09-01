@@ -59,6 +59,12 @@ DATA_VIEWS = [
         "timeFieldName": "@timestamp",
     },
     {
+        "id": "metrics-elasticco.host-*",
+        "title": "metrics-elasticco.host-*",
+        "name": "Elastic Co. Host Metrics",
+        "timeFieldName": "@timestamp",
+    },
+    {
         "id": "elasticco-incidents",
         "title": "logs-elasticco.incident-*",
         "name": "Elastic Co. Incident Audit",
@@ -83,6 +89,7 @@ DATA_VIEW_REQUIRED_FIELDS: dict[str, list[str]] = {
     "elasticco-orchestrator": ["tenant.id", "trace.id", "orchestrator.dag_id", "log.level"],
     "elasticco-checkout": ["service.name", "service.version", "message"],
     "elasticco-k8s": ["kubernetes.event.reason", "kubernetes.pod.name", "service.name"],
+    "metrics-elasticco.host-*": ["system.cpu.total.norm.pct", "host.name"],
     "elasticco-incidents": ["incident.id", "incident.phase", "message"],
     "elasticco-logs": ["tenant.id", "trace.id", "service.name", "kubernetes.event.reason"],
 }
@@ -264,6 +271,49 @@ def verify_data_views() -> bool:
     return ok
 
 
+def _delete_rule(rid: str, name: str) -> bool:
+    r = requests.delete(
+        f"{KIBANA_URL}/api/alerting/rule/{rid}",
+        headers=KBN_HEADERS,
+        timeout=60,
+    )
+    if r.status_code >= 300 and r.status_code != 404:
+        print(f"  [warn] delete rule {name}: {r.status_code} {r.text[:160]}")
+        return False
+    print(f"  [ok] deleted rule {name} (will recreate)")
+    return True
+
+
+def _create_rule(rule: dict) -> bool:
+    """POST a rule; consumer cannot be changed on update. Retry alerts if infrastructure 400s."""
+    consumers = [rule.get("consumer") or "alerts"]
+    for extra in ("alerts", "observability"):
+        if extra not in consumers:
+            consumers.append(extra)
+    last = None
+    bodies = [rule]
+    if rule.get("actions"):
+        bodies.append({**rule, "actions": []})
+    for consumer in consumers:
+        for body in bodies:
+            payload = {**body, "consumer": consumer}
+            r = requests.post(
+                f"{KIBANA_URL}/api/alerting/rule",
+                headers=KBN_HEADERS,
+                json=payload,
+                timeout=60,
+            )
+            last = r
+            if r.status_code < 300:
+                extra = f" (consumer={consumer})" if consumer != rule.get("consumer") else ""
+                print(f"  [ok] alert rule created: {rule['name']}{extra}")
+                return True
+            if r.status_code != 400:
+                break
+    print(f"  [warn] create rule {rule['name']}: {last.status_code} {last.text[:300]}")
+    return False
+
+
 def ensure_alert_rules():
     """Create noisy vs quality ES query rules via Kibana alerting API."""
     rules_file = KIBANA_DIR / "alert-rules.json"
@@ -273,7 +323,6 @@ def ensure_alert_rules():
     rules = json.loads(rules_file.read_text())
     _disable_retired_rules()
     for rule in rules:
-        # List existing by name
         r = requests.get(
             f"{KIBANA_URL}/api/alerting/rules/_find",
             headers=KBN_HEADERS,
@@ -284,7 +333,16 @@ def ensure_alert_rules():
         if r.status_code == 200:
             existing = [x for x in r.json().get("data", []) if x.get("name") == rule["name"]]
         if existing:
-            rid = existing[0]["id"]
+            remote = existing[0]
+            rid = remote["id"]
+            # consumer / rule_type_id are immutable — recreate so noisy CPU
+            # can leave consumer=logs (execution_status=error on host metrics).
+            if remote.get("consumer") != rule.get("consumer") or remote.get("rule_type_id") != rule.get(
+                "rule_type_id"
+            ):
+                if _delete_rule(rid, rule["name"]):
+                    _create_rule(rule)
+                continue
             update_body = {
                 k: v
                 for k, v in rule.items()
@@ -313,28 +371,7 @@ def ensure_alert_rules():
             else:
                 print(f"  [ok] alert rule updated: {rule['name']}")
             continue
-        r = requests.post(
-            f"{KIBANA_URL}/api/alerting/rule",
-            headers=KBN_HEADERS,
-            json=rule,
-            timeout=60,
-        )
-        if r.status_code >= 300 and rule.get("actions"):
-            print(
-                f"  [warn] create rule {rule['name']} with Cases action: "
-                f"{r.status_code} {r.text[:300]}"
-            )
-            stripped = {**rule, "actions": []}
-            r = requests.post(
-                f"{KIBANA_URL}/api/alerting/rule",
-                headers=KBN_HEADERS,
-                json=stripped,
-                timeout=60,
-            )
-        if r.status_code >= 300:
-            print(f"  [warn] create rule {rule['name']}: {r.status_code} {r.text[:300]}")
-        else:
-            print(f"  [ok] alert rule created: {rule['name']}")
+        _create_rule(rule)
 
 
 def import_saved_objects():

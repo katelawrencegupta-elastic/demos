@@ -154,7 +154,7 @@
     <aside class="sidebar">
       <div class="brand">Elastic Observability</div>
       <h1>U5 · App monitoring + Agent Builder</h1>
-      <p>Alert or SLO burn → tool-backed RCA in chat → approve rollback into the case.</p>
+      <p>Alert or SLO chart → tool-backed RCA in chat → approve rollback into the case.</p>
       <ul class="nav" id="nav"></ul>
       <div class="controls">
         <button class="primary" id="btnPlayFlow">▶ Walk the workflow</button>
@@ -187,7 +187,7 @@
         <section class="slide" data-slide="1">
           <div class="slide-header">
             <h2>Application monitoring alert</h2>
-            <p><code>elasticco-app-checkout-error-rate</code> or native SLO burn on <code>elasticco-slo-checkout-availability</code> — service-level, not infrastructure noise. The ES|QL rule <code>elasticco-checkout-correlated-rca</code> is the RCA starter, not an SLO.</p>
+            <p><code>elasticco-app-checkout-error-rate</code> or the native SLO (error budget) on <code>elasticco-slo-checkout-availability</code> — service-level, not infrastructure noise. The ES|QL rule <code>elasticco-checkout-correlated-rca</code> is the RCA starter, not an SLO.</p>
           </div>
           <div class="card">
             <div class="card-head">Alert rule ES|QL <span class="badge info">traces-apm-default</span></div>
@@ -209,7 +209,7 @@
         <section class="slide" data-slide="2">
           <div class="slide-header">
             <h2>Agent Builder · what the tools investigate</h2>
-            <p>ES|QL tools on <code>elasticco-rca-agent</code> (2h lookback, <code>labels.demo: elastic-co</code>). The agent must call tools — never invent counts.</p>
+            <p>ES|QL tools on <code>elasticco-rca-agent</code> (60-minute lookback, <code>labels.demo: elastic-co</code>). The agent must call tools — never invent counts.</p>
           </div>
           <div class="card">
             <div class="card-head">Evidence sources <span class="badge">5 streams</span></div>
@@ -263,8 +263,8 @@
 
         <section class="slide" data-slide="4">
           <div class="slide-header">
-            <h2>Approve rollback · Cases if capabilities allow</h2>
-            <p>Human-in-the-loop in chat. If elastic capabilities are read-only, paste into the open case. CLI is facilitator-only.</p>
+            <h2>Approve rollback · paste into the case</h2>
+            <p>Human-in-the-loop in chat. Paste into the open case. If Cases/email tools appear, use them too. CLI is facilitator-only.</p>
           </div>
           <div class="grid-2">
             <div class="compare-card manual">
@@ -274,8 +274,8 @@ reconstruct RCA and recommend one remediation.</pre>
               <ul>
                 <li>Walk tool-backed p95 / OOM / FOR UPDATE</li>
                 <li>Say <code>approve rollback to v2.4.0</code></li>
-                <li>If Cases/email tools appear: agent writes the case</li>
-                <li>Else: paste comment + email into the open case</li>
+                <li>Paste comment + email into the open case</li>
+                <li>If Cases/email tools appear, use those too</li>
               </ul>
             </div>
             <div class="compare-card auto">
@@ -307,7 +307,7 @@ reconstruct RCA and recommend one remediation.</pre>
             </div>
             <div class="stat-grid">
               <div class="stat"><label>Customer audit</label><span>Observability case thread</span></div>
-              <div class="stat"><label>Write path</label><span>Agent capabilities (Cases / email) or SE paste</span></div>
+              <div class="stat"><label>Write path</label><span>SE paste into the open case (Cases/email if tools appear)</span></div>
               <div class="stat"><label>CLI lab only</label><span>logs-elasticco.incident-default via incident --dry-run</span></div>
               <div class="callout success" style="margin:0;">
                 <strong>Do not open a terminal</strong>
@@ -390,11 +390,11 @@ reconstruct RCA and recommend one remediation.</pre>
     ];
 
     const FLOW = [
-      { title: "Alert or SLO burn", detail: "elasticco-app-checkout-error-rate or native SLO elasticco-slo-checkout-availability for checkout-api / acme-retail." },
+      { title: "Alert or SLO chart", detail: "elasticco-app-checkout-error-rate or native SLO elasticco-slo-checkout-availability for checkout-api / acme-retail." },
       { title: "Agent Builder investigates", detail: "elasticco-rca-agent calls ES|QL tools. Must show acme-retail p95 / OOM / FOR UPDATE — not 0% errors." },
       { title: "Walk the evidence", detail: "v2.4.1 CartCache leak → OOM restart loop → orchestrator retries → slow SELECT … FOR UPDATE." },
       { title: "Approve rollback", detail: "Human says approve rollback to v2.4.0 in chat. No silent CLI." },
-      { title: "Cases / email if capable", detail: "If enable_elastic_capabilities exposes Cases or email, the agent writes them. Else paste into the open case." },
+      { title: "Paste into the open case", detail: "Paste the agent’s case comment into the Observability case. If Cases/email tools appear, use those too." },
       { title: "Case thread is the audit", detail: "Discover incident stream only if a write path existed. Otherwise the Observability case is the record." },
     ];
 
@@ -415,7 +415,7 @@ reconstruct RCA and recommend one remediation.</pre>
     const KIBANA = [
       ["Alerts or SLOs", "App error-rate or elasticco-slo-checkout-availability"],
       ["Agent Builder chat", "elasticco-rca-agent — paste the scripted prompt"],
-      ["Observability → Cases", "Paste or agent-written RCA + rollback"],
+      ["Observability → Cases", "Paste RCA + rollback into the open case"],
       ["Dashboard elasticco-e2e-tracing", "Seven hops + FOR UPDATE context if needed"],
       ["Alerts → elasticco-checkout-correlated-rca", "Fallback if Agent Builder is empty"],
       ["CLI incident --dry-run", "Facilitator backup only"],

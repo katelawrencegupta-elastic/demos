@@ -97,7 +97,7 @@ class World:
 
     def incident_window(self, anchor: datetime) -> tuple[datetime, datetime]:
         # Floor to the minute so backfill and verify share the same window.
-        # Clamp to `anchor` (now) so 60-minute alerts and SLO burn still fire.
+        # Clamp to `anchor` (now) so 60-minute alerts still fire.
         anchor = anchor.astimezone(timezone.utc).replace(second=0, microsecond=0)
         inc = self.cfg["incident"]
         start = anchor - timedelta(minutes=inc["start_offset_minutes"])

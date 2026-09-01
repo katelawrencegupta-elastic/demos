@@ -29,7 +29,7 @@ instructions: |
   - Always call ES|QL tools before answering. Never invent counts, p95, or error rates.
   - Reconstruct the planted incident for **checkout-api** / tenant **acme-retail**.
   - Recommend **one** remediation: roll back checkout-api from **v2.4.1** to **v2.4.0**.
-  - State the lookback (tools use 2 hours) and cite tool names you used.
+  - State the lookback (tools use 60 minutes) and cite tool names you used.
 
   ## Planted story (confirm with tools — do not recite if tools contradict)
   1. `checkout-api` deploy **v2.4.1** introduced a memory leak (`CartCache.retainAll`).
@@ -46,15 +46,14 @@ instructions: |
   - `elasticco-rca-orchestrator-retries` — DAG fulfillment.checkout for acme-retail
   - `elasticco-rca-slo-posture` — native SLO error budget (if the summary index exists)
 
-  ## Write path (Cases / email)
-  If Elastic built-in capabilities include Cases or an email connector, use them when the
-  human says **approve rollback to v2.4.0**: comment the open Observability case and send
-  a short incident email. If those tools are not available, do **not** pretend you wrote
-  anything. Print:
+  ## Write path (paste first; Cases / email if present)
+  When the human says **approve rollback to v2.4.0**, always print:
   1. A ready-to-paste **case comment** (markdown: RCA bullets + remediation).
-  2. A ready-to-paste **email** to kate.lawrencegupta@elastic.co.
+  2. A ready-to-paste **email** to oncall@elastic.co.
   The SE pastes into the case already opened by `elasticco-checkout-correlated-rca`
-  or `elasticco-eks-pod-restarts`.
+  or `elasticco-eks-pod-restarts`. If Elastic built-in capabilities include Cases or
+  an email connector, use them as well — do **not** pretend you wrote anything if
+  those tools are absent.
 
   Never claim you ran a Python CLI, `src.cli incident`, or any terminal command.
 
@@ -75,10 +74,10 @@ tools:
   - id: elasticco-rca-checkout-errors
     description: >
       checkout-api transaction error rate and p95 latency by tenant.id over the last
-      2 hours (labels.demo: elastic-co). Use first for blast-radius and SLO-style impact.
+      60 minutes (labels.demo: elastic-co). Use first for blast-radius and SLO-style impact.
     esql: |
       FROM traces-apm-default
-      | WHERE @timestamp >= NOW() - 2 hours
+      | WHERE @timestamp >= NOW() - 60 minutes
         AND labels.demo == "elastic-co"
         AND processor.event == "transaction"
         AND service.name == "checkout-api"
@@ -93,11 +92,11 @@ tools:
 
   - id: elasticco-rca-slow-postgres
     description: >
-      Slow PostgreSQL spans (>2s) for tenant acme-retail over the last 2 hours,
+      Slow PostgreSQL spans (>2s) for tenant acme-retail over the last 60 minutes,
       including SELECT … FOR UPDATE. Use when asked where time was spent.
     esql: |
       FROM traces-apm-default
-      | WHERE @timestamp >= NOW() - 2 hours
+      | WHERE @timestamp >= NOW() - 60 minutes
         AND labels.demo == "elastic-co"
         AND processor.event == "span"
         AND span.type == "db"
@@ -107,30 +106,30 @@ tools:
       | STATS n = COUNT(*),
               p95_ms = ROUND(PERCENTILE(span.duration.us, 95) / 1000.0, 0),
               max_ms = ROUND(MAX(span.duration.us) / 1000.0, 0)
-      | EVAL lookback = "2 hours"
+      | EVAL lookback = "60 minutes"
     params: {}
 
   - id: elasticco-rca-oom-restarts
     description: >
       OOMKilled / BackOff Kubernetes events and max checkout-api pod restart.count
-      over the last 2 hours. Use for the leak → OOM restart-loop evidence.
+      over the last 60 minutes. Use for the leak → OOM restart-loop evidence.
     esql: |
       FROM logs-elasticco.k8s.event-default, metrics-elasticco.k8s.pod-default
-      | WHERE @timestamp >= NOW() - 2 hours
+      | WHERE @timestamp >= NOW() - 60 minutes
         AND labels.demo == "elastic-co"
       | STATS oom = COUNT(*) WHERE kubernetes.event.reason == "OOMKilled",
               backoff = COUNT(*) WHERE kubernetes.event.reason == "BackOff",
               max_restarts = MAX(kubernetes.pod.restart.count)
-      | EVAL lookback = "2 hours"
+      | EVAL lookback = "60 minutes"
     params: {}
 
   - id: elasticco-rca-orchestrator-retries
     description: >
       Orchestrator DAG fulfillment.checkout warning/error lines for acme-retail
-      over the last 2 hours. Use for retry amplification of DB lock contention.
+      over the last 60 minutes. Use for retry amplification of DB lock contention.
     esql: |
       FROM logs-elasticco.orchestrator-default
-      | WHERE @timestamp >= NOW() - 2 hours
+      | WHERE @timestamp >= NOW() - 60 minutes
         AND labels.demo == "elastic-co"
         AND tenant.id == "acme-retail"
         AND orchestrator.dag_id == "fulfillment.checkout"
@@ -141,10 +140,10 @@ tools:
   - id: elasticco-rca-slo-posture
     description: >
       Native Observability SLO posture for Elastic Co. checkout availability.
-      errorBudgetRemaining < 0 means violated. Use for SLO burn questions —
+      errorBudgetRemaining < 0 means violated. Use for SLO error-budget questions —
       this is the pageable SLO, not the ES|QL correlation alert.
     esql: |
-      FROM .slo-observability.summary-v3.6
+      FROM .slo-observability.summary*
       | WHERE slo.id LIKE "elasticco-*"
       | KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp
       | EVAL violated = errorBudgetRemaining < 0

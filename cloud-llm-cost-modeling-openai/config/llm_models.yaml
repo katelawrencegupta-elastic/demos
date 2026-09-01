@@ -1,0 +1,253 @@
+# Popular LLM model catalog with Aug-2026 list prices ($ / 1M tokens).
+# Used by llm_invocation / llm_usage / llm_cost generators.
+models:
+  # --- OpenAI ---
+  - id: gpt-5.6-sol
+    provider: openai
+    family: gpt-5.6
+    tier: flagship
+    input_per_m: 5.00
+    output_per_m: 30.00
+    cached_input_per_m: 0.50
+    ops: [chat]
+  - id: gpt-5.4
+    provider: openai
+    family: gpt-5.4
+    tier: standard
+    input_per_m: 2.50
+    output_per_m: 15.00
+    cached_input_per_m: 0.25
+    ops: [chat]
+  - id: gpt-5.4-mini
+    provider: openai
+    family: gpt-5.4
+    tier: cheap
+    input_per_m: 0.75
+    output_per_m: 4.50
+    cached_input_per_m: 0.075
+    ops: [chat]
+  - id: gpt-4o
+    provider: openai
+    family: gpt-4o
+    tier: standard
+    input_per_m: 2.50
+    output_per_m: 10.00
+    cached_input_per_m: 1.25
+    ops: [chat]
+  - id: gpt-4o-mini
+    provider: openai
+    family: gpt-4o
+    tier: cheap
+    input_per_m: 0.15
+    output_per_m: 0.60
+    cached_input_per_m: 0.075
+    ops: [chat]
+  - id: o3
+    provider: openai
+    family: o-series
+    tier: reasoning
+    input_per_m: 2.00
+    output_per_m: 8.00
+    cached_input_per_m: 0.50
+    ops: [chat]
+  - id: text-embedding-3-large
+    provider: openai
+    family: embeddings
+    tier: embedding
+    input_per_m: 0.13
+    output_per_m: 0.0
+    cached_input_per_m: 0.13
+    ops: [embeddings]
+
+  # --- Anthropic ---
+  - id: claude-opus-5
+    provider: anthropic
+    family: claude-opus
+    tier: flagship
+    input_per_m: 5.00
+    output_per_m: 25.00
+    cached_input_per_m: 0.50
+    ops: [chat]
+  - id: claude-sonnet-5
+    provider: anthropic
+    family: claude-sonnet
+    tier: standard
+    input_per_m: 2.00
+    output_per_m: 10.00
+    cached_input_per_m: 0.20
+    ops: [chat]
+  - id: claude-haiku-4.5
+    provider: anthropic
+    family: claude-haiku
+    tier: cheap
+    input_per_m: 1.00
+    output_per_m: 5.00
+    cached_input_per_m: 0.10
+    ops: [chat]
+
+  # --- Google Gemini ---
+  - id: gemini-3.1-pro
+    provider: google
+    family: gemini-pro
+    tier: flagship
+    input_per_m: 2.00
+    output_per_m: 12.00
+    cached_input_per_m: 0.20
+    ops: [chat]
+  - id: gemini-2.5-flash
+    provider: google
+    family: gemini-flash
+    tier: cheap
+    input_per_m: 0.15
+    output_per_m: 0.60
+    cached_input_per_m: 0.0375
+    ops: [chat]
+  - id: text-embedding-004
+    provider: google
+    family: embeddings
+    tier: embedding
+    input_per_m: 0.025
+    output_per_m: 0.0
+    cached_input_per_m: 0.025
+    ops: [embeddings]
+
+  # --- AWS Bedrock (Anthropic + Meta via Bedrock) ---
+  - id: anthropic.claude-sonnet-5
+    provider: aws_bedrock
+    family: claude-sonnet
+    tier: standard
+    input_per_m: 2.20
+    output_per_m: 11.00
+    cached_input_per_m: 0.22
+    ops: [chat]
+  - id: meta.llama-4-maverick
+    provider: aws_bedrock
+    family: llama
+    tier: cheap
+    input_per_m: 0.24
+    output_per_m: 0.97
+    cached_input_per_m: 0.24
+    ops: [chat]
+
+  # --- Azure OpenAI (same models, slight premium) ---
+  - id: gpt-5.4
+    provider: azure_openai
+    family: gpt-5.4
+    tier: standard
+    input_per_m: 2.75
+    output_per_m: 16.50
+    cached_input_per_m: 0.275
+    ops: [chat]
+    deployment: meridian-gpt54-eastus
+  - id: gpt-4o-mini
+    provider: azure_openai
+    family: gpt-4o
+    tier: cheap
+    input_per_m: 0.165
+    output_per_m: 0.66
+    cached_input_per_m: 0.0825
+    ops: [chat]
+    deployment: meridian-gpt4omini-eastus
+
+# Application workloads that call LLMs — tied to Meridian BUs.
+apps:
+  - id: checkout-assistant
+    bu: ecommerce
+    env: prod
+    primary_providers: [openai, anthropic]
+    preferred_models: [gpt-5.4-mini, claude-haiku-4.5, gpt-4o-mini]
+    ops: [chat]
+    base_rpm: 45          # requests per hour at peak diurnal
+    avg_input: 1200
+    avg_output: 350
+    cache_hit_rate: 0.35
+  - id: catalog-search-embed
+    bu: ecommerce
+    env: prod
+    primary_providers: [openai, google]
+    preferred_models: [text-embedding-3-large, text-embedding-004]
+    ops: [embeddings]
+    base_rpm: 80
+    avg_input: 400
+    avg_output: 0
+    cache_hit_rate: 0.0
+  - id: support-copilot
+    bu: ecommerce
+    env: prod
+    primary_providers: [openai, anthropic]
+    preferred_models: [gpt-5.4, claude-sonnet-5, gpt-4o]
+    ops: [chat]
+    base_rpm: 22
+    avg_input: 3500
+    avg_output: 800
+    cache_hit_rate: 0.45
+  - id: feature-ranker
+    bu: mlplatform
+    env: prod
+    primary_providers: [openai, google]
+    preferred_models: [gpt-5.4-mini, gemini-2.5-flash, o3]
+    ops: [chat]
+    base_rpm: 30
+    avg_input: 2000
+    avg_output: 200
+    cache_hit_rate: 0.20
+  - id: rag-research
+    bu: mlplatform
+    env: prod
+    primary_providers: [anthropic, google, openai]
+    preferred_models: [claude-sonnet-5, gemini-3.1-pro, gpt-5.4]
+    ops: [chat]
+    base_rpm: 18
+    avg_input: 8000
+    avg_output: 1500
+    cache_hit_rate: 0.55
+  - id: doc-summarizer
+    bu: corpit
+    env: prod
+    primary_providers: [azure_openai, openai]
+    preferred_models: [gpt-5.4, gpt-4o-mini]
+    ops: [chat]
+    base_rpm: 12
+    avg_input: 6000
+    avg_output: 900
+    cache_hit_rate: 0.40
+  - id: fraud-nlp
+    bu: fintech
+    env: prod
+    primary_providers: [aws_bedrock, anthropic, openai]
+    preferred_models: [anthropic.claude-sonnet-5, claude-haiku-4.5, gpt-5.4-mini]
+    ops: [chat]
+    base_rpm: 35
+    avg_input: 1800
+    avg_output: 120
+    cache_hit_rate: 0.15
+  - id: kyc-classifier
+    bu: fintech
+    env: prod
+    primary_providers: [openai, google]
+    preferred_models: [gpt-4o-mini, gemini-2.5-flash]
+    ops: [chat]
+    base_rpm: 25
+    avg_input: 900
+    avg_output: 80
+    cache_hit_rate: 0.10
+  - id: skunk-agent-lab
+    bu: skunkworks
+    env: dev
+    primary_providers: [anthropic, openai, google]
+    preferred_models: [claude-opus-5, gpt-5.6-sol, gemini-3.1-pro, o3]
+    ops: [chat]
+    base_rpm: 8
+    avg_input: 12000
+    avg_output: 2500
+    cache_hit_rate: 0.05
+  - id: prompt-playground
+    bu: skunkworks
+    env: dev
+    primary_providers: [openai, anthropic, google, aws_bedrock]
+    preferred_models: [gpt-4o, claude-sonnet-5, gemini-2.5-flash, meta.llama-4-maverick]
+    ops: [chat]
+    base_rpm: 15
+    avg_input: 2500
+    avg_output: 1000
+    cache_hit_rate: 0.0

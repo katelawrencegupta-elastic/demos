@@ -61,18 +61,17 @@ Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globe
 
 **Outcome:** Restarts are a symptom; OOM + deploy version is the reason — same window as the slow traces.  
 **Deck:** [../presentations/u3-eks-restart-rca.html](../presentations/u3-eks-restart-rca.html)  
-**Tabs:** Inventory (optional 30s) · Dashboard **Elastic Co. — EKS Restarts** · Discover Kubernetes + checkout logs · Alerts / Cases
+**Tabs:** Dashboard **Elastic Co. — EKS Restarts** · Discover Kubernetes + checkout logs · Alerts / Cases
 
 | Clock | Do |
 |-------|----|
 | 0:00–0:40 | **Say:** On-call sees checkout pods restarting. The wrong ending is “add memory.” We want reason in one timeline. |
-| 0:40–1:10 | **Inventory 30s** (if hosts render): cluster `eks-elastic-prod-usc1` → the checkout host/pod. Skip if Inventory ignores custom datasets. |
-| 1:10–2:20 | Dashboard **Elastic Co. — EKS Restarts**. `kubernetes.event.reason: OOMKilled` on `checkout-api`. Memory vs limit; `kubernetes.pod.restart.count` climbing. |
+| 0:40–2:20 | Dashboard **Elastic Co. — EKS Restarts**. `kubernetes.event.reason: OOMKilled` on `checkout-api`. Memory vs limit; `kubernetes.pod.restart.count` climbing. |
 | 2:20–3:30 | Discover checkout logs: `OutOfMemoryError` + `deploy=2.4.1` + `CartCache.retainAll`. *This is the leak you’d confirm on a flamegraph* (Profiling not seeded). |
 | 3:30–4:20 | Alert `elasticco-eks-pod-restarts` → Observability case **EKS restart loop — checkout-api**. |
 | 4:20–5:00 | **Line:** Restarts are a symptom. OOM plus deploy version is a reason — not a second mystery. |
 
-**Skip if late:** Inventory and Cases — stay on the dashboard + one OOM log line.  
+**Skip if late:** Cases — stay on the dashboard + one OOM log line.  
 **If they want more:** noisy vs SLO vs correlation (U4).
 
 ---
@@ -108,9 +107,9 @@ Story facts (do not dump on slide 1): blast tenant `acme-retail`; healthy `globe
 | Clock | Do |
 |-------|----|
 | 0:00–0:40 | **Say:** Application monitoring names the failing service. The close is grounded RCA in Elastic — not a Python CLI. |
-| 0:40–1:20 | Alerts → **`elasticco-app-checkout-error-rate`** *or* native SLO burn. |
+| 0:40–1:20 | Alerts → **`elasticco-app-checkout-error-rate`** *or* Observability → SLOs (error budget). |
 | 1:20–3:20 | Agent Builder: paste the prompt. Walk acme-retail p95 / OOM / FOR UPDATE from **tools** (not 0% errors). |
-| 3:20–4:30 | “Approve rollback to v2.4.0.” If Cases/email tools appear, use them. Else paste the agent’s comment into the open case. |
+| 3:20–4:30 | “Approve rollback to v2.4.0.” Paste the agent’s comment into the open case. If Cases/email tools appear, use those too. |
 | 4:30–5:00 | **Line:** From alert to grounded RCA to the case — without leaving Elastic. |
 
 **Skip if late / Agent Builder empty:** open case + correlated RCA alert. Never open a terminal unless they ask. Facilitator backup: `python -m src.cli incident --dry-run`.  

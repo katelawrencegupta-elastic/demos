@@ -1,6 +1,6 @@
 # Lab 05 — Application monitoring + Agent Builder RCA (U5)
 
-**Goal:** From a service-level alert (or native SLO burn) to a tool-backed RCA in Agent Builder, then approve rollback into the Observability case.
+**Goal:** From a service-level alert (or native SLO error-budget chart) to a tool-backed RCA in Agent Builder, then approve rollback into the Observability case.
 
 The Python CLI (`incident --dry-run`) is a **facilitator backup**, not the customer-facing close.
 
@@ -38,8 +38,8 @@ Contrast with **`elasticco-noisy-node-cpu`** if you skipped U4.
 
 3. Confirm the agent **calls tools**. Evidence must show acme-retail p95 / OOM / slow `FOR UPDATE` — not 0% errors.
 4. Say **approve rollback to v2.4.0**.
-   - If built-in Cases / email capabilities appear: let the agent comment the case and send email.
-   - If tools are read-only: copy the paste-ready case comment (and email) into the Observability case already opened by the correlation or EKS-restarts alert.
+   - Copy the paste-ready case comment (and email) into the Observability case already opened by the correlation or EKS-restarts alert.
+   - If built-in Cases / email capabilities appear, use them as well.
 
 Do **not** run `src.cli incident` in front of the customer. The chat agent must not silently call the CLI.
 
@@ -54,7 +54,7 @@ Prints the same planted RCA from Elasticsearch. Exits non-zero if evidence canno
 Full write path (case + email) for lab practice:
 
 ```bash
-.venv/bin/python -m src.cli incident --email kate.lawrencegupta@elastic.co
+.venv/bin/python -m src.cli incident --email oncall@elastic.co
 ```
 
 ## Part D — Verify the case thread
@@ -63,6 +63,6 @@ Observability → **Cases**: the thread should hold the RCA (agent comment or pa
 
 ## Done when
 
-You can explain: alert or SLO burn → Agent Builder tools prove OOM + FOR UPDATE for acme-retail → human “approve rollback” → case comment (in product or pasted) — without inventing counts.
+You can explain: alert or SLO chart → Agent Builder tools prove OOM + FOR UPDATE for acme-retail → human “approve rollback” → case comment (in product or pasted) — without inventing counts.
 
 Interactive deck: [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)

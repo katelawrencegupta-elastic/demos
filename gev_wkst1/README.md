@@ -8,7 +8,7 @@ Synthetic multi-tenant fulfillment SaaS demo for Elastic Cloud Serverless. One c
 |---|--------|----------------|
 | U1 | Unstructured orchestrator logs → structured, searchable, correlated | Discover · ingest pipeline |
 | U2 | End-to-end distributed trace (7 hops) with tenant context and DB deep dive | APM waterfall · E2E tracing dashboard |
-| U3 | EKS/pod incident root cause — restart to reason | K8s events · pod metrics · Inventory (30s) |
+| U3 | EKS/pod incident root cause — restart to reason | K8s events · pod metrics · EKS Restarts dashboard |
 | U4 | Noisy vs native SLO vs correlated RCA | Alerts · SLOs · Cases · AI Assistant (opener) |
 | U5 | Agent Builder RCA → approve rollback into the case | Agent Builder `elasticco-rca-agent` · Cases |
 
@@ -50,7 +50,7 @@ Narrow a reload with `--scope` (`orchestrator` | `apm` | `apm_deps` | `traces` |
 
 ## Incident (planted)
 
-**Tenant `acme-retail` checkout degradation** (last ~60 minutes **through now**, so 60-minute alerts and SLO burn fire):
+**Tenant `acme-retail` checkout degradation** (last ~60 minutes **through now**, so 60-minute alerts fire and the native SLO shows error-budget impact):
 
 - `checkout-api` **v2.4.1** memory leak → **OOMKilled** / restart loop on `eks-elastic-prod-usc1`
 - Orchestrator DAG `fulfillment.checkout` retries
@@ -72,7 +72,7 @@ Seven-hop checkout path: `edge-gateway` → `identity-service` → `checkout-api
 | `elasticco-app-checkout-error-rate` | App error rate > 10% (U5 entry) |
 | `elasticco-rca-agent` | Agent Builder U5 close — ES\|QL tools, approve rollback into the case |
 
-Kibana: **SLOs**, **Agent Builder** (`/app/agent_builder/chat`), **Inventory** (U3 30s — skip if hosts do not render). Universal Profiling is talk-only after `CartCache.retainAll`; Synthetics is not in this demo.
+Kibana: **SLOs**, **Agent Builder** (`/app/agent_builder/chat`). Universal Profiling is talk-only after `CartCache.retainAll`; Synthetics is not in this demo.
 
 `logs-elasticco.incident-default` is written by the **facilitator CLI** (`incident`), not by Agent Builder. The customer audit is the Observability **case** thread.
 

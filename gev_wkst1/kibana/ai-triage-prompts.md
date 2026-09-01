@@ -49,13 +49,13 @@ Pre-open **Agent Builder** → **Elastic Co. RCA Agent** (`elasticco-rca-agent`)
 
 > checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.
 
-Walk tool results: acme-retail error rate / p95, OOMKilled + restarts, slow `FOR UPDATE`. Then: **approve rollback to v2.4.0**. If Cases/email capabilities are present, use them; otherwise paste the agent’s comment into the open Observability case.
+Walk tool results: acme-retail error rate / p95, OOMKilled + restarts, slow `FOR UPDATE`. Then: **approve rollback to v2.4.0**. Paste the agent’s comment into the open Observability case. If Cases/email tools appear, use those too.
 
 ## Facilitator backup (not the customer close)
 
 ```bash
 python -m src.cli incident --dry-run
-python -m src.cli incident --email kate.lawrencegupta@elastic.co
+python -m src.cli incident --email oncall@elastic.co
 ```
 
 Do not say “without leaving Elastic” when using the terminal. The chat agent must never silently call `src.cli incident`.

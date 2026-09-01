@@ -22,6 +22,10 @@ Start a live tick in a **side terminal** before the room (`--live-incident` is t
 
 Open Kibana tabs: Discover (`elasticco-orchestrator`), APM Services, Dashboard **Elastic Co. — End-to-End Tracing**, Alerts, SLOs, Cases, **Agent Builder** (`elasticco-rca-agent`). Time range: **Last 2 hours**.
 
+**Pre-warm U5:** in the Agent Builder tab, paste the scripted prompt before the room (or during U4) so U5 is walking tool results, not waiting on a cold chat:
+
+> checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.
+
 Do **not** open a terminal in front of the customer unless they ask how the demo was seeded. `cli incident --dry-run` is a facilitator backup only.
 
 ---
@@ -55,12 +59,11 @@ Do **not** open a terminal in front of the customer unless they ask how the demo
 
 ---
 
-### 13:00–17:00 · U3 Restart to reason (+ Inventory 30s)
+### 13:00–17:00 · U3 Restart to reason
 
-1. Inventory (if hosts render): host for `eks-elastic-prod-usc1` → same checkout pod on **EKS Restarts**. Skip if Inventory ignores custom `metrics-elasticco.*` datasets — do not force a dead click.
-2. Dashboard **Elastic Co. — EKS Restarts**: `kubernetes.event.reason: OOMKilled` on `checkout-api` pods. Memory vs limit; `kubernetes.pod.restart.count` rising.
-3. Checkout logs: `OutOfMemoryError` + `deploy=2.4.1` + `CartCache.retainAll`. *This is the leak you’d confirm on a flamegraph* (Universal Profiling is not seeded — talk only).
-4. Alert `elasticco-eks-pod-restarts` + Observability case **EKS restart loop — checkout-api**.
+1. Dashboard **Elastic Co. — EKS Restarts**: `kubernetes.event.reason: OOMKilled` on `checkout-api` pods. Memory vs limit; `kubernetes.pod.restart.count` rising.
+2. Checkout logs: `OutOfMemoryError` + `deploy=2.4.1` + `CartCache.retainAll`. *This is the leak you’d confirm on a flamegraph* (Universal Profiling is not seeded — talk only).
+3. Alert `elasticco-eks-pod-restarts` + Observability case **EKS restart loop — checkout-api**.
 
 **Line:** Restarts are a symptom. OOM + deploy version is a reason. Same time window as the slow traces — not a second mystery.
 
@@ -69,7 +72,7 @@ Do **not** open a terminal in front of the customer unless they ask how the demo
 ### 17:00–21:00 · U4 Noisy vs SLO vs correlated RCA
 
 1. Alerts: **`elasticco-noisy-node-cpu`** — CPU threshold, no tenant/service. “Would you wake someone for this?”
-2. Observability → **SLOs**: **`elasticco-slo-checkout-availability`** — native error budget / burn for `checkout-api` + `tenant.id: acme-retail`. *This is what you page on.*
+2. Observability → **SLOs**: **`elasticco-slo-checkout-availability`** — native error budget for `checkout-api` + `tenant.id: acme-retail`. *This is what you page on.*
 3. Alerts: **`elasticco-checkout-correlated-rca`** — ES|QL quality **correlation** (OOM + slow DB + OOM logs). Tags include `checkout-api`, `acme-retail`. Cases action. *This is the RCA starter — not an SLO.*
 4. Optional contrast opener: paste the noisy-vs-quality prompt into AI Assistant. Do **not** close U4 in AI Assistant — U5 is Agent Builder.
 
@@ -81,14 +84,14 @@ Do **not** open a terminal in front of the customer unless they ask how the demo
 
 Deck: [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)
 
-1. Alerts: **`elasticco-app-checkout-error-rate`** *or* native SLO burn on checkout-api / acme-retail.
+1. Alerts: **`elasticco-app-checkout-error-rate`** *or* the native SLO chart on checkout-api / acme-retail.
 2. Agent Builder chat (pre-opened tab, agent `elasticco-rca-agent`):
 
 > checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.
 
 3. Walk tool-backed evidence: acme-retail p95 / OOM / `FOR UPDATE` — not 0% errors. If tools are empty, skip to the open case + quality alert (do not invent).
-4. “Approve rollback to v2.4.0” → Cases + email if elastic capabilities allow; otherwise paste the agent’s case comment into the open Observability case.
-5. Discover incident audit **only if** a write path existed; otherwise the case thread is the audit.
+4. “Approve rollback to v2.4.0” → paste the agent’s case comment into the open Observability case. If the agent offers Cases/email, use those too.
+5. The case thread is the audit. Discover incident stream only if a CLI write path existed (lab-only).
 
 **If Agent Builder is slow or empty:** skip to the open case + `elasticco-checkout-correlated-rca` (U4 exit line). Never open a terminal unless they ask.
 
@@ -98,7 +101,7 @@ Deck: [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-moni
 
 ### If time is short (12 min)
 
-Skip pipeline UI in U1 (assert fields exist). Skip Inventory. Skip noisy alert; show native SLO + correlated RCA. Skip U5 if Agent Builder is cold — stop after U4.
+Skip pipeline UI in U1 (assert fields exist). Skip noisy alert; show native SLO + correlated RCA. Skip U5 if Agent Builder is cold — stop after U4.
 
 ### If time is short (20 min)
 

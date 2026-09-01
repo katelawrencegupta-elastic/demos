@@ -1,0 +1,89 @@
+# Meridian FinOps spend budgets — intentionally tight so workshop demos show
+# breached SLOs / Active alerts against the seeded timeline.
+# Calibrated 2026-08-27 against Serverless backfill (~120d):
+#   AWS CUR 30d total ~$220k, daily avg ~$7.4k
+#   meridian-staging daily ~$1.0k (cost_leak)
+#   checkout-assistant 7d LLM ~$5.5 (agent-loop spike days $2–3.5)
+#   meridian-ml-prod GCP 7d ~$7.2k
+
+tags:
+  - meridian
+  - finops
+  - workshop
+
+# Dashboard / alert shared numbers
+budgets:
+  aws_monthly_usd: 150000          # below ~$220k trailing-30d burn
+  aws_daily_ceiling_usd: 5200      # ~0.7× 30d daily avg — crypto/growth burn days
+  staging_daily_ceiling_usd: 150   # cost_leak ~$1k/day → chronically breached
+  staging_daily_alert_usd: 200
+  checkout_daily_ceiling_usd: 0.50 # agent-loop days $2–3.5; normal ~$0.45–0.58 → chronic breach
+  checkout_7d_alert_usd: 4.0       # 7d sum ~$5.5
+  gcp_ml_7d_alert_usd: 4000        # meridian-ml-prod 7d ~$7.2k
+
+slos:
+  - id: meridian-slo-aws-daily-spend
+    name: "[Meridian] AWS daily unblended under budget"
+    description: >
+      Daily AWS CUR unblended cost must stay at or below the FinOps ceiling.
+      Crypto-mining (−12..−9) and organic growth burn error budget.
+    index: metrics-aws_billing.cur-default
+    filter: ""
+    field: aws_billing.cur.line_item.unblended_cost
+    ceiling_key: aws_daily_ceiling_usd
+    burn_rate_alert: false
+
+  - id: meridian-slo-staging-cost-leak
+    name: "[Meridian] Staging account daily spend healthy"
+    description: >
+      meridian-staging daily CUR spend under a healthy baseline. The ongoing
+      cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.
+    index: metrics-aws_billing.cur-default
+    filter: 'aws_billing.cur.line_item.usage_account_name : "meridian-staging"'
+    field: aws_billing.cur.line_item.unblended_cost
+    ceiling_key: staging_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: meridian-slo-llm-checkout-spend
+    name: "[Meridian] checkout-assistant daily LLM cost"
+    description: >
+      Daily gen_ai span cost for checkout-assistant under ceiling. The
+      llm_agent_loop scenario (−8..−6, ×12) burns this budget.
+    index: traces-apm-default
+    filter: 'span.subtype : "gen_ai" and service.name : "checkout-assistant"'
+    field: labels.llm_cost_usd
+    ceiling_key: checkout_daily_ceiling_usd
+    burn_rate_alert: true
+
+alerts:
+  - id: meridian-alert-aws-mtd-budget
+    name: "[Meridian] AWS trailing-30d spend over monthly budget"
+    description: Trailing 30-day CUR unblended cost exceeds the monthly FinOps budget.
+    schedule: 1h
+    time_window_size: 30
+    time_window_unit: d
+    kind: aws_mtd
+
+  - id: meridian-alert-staging-daily
+    name: "[Meridian] Staging cost-leak daily burn"
+    description: meridian-staging daily CUR spend above cost-leak alert floor.
+    schedule: 1h
+    time_window_size: 1
+    time_window_unit: d
+    kind: staging_daily
+
+  - id: meridian-alert-llm-agent-loop
+    name: "[Meridian] checkout-assistant LLM burn"
+    description: 7-day LLM cost for checkout-assistant above agent-loop floor.
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    kind: checkout_7d
+
+  - id: meridian-alert-gcp-ml-burn
+    name: "[Meridian] ML platform GCP project burn"
+    description: 7-day GCP billing for meridian-ml-prod above ML-burn floor.
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    kind: gcp_ml_7d

@@ -178,7 +178,7 @@
     <aside class="sidebar">
       <div class="brand">Elastic Observability</div>
       <h1>U3 · EKS restart to reason</h1>
-      <p>From pod restart count to OOMKilled, deploy version, and the cache leak. Inventory 30s if hosts render.</p>
+      <p>From pod restart count to OOMKilled, deploy version, and the cache leak.</p>
       <ul class="nav" id="nav"></ul>
       <div class="controls">
         <button class="primary" id="btnPlay">▶ Walk restart → reason</button>
@@ -194,7 +194,7 @@
           <div class="slide-header">
             <span class="pill">Use case 3</span><span class="pill">Kubernetes</span>
             <h2>Restarts are a symptom. OOM + deploy version is the reason.</h2>
-            <p>checkout-api pods on <code>eks-elastic-prod-usc1</code> enter a restart loop. Optional 30s on Observability Inventory (skip if custom host metrics do not render), then reconstruct the timeline from metrics, Kubernetes events, and container logs — no kubectl required.</p>
+            <p>checkout-api pods on <code>eks-elastic-prod-usc1</code> enter a restart loop. Reconstruct the timeline from metrics, Kubernetes events, and container logs — no kubectl required.</p>
           </div>
           <div class="hero-stats">
             <div class="hero-stat"><div class="num">3</div><div class="lbl">checkout-api pods OOMKilled</div></div>
@@ -341,7 +341,7 @@
             </div>
             <div class="callout success" style="margin:0;">
               <strong>U3 → U4 / U5</strong>
-              <p>U3 proves restart → reason from telemetry. Optional 30s on Inventory if hosts render. U4 contrasts noisy CPU vs native SLO vs this quality restart/correlation path. U5 Agent Builder lands the RCA on the case.</p>
+              <p>U3 proves restart → reason from telemetry. U4 contrasts noisy CPU vs native SLO vs this quality restart/correlation path. U5 Agent Builder lands the RCA on the case.</p>
             </div>
           </div>
         </section>
@@ -501,7 +501,6 @@
     ];
 
     const KIBANA = [
-      ["Observability → Inventory", "30s: host for eks-elastic-prod-usc1 → same checkout pod (skip if empty)"],
       ["Dashboard elasticco-eks-restarts", "Memory vs limit, restart count by pod, event reasons"],
       ["Discover · Elastic Co. Kubernetes", "Filter kubernetes.event.reason: OOMKilled"],
       ["Saved search EKS OOMKilled / BackOff", "Open the planted kill + BackOff events"],
@@ -668,7 +667,7 @@
     document.addEventListener("keydown", e => {
       if (e.key === "ArrowRight") goSlide(currentSlide + 1);
       if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
-      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.());
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
     });
 
     buildNav();

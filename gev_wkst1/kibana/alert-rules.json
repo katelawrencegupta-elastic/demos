@@ -2,7 +2,7 @@
   {
     "name": "elasticco-noisy-node-cpu",
     "rule_type_id": "observability.rules.custom_threshold",
-    "consumer": "logs",
+    "consumer": "infrastructure",
     "enabled": true,
     "schedule": { "interval": "5m" },
     "tags": ["elastic-co", "noisy", "demo"],
@@ -10,14 +10,14 @@
       "criteria": [
         {
           "comparator": ">",
-          "threshold": [70],
+          "threshold": [0.25],
           "timeSize": 5,
           "timeUnit": "m",
           "metrics": [
             {
               "name": "A",
               "aggType": "avg",
-              "field": "kubernetes.pod.cpu.usage.nanocores"
+              "field": "system.cpu.total.norm.pct"
             }
           ]
         }
@@ -29,7 +29,7 @@
           "query": "labels.demo: elastic-co",
           "language": "kuery"
         },
-        "index": "metrics-elasticco.k8s.pod-*"
+        "index": "metrics-elasticco.host-*"
       }
     },
     "actions": [],

@@ -1,0 +1,189 @@
+# Meridian FinOps AI Assistant — Agent Builder agent + ES|QL tools.
+# Budget numbers in ES|QL/instructions are filled from config/budgets.yaml at provision time.
+
+agent:
+  id: meridian-finops-ai-assistant
+  name: Meridian FinOps AI Assistant
+  description: >
+    Answers questions about Meridian Dynamics cloud + LLM spend, budget posture,
+    spend SLO health, and FinOps budget alerts. Ground answers in ES|QL tool
+    results; cite USD amounts and the lookback window.
+  labels:
+    - meridian
+    - finops
+    - workshop
+  avatar_color: "#2563EB"
+  avatar_symbol: MF
+  access_mode: public
+  enable_elastic_capabilities: false
+
+# System instructions — {budgets_block} and {kibana_url} substituted at provision.
+instructions: |
+  You are the **Meridian FinOps AI Assistant** for Meridian Dynamics (fictional demo company).
+
+  ## Your job
+  - Explain cloud + LLM spend using the custom ES|QL tools (always call tools before answering).
+  - Compare results to FinOps budgets and spend SLOs; flag breaches when error budget remaining is negative.
+  - Tie findings to seeded demo scenarios when relevant.
+  - Provide Kibana deep links for dashboards, SLOs, and alerts.
+
+  ## Budget thresholds (USD)
+  {budgets_block}
+
+  ## Spend SLOs (Observability)
+  - meridian-slo-aws-daily-spend — AWS daily CUR under ceiling
+  - meridian-slo-staging-cost-leak — meridian-staging daily spend healthy
+  - meridian-slo-llm-checkout-spend — checkout-assistant daily LLM cost
+  Use tool `meridian-finops-slo-posture` for current error budget remaining/consumed.
+
+  ## Budget alert rules (typically ACTIVE in this demo)
+  - meridian-alert-aws-mtd-budget — trailing 30d AWS CUR vs monthly budget
+  - meridian-alert-staging-daily — meridian-staging daily burn
+  - meridian-alert-llm-agent-loop — checkout-assistant 7d LLM cost
+  - meridian-alert-gcp-ml-burn — meridian-ml-prod GCP 7d burn
+  Direct users to check live status: {kibana_url}/app/observability/alerts
+
+  ## Scenario cheat sheet
+  - **cost_leak** — ongoing high spend on `meridian-staging` (~orphaned EC2/RDS) with little activity
+  - **crypto_incident** — days −12..−9 on meridian-dev; AWS CUR + GuardDuty + CPU spike
+  - **ml_burn** — days −20..−16 on meridian-ml-prod GCP; Vertex/Compute spike
+  - **llm_agent_loop** — days −8..−6 on `checkout-assistant`; token/cost ×12
+  - **genai_ramp** — shadow IT on meridian-genai-poc from day −15
+
+  ## Dashboard links
+  - FinOps baseline (Budget posture): {kibana_url}/app/dashboards#/view/meridian-finops-llm-observability
+  - FinOps classic (security→cost): {kibana_url}/app/dashboards#/view/meridian-finops-llm-observability-classic
+  - AI Assistant usage: {kibana_url}/app/dashboards#/view/meridian-ai-assistant-inference-usage
+  - SLOs: {kibana_url}/app/observability/slos
+  - Alerts: {kibana_url}/app/observability/alerts
+
+  ## Rules
+  - Always state the lookback window (days parameter) you used.
+  - Never invent spend numbers — use tool output only.
+  - When errorBudgetRemaining < 0, say the SLO is **violated** and quantify remaining budget.
+  - Prefer concise bullet answers with one dashboard link.
+
+# ES|QL lookback: use TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days")) — integer * 1 day is invalid.
+
+tools:
+  - id: meridian-finops-aws-spend
+    description: >
+      AWS CUR unblended spend for the last N days: total, daily average, and percent
+      of monthly budget. Use when asked about AWS spend, monthly budget, or CUR totals.
+    esql: |
+      FROM metrics-aws_billing.cur-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | STATS total_spend = SUM(aws_billing.cur.line_item.unblended_cost)
+      | EVAL lookback_days = ?days::integer
+      | EVAL avg_daily = total_spend / lookback_days
+      | EVAL monthly_budget_usd = {aws_monthly_usd}
+      | EVAL pct_of_budget = total_spend / monthly_budget_usd * 100
+    params:
+      days:
+        type: integer
+        description: Lookback window in days (30 for budget questions, 7 for recent trends)
+
+  - id: meridian-finops-aws-top-accounts
+    description: >
+      Top AWS linked accounts by CUR unblended cost over the last N days.
+      Use for allocation / which account is driving spend.
+    esql: |
+      FROM metrics-aws_billing.cur-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)
+        BY account = aws_billing.cur.line_item.usage_account_name
+      | SORT spend DESC
+      | LIMIT 12
+    params:
+      days:
+        type: integer
+        description: Lookback window in days
+
+  - id: meridian-finops-staging-leak
+    description: >
+      meridian-staging account spend over the last N days vs the daily SLO ceiling.
+      Use when asked about staging cost leak, orphaned resources, or meridian-staging.
+    esql: |
+      FROM metrics-aws_billing.cur-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+        AND aws_billing.cur.line_item.usage_account_name == "meridian-staging"
+      | STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)
+      | EVAL lookback_days = ?days::integer
+      | EVAL avg_daily = spend / lookback_days
+      | EVAL daily_slo_ceiling_usd = {staging_daily_ceiling_usd}
+      | EVAL daily_alert_floor_usd = {staging_daily_alert_usd}
+      | EVAL over_slo_ceiling = avg_daily > daily_slo_ceiling_usd
+    params:
+      days:
+        type: integer
+        description: Lookback window in days (7 recommended)
+
+  - id: meridian-finops-llm-spend-by-app
+    description: >
+      LLM cost from APM gen_ai spans by service.name over the last N days.
+      Use for LLM burn, checkout-assistant, or app-level LLM FinOps.
+    esql: |
+      FROM traces-apm-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+        AND span.subtype == "gen_ai"
+      | EVAL cost = TO_DOUBLE(labels.llm_cost_usd)
+      | STATS spend_usd = SUM(cost), calls = COUNT(*)
+        BY app = service.name, team = COALESCE(labels.team, "untagged")
+      | SORT spend_usd DESC
+      | LIMIT 15
+    params:
+      days:
+        type: integer
+        description: Lookback window in days (7 for agent-loop questions)
+
+  - id: meridian-finops-cloud-mix
+    description: >
+      Total cloud billing spend by provider (AWS CUR, GCP billing, Azure billing)
+      over the last N days. Use for multi-cloud spend mix questions.
+    esql: |
+      FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | EVAL spend = COALESCE(
+          aws_billing.cur.line_item.unblended_cost,
+          gcp.billing.total,
+          azure.billing.pretax_cost)
+      | EVAL provider = CASE(
+          data_stream.dataset == "aws_billing.cur", "aws",
+          data_stream.dataset == "gcp.billing", "gcp",
+          data_stream.dataset == "azure.billing", "azure",
+          "other")
+      | STATS total = SUM(spend) BY provider
+      | SORT total DESC
+    params:
+      days:
+        type: integer
+        description: Lookback window in days
+
+  - id: meridian-finops-gcp-ml-burn
+    description: >
+      GCP billing for meridian-ml-prod over the last N days. Use for ML platform burn
+      or Vertex/GCE cost spike scenarios.
+    esql: |
+      FROM metrics-gcp.billing-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+        AND gcp.billing.project_name == "meridian-ml-prod"
+      | STATS spend = SUM(gcp.billing.total)
+      | EVAL lookback_days = ?days::integer
+      | EVAL alert_floor_usd = {gcp_ml_7d_alert_usd}
+      | EVAL over_alert_floor = spend > alert_floor_usd
+    params:
+      days:
+        type: integer
+        description: Lookback window in days (7 recommended)
+
+  - id: meridian-finops-slo-posture
+    description: >
+      Current Meridian spend SLO posture: error budget remaining and consumed.
+      errorBudgetRemaining < 0 means violated. Use for SLO health questions.
+    esql: |
+      FROM .slo-observability.summary-v3.6
+      | WHERE slo.id LIKE "meridian-*"
+      | KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp
+      | EVAL violated = errorBudgetRemaining < 0
+      | SORT slo.name
+    params: {}
