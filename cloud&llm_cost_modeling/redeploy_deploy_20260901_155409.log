@@ -1,0 +1,156 @@
+LOG=/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/redeploy_deploy_20260901_155409.log
+
+========== VARIANT aws setup 2026-09-01T19:54:09Z ==========
+== variant: aws — Meridian FinOps — AWS ==
+== checking Elasticsearch ==
+  [ok] 9.6.0 (serverless)
+== installing integration packages (Fleet) ==
+  [ok] package aws 8.1.0 already installed
+  [ok] package aws_bedrock 2.0.0 already installed
+  [ok] package aws_billing 0.2.1 already installed
+  installing package apm ...
+  [warn] package apm install failed (500) — continuing (gen_ai traces index on first backfill)
+== patching TSDS templates for backfill ==
+  [ok] metrics-aws.ec2_metrics already standard mode
+  [ok] metrics-aws_bedrock.runtime already standard mode
+  [ok] metrics-aws_bedrock.guardrails already standard mode
+== CUR latest alias (OOTB aws_billing dashboards) ==
+  [ok] alias aws_billing.cur_latest already exists
+== CUR data view + Payer/Linked Account controls ==
+  [ok] data view aws-billing-cur-latest already exists
+  [ok] [Metrics] AWS Cost and Usage Report - Current month: pinned time range
+  [ok] [Metrics] AWS Cost and Usage Report - Last month: pinned time range
+  [ok] [Metrics] AWS Cost and Usage Report - Last 3 months: pinned time range
+  [ok] [Metrics] AWS Cost and Usage Report - Last 6 months: pinned time range
+  [ok] [Metrics] AWS Cost and Usage Report - All time: pinned time range
+== Amazon Bedrock dashboards (time range) ==
+  [ok] pinned time range on [Amazon Bedrock] Overview
+  [ok] pinned time range on [Amazon Bedrock] Guardrails
+== ESS Billing dashboards (time range) ==
+  [warn] dashboard ess_billing-billingdashboard: 404
+  [warn] dashboard ess_billing-creditsdashboard: 404
+== checking write access ==
+  [ok] API key can create indices and write documents
+== APM gen_ai mappings + retention (ES|QL) ==
+  [ok] component template traces-apm@custom (180d)
+  [ok] traces-apm-default mapping updated
+  [ok] traces-apm-default retention 180d
+== FinOps spend SLOs + budget alerts ==
+== FinOps spend SLOs ==
+  [ok] SLO updated: meridian-slo-aws-daily-spend
+  [ok] SLO updated: meridian-slo-staging-cost-leak
+  [ok] rule updated: meridian-slo-staging-cost-leak-burn
+  [ok] SLO updated: meridian-slo-llm-checkout-spend
+  [ok] rule updated: meridian-slo-llm-checkout-spend-burn
+== FinOps budget ES|QL alerts ==
+  [ok] rule updated: meridian-alert-aws-mtd-budget
+  [ok] rule updated: meridian-alert-staging-daily
+  [ok] rule updated: meridian-alert-llm-agent-loop
+  [ok] rule updated: meridian-alert-gcp-ml-burn
+== Meridian FinOps AI Assistant ==
+== FinOps AI Assistant tools ==
+  [ok] tool updated: meridian-finops-aws-spend
+  [ok] tool updated: meridian-finops-aws-top-accounts
+  [ok] tool updated: meridian-finops-staging-leak
+  [ok] tool updated: meridian-finops-llm-spend-by-app
+  [ok] tool updated: meridian-finops-cloud-mix
+  [ok] tool updated: meridian-finops-gcp-ml-burn
+  [ok] tool updated: meridian-finops-slo-posture
+== Meridian FinOps AI Assistant ==
+  [ok] agent updated: meridian-finops-ai-assistant (Meridian FinOps AI Assistant)
+setup complete.
+
+========== VARIANT aws backfill 2026-09-01T19:55:04Z ==========
+== variant: aws — Meridian FinOps — AWS ==
+backfilling all 120 days: 2026-05-04 19:55 -> 2026-09-01 19:55 UTC (11 generators)
+  [ok] component template traces-apm@custom (180d)
+  [ok] traces-apm-default mapping updated
+  [ok] traces-apm-default retention 180d
+  day 1/120: 30,000 docs indexed (19s elapsed)
+  day 2/120: 60,000 docs indexed (37s elapsed)
+  day 3/120: 90,000 docs indexed (56s elapsed)
+  day 4/120: 122,000 docs indexed (75s elapsed)
+  day 5/120: 150,000 docs indexed (91s elapsed)
+  day 6/120: 180,000 docs indexed (110s elapsed)
+  day 7/120: 210,000 docs indexed (128s elapsed)
+  day 8/120: 242,000 docs indexed (147s elapsed)
+  day 9/120: 272,000 docs indexed (165s elapsed)
+  day 10/120: 304,000 docs indexed (186s elapsed)
+  day 11/120: 334,000 docs indexed (204s elapsed)
+  day 12/120: 364,000 docs indexed (221s elapsed)
+  day 13/120: 394,000 docs indexed (239s elapsed)
+  day 14/120: 424,000 docs indexed (257s elapsed)
+  day 15/120: 454,000 docs indexed (275s elapsed)
+  day 16/120: 486,000 docs indexed (294s elapsed)
+  day 17/120: 516,000 docs indexed (311s elapsed)
+  day 18/120: 548,000 docs indexed (331s elapsed)
+  day 19/120: 578,000 docs indexed (349s elapsed)
+  day 20/120: 608,000 docs indexed (367s elapsed)
+  day 21/120: 638,000 docs indexed (384s elapsed)
+  day 22/120: 670,000 docs indexed (403s elapsed)
+  day 23/120: 700,000 docs indexed (420s elapsed)
+  day 24/120: 732,000 docs indexed (439s elapsed)
+  day 25/120: 762,000 docs indexed (457s elapsed)
+  day 26/120: 792,000 docs indexed (475s elapsed)
+  day 27/120: 822,000 docs indexed (494s elapsed)
+  day 28/120: 854,000 docs indexed (513s elapsed)
+  day 29/120: 884,000 docs indexed (530s elapsed)
+  day 30/120: 916,000 docs indexed (550s elapsed)
+  day 31/120: 948,000 docs indexed (569s elapsed)
+  day 32/120: 980,000 docs indexed (587s elapsed)
+  day 33/120: 1,008,000 docs indexed (605s elapsed)
+  day 34/120: 1,038,000 docs indexed (623s elapsed)
+  day 35/120: 1,070,000 docs indexed (642s elapsed)
+  day 36/120: 1,102,000 docs indexed (660s elapsed)
+  day 37/120: 1,134,000 docs indexed (680s elapsed)
+  day 38/120: 1,166,000 docs indexed (699s elapsed)
+  day 39/120: 1,196,000 docs indexed (717s elapsed)
+  day 40/120: 1,226,000 docs indexed (736s elapsed)
+  day 41/120: 1,258,000 docs indexed (754s elapsed)
+  day 42/120: 1,288,000 docs indexed (772s elapsed)
+  day 43/120: 1,320,000 docs indexed (791s elapsed)
+  day 44/120: 1,352,000 docs indexed (811s elapsed)
+  day 45/120: 1,384,000 docs indexed (830s elapsed)
+  day 46/120: 1,416,000 docs indexed (851s elapsed)
+  day 47/120: 1,446,000 docs indexed (869s elapsed)
+  day 48/120: 1,476,000 docs indexed (886s elapsed)
+  day 49/120: 1,508,000 docs indexed (906s elapsed)
+  day 50/120: 1,540,000 docs indexed (926s elapsed)
+  day 51/120: 1,572,000 docs indexed (946s elapsed)
+  day 52/120: 1,606,000 docs indexed (965s elapsed)
+  day 53/120: 1,638,000 docs indexed (984s elapsed)
+  day 54/120: 1,668,000 docs indexed (1002s elapsed)
+  day 55/120: 1,698,000 docs indexed (1020s elapsed)
+  day 56/120: 1,730,000 docs indexed (1041s elapsed)
+  day 57/120: 1,762,000 docs indexed (1060s elapsed)
+  day 58/120: 1,796,000 docs indexed (1081s elapsed)
+  day 59/120: 1,828,000 docs indexed (1100s elapsed)
+  day 60/120: 1,860,000 docs indexed (1120s elapsed)
+  day 61/120: 1,890,000 docs indexed (1137s elapsed)
+  day 62/120: 1,922,000 docs indexed (1156s elapsed)
+  day 63/120: 1,954,000 docs indexed (1174s elapsed)
+  day 64/120: 1,986,000 docs indexed (1193s elapsed)
+  day 65/120: 2,020,000 docs indexed (1213s elapsed)
+  day 66/120: 2,052,000 docs indexed (1232s elapsed)
+  day 67/120: 2,084,000 docs indexed (1251s elapsed)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/src/cli.py", line 628, in <module>
+    main()
+    ~~~~^^
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/src/cli.py", line 588, in main
+    cmd_backfill(args.days, _resolve_scope(args))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/src/cli.py", line 145, in cmd_backfill
+    sink.add(gen.DATA_STREAM, doc)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/src/sink/elastic.py", line 25, in add
+    self.flush()
+    ~~~~~~~~~~^^
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/src/sink/elastic.py", line 43, in flush
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/.venv/lib/python3.14/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://klgawsfinopsdemo-b4019b.es.eastus.azure.elastic.cloud:443/_bulk
