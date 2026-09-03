@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>U3 · EKS Restart to Reason — Elastic Stack</title>
+  <title>U3 · EKS Restart to Reason — Elastic Co.</title>
   <style>
     :root {
-      --bg: #0b0d0e; --surface: #141619; --surface-2: #1c1f24; --border: #2a2f36;
-      --text: #e4e8ef; --muted: #9aa3b2; --accent: #00bfb3; --accent-dim: rgba(0,191,179,0.12);
-      --warn: #f5a524; --success: #32d583; --danger: #f97066;
-      --font: "Inter", "Segoe UI", system-ui, sans-serif;
-      --mono: "SF Mono", "Fira Code", "Consolas", monospace;
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -20,7 +21,7 @@
       border-right: 1px solid var(--border); background: var(--surface);
       padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
     }
-    .brand { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
     .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
     .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
     .nav { list-style: none; padding: 0; margin: 0; flex: 1; }
@@ -30,7 +31,7 @@
       font: inherit; font-size: 0.82rem; display: flex; align-items: center; gap: 0.5rem;
     }
     .nav li button:hover { background: var(--surface-2); color: var(--text); }
-    .nav li button.active { background: var(--accent-dim); border-color: rgba(0,191,179,0.35); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
     .nav .idx {
       width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
       display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
@@ -42,7 +43,7 @@
       border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
     }
     .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
-    .controls button.primary { background: var(--accent-dim); border-color: rgba(0,191,179,0.4); color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
     main { position: relative; overflow: hidden; }
     .slides { height: 100%; position: relative; }
     .slide {
@@ -60,7 +61,7 @@
     .slide-header p { color: var(--muted); max-width: 52rem; line-height: 1.55; margin: 0; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
     .card-head {
       padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
@@ -73,14 +74,14 @@
     .badge.warn { color: var(--warn); border-color: rgba(245,165,36,0.35); }
     .badge.ok { color: var(--success); border-color: rgba(50,213,131,0.35); }
     .badge.danger { color: var(--danger); border-color: rgba(249,112,102,0.35); }
-    .badge.info { color: var(--accent); border-color: rgba(0,191,179,0.35); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
     table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
     th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
     tr.clickable { cursor: pointer; }
     tr.clickable:hover td { background: var(--surface-2); }
     tr.clickable.selected td { background: var(--accent-dim); }
-    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: #c9d4e3; }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
     pre.doc {
       margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 8px;
       font-family: var(--mono); font-size: 0.72rem; line-height: 1.55; overflow-x: auto; white-space: pre-wrap;
@@ -97,7 +98,7 @@
     .callout.success { border-color: var(--success); background: rgba(50,213,131,0.08); }
     .callout.danger { border-color: var(--danger); background: rgba(249,112,102,0.08); }
     .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
-    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.1rem; }
     .hero-stat .num { font-size: 1.75rem; font-weight: 700; color: var(--accent); }
     .hero-stat .lbl { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
     .stat-grid { display: grid; gap: 0.65rem; }
@@ -123,7 +124,7 @@
       font-size: 0.8rem; align-items: start; cursor: pointer;
     }
     .step-item.done { opacity: 0.55; }
-    .step-item.active { border-color: rgba(0,191,179,0.45); background: var(--accent-dim); }
+    .step-item.active { border-color: var(--accent-border); background: var(--accent-dim); }
     .step-item.hot { border-color: rgba(249,112,102,0.45); background: rgba(249,112,102,0.08); }
     .step-item .num { color: var(--muted); font-family: var(--mono); }
     .step-item .svc { color: var(--accent); font-weight: 600; font-family: var(--mono); font-size: 0.74rem; }
@@ -151,14 +152,14 @@
     .pod-card.hot { border-color: rgba(249,112,102,0.45); }
     .pod-card h4 { margin: 0 0 0.35rem; font-size: 0.82rem; font-family: var(--mono); }
     .pod-card p { margin: 0; font-size: 0.75rem; color: var(--muted); line-height: 1.45; }
-    .compare-card { border-radius: 12px; padding: 1rem; border: 1px solid var(--border); }
+    .compare-card { border-radius: 4px; padding: 1rem; border: 1px solid var(--border); }
     .compare-card.noisy { border-color: rgba(245,165,36,0.45); background: rgba(245,165,36,0.06); }
     .compare-card.quality { border-color: rgba(50,213,131,0.45); background: rgba(50,213,131,0.06); }
     .compare-card h3 { margin: 0 0 0.5rem; font-size: 0.95rem; }
     .compare-card ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
     .toolbar {
       position: fixed; bottom: 0; left: 220px; right: 0; display: flex; justify-content: space-between;
-      align-items: center; padding: 0.65rem 1.25rem; background: rgba(11,13,14,0.92);
+      align-items: center; padding: 0.65rem 1.25rem; background: var(--surface);
       border-top: 1px solid var(--border);
     }
     .dots { display: flex; gap: 0.35rem; }
@@ -176,7 +177,7 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="brand">Elastic Observability</div>
+      <div class="brand">Elastic Co.</div>
       <h1>U3 · EKS restart to reason</h1>
       <p>From pod restart count to OOMKilled, deploy version, and the cache leak.</p>
       <ul class="nav" id="nav"></ul>
@@ -487,7 +488,8 @@
 | WHERE kubernetes.event.reason IN ("OOMKilled", "BackOff")
    OR (service.name == "checkout-api" AND kubernetes.pod.restart.count >= 1)
 | STATS hits = COUNT(*), pods = COUNT_DISTINCT(kubernetes.pod.name)
-| WHERE hits > 0`;
+| WHERE hits > 0
+| EVAL \`service.name\` = "checkout-api", \`service.environment\` = "production"`;
 
     const ASSETS = [
       ["Dashboard", "elasticco-eks-restarts", "Memory, restarts, OOM/BackOff"],

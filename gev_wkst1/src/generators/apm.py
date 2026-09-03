@@ -282,7 +282,8 @@ def _emit_checkout_trace(world: World, h: HeroTrace, checkout_version: str, slow
     redis_us = rng.randint(2, 12) * 1000
     inv_db_us = rng.randint(15, 60) * 1000
     inv_us = inv_db_us + rng.randint(10, 30) * 1000
-    db_us = (rng.randint(2400, 3800) * 1000) if slow else (rng.randint(20, 90) * 1000)
+    # Slow traces: FOR UPDATE ~2.8s so checkout/e2e p95 lands ~3.1s vs 400ms SLO.
+    db_us = (rng.randint(2700, 2900) * 1000) if slow else (rng.randint(20, 90) * 1000)
     fraud_redis_us = rng.randint(3, 15) * 1000
     fraud_us = fraud_redis_us + rng.randint(20, 80) * 1000
     stripe_us = rng.randint(40, 140) * 1000

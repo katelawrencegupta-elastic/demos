@@ -1,5 +1,5 @@
 """Generator registry."""
-from src.generators import apm, apm_deps, infra, k8s, orchestrator
+from src.generators import apm, apm_deps, app_logs, infra, k8s, orchestrator
 
 GENERATORS = {
     "orchestrator": orchestrator,
@@ -7,6 +7,7 @@ GENERATORS = {
     "apm_deps": apm_deps,
     "k8s": k8s,
     "infra": infra,
+    "app_logs": app_logs,
 }
 
 

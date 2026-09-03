@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U7 + SLO · Page vs ingest noise — Elastic Co.</title>
+  <style>
+    :root {
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls { display: flex; flex-direction: column; gap: 0.45rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity 0.35s, transform 0.35s;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .slide-header { margin-bottom: 1.25rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 54rem; line-height: 1.55; margin: 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .swim, .hero-stats, .stat-grid { grid-template-columns: 1fr !important; }
+      .phase:not(:last-child)::after { content: none; }
+      .toolbar { left: 0; }
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
+    }
+    .card-body { padding: 1rem; }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(181,121,42,0.4); }
+    .badge.ok { color: var(--success); border-color: rgba(63,111,78,0.4); }
+    .badge.danger { color: var(--danger); border-color: rgba(163,61,61,0.4); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: var(--surface-2); }
+    tr.clickable.selected td { background: var(--accent-dim); }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 4px;
+      font-family: var(--mono); font-size: 0.7rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+    }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .callout.warn { border-color: var(--warn); background: rgba(181,121,42,0.1); }
+    .callout.success { border-color: var(--success); background: rgba(63,111,78,0.1); }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
+    .hero-stat .num { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .hero-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 0.7rem 0.8rem; }
+    .stat label { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; }
+    .stat span { display: block; margin-top: 0.25rem; font-size: 0.84rem; }
+    .swim { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+    .phase {
+      position: relative;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem;
+    }
+    .phase:not(:last-child)::after {
+      content: "→"; position: absolute; right: -0.6rem; top: 0.85rem;
+      color: var(--accent); font-size: 1rem; z-index: 1;
+    }
+    .phase h3 {
+      margin: 0 0 0.65rem; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    }
+    .phase.hot { border-color: var(--accent-border); background: var(--accent-dim); }
+    .node {
+      display: block; width: 100%; text-align: left; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.55rem;
+      margin-bottom: 0.4rem; cursor: pointer; font: inherit; color: var(--text);
+    }
+    .node:last-child { margin-bottom: 0; }
+    .node:hover { border-color: var(--accent); }
+    .node.active { border-color: var(--accent); background: var(--accent-dim); }
+    .node.done { opacity: 0.55; }
+    .node .when { display: block; font-family: var(--mono); font-size: 0.65rem; color: var(--warn); }
+    .node .title { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 0.1rem; }
+    .pipeline-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .pipeline-controls .progress {
+      flex: 1; min-width: 140px; height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden;
+    }
+    .pipeline-controls .progress > span { display: block; height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+    .detail-panel {
+      padding: 0.85rem 1rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; min-height: 7rem;
+    }
+    .detail-panel h4 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+    .detail-panel p { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+    .detail-panel p:last-child { margin-bottom: 0; }
+    .meta { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.65rem; }
+    .hist { display: flex; align-items: flex-end; gap: 3px; height: 110px; padding: 0.25rem 0; }
+    .hist span { flex: 1; background: var(--surface-2); border-radius: 2px 2px 0 0; min-height: 4px; }
+    .hist span.spike { background: var(--danger); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: var(--border); cursor: pointer; }
+    .dots button.active { background: var(--accent); }
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Co.</div>
+      <h1>U7 + SLO · Page vs noise</h1>
+      <p>A violated SLO is a page. A log cliff is not — until Log Rate Analysis names the field-value pair.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlay">▶ Walk the lab</button>
+        <button id="btnCopySlo">Copy SLO KQL</button>
+        <button id="btnCopyEsql">Copy log ES|QL</button>
+        <button id="btnFullscreen">Fullscreen</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+
+        <section class="slide active">
+          <div class="slide-header">
+            <span class="pill">Combined lab</span><span class="pill">Native SLO</span><span class="pill">U7 AIOps</span>
+            <h2>What you page on is not what the logs just did</h2>
+            <p>Two planted signals in the same project. The native SLO names the <strong>availability page</strong> (checkout-api / acme-retail). Log Rate Analysis names a <strong>second</strong> problem — ingest noise on inventory. Do not mix the remediations.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">Page</div><div class="lbl">elasticco-slo-checkout-availability — error budget, not a CPU threshold</div></div>
+            <div class="hero-stat"><div class="num">Noise</div><div class="lbl">Log cliff last ~35 min. AIOps ranks field-value pairs, not grep</div></div>
+            <div class="hero-stat"><div class="num">Close</div><div class="lbl">Two closes: restore INFO, or rollback v2.4.0 — never both for the same spike</div></div>
+          </div>
+          <div class="callout">
+            <strong>Promise</strong>
+            <p>Open the SLO first so the room knows what a page looks like. Then show the log cliff and let Log Rate Analysis prove it is <em>not</em> that page. Optional beat 2: same product on Orchestrator Logs names the SLO’s incident.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Visual workflow</span>
+            <h2>Click a beat, or press Walk</h2>
+            <p>Three phases. Detect is the native SLO. Noise is U7 on inventory logs. Tie-back is the same AIOps product on orchestrator — that spike <em>is</em> the SLO.</p>
+          </div>
+          <div class="pipeline-controls">
+            <button id="btnStepBack">◀</button>
+            <button id="btnStepFwd">▶</button>
+            <button id="btnStepReset">Reset</button>
+            <div class="progress"><span id="tlProgress"></span></div>
+            <span class="mono" id="tlLabel">All beats</span>
+          </div>
+          <div class="swim" id="swim"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">This beat</div>
+              <div class="card-body"><div class="detail-panel" id="tlDetail"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head">Evidence / line</div>
+              <div class="card-body"><pre class="doc" id="tlEvidence"></pre></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">SLO in the room</span>
+            <h2>What you page on</h2>
+            <p>Observability → SLOs → <code>elasticco-slo-checkout-availability</code>. Custom KQL on <code>traces-apm-default</code> — not the APM rollup indicator, not the ES|QL correlation alert.</p>
+          </div>
+          <div class="grid-2">
+            <div class="stat-grid">
+              <div class="stat"><label>Object</label><span>elasticco-slo-checkout-availability</span></div>
+              <div class="stat"><label>Objective</label><span>99% availability · 7-day rolling</span></div>
+              <div class="stat"><label>Good events</label><span>not event.outcome: failure</span></div>
+              <div class="stat"><label>Scope</label><span>checkout-api · acme-retail · labels.demo</span></div>
+              <div class="stat"><label>Group by</label><span>service.name — inventory / map can badge it</span></div>
+              <div class="stat"><label>Burn rule</label><span>elasticco-slo-checkout-availability-burn</span></div>
+            </div>
+            <div class="card">
+              <div class="card-head">KQL indicator <span class="badge info">sli.kql.custom</span></div>
+              <div class="card-body"><pre class="doc" id="sloKql"></pre></div>
+            </div>
+          </div>
+          <div class="callout warn">
+            <strong>Facilitator line</strong>
+            <p>Status should be <strong>VIOLATED</strong> (SLI ~94% vs 99%). Error budget remaining is negative. This is the page — not <code>elasticco-noisy-node-cpu</code>, not SkuCache DEBUG.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">U7 in the room</span>
+            <h2>The cliff is a different incident</h2>
+            <p>Discover <strong>Elastic Co. Logs</strong>, Last 2 hours. Then AIOps Labs → Log rate analysis. Click the last ~35 minutes. APM inventory-service stays healthy.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Inventory volume (schematic) <span class="badge danger">DEBUG flood</span></div>
+              <div class="card-body">
+                <div class="hist" id="hist"></div>
+                <p style="margin:0.75rem 0 0;color:var(--muted);font-size:0.82rem;">Quiet INFO → canary ships verbose SkuCache. Ingest cost, not checkout latency.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">Significant terms</div>
+              <div class="card-body">
+                <table>
+                  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>log.level</code></td><td>debug</td></tr>
+                    <tr><td><code>log.logger</code></td><td>com.elasticco.inventory.SkuCache</td></tr>
+                    <tr><td><code>service.name</code></td><td>inventory-service</td></tr>
+                    <tr><td><code>service.version</code></td><td>4.0.9</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="callout success">
+            <strong>Close for this cliff</strong>
+            <p>Restore INFO (or revert the log config). Do <strong>not</strong> roll back checkout-api. The SLO you just opened is still about acme-retail checkout failures — this flood did not cause it.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Contrast</span><span class="pill">Beat 2</span>
+            <h2>Same project, two remediations</h2>
+            <p>Click a row. Optional beat 2: switch Log rate analysis to <strong>Elastic Co. Orchestrator Logs</strong> — that spike is the SLO’s incident.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">SLO vs log-rate flood <span class="badge info">Interactive</span></div>
+            <div class="card-body">
+              <table id="compareTable">
+                <thead><tr><th>Dimension</th><th>Native SLO</th><th>U7 inventory flood</th><th>Beat 2 orchestrator</th></tr></thead>
+                <tbody></tbody>
+              </table>
+              <div class="detail-panel" id="compareDetail" style="margin-top:1rem;">
+                <h4>Select a row</h4>
+                <p>Compare what you page on, what AIOps names, and which close you say out loud.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Kibana</span>
+            <h2>Tabs to pre-open</h2>
+            <p>Last 2 hours · <code>labels.demo: elastic-co</code>. Stream <code>--tick 60</code> keeps the DEBUG window and the SLO’s traces through now.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Open this</th><th>Show</th></tr></thead>
+              <tbody id="kibanaTable"></tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <strong>If time is short</strong>
+            <p>Skip beat 2. SLO chart + one Log Rate spike + APM inventory-service is enough. If AIOps Labs is 403, use dashboard <code>elasticco-log-rate</code>. Never open a terminal unless they ask how it was seeded.</p>
+          </div>
+        </section>
+
+      </div>
+      <div class="toolbar">
+        <button id="btnPrev">← Prev</button>
+        <div class="dots" id="dots"></div>
+        <span class="mono" id="slideCounter">1 / 6</span>
+        <span style="color:var(--muted);font-size:0.75rem"><kbd>←</kbd> <kbd>→</kbd> · <kbd>F</kbd></span>
+        <button id="btnNext">Next →</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const SLIDES = ["Frame", "Visual workflow", "SLO", "Log cliff", "Contrast", "Kibana"];
+
+    const SLO_KQL = `processor.event: transaction
+and service.name: "checkout-api"
+and labels.demo: "elastic-co"
+and tenant.id: "acme-retail"
+
+good: not event.outcome: failure
+index: traces-apm-default
+target: 99% · 7d rolling`;
+
+    const LOG_ESQL = `FROM logs-elasticco.*
+| WHERE @timestamp > NOW() - 2 hours
+| WHERE labels.demo == "elastic-co"
+| STATS n = COUNT(*) BY service.name, log.level, log.logger
+| SORT n DESC
+| LIMIT 12`;
+
+    const STEPS = [
+      {
+        phase: 0, when: "SLO", title: "Open the page object",
+        detail: "Observability → SLOs → elasticco-slo-checkout-availability. Native error budget for checkout-api / acme-retail. Status VIOLATED. This is what you page on.",
+        kibana: "Observability → SLOs",
+        product: "Page",
+        evidence: "elasticco-slo-checkout-availability\n99% · 7d rolling · occurrences\nKQL on traces-apm-default\nSLI ≈ 94% · budget remaining < 0"
+      },
+      {
+        phase: 0, when: "say", title: "Name the blast radius",
+        detail: "The SLO filter already names the service and the tenant. Not a host CPU threshold. Not inventory-service. Ask: would you wake someone for this?",
+        kibana: "SLO overview + error-budget chart",
+        product: "Page",
+        evidence: "service.name: checkout-api\ntenant.id: acme-retail\ngroupBy: service.name\nIgnore: elasticco-noisy-node-cpu"
+      },
+      {
+        phase: 0, when: "not", title: "Not the correlation alert",
+        detail: "elasticco-checkout-correlated-rca is the RCA starter (OOM + slow DB + OOM logs). It is not an SLO. Stay on the native SLO object.",
+        kibana: "Optional: Alerts list for contrast only",
+        product: "Page",
+        evidence: "Page: elasticco-slo-checkout-availability\nRCA starter: elasticco-checkout-correlated-rca\nDo not call the ES|QL rule an SLO"
+      },
+      {
+        phase: 1, when: "U7", title: "Logs are also on fire",
+        detail: "Discover Elastic Co. Logs, Last 2 hours. Point at the cliff in the last ~35 minutes. Do not assume it is the SLO. Counting is not RCA.",
+        kibana: "Discover · elasticco-logs",
+        product: "Noise",
+        evidence: "Time: Last 2 hours\nlabels.demo: elastic-co\nCliff: last ~35 minutes\nQuestion: which field-value pair?"
+      },
+      {
+        phase: 1, when: "AIOps", title: "Click the spike",
+        detail: "Machine Learning → AIOps Labs → Log rate analysis. Same data view. Baseline vs deviation. Significant terms should name debug · SkuCache · inventory-service · 4.0.9.",
+        kibana: "AIOps Labs → Log rate analysis",
+        product: "Noise",
+        evidence: "log.level: debug\nlog.logger: com.elasticco.inventory.SkuCache\nservice.name: inventory-service\nservice.version: 4.0.9"
+      },
+      {
+        phase: 1, when: "prove", title: "APM is fine",
+        detail: "APM → inventory-service. Latency near baseline. This flood did not burn the checkout SLO. Close is restore INFO — not rollback checkout-api.",
+        kibana: "APM → inventory-service",
+        product: "Noise",
+        evidence: "inventory-service p95 healthy\nNot checkout-api v2.4.1\nClose: restore INFO / revert log config\nDo not page. Do not kubectl."
+      },
+      {
+        phase: 2, when: "beat 2", title: "Switch data view",
+        detail: "Same Log Rate Analysis product. Data view Elastic Co. Orchestrator Logs. Click the last ~60 minutes. This spike is the checkout retry storm.",
+        kibana: "Log rate analysis · elasticco-orchestrator",
+        product: "Tie-back",
+        evidence: "tenant.id: acme-retail\nlog.level: error\norchestrator.task_id: charge_payment\norchestrator.dag_id: fulfillment.checkout"
+      },
+      {
+        phase: 2, when: "done", title: "Two closes, say both",
+        detail: "Inventory DEBUG → restore INFO. Orchestrator ERROR / violated SLO → roll back checkout-api v2.4.1 → v2.4.0 on the case. Never mix them.",
+        kibana: "SLO still open + Cases if they ask",
+        product: "Tie-back",
+        evidence: "Page: native SLO (checkout / acme-retail)\nNoise: SkuCache DEBUG 4.0.9 → INFO\nSame incident as SLO: rollback v2.4.0\nLine: a log spike is not an outage until AIOps names the pair."
+      },
+    ];
+
+    const PHASES = [
+      { id: "page", label: "1 · Page · SLO" },
+      { id: "noise", label: "2 · Noise · U7" },
+      { id: "tie", label: "3 · Tie-back" },
+    ];
+
+    const COMPARE = [
+      ["What it is", "Native Observability SLO (error budget)", "AIOps log-rate on inventory logs", "Same AIOps product on orchestrator"],
+      ["Object / view", "elasticco-slo-checkout-availability", "elasticco-logs / inventory", "elasticco-orchestrator"],
+      ["Names", "checkout-api + acme-retail", "SkuCache DEBUG · inventory 4.0.9", "acme-retail · error · charge_payment"],
+      ["Page on this?", "Yes — this is the page", "No — ingest / cost / noise", "No — it explains the page you already have"],
+      ["On APM inventory / map?", "Yes if groupBy service.name", "inventory-service stays healthy", "Not an APM service badge"],
+      ["Close", "Keep watching error budget; U5/U6 rollback if you continue", "Restore INFO (or revert log config)", "Roll back checkout-api v2.4.1 → v2.4.0"],
+    ];
+
+    const COMPARE_DETAIL = [
+      "The SLO is a first-class Kibana object with an error budget. The ES|QL correlation alert is not a substitute.",
+      "Open SLOs, not Alerts, for this beat. Burn rule elasticco-slo-checkout-availability-burn is attached.",
+      "Let the product name the pair. Do not recite SkuCache until the terms table does.",
+      "If they say “we’d page on log volume,” stay on the SLO: availability is the contract.",
+      "Noisy CPU has no service.name. The SLO does. Inventory DEBUG does not violate checkout availability.",
+      "Say both closes out loud so nobody rolls back checkout for a DEBUG flag.",
+    ];
+
+    const KIBANA = [
+      ["SLOs · elasticco-slo-checkout-availability", "U7+SLO entry — VIOLATED error budget"],
+      ["Discover · elasticco-logs", "Histogram cliff · last ~35 minutes"],
+      ["AIOps Labs → Log rate analysis", "Click the spike; SkuCache / debug / 4.0.9"],
+      ["APM → inventory-service", "Prove traces are not the flood"],
+      ["Dashboard elasticco-log-rate", "Fallback if AIOps Labs 403"],
+      ["Log rate · elasticco-orchestrator", "Beat 2 — acme-retail · error · charge_payment"],
+      ["APM Services / Service map", "Optional: SLO / alert badge on checkout-api"],
+      ["Cases (only if they continue)", "Rollback is the U1–U6 close, not U7"],
+    ];
+
+    let currentSlide = 0;
+    let tlStep = -1;
+    let playTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function buildSwim() {
+      const swim = document.getElementById("swim");
+      PHASES.forEach((ph, pi) => {
+        const col = document.createElement("div");
+        col.className = "phase";
+        col.dataset.phase = String(pi);
+        col.innerHTML = `<h3>${ph.label}</h3>`;
+        STEPS.forEach((s, i) => {
+          if (s.phase !== pi) return;
+          const btn = document.createElement("button");
+          btn.className = "node";
+          btn.dataset.step = String(i);
+          btn.innerHTML = `<span class="when">${s.when}</span><span class="title">${s.title}</span>`;
+          btn.addEventListener("click", () => { tlStep = i; updateTimeline(); });
+          col.appendChild(btn);
+        });
+        swim.appendChild(col);
+      });
+    }
+
+    function updateTimeline() {
+      document.querySelectorAll(".node").forEach(el => {
+        const n = +el.dataset.step;
+        el.classList.toggle("active", n === tlStep);
+        el.classList.toggle("done", tlStep >= 0 && n < tlStep);
+      });
+      document.querySelectorAll(".phase").forEach(el => {
+        const pi = +el.dataset.phase;
+        el.classList.toggle("hot", tlStep >= 0 && STEPS[tlStep].phase === pi);
+      });
+      const pct = tlStep < 0 ? 0 : ((tlStep + 1) / STEPS.length) * 100;
+      document.getElementById("tlProgress").style.width = pct + "%";
+      document.getElementById("tlLabel").textContent = tlStep < 0 ? "All beats" : `Beat ${tlStep + 1} / ${STEPS.length}`;
+      const s = tlStep >= 0 ? STEPS[tlStep] : null;
+      document.getElementById("tlDetail").innerHTML = s
+        ? `<h4>${s.title}</h4><p>${s.detail}</p><div class="meta"><span class="badge info">${s.product}</span><span class="badge">${s.kibana}</span></div>`
+        : `<h4>Lab path</h4><p>Native SLO (the page) → inventory log cliff + AIOps terms (not the page) → optional orchestrator log-rate names the SLO’s incident. Two closes.</p>`;
+      document.getElementById("tlEvidence").textContent = s
+        ? s.evidence
+        : "Select a beat.\nPage: elasticco-slo-checkout-availability\nNoise: SkuCache DEBUG 4.0.9 → restore INFO\nTie-back: rollback v2.4.0";
+    }
+
+    function playTimeline() {
+      clearInterval(playTimer);
+      tlStep = -1;
+      updateTimeline();
+      goSlide(1);
+      let i = 0;
+      playTimer = setInterval(() => {
+        tlStep = i;
+        updateTimeline();
+        i++;
+        if (i >= STEPS.length) clearInterval(playTimer);
+      }, 1200);
+    }
+
+    function buildHist() {
+      const el = document.getElementById("hist");
+      const heights = [12, 14, 11, 13, 12, 15, 11, 14, 12, 13, 78, 92, 88, 95, 90];
+      heights.forEach((h, i) => {
+        const s = document.createElement("span");
+        s.style.height = h + "%";
+        if (i >= 10) s.classList.add("spike");
+        el.appendChild(s);
+      });
+    }
+
+    function buildCompare() {
+      const body = document.querySelector("#compareTable tbody");
+      COMPARE.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.classList.add("clickable");
+        tr.innerHTML = row.map((c, n) => n === 0 ? `<th>${c}</th>` : `<td>${c}</td>`).join("");
+        tr.addEventListener("click", () => {
+          document.querySelectorAll("#compareTable tbody tr").forEach((el, n) => el.classList.toggle("selected", n === i));
+          document.getElementById("compareDetail").innerHTML = `<h4>${row[0]}</h4><p>${COMPARE_DETAIL[i]}</p>`;
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    function copyText(text, btn, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = label;
+        setTimeout(() => { btn.textContent = orig; }, 1400);
+      });
+    }
+
+    document.getElementById("sloKql").textContent = SLO_KQL;
+
+    const kBody = document.getElementById("kibanaTable");
+    KIBANA.forEach(([a, b]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+      kBody.appendChild(tr);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnStepBack").addEventListener("click", () => { tlStep = Math.max(-1, tlStep - 1); updateTimeline(); });
+    document.getElementById("btnStepFwd").addEventListener("click", () => { tlStep = Math.min(STEPS.length - 1, tlStep + 1); updateTimeline(); });
+    document.getElementById("btnStepReset").addEventListener("click", () => { tlStep = -1; updateTimeline(); });
+    document.getElementById("btnPlay").addEventListener("click", playTimeline);
+    document.getElementById("btnCopySlo").addEventListener("click", function () { copyText(SLO_KQL, this, "Copied KQL"); });
+    document.getElementById("btnCopyEsql").addEventListener("click", function () { copyText(LOG_ESQL, this, "Copied ES|QL"); });
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+      if (e.key === " " && currentSlide === 1) { e.preventDefault(); playTimeline(); }
+    });
+
+    buildNav();
+    buildSwim();
+    updateTimeline();
+    buildHist();
+    buildCompare();
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 ## Steps
 
-1. APM → Services **or** dashboard **Elastic Co. — End-to-End Tracing**. Hop list: `edge-gateway` → `identity-service` → `checkout-api` → inventory / fraud / payments → postgres + redis + kafka → `notification-service`.
+1. APM → **Services** / **Service map** **or** dashboard **Elastic Co. — End-to-End Tracing**. Hop list: `edge-gateway` → `identity-service` → `checkout-api` → inventory / fraud / payments → postgres + redis + kafka → `notification-service`. Checkout-api should show an **alert badge** (error-rate / correlation / restarts). Peers do not.
 2. APM → Transactions for `checkout-api`. Filter `tenant.id: "acme-retail"` (or labels).
 3. Open a slow transaction → expand the span `SELECT … FOR UPDATE orders`. Note duration and `service.version` (2.4.1 in the incident window).
 4. Run ES|QL (Discover ES|QL mode or Dev Tools `_query`):
@@ -24,3 +24,5 @@ FROM traces-apm-default
 ## Done when
 
 You have one `trace.id` that joins APM waterfall ↔ orchestrator logs, and an ES|QL table showing tenant asymmetry.
+
+**Combined with U5 (trace → Agent Builder RCA):** [02-05-trace-rca.md](02-05-trace-rca.md) · Deck: [../presentations/scenario-u2-u5.html](../presentations/scenario-u2-u5.html)

@@ -18,6 +18,8 @@ from src.config import (
 COMPONENT_ORDER = [
     "logs-elasticco.orchestrator",
     "logs-elasticco.checkout",
+    "logs-elasticco.inventory",
+    "logs-elasticco.notification",
     "logs-elasticco.k8s.event",
     "logs-elasticco.incident",
     "metrics-elasticco.k8s.pod",
@@ -28,6 +30,8 @@ COMPONENT_ORDER = [
 INDEX_TEMPLATES = [
     "logs-elasticco.orchestrator",
     "logs-elasticco.checkout",
+    "logs-elasticco.inventory",
+    "logs-elasticco.notification",
     "logs-elasticco.k8s.event",
     "logs-elasticco.incident",
     "metrics-elasticco.k8s.pod",
@@ -50,6 +54,18 @@ DATA_VIEWS = [
         "id": "elasticco-checkout",
         "title": "logs-elasticco.checkout-*",
         "name": "Elastic Co. Checkout Logs",
+        "timeFieldName": "@timestamp",
+    },
+    {
+        "id": "elasticco-inventory",
+        "title": "logs-elasticco.inventory-*",
+        "name": "Elastic Co. Inventory Logs",
+        "timeFieldName": "@timestamp",
+    },
+    {
+        "id": "elasticco-notification",
+        "title": "logs-elasticco.notification-*",
+        "name": "Elastic Co. Notification Logs",
         "timeFieldName": "@timestamp",
     },
     {
@@ -88,10 +104,12 @@ DATA_VIEWS = [
 DATA_VIEW_REQUIRED_FIELDS: dict[str, list[str]] = {
     "elasticco-orchestrator": ["tenant.id", "trace.id", "orchestrator.dag_id", "log.level"],
     "elasticco-checkout": ["service.name", "service.version", "message"],
+    "elasticco-inventory": ["service.name", "log.level", "log.logger"],
+    "elasticco-notification": ["service.name", "log.level", "log.logger"],
     "elasticco-k8s": ["kubernetes.event.reason", "kubernetes.pod.name", "service.name"],
     "metrics-elasticco.host-*": ["system.cpu.total.norm.pct", "host.name"],
     "elasticco-incidents": ["incident.id", "incident.phase", "message"],
-    "elasticco-logs": ["tenant.id", "trace.id", "service.name", "kubernetes.event.reason"],
+    "elasticco-logs": ["tenant.id", "trace.id", "service.name", "log.logger", "kubernetes.event.reason"],
 }
 
 
@@ -284,6 +302,13 @@ def _delete_rule(rid: str, name: str) -> bool:
     return True
 
 
+_WORKFLOWS_CONNECTOR = "system-connector-.workflows"
+
+
+def _actions_without(actions: list, connector_id: str) -> list:
+    return [a for a in actions if a.get("id") != connector_id]
+
+
 def _create_rule(rule: dict) -> bool:
     """POST a rule; consumer cannot be changed on update. Retry alerts if infrastructure 400s."""
     consumers = [rule.get("consumer") or "alerts"]
@@ -293,6 +318,9 @@ def _create_rule(rule: dict) -> bool:
     last = None
     bodies = [rule]
     if rule.get("actions"):
+        no_wf = {**rule, "actions": _actions_without(rule["actions"], _WORKFLOWS_CONNECTOR)}
+        if no_wf["actions"] != rule["actions"]:
+            bodies.append(no_wf)
         bodies.append({**rule, "actions": []})
     for consumer in consumers:
         for body in bodies:
@@ -306,7 +334,9 @@ def _create_rule(rule: dict) -> bool:
             last = r
             if r.status_code < 300:
                 extra = f" (consumer={consumer})" if consumer != rule.get("consumer") else ""
-                print(f"  [ok] alert rule created: {rule['name']}{extra}")
+                dropped = "actions" in body and body["actions"] != rule.get("actions")
+                note = " (without Workflows/Cases action)" if dropped else ""
+                print(f"  [ok] alert rule created: {rule['name']}{extra}{note}")
                 return True
             if r.status_code != 400:
                 break
@@ -356,16 +386,26 @@ def ensure_alert_rules():
             )
             if r2.status_code >= 300 and update_body.get("actions"):
                 print(
-                    f"  [warn] update rule {rule['name']} with Cases action: "
+                    f"  [warn] update rule {rule['name']} with Cases/Workflows action: "
                     f"{r2.status_code} {r2.text[:240]}"
                 )
-                update_body["actions"] = []
-                r2 = requests.put(
-                    f"{KIBANA_URL}/api/alerting/rule/{rid}",
-                    headers=KBN_HEADERS,
-                    json=update_body,
-                    timeout=60,
-                )
+                stripped = _actions_without(update_body["actions"], _WORKFLOWS_CONNECTOR)
+                if stripped != update_body["actions"]:
+                    update_body["actions"] = stripped
+                    r2 = requests.put(
+                        f"{KIBANA_URL}/api/alerting/rule/{rid}",
+                        headers=KBN_HEADERS,
+                        json=update_body,
+                        timeout=60,
+                    )
+                if r2.status_code >= 300:
+                    update_body["actions"] = []
+                    r2 = requests.put(
+                        f"{KIBANA_URL}/api/alerting/rule/{rid}",
+                        headers=KBN_HEADERS,
+                        json=update_body,
+                        timeout=60,
+                    )
             if r2.status_code >= 300:
                 print(f"  [warn] update rule {rule['name']}: {r2.status_code} {r2.text[:240]}")
             else:
@@ -426,9 +466,6 @@ def run_setup(include_alerts: bool = True):
         publish_dashboard()
     except SystemExit:
         print("  [warn] dashboard publish failed; run: python -m src.cli dashboards")
-    if include_alerts:
-        print("== alert rules ==")
-        ensure_alert_rules()
     print("== native SLOs ==")
     try:
         from src.slos import ensure_slos
@@ -441,6 +478,16 @@ def run_setup(include_alerts: bool = True):
         ensure_agent(fail_loud=False)
     except Exception as exc:
         print(f"  [warn] Agent Builder: {exc}")
+    print("== Kibana Workflow (detect → remediate) ==")
+    try:
+        from src.workflows import ensure_workflow
+        ensure_workflow(fail_loud=False)
+    except Exception as exc:
+        print(f"  [warn] Workflow: {exc}")
+    # Alerts after the workflow so Run Workflow can reference elasticco-detect-remediate.
+    if include_alerts:
+        print("== alert rules ==")
+        ensure_alert_rules()
     kb = KIBANA_DIR / "knowledge-base-checkout-oom.md"
     if kb.exists():
         print(f"  [info] U4 knowledge base export: {kb}")

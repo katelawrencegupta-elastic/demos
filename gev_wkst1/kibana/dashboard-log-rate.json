@@ -1,0 +1,531 @@
+{
+  "title": "Elastic Co. \u2014 Log Rate",
+  "description": "U7 beat 1: inventory SkuCache DEBUG. Beat 2: orchestrator acme-retail ERROR retries. Use AIOps Log rate analysis on elasticco-logs then elasticco-orchestrator.",
+  "time_range": {
+    "from": "now-2h",
+    "to": "now"
+  },
+  "options": {
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_cursor": true,
+    "sync_tooltips": true,
+    "hide_panel_titles": false
+  },
+  "query": {
+    "expression": "labels.demo: elastic-co",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 4
+      },
+      "type": "markdown",
+      "config": {
+        "content": "## Elastic Co. \u2014 Log rate\n\n**Beat 1:** inventory SkuCache **DEBUG** (last ~35 min) on **Elastic Co. Logs** / Inventory Logs. Terms: `debug` \u00b7 `SkuCache` \u00b7 `4.0.9`. Restore INFO \u2014 not checkout rollback.\n\n**Beat 2:** same product on **Elastic Co. Orchestrator Logs**. Terms: `tenant.id: acme-retail` \u00b7 `log.level: error` \u00b7 `charge_payment` retries. That is U1\u2013U6. Time range **Last 2 hours**.",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "DEBUG lines",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE log.level == \"debug\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "SkuCache flood",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "INFO lines",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE log.level == \"info\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "baseline reserve",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "gauge",
+        "title": "DEBUG share",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS debugs = COUNT(*) WHERE log.level == \"debug\", total = COUNT(*)\n| EVAL debug_share = debugs * 1.0 / total, min = 0.0, max = 1.0, goal = 0.05"
+        },
+        "metric": {
+          "column": "debug_share",
+          "ticks": {
+            "visible": true,
+            "mode": "bands"
+          },
+          "subtitle": "goal \u22645%",
+          "min": {
+            "column": "min"
+          },
+          "max": {
+            "column": "max"
+          },
+          "goal": {
+            "column": "goal"
+          }
+        },
+        "styling": {
+          "shape": {
+            "type": "arc"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Volume by version",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY service.version\n| SORT count DESC"
+            },
+            "x": {
+              "column": "service.version"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 11,
+        "w": 32,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Inventory log rate by level",
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), log.level\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "log.level"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 32,
+        "y": 11,
+        "w": 16,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "pie",
+        "title": "Level mix",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY log.level"
+        },
+        "metrics": [
+          {
+            "column": "count"
+          }
+        ],
+        "group_by": [
+          {
+            "column": "log.level"
+          }
+        ],
+        "styling": {
+          "donut_hole": "m",
+          "labels": {
+            "visible": true,
+            "position": "inside"
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Loggers (count)",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.inventory-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY log.logger, log.level, service.version\n| SORT count DESC"
+            },
+            "x": {
+              "column": "log.logger"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "log.level"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 27,
+        "w": 24,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "All Elastic Co. logs by service",
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.*\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), service.name\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "service.name"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 41,
+        "w": 48,
+        "h": 3
+      },
+      "type": "markdown",
+      "config": {
+        "content": "### Beat 2 \u2014 Orchestrator (U1\u2013U6)\nSwitch Log rate analysis to data view **Elastic Co. Orchestrator Logs**. Expected terms: `tenant.id: acme-retail`, `log.level: error`, `orchestrator.task_id: charge_payment`.",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 44,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Orchestrator ERROR",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE log.level == \"error\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "acme-retail retries",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 44,
+        "w": 20,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Orchestrator log rate by level",
+        "layers": [
+          {
+            "type": "area_stacked",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), log.level\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "log.level"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 32,
+        "y": 44,
+        "w": 16,
+        "h": 14
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Orchestrator by tenant \u00d7 level",
+        "layers": [
+          {
+            "type": "bar_horizontal",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.orchestrator-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY tenant.id, log.level\n| SORT count DESC"
+            },
+            "x": {
+              "column": "tenant.id"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ],
+            "breakdown_by": {
+              "column": "log.level"
+            }
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "tenant": {
+          "properties": {
+            "id": { "type": "keyword" }
+          }
+        },
+        "service": {
+          "properties": {
+            "name": { "type": "keyword" },
+            "version": { "type": "keyword" }
+          }
+        },
+        "log": {
+          "properties": {
+            "level": { "type": "keyword" },
+            "logger": { "type": "keyword" }
+          }
+        },
+        "event": {
+          "properties": {
+            "dataset": { "type": "keyword" }
+          }
+        },
+        "kubernetes": {
+          "properties": {
+            "cluster": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "pod": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "namespace": { "type": "keyword" },
+            "deployment": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            },
+            "container": {
+              "properties": {
+                "name": { "type": "keyword" }
+              }
+            }
+          }
+        },
+        "message": { "type": "match_only_text" },
+        "labels": {
+          "properties": {
+            "demo": { "type": "keyword" }
+          }
+        }
+      }
+    },
+    "lifecycle": { "data_retention": "30d" }
+  },
+  "_meta": { "demo": "elastic-co" }
+}

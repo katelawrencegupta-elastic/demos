@@ -130,6 +130,10 @@ orchestrator:
     - reserve_inventory
     - charge_payment
     - emit_fulfillment
+  # U7 beat 2 — Log Rate Analysis on Orchestrator Logs names acme-retail + error.
+  retry_storm:
+    interval_seconds: 4
+    task_id: charge_payment
 
 incident:
   name: acme-checkout-degradation
@@ -144,6 +148,34 @@ incident:
     DB lock contention → slow SELECT … FOR UPDATE on orders for acme-retail.
   hero_trace_count: 8
 
+# U7 — log-volume incident (not an outage). Distinct from checkout OOM.
+# Last ~35 minutes through now so Last 2 hours shows a quiet baseline then a cliff.
+log_rate:
+  name: inventory-skucache-debug
+  start_offset_minutes: 35
+  duration_minutes: 35
+  service: inventory-service
+  logger: com.elasticco.inventory.SkuCache
+  verbose_version: "4.0.9"
+  good_version: "4.0.8"
+  level: debug
+  root_cause: >
+    inventory-service canary left SkuCache at DEBUG in production. Ingest
+    volume spikes; APM latency for inventory stays healthy. Close is restore
+    INFO (or revert the log config) — not rollback checkout-api.
+
+# U8 — log telemetry failed (not an app outage). Last ~20 minutes through now:
+# notification-service logs go silent while APM + pod metrics continue.
+telemetry_gap:
+  name: notification-log-silence
+  service: notification-service
+  start_offset_minutes: 20
+  duration_minutes: 20
+  root_cause: >
+    notification-service log collection stopped (agent / ingest / pipeline).
+    Traces and pod metrics still flow. Triage: logs dark, APM live → fix
+    telemetry, not the application. Do not rollback checkout-api.
+
 alerts:
   noisy:
     name: elasticco-noisy-node-cpu
@@ -156,7 +188,10 @@ alerts:
     description: OOMKilled / BackOff / restart count on checkout-api (opens a case)
   app_monitoring:
     name: elasticco-app-checkout-error-rate
-    description: checkout-api transaction error rate > 10% with tenant context
+    description: checkout-api transaction error rate > 10% with tenant context (service.name on the alert for APM inventory / map)
+  log_telemetry:
+    name: elasticco-log-telemetry-gap
+    description: No notification-service logs in 15m while the service still exists (telemetry gap, Cases)
 
 app_monitoring:
   monitored_service: checkout-api

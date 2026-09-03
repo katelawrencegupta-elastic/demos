@@ -1,0 +1,316 @@
+{
+  "title": "Elastic Co. \u2014 Log Telemetry Gap",
+  "description": "U8: notification-service logs silent last ~20 min while APM and pods stay healthy. Triage telemetry (agent/ingest), not rollback checkout-api.",
+  "time_range": {
+    "from": "now-2h",
+    "to": "now"
+  },
+  "options": {
+    "use_margins": true,
+    "sync_colors": true,
+    "sync_cursor": true,
+    "sync_tooltips": true,
+    "hide_panel_titles": false
+  },
+  "query": {
+    "expression": "labels.demo: elastic-co",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 4
+      },
+      "type": "markdown",
+      "config": {
+        "content": "## Elastic Co. \u2014 Log telemetry gap\n\n**notification-service** logs went silent last ~20 minutes. APM transactions and pod metrics still flow. Triage: **telemetry failed, not the app.** Alert `elasticco-log-telemetry-gap` opens a case. Do **not** start `elasticco-detect-remediate`. Close: restart elastic-agent / check ingest \u2014 not checkout rollback, not SkuCache INFO. Time range **Last 2 hours**.",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Logs last 15m",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.notification-default\n| WHERE @timestamp >= NOW() - 2 hours AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) WHERE @timestamp >= NOW() - 15 minutes"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "expect 0",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "APM txns last 15m",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM traces-apm-default\n| WHERE @timestamp >= NOW() - 15 minutes AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"notification-service\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "app still alive",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Logs in range",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.notification-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "count",
+            "subtitle": "baseline exists",
+            "background_chart": {
+              "type": "trend"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 4,
+        "w": 12,
+        "h": 7
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Last log @",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM logs-elasticco.notification-default\n| WHERE @timestamp >= NOW() - 2 hours AND labels.demo == \"elastic-co\"\n| STATS last_seen = MAX(@timestamp)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "last_seen",
+            "subtitle": "~20 min ago"
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Notification logs (drop to zero)",
+        "layers": [
+          {
+            "type": "area",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM logs-elasticco.notification-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 11,
+        "w": 24,
+        "h": 16
+      },
+      "type": "vis",
+      "config": {
+        "type": "xy",
+        "title": "Notification APM transactions (still flowing)",
+        "layers": [
+          {
+            "type": "area",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM traces-apm-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE processor.event == \"transaction\" AND service.name == \"notification-service\"\n| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)\n| SORT bucket"
+            },
+            "x": {
+              "column": "bucket"
+            },
+            "y": [
+              {
+                "column": "count"
+              }
+            ]
+          }
+        ],
+        "legend": {
+          "visibility": "visible",
+          "position": "right"
+        },
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "scale": "temporal"
+          },
+          "y": {
+            "title": {
+              "visible": true
+            }
+          }
+        },
+        "styling": {
+          "interpolation": "smooth",
+          "areas": {
+            "fill": "gradient",
+            "fill_opacity": 0.7
+          },
+          "points": {
+            "visibility": "auto"
+          }
+        }
+      }
+    },
+    {
+      "grid": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 8
+      },
+      "type": "markdown",
+      "config": {
+        "content": "### Triage\n\n1. Alert `elasticco-log-telemetry-gap` firing \u2192 Observability case.\n2. Discover **Elastic Co. Notification Logs** \u2014 last event ~20 min ago.\n3. APM \u2192 **notification-service** \u2014 transactions continue.\n4. EKS pod metrics \u2014 CPU/restarts healthy. **Fix ingest, not the app.**",
+        "title": "",
+        "hide_title": true
+      }
+    },
+    {
+      "grid": {
+        "x": 24,
+        "y": 27,
+        "w": 12,
+        "h": 8
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Pod CPU (avg)",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"notification-service\"\n| STATS cpu = AVG(kubernetes.pod.cpu.usage.nanocores), restarts = MAX(kubernetes.pod.restart.count)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "cpu",
+            "subtitle": "notification-service"
+          }
+        ]
+      }
+    },
+    {
+      "grid": {
+        "x": 36,
+        "y": 27,
+        "w": 12,
+        "h": 8
+      },
+      "type": "vis",
+      "config": {
+        "type": "metric",
+        "title": "Pod restarts",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM metrics-elasticco.k8s.pod-default\n| WHERE @timestamp <= ?_tend AND @timestamp > ?_tstart AND labels.demo == \"elastic-co\"\n| WHERE service.name == \"notification-service\"\n| STATS cpu = AVG(kubernetes.pod.cpu.usage.nanocores), restarts = MAX(kubernetes.pod.restart.count)"
+        },
+        "metrics": [
+          {
+            "type": "primary",
+            "column": "restarts",
+            "subtitle": "expect 0"
+          }
+        ]
+      }
+    }
+  ]
+}

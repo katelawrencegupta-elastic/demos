@@ -1,0 +1,180 @@
+# Elastic Co. — detection through remediation.
+# Provisioned by src/workflows.py as id elasticco-detect-remediate.
+# Official pattern: https://www.elastic.co/docs/explore-analyze/workflows/use-cases/observability/root-cause-analysis
+# This demo uses Agent Builder agent elasticco-rca-agent (not elastic-ai-agent).
+# Does not kubectl. Remediation is a case comment: roll back checkout-api v2.4.1 to v2.4.0.
+# Step `if:` is KQL (not Liquid). See Kibana workflow schema.
+
+name: Elastic Co. detect-to-remediate
+description: >
+  Alerting/SLO detect, Elasticsearch ES|QL enrich (OOM, FOR UPDATE, tenant p95),
+  Agent Builder RCA (elasticco-rca-agent), Observability case with
+  rollback-to-v2.4.0 plan. Human approves in the case; this workflow does not
+  mutate the cluster.
+enabled: true
+tags:
+  - elastic-co
+  - rca
+  - observability
+  - checkout-api
+
+triggers:
+  - type: alert
+  - type: manual
+
+steps:
+  - name: query_oom
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: |
+        FROM logs-elasticco.k8s.event-default, metrics-elasticco.k8s.pod-default
+        | WHERE @timestamp >= NOW() - 60 minutes
+          AND labels.demo == "elastic-co"
+        | STATS oom = COUNT(*) WHERE kubernetes.event.reason == "OOMKilled",
+                backoff = COUNT(*) WHERE kubernetes.event.reason == "BackOff",
+                max_restarts = MAX(kubernetes.pod.restart.count)
+        | EVAL lookback = "60 minutes"
+
+  - name: query_slow_db
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: |
+        FROM traces-apm-default
+        | WHERE @timestamp >= NOW() - 60 minutes
+          AND labels.demo == "elastic-co"
+          AND processor.event == "span"
+          AND span.type == "db"
+          AND span.subtype == "postgresql"
+          AND tenant.id == "acme-retail"
+          AND span.duration.us > 2000000
+        | STATS n = COUNT(*),
+                p95_ms = ROUND(PERCENTILE(span.duration.us, 95) / 1000.0, 0),
+                max_ms = ROUND(MAX(span.duration.us) / 1000.0, 0)
+        | EVAL lookback = "60 minutes"
+
+  - name: query_tenant_p95
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: |
+        FROM traces-apm-default
+        | WHERE @timestamp >= NOW() - 60 minutes
+          AND labels.demo == "elastic-co"
+          AND processor.event == "transaction"
+          AND service.name == "checkout-api"
+        | STATS total = COUNT(*),
+                failures = COUNT(*) WHERE event.outcome == "failure",
+                p95_us = PERCENTILE(transaction.duration.us, 95)
+          BY tenant.id
+        | EVAL error_rate_pct = ROUND(failures * 100.0 / total, 1)
+        | EVAL p95_ms = ROUND(p95_us / 1000.0, 0)
+        | SORT error_rate_pct DESC, p95_ms DESC
+
+  - name: rca_analysis
+    type: ai.agent
+    agent-id: elasticco-rca-agent
+    create-conversation: true
+    with:
+      message: |
+        Investigate the following checkout-api / acme-retail incident.
+        Call your ES|QL tools. Cite counts and p95 from tools — do not invent.
+        Recommend one remediation: roll back checkout-api from v2.4.1 to v2.4.0.
+        Do not claim you ran kubectl, a Python CLI, or src.cli incident.
+
+        <alert>
+        {{ event | json }}
+        </alert>
+
+        <oom_restarts>
+        {{ steps.query_oom.output | json }}
+        </oom_restarts>
+
+        <slow_postgres>
+        {{ steps.query_slow_db.output | json }}
+        </slow_postgres>
+
+        <tenant_p95>
+        {{ steps.query_tenant_p95.output | json }}
+        </tenant_p95>
+
+  - name: case_title
+    type: ai.agent
+    agent-id: elasticco-rca-agent
+    with:
+      conversation_id: "{{ steps.rca_analysis.output.conversation_id }}"
+      message: Based on your analysis, produce a clear Observability case title. Output only the title.
+
+  - name: case_description
+    type: ai.agent
+    agent-id: elasticco-rca-agent
+    with:
+      conversation_id: "{{ steps.rca_analysis.output.conversation_id }}"
+      message: Based on your analysis, produce a clear case description. Output only the description.
+
+  - name: create_case
+    type: cases.createCase
+    with:
+      title: "{{ steps.case_title.output.message }}"
+      description: "{{ steps.case_description.output.message }}"
+      owner: observability
+      severity: high
+      tags:
+        - elastic-co
+        - workflow
+        - rca
+        - checkout-api
+        - auto-rca
+
+  - name: attach_alert
+    type: cases.addAlerts
+    if: "event.alerts.0._id : *"
+    with:
+      case_id: "{{ steps.create_case.output.case.id }}"
+      alerts:
+        - alertId: "{{ event.alerts[0]._id }}"
+          index: "{{ event.alerts[0]._index }}"
+          rule:
+            id: "{{ event.rule.id }}"
+            name: "{{ event.rule.name }}"
+
+  - name: add_analysis
+    type: cases.addComment
+    with:
+      case_id: "{{ steps.create_case.output.case.id }}"
+      comment: "{{ steps.rca_analysis.output.message }}"
+
+  - name: get_conversation
+    type: kibana.request
+    with:
+      method: GET
+      path: /api/agent_builder/conversations/{{ steps.rca_analysis.output.conversation_id }}
+
+  - name: add_reasoning
+    type: cases.addComment
+    with:
+      case_id: "{{ steps.create_case.output.case.id }}"
+      comment: |
+        ## AI investigation summary
+
+        Agent Builder conversation: {{ kibanaUrl }}/app/agent_builder/conversations/{{ steps.rca_analysis.output.conversation_id }}
+
+        Transcript is in that conversation (not inlined here — case comments cap at 30k characters).
+
+  - name: add_remediation
+    type: cases.addComment
+    with:
+      case_id: "{{ steps.create_case.output.case.id }}"
+      comment: |
+        ## Recommended remediation (human-in-the-loop)
+
+        Roll back **checkout-api** from **v2.4.1** to **v2.4.0**.
+
+        This Kibana workflow does **not** run kubectl. Approve in this case, or tell Agent Builder `elasticco-rca-agent`: **approve rollback to v2.4.0**.
+
+        **Why:** `CartCache.retainAll` heap leak on `eks-elastic-prod-usc1` (OOMKilled / BackOff) then orchestrator DAG `fulfillment.checkout` retries then slow `SELECT FOR UPDATE` for **acme-retail**. Peer tenants stay near baseline.
+
+        **Evidence steps:** `query_oom`, `query_slow_db`, `query_tenant_p95`.
+        **Agent:** {{ kibanaUrl }}/app/agent_builder/conversations/{{ steps.rca_analysis.output.conversation_id }}
+        **SLO you page on:** `elasticco-slo-checkout-availability`

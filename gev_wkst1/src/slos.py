@@ -23,7 +23,13 @@ def _kbn(method: str, url: str, **kwargs):
 
 
 def _kql_slo_body() -> dict:
-    """Custom KQL SLO — works with synthetic APM + tenant.id (not only Elastic Agent APM)."""
+    """Custom KQL SLO on raw traces — tenant.id lives here, not on APM rollups.
+
+    ``sli.apm.transactionErrorRate`` looks at ``metrics-apm.transaction*`` /
+    service-transaction rollups, which this demo does not slice by tenant and
+    which go stale when only traces are backfilled. KQL on ``traces-apm-default``
+    is the indicator that actually computes error budget for acme-retail.
+    """
     return {
         "name": SLO_NAME,
         "description": (
@@ -38,7 +44,7 @@ def _kql_slo_body() -> dict:
                     'processor.event: transaction and service.name: "checkout-api" '
                     'and labels.demo: "elastic-co" and tenant.id: "acme-retail"'
                 ),
-                "good": 'not event.outcome: failure',
+                "good": "not event.outcome: failure",
                 "total": "*",
                 "timestampField": "@timestamp",
             },
@@ -47,6 +53,8 @@ def _kql_slo_body() -> dict:
         "timeWindow": {"duration": "7d", "type": "rolling"},
         "objective": {"target": 0.99},
         "tags": TAGS,
+        # One series keyed by service.name so APM inventory / Service map can badge it.
+        "groupBy": ["service.name"],
     }
 
 
@@ -75,11 +83,35 @@ def _apm_slo_body() -> dict:
     }
 
 
+def _slo_needs_recreate(remote: dict, body: dict) -> bool:
+    """Indicator type cannot change in place. APM rollup SLOs stay NO_DATA here."""
+    want = (body.get("indicator") or {}).get("type")
+    have = (remote.get("indicator") or {}).get("type")
+    return bool(want) and have != want
+
+
+def _delete_slo() -> bool:
+    r = _kbn("DELETE", f"{SLO_API}/{SLO_ID}")
+    if r.status_code < 300 or r.status_code == 404:
+        print(f"  [ok] SLO deleted: {SLO_ID}")
+        return True
+    print(f"  [warn] SLO delete {SLO_ID}: {r.status_code} {r.text[:200]}")
+    return False
+
+
 def _upsert_slo(body: dict, fail_loud: bool) -> bool:
     r = _kbn("GET", f"{SLO_API}/{SLO_ID}")
     if r.status_code == 200:
-        r = _kbn("PUT", f"{SLO_API}/{SLO_ID}", json=body)
-        action = "updated"
+        if _slo_needs_recreate(r.json(), body):
+            if _delete_slo():
+                r = _kbn("POST", SLO_API, json={**body, "id": SLO_ID})
+                action = "recreated"
+            else:
+                r = _kbn("PUT", f"{SLO_API}/{SLO_ID}", json=body)
+                action = "updated"
+        else:
+            r = _kbn("PUT", f"{SLO_API}/{SLO_ID}", json=body)
+            action = "updated"
     elif r.status_code == 404:
         r = _kbn("POST", SLO_API, json={**body, "id": SLO_ID})
         action = "created"
@@ -89,6 +121,14 @@ def _upsert_slo(body: dict, fail_loud: bool) -> bool:
             raise SystemExit(msg)
         print(msg.replace("[fail]", "[warn]"))
         return False
+
+    if r.status_code >= 300 and body.get("groupBy"):
+        print(f"  [info] SLO {action} with groupBy rejected; retrying without grouping")
+        stripped = {k: v for k, v in body.items() if k != "groupBy"}
+        if action in ("created", "recreated"):
+            r = _kbn("POST", SLO_API, json={**stripped, "id": SLO_ID})
+        else:
+            r = _kbn("PUT", f"{SLO_API}/{SLO_ID}", json=stripped)
 
     if r.status_code >= 300:
         msg = f"  [fail] SLO {action} {SLO_ID}: {r.status_code} {r.text[:400]}"
@@ -165,11 +205,11 @@ def _upsert_burn_rule(fail_loud: bool) -> bool:
 
 
 def ensure_slos(fail_loud: bool = False) -> bool:
-    """Create the native checkout availability SLO. Prefers APM indicator, falls back to KQL."""
-    ok = _upsert_slo(_apm_slo_body(), fail_loud=False)
+    """Create the native checkout availability SLO (KQL on traces; APM rollup fallback)."""
+    ok = _upsert_slo(_kql_slo_body(), fail_loud=False)
     if not ok:
-        print("  [info] APM SLO indicator rejected; trying custom KQL SLO")
-        ok = _upsert_slo(_kql_slo_body(), fail_loud)
+        print("  [info] KQL SLO rejected; trying APM transactionErrorRate indicator")
+        ok = _upsert_slo(_apm_slo_body(), fail_loud)
     if ok:
         _upsert_burn_rule(fail_loud=False)
     return ok

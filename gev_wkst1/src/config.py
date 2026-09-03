@@ -32,6 +32,8 @@ KIBANA_DIR = ROOT / "kibana"
 # Data streams
 DS_ORCHESTRATOR = "logs-elasticco.orchestrator-default"
 DS_CHECKOUT = "logs-elasticco.checkout-default"
+DS_INVENTORY = "logs-elasticco.inventory-default"
+DS_NOTIFICATION = "logs-elasticco.notification-default"
 DS_K8S_EVENT = "logs-elasticco.k8s.event-default"
 DS_K8S_POD = "metrics-elasticco.k8s.pod-default"
 DS_K8S_NODE = "metrics-elasticco.k8s.node-default"

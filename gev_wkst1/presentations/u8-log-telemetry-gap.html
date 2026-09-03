@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U8 · Log Telemetry Gap — Elastic Co.</title>
+  <style>
+    :root {
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls { display: flex; flex-direction: column; gap: 0.45rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity 0.35s, transform 0.35s;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .slide-header { margin-bottom: 1.25rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 54rem; line-height: 1.55; margin: 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
+    .hero-stat .num { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .hero-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .hero-stats { grid-template-columns: 1fr; }
+      .toolbar { left: 0; }
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
+    }
+    .card-body { padding: 1rem; }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(181,121,42,0.4); }
+    .badge.ok { color: var(--success); border-color: rgba(63,111,78,0.4); }
+    .badge.danger { color: var(--danger); border-color: rgba(163,61,61,0.4); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: var(--surface-2); }
+    tr.clickable.selected td { background: var(--accent-dim); }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 4px;
+      font-family: var(--mono); font-size: 0.7rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+    }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .callout.warn { border-color: var(--warn); background: rgba(181,121,42,0.1); }
+    .callout.success { border-color: var(--success); background: rgba(63,111,78,0.1); }
+    .hist { display: flex; align-items: flex-end; gap: 3px; height: 120px; padding: 0.25rem 0; }
+    .hist span {
+      flex: 1; background: var(--surface-2); border-radius: 2px 2px 0 0; min-height: 4px;
+    }
+    .hist span.live { background: var(--success); }
+    .hist span.drop { background: var(--danger); opacity: 0.35; }
+    .compare-card { border-radius: 4px; padding: 1rem; border: 1px solid var(--border); }
+    .compare-card.noisy { border-color: rgba(181,121,42,0.45); background: rgba(181,121,42,0.06); }
+    .compare-card.quality { border-color: rgba(63,111,78,0.45); background: rgba(63,111,78,0.06); }
+    .compare-card h3 { margin: 0 0 0.5rem; font-size: 0.95rem; }
+    .compare-card ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: var(--border); cursor: pointer; }
+    .dots button.active { background: var(--accent); }
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Co.</div>
+      <h1>U8 · Log telemetry gap</h1>
+      <p>Logs went dark. Traces did not. Triage telemetry — do not page the app.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlay">▶ Walk the triage</button>
+        <button id="btnCopyEsql">Copy alert ES|QL</button>
+        <button id="btnFullscreen">Fullscreen</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+        <section class="slide active">
+          <div class="slide-header">
+            <span class="pill">Use case 8</span><span class="pill">Alerting · triage</span>
+            <h2>Logs went silent. Is the app down?</h2>
+            <p>A sibling scenario — not the checkout OOM, not SkuCache DEBUG. <strong>notification-service</strong> logs stop for the last ~20 minutes. APM and pod metrics keep flowing. The wrong close is a rollback. The right close is ingest.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">Logs</div><div class="lbl">0 docs last 15 min · last event ~20 min ago</div></div>
+            <div class="hero-stat"><div class="num">APM</div><div class="lbl">notification-service transactions still arriving</div></div>
+            <div class="hero-stat"><div class="num">Close</div><div class="lbl">Restart agent / check ingest. Not kubectl.</div></div>
+          </div>
+          <div class="callout">
+            <strong>Promise</strong>
+            <p>A log-silence alert is only useful if on-call can prove the process is still alive. Traces and pod metrics are that proof.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Alert</span>
+            <h2>elasticco-log-telemetry-gap</h2>
+            <p>ES|QL fires when last-15m log count is 0 but a 2-hour baseline exists. Cases action. No Run Workflow — <code>elasticco-detect-remediate</code> is the checkout RCA path.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Rule query <span class="badge info">ES|QL · 120m window</span></div>
+            <div class="card-body"><pre class="doc" id="gapEsql"></pre></div>
+          </div>
+          <div class="callout warn">
+            <strong>Facilitator</strong>
+            <p>EVAL <code>service.name</code> so APM inventory / Service map can badge notification-service. Do not attach the detect-remediate workflow.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Disagree</span>
+            <h2>Logs drop. Traces do not.</h2>
+            <p>Discover <strong>Elastic Co. Notification Logs</strong> vs APM <strong>notification-service</strong>. Same window. Opposite shapes.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Logs <span class="badge danger">Silent</span></div>
+              <div class="card-body">
+                <div class="hist" id="histLogs"></div>
+                <p style="color:var(--muted);font-size:0.78rem;margin:0.75rem 0 0">Heartbeat every ~30s, then nothing for ~20 min.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">APM transactions <span class="badge ok">Alive</span></div>
+              <div class="card-body">
+                <div class="hist" id="histApm"></div>
+                <p style="color:var(--muted);font-size:0.78rem;margin:0.75rem 0 0">Kafka consumer hop still transacting. Pods healthy.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Triage</span>
+            <h2>App down vs telemetry down</h2>
+            <p>Walk the four hops. Stop when traces and pods contradict the log gap.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Beats <span class="badge info" id="walkLabel">All</span></div>
+            <div class="card-body">
+              <table id="walkTable">
+                <thead><tr><th>#</th><th>Do</th><th>Say</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Close</span>
+            <h2>Fix ingest. Do not mix remediations.</h2>
+            <p>Three planted stories, three closes. Mixing them in the room is the failure mode.</p>
+          </div>
+          <div class="grid-2">
+            <div class="compare-card noisy">
+              <h3>Not this close</h3>
+              <ul>
+                <li>Rollback checkout-api <code>v2.4.1 → v2.4.0</code> (U1–U6)</li>
+                <li>Restore SkuCache INFO (U7)</li>
+                <li>Start <code>elasticco-detect-remediate</code></li>
+                <li>kubectl / add replicas</li>
+              </ul>
+            </div>
+            <div class="compare-card quality">
+              <h3>This close</h3>
+              <ul>
+                <li>Restart elastic-agent on the node / check the log integration</li>
+                <li>Confirm ingest pipeline / data stream is receiving</li>
+                <li>Case comment: telemetry gap, app alive</li>
+                <li>Optional: Log rate analysis on the <em>drop</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout success">
+            <strong>Line</strong>
+            <p>Logs going dark is not an outage until traces and pods disagree.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Kibana</span>
+            <h2>Where to stand</h2>
+            <p>Last 2 hours · <code>labels.demo: elastic-co</code>. Stream keeps the silence and the APM ticks through now.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Open this</th><th>Show</th></tr></thead>
+              <tbody id="kibanaTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="toolbar">
+        <button id="btnPrev">← Prev</button>
+        <div class="dots" id="dots"></div>
+        <span class="mono" id="slideCounter">1 / 6</span>
+        <span style="color:var(--muted);font-size:0.75rem"><kbd>←</kbd> <kbd>→</kbd> · <kbd>F</kbd></span>
+        <button id="btnNext">Next →</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const SLIDES = ["Frame", "Alert", "Disagree", "Triage", "Close", "Kibana"];
+    const ESQL = `FROM logs-elasticco.notification-default
+| WHERE @timestamp >= NOW() - 2 hours
+| WHERE labels.demo == "elastic-co"
+| STATS last_seen = MAX(@timestamp), n_15m = COUNT(*) WHERE @timestamp >= NOW() - 15 minutes, n_2h = COUNT(*)
+| WHERE n_15m < 1 AND n_2h > 0
+| EVAL \`service.name\` = "notification-service", \`service.environment\` = "production"`;
+
+    const WALKS = [
+      ["Alerts · elasticco-log-telemetry-gap", "Firing. Cases. No Run Workflow. service.name badges APM map."],
+      ["Discover · Notification Logs", "Last event ~20 min ago. Histogram drops to zero."],
+      ["APM · notification-service", "Transactions still arriving. The process is alive."],
+      ["Dashboard elasticco-telemetry-gap", "Logs last 15m = 0 vs APM last 15m > 0. Pods healthy."],
+      ["Close on the case", "Restart agent / check ingest. Not rollback. Not restore INFO."],
+    ];
+
+    const KIBANA = [
+      ["Alerts · elasticco-log-telemetry-gap", "ES|QL silence rule; Cases; no workflow"],
+      ["Discover · elasticco-notification", "Last log ~20 min ago"],
+      ["APM → notification-service", "Prove the app is not down"],
+      ["Dashboard elasticco-telemetry-gap", "Logs vs APM vs pod metrics"],
+      ["Observability → Cases", "Telemetry-gap comment — not v2.4.0"],
+    ];
+
+    let currentSlide = 0;
+    let walkRow = -1;
+    let playTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function bars(el, heights, clsFrom) {
+      heights.forEach((h, i) => {
+        const s = document.createElement("span");
+        s.style.height = h + "%";
+        if (i >= 10) s.classList.add(clsFrom);
+        else if (clsFrom === "live") s.classList.add("live");
+        el.appendChild(s);
+      });
+    }
+
+    function buildWalk() {
+      const body = document.querySelector("#walkTable tbody");
+      WALKS.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.classList.add("clickable");
+        tr.innerHTML = `<td class="mono">${i + 1}</td><td>${row[0]}</td><td>${row[1]}</td>`;
+        tr.addEventListener("click", () => highlightWalk(i));
+        body.appendChild(tr);
+      });
+    }
+
+    function highlightWalk(i) {
+      walkRow = i;
+      document.querySelectorAll("#walkTable tbody tr").forEach((tr, n) => {
+        tr.classList.toggle("selected", n === i);
+      });
+      document.getElementById("walkLabel").textContent = `Beat ${i + 1} / ${WALKS.length}`;
+    }
+
+    function playWalk() {
+      clearInterval(playTimer);
+      goSlide(3);
+      let i = 0;
+      highlightWalk(0);
+      playTimer = setInterval(() => {
+        i++;
+        if (i >= WALKS.length) { clearInterval(playTimer); return; }
+        highlightWalk(i);
+      }, 1400);
+    }
+
+    document.getElementById("gapEsql").textContent = ESQL;
+    const kBody = document.getElementById("kibanaTable");
+    KIBANA.forEach(([a, b]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+      kBody.appendChild(tr);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnPlay").addEventListener("click", playWalk);
+    document.getElementById("btnCopyEsql").addEventListener("click", () => navigator.clipboard?.writeText(ESQL));
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+
+    buildNav();
+    bars(document.getElementById("histLogs"), [40, 38, 42, 39, 41, 40, 38, 43, 40, 39, 4, 3, 2, 3, 2], "drop");
+    bars(document.getElementById("histApm"), [36, 40, 38, 42, 39, 41, 37, 40, 38, 42, 39, 41, 38, 40, 39], "live");
+    buildWalk();
+  </script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scenario walkthrough — Elastic Co.</title>
+  <style>
+    :root {
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls { display: flex; flex-direction: column; gap: 0.45rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity 0.35s, transform 0.35s;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .slide-header { margin-bottom: 1.25rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 54rem; line-height: 1.55; margin: 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .swim, .hero-stats { grid-template-columns: 1fr !important; }
+      .phase:not(:last-child)::after { content: none; }
+      .toolbar { left: 0; }
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
+    }
+    .card-body { padding: 1rem; }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(181,121,42,0.4); }
+    .badge.ok { color: var(--success); border-color: rgba(63,111,78,0.4); }
+    .badge.danger { color: var(--danger); border-color: rgba(163,61,61,0.4); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 4px;
+      font-family: var(--mono); font-size: 0.7rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+    }
+    .hl { color: var(--accent); }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
+    .hero-stat .num { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .hero-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    .swim {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .phase {
+      position: relative;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem;
+    }
+    .phase:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -0.6rem;
+      top: 0.85rem;
+      color: var(--accent);
+      font-size: 1rem;
+      z-index: 1;
+    }
+    .phase h3 {
+      margin: 0 0 0.65rem; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    }
+    .phase.hot { border-color: var(--accent-border); background: var(--accent-dim); }
+    .node {
+      display: block; width: 100%; text-align: left; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.55rem;
+      margin-bottom: 0.4rem; cursor: pointer; font: inherit; color: var(--text);
+    }
+    .node:last-child { margin-bottom: 0; }
+    .node:hover { border-color: var(--accent); }
+    .node.active { border-color: var(--accent); background: var(--accent-dim); }
+    .node.done { opacity: 0.55; }
+    .node .when { display: block; font-family: var(--mono); font-size: 0.65rem; color: var(--warn); }
+    .node .title { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 0.1rem; }
+    .pipeline-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .pipeline-controls .progress {
+      flex: 1; min-width: 140px; height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden;
+    }
+    .pipeline-controls .progress > span { display: block; height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+    .detail-panel {
+      padding: 0.85rem 1rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; min-height: 7rem;
+    }
+    .detail-panel h4 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+    .detail-panel p { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+    .detail-panel p:last-child { margin-bottom: 0; }
+    .meta { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.65rem; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: var(--border); cursor: pointer; }
+    .dots button.active { background: var(--accent); }
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Co.</div>
+      <h1>Scenario · start to finish</h1>
+      <p>One planted incident. Walk cause → EKS restart → tenant trace → detect → case → rollback.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlay">▶ Walk the scenario</button>
+        <button id="btnFullscreen">Fullscreen</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+
+        <section class="slide active">
+          <div class="slide-header">
+            <span class="pill">Full arc</span><span class="pill">acme-retail</span>
+            <h2>One incident, start to finish</h2>
+            <p>Elastic Co. is a multi-tenant fulfillment SaaS. Checkout-api <strong>v2.4.1</strong> leaks heap. Only tenant <code>acme-retail</code> hurts. The close is a case comment: roll back to <strong>v2.4.0</strong> — not kubectl.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">Cause</div><div class="lbl">CartCache.retainAll on checkout-api v2.4.1</div></div>
+            <div class="hero-stat"><div class="num">Symptom</div><div class="lbl">OOMKilled / BackOff on eks-elastic-prod-usc1</div></div>
+            <div class="hero-stat"><div class="num">Who / where</div><div class="lbl">acme-retail · SELECT FOR UPDATE ~2.8s</div></div>
+            <div class="hero-stat"><div class="num">Close</div><div class="lbl">SLO pages · workflow RCA · rollback comment</div></div>
+          </div>
+          <div class="callout">
+            <strong>Promise</strong>
+            <p>Raw orchestrator spam → a seven-hop <code>trace.id</code> → Postgres lock → EKS restart loop → noisy vs SLO vs correlation → Agent Builder / Workflow → case. Never reset the story.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Visual workflow</span>
+            <h2>Click a beat, or press Walk</h2>
+            <p>Four phases, twelve beats. Same planted data as U1–U6. Highlighted node is the current step.</p>
+          </div>
+          <div class="pipeline-controls">
+            <button id="btnStepBack">◀</button>
+            <button id="btnStepFwd">▶</button>
+            <button id="btnStepReset">Reset</button>
+            <div class="progress"><span id="tlProgress"></span></div>
+            <span class="mono" id="tlLabel">All beats</span>
+          </div>
+          <div class="swim" id="swim"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">This beat</div>
+              <div class="card-body"><div class="detail-panel" id="tlDetail"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head">Evidence</div>
+              <div class="card-body"><pre class="doc" id="tlEvidence"></pre></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Use cases</span>
+            <h2>Same story, six surfaces</h2>
+            <p>Do not restart the incident between use cases. Each UC is a lens on the same <code>trace.id</code> / same pods.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>UC</th><th>When in the walk</th><th>Kibana</th><th>Line</th></tr></thead>
+              <tbody>
+                <tr><td>U1</td><td>Orchestrator retries still look like grep</td><td>Discover · pipeline</td><td>Parsing makes correlation a click.</td></tr>
+                <tr><td>U2</td><td>Same trace.id, seven hops</td><td>APM · E2E tracing</td><td>Who is hurt, where time went.</td></tr>
+                <tr><td>U3</td><td>OOMKilled / BackOff / restart.count</td><td>EKS Restarts dashboard</td><td>Restarts are a symptom.</td></tr>
+                <tr><td>U4</td><td>Noisy CPU vs SLO vs correlation</td><td>Alerts · SLOs · Cases</td><td>Page on the SLO.</td></tr>
+                <tr><td>U5</td><td>Tool-backed RCA</td><td>Agent Builder</td><td>Approve rollback into the case.</td></tr>
+                <tr><td>U6</td><td>Alert → ES|QL → agent → case</td><td>Workflows</td><td>Workflows is the stitch.</td></tr>
+                <tr><td>U7</td><td>Inventory SkuCache DEBUG flood (sibling scenario)</td><td>AIOps Log rate analysis</td><td>A spike is not an outage until terms name it.</td></tr>
+                <tr><td>U8</td><td>notification-service logs silent (sibling scenario)</td><td>Alert + APM vs Discover</td><td>Logs going dark is not an outage until traces disagree.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Kibana</span>
+            <h2>Where to stand in the room</h2>
+            <p>Time range Last 2 hours · <code>labels.demo: elastic-co</code>. Stream keeps the 60-minute window through now.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Open this</th><th>Show</th></tr></thead>
+              <tbody id="kibanaTable"></tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <strong>Close</strong>
+            <p>Roll back checkout-api <code>v2.4.1</code> → <code>v2.4.0</code>. The audit is the Observability case — workflow comment or Agent Builder paste. Do not open a terminal unless they ask how it was seeded.</p>
+          </div>
+        </section>
+
+      </div>
+      <div class="toolbar">
+        <button id="btnPrev">← Prev</button>
+        <div class="dots" id="dots"></div>
+        <span class="mono" id="slideCounter">1 / 4</span>
+        <span style="color:var(--muted);font-size:0.75rem"><kbd>←</kbd> <kbd>→</kbd> · <kbd>F</kbd></span>
+        <button id="btnNext">Next →</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const SLIDES = ["Frame", "Visual workflow", "Use cases", "Kibana"];
+
+    const STEPS = [
+      {
+        phase: 0, when: "t+0", title: "Bad deploy",
+        detail: "checkout-api v2.4.1 ships a heap leak in CartCache.retainAll. Cluster eks-elastic-prod-usc1. This is the cause — not capacity.",
+        kibana: "APM / logs: service.version 2.4.1",
+        product: "Cause",
+        evidence: "service.name: checkout-api\nservice.version: 2.4.1\nsuspected_leak: CartCache.retainAll"
+      },
+      {
+        phase: 0, when: "t+10m", title: "Heap climbs",
+        detail: "Three checkout pods approach the 512 MiB limit (~98%). Other services stay healthy. Adding memory would hide the leak.",
+        kibana: "Dashboard Elastic Co. — EKS Restarts · memory vs limit",
+        product: "Cause",
+        evidence: "kubernetes.pod.memory.usage.limit.pct ≈ 0.98\nkubernetes.pod.memory.limit.bytes = 536870912"
+      },
+      {
+        phase: 1, when: "t+12m", title: "OutOfMemoryError",
+        detail: "Container logs: FATAL Java heap space, deploy=2.4.1, CartCache.retainAll. Same window as the slow traces — not a second mystery.",
+        kibana: "Discover · Elastic Co. checkout logs",
+        product: "Symptom",
+        evidence: "FATAL java.lang.OutOfMemoryError: Java heap space\ndeploy=2.4.1 pod=checkout-api-523f0-5ab4d\nsuspected_leak=CartCache.retainAll"
+      },
+      {
+        phase: 1, when: "t+12m", title: "OOMKilled + BackOff",
+        detail: "Two kill waves per pod. BackOff 45s later. restart.count reaches 2. Restarts are the symptom; OOM + version is the reason.",
+        kibana: "Discover Kubernetes · kubernetes.event.reason: OOMKilled",
+        product: "Symptom",
+        evidence: "reason: OOMKilled\nreason: BackOff\nkubernetes.pod.restart.count: 2\npods: checkout-api-523f0-5ab4d, …1cd5c-29f59, …9de64-c30ad"
+      },
+      {
+        phase: 2, when: "same window", title: "Orchestrator retries",
+        detail: "DAG fulfillment.checkout retries look like Airflow spam. Without fields, “errors for acme-retail” is a grep problem.",
+        kibana: "Discover · Elastic Co. Orchestrator Logs · raw message",
+        product: "Correlate",
+        evidence: "2026-… [fulfillment.checkout] charge_payment\ntenant=acme-retail order=ord-… trace_id=271f8e31…\nERROR: Task failed after checkout-api timeout"
+      },
+      {
+        phase: 2, when: "write time", title: "Grok → tenant + trace",
+        detail: "Pipeline logs-elasticco.orchestrator extracts tenant.id, trace.id, orchestrator.dag_id at write. Filter, don’t regex.",
+        kibana: "Ingest pipeline logs-elasticco.orchestrator · then Discover KQL",
+        product: "Correlate",
+        evidence: "tenant.id: acme-retail\ntrace.id: 271f8e318871ab12\norchestrator.dag_id: fulfillment.checkout\nlog.level: error"
+      },
+      {
+        phase: 2, when: "click", title: "Seven-hop trace",
+        detail: "Same trace.id in APM: edge-gateway → identity-service → checkout-api → inventory / fraud / payments → postgres + redis + kafka → notification-service.",
+        kibana: "APM waterfall or dashboard Elastic Co. — End-to-End Tracing",
+        product: "Correlate",
+        evidence: "processor.event: transaction\ntenant.id: acme-retail\nservice.version: 2.4.1\nhops: 7"
+      },
+      {
+        phase: 2, when: "DB span", title: "FOR UPDATE ~2.8s",
+        detail: "PostgreSQL SELECT … FOR UPDATE on orders for acme-retail. Peer tenants globex-mart / initech-b2b stay near ~400 ms. Who is hurt, where time went.",
+        kibana: "Expand postgresql span · ES|QL p95 by tenant.id",
+        product: "Correlate",
+        evidence: "span.type: db  span.subtype: postgresql\nstatement: SELECT … FOR UPDATE … orders\ntenant.id: acme-retail  p95 ≈ 2800 ms"
+      },
+      {
+        phase: 3, when: "page", title: "SLO, not noisy CPU",
+        detail: "Ignore elasticco-noisy-node-cpu (host CPU, no tenant). Page on native SLO elasticco-slo-checkout-availability for checkout-api / acme-retail.",
+        kibana: "Observability → SLOs",
+        product: "Close",
+        evidence: "page: elasticco-slo-checkout-availability\nignore: elasticco-noisy-node-cpu\nmap badge: checkout-api\nerror-rate alert: elasticco-app-checkout-error-rate"
+      },
+      {
+        phase: 3, when: "detect", title: "Quality alerts fire",
+        detail: "elasticco-eks-pod-restarts and elasticco-checkout-correlated-rca open Cases and Run Workflow on first active. Correlation is the RCA starter — not an SLO.",
+        kibana: "Alerts → those two rules · Actions: Cases + Workflows",
+        product: "Close",
+        evidence: "elasticco-eks-pod-restarts\nelasticco-checkout-correlated-rca\naction: system-connector-.workflows\nworkflowId: elasticco-detect-remediate"
+      },
+      {
+        phase: 3, when: "workflow", title: "ES|QL → agent",
+        detail: "Workflow enriches (OOM, FOR UPDATE, tenant p95) then elasticco-rca-agent writes RCA. Manual Run if alerts were already firing.",
+        kibana: "Analytics → Workflows → Elastic Co. detect-to-remediate",
+        product: "Close",
+        evidence: "steps: query_oom → query_slow_db → query_tenant_p95\n      → rca_analysis → create_case → add_remediation\nagent-id: elasticco-rca-agent"
+      },
+      {
+        phase: 3, when: "done", title: "Rollback comment",
+        detail: "Case holds the audit. Recommended remediation: roll back checkout-api v2.4.1 → v2.4.0. Human approves. Workflow does not kubectl.",
+        kibana: "Observability → Cases",
+        product: "Close",
+        evidence: "Roll back checkout-api from v2.4.1 to v2.4.0.\nApprove in this case, or tell elasticco-rca-agent:\napprove rollback to v2.4.0."
+      },
+    ];
+
+    const PHASES = [
+      { id: "cause", label: "1 · Cause" },
+      { id: "symptom", label: "2 · EKS symptom" },
+      { id: "correlate", label: "3 · Correlate" },
+      { id: "close", label: "4 · Detect → remediate" },
+    ];
+
+    const KIBANA = [
+      ["Discover · Orchestrator Logs", "Raw message, then tenant.id + click trace.id"],
+      ["Ingest pipeline logs-elasticco.orchestrator", "Grok at write time"],
+      ["APM / E2E tracing dashboard", "Seven hops · FOR UPDATE · tenant p95"],
+      ["Dashboard elasticco-eks-restarts", "Memory vs limit, OOMKilled, restart.count"],
+      ["SLOs · elasticco-slo-checkout-availability", "What you page on"],
+      ["Alerts · eks-pod-restarts + correlated-rca", "Cases + Run Workflow"],
+      ["Workflows · elasticco-detect-remediate", "Manual Run if already firing"],
+      ["Agent Builder · elasticco-rca-agent", "U5 close if you skip the workflow"],
+      ["Observability → Cases", "Rollback comment is the audit"],
+    ];
+
+    let currentSlide = 0;
+    let tlStep = -1;
+    let playTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function buildSwim() {
+      const swim = document.getElementById("swim");
+      PHASES.forEach((ph, pi) => {
+        const col = document.createElement("div");
+        col.className = "phase";
+        col.dataset.phase = String(pi);
+        col.innerHTML = `<h3>${ph.label}</h3>`;
+        STEPS.forEach((s, i) => {
+          if (s.phase !== pi) return;
+          const btn = document.createElement("button");
+          btn.className = "node";
+          btn.dataset.step = String(i);
+          btn.innerHTML = `<span class="when">${s.when}</span><span class="title">${s.title}</span>`;
+          btn.addEventListener("click", () => { tlStep = i; updateTimeline(); });
+          col.appendChild(btn);
+        });
+        swim.appendChild(col);
+      });
+    }
+
+    function updateTimeline() {
+      document.querySelectorAll(".node").forEach(el => {
+        const n = +el.dataset.step;
+        el.classList.toggle("active", n === tlStep);
+        el.classList.toggle("done", tlStep >= 0 && n < tlStep);
+      });
+      document.querySelectorAll(".phase").forEach(el => {
+        const pi = +el.dataset.phase;
+        el.classList.toggle("hot", tlStep >= 0 && STEPS[tlStep].phase === pi);
+      });
+      const pct = tlStep < 0 ? 0 : ((tlStep + 1) / STEPS.length) * 100;
+      document.getElementById("tlProgress").style.width = pct + "%";
+      document.getElementById("tlLabel").textContent = tlStep < 0 ? "All beats" : `Beat ${tlStep + 1} / ${STEPS.length}`;
+      const s = tlStep >= 0 ? STEPS[tlStep] : null;
+      document.getElementById("tlDetail").innerHTML = s
+        ? `<h4>${s.title}</h4><p>${s.detail}</p><div class="meta"><span class="badge info">${s.product}</span><span class="badge">${s.kibana}</span></div>`
+        : `<h4>Full path</h4><p>Cause (v2.4.1 leak) → EKS OOM restart loop → parse + seven-hop trace + FOR UPDATE for acme-retail → SLO / quality alerts → workflow RCA → rollback comment on the case.</p>`;
+      document.getElementById("tlEvidence").textContent = s
+        ? s.evidence
+        : "Select a beat.\nPods: checkout-api-523f0-5ab4d · 1cd5c-29f59 · 9de64-c30ad\nDAG: fulfillment.checkout\nRemediation: v2.4.1 → v2.4.0";
+    }
+
+    function playTimeline() {
+      clearInterval(playTimer);
+      tlStep = -1;
+      updateTimeline();
+      goSlide(1);
+      let i = 0;
+      playTimer = setInterval(() => {
+        tlStep = i;
+        updateTimeline();
+        i++;
+        if (i >= STEPS.length) clearInterval(playTimer);
+      }, 1100);
+    }
+
+    const kBody = document.getElementById("kibanaTable");
+    KIBANA.forEach(([a, b]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+      kBody.appendChild(tr);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnStepBack").addEventListener("click", () => { tlStep = Math.max(-1, tlStep - 1); updateTimeline(); });
+    document.getElementById("btnStepFwd").addEventListener("click", () => { tlStep = Math.min(STEPS.length - 1, tlStep + 1); updateTimeline(); });
+    document.getElementById("btnStepReset").addEventListener("click", () => { tlStep = -1; updateTimeline(); });
+    document.getElementById("btnPlay").addEventListener("click", playTimeline);
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+      if (e.key === " " && currentSlide === 1) { e.preventDefault(); playTimeline(); }
+    });
+
+    buildNav();
+    buildSwim();
+    updateTimeline();
+  </script>
+</body>
+</html>

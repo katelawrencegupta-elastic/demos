@@ -22,8 +22,9 @@ Start a live tick in a side terminal before opening Alerts (`--live-incident` is
 
 ## Part A — Application alert or native SLO
 
-1. Kibana → **Alerts** → open **`elasticco-app-checkout-error-rate`** (checkout-api / acme-retail error rate > 10% in 60 minutes), **or**
-2. Observability → **SLOs** → **`elasticco-slo-checkout-availability`** (native error budget for `checkout-api` + `acme-retail`).
+1. APM → **Services** / **Service map** → **checkout-api** (alert badge from `elasticco-app-checkout-error-rate` and the other checkout rules), **or**
+2. Kibana → **Alerts** → open **`elasticco-app-checkout-error-rate`** (checkout-api / acme-retail error rate > 10% in 60 minutes), **or**
+3. Observability → **SLOs** → **`elasticco-slo-checkout-availability`** (native error budget for `checkout-api` + `acme-retail`).
 
 Contrast with **`elasticco-noisy-node-cpu`** if you skipped U4.
 
@@ -66,3 +67,5 @@ Observability → **Cases**: the thread should hold the RCA (agent comment or pa
 You can explain: alert or SLO chart → Agent Builder tools prove OOM + FOR UPDATE for acme-retail → human “approve rollback” → case comment (in product or pasted) — without inventing counts.
 
 Interactive deck: [../presentations/u5-app-monitoring-rca.html](../presentations/u5-app-monitoring-rca.html)
+
+**Combined with U2 (waterfall then this close):** [02-05-trace-rca.md](02-05-trace-rca.md) · Deck: [../presentations/scenario-u2-u5.html](../presentations/scenario-u2-u5.html)

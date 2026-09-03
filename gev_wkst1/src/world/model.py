@@ -109,6 +109,37 @@ class World:
             start = end - timedelta(minutes=inc["duration_minutes"])
         return start, end
 
+    def log_rate_window(self, anchor: datetime) -> tuple[datetime, datetime] | None:
+        """U7 verbose-logger window. None if log_rate is not configured."""
+        lr = self.cfg.get("log_rate")
+        if not lr:
+            return None
+        anchor = anchor.astimezone(timezone.utc).replace(second=0, microsecond=0)
+        start = anchor - timedelta(minutes=int(lr.get("start_offset_minutes", 35)))
+        end = start + timedelta(minutes=int(lr.get("duration_minutes", 35)))
+        if end > anchor:
+            end = anchor
+        if end <= start:
+            end = anchor
+            start = end - timedelta(minutes=int(lr.get("duration_minutes", 35)))
+        return start, end
+
+    def telemetry_gap_window(self, anchor: datetime) -> tuple[datetime, datetime] | None:
+        """U8 log-silence window through now (keep seconds so ticks stay silent)."""
+        gap = self.cfg.get("telemetry_gap")
+        if not gap:
+            return None
+        anchor = anchor.astimezone(timezone.utc)
+        duration = timedelta(minutes=int(gap.get("duration_minutes", 20)))
+        start = anchor - timedelta(minutes=int(gap.get("start_offset_minutes", 20)))
+        end = start + duration
+        if end >= anchor.replace(second=0, microsecond=0):
+            end = anchor + timedelta(seconds=1)
+        if end <= start:
+            end = anchor + timedelta(seconds=1)
+            start = end - duration
+        return start, end
+
     def hero_traces(self, anchor: datetime) -> list[HeroTrace]:
         start, end = self.incident_window(anchor)
         n = int(self.cfg["incident"]["hero_trace_count"])

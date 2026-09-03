@@ -1036,6 +1036,262 @@ def build_eks_restarts() -> dict:
     }
 
 
+def build_log_rate() -> dict:
+    """U7 — inventory SkuCache DEBUG flood vs quiet INFO baseline."""
+    debug_n = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE log.level == "debug"',
+        "| STATS count = COUNT(*)",
+    )
+    info_n = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE log.level == "info"',
+        "| STATS count = COUNT(*)",
+    )
+    share = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS debugs = COUNT(*) WHERE log.level == \"debug\", total = COUNT(*)",
+        "| EVAL debug_share = debugs * 1.0 / total, min = 0.0, max = 1.0, goal = 0.05",
+    )
+    by_level = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), log.level",
+        "| SORT bucket",
+    )
+    by_logger = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY log.logger, log.level, service.version",
+        "| SORT count DESC",
+    )
+    level_pie = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY log.level",
+    )
+    all_svc = _q(
+        "FROM logs-elasticco.*",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), service.name",
+        "| SORT bucket",
+    )
+    version_bar = _q(
+        "FROM logs-elasticco.inventory-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY service.version",
+        "| SORT count DESC",
+    )
+    orch_err = _q(
+        "FROM logs-elasticco.orchestrator-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE log.level == "error"',
+        "| STATS count = COUNT(*)",
+    )
+    orch_by_level = _q(
+        "FROM logs-elasticco.orchestrator-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend), log.level",
+        "| SORT bucket",
+    )
+    orch_by_tenant = _q(
+        "FROM logs-elasticco.orchestrator-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY tenant.id, log.level",
+        "| SORT count DESC",
+    )
+
+    panels = [
+        markdown(
+            0, 0, 48, 4,
+            "## Elastic Co. — Log rate\n\n"
+            "**Beat 1:** inventory SkuCache **DEBUG** (last ~35 min) on **Elastic Co. Logs** / Inventory Logs. "
+            "Terms: `debug` · `SkuCache` · `4.0.9`. Restore INFO — not checkout rollback.\n\n"
+            "**Beat 2:** same product on **Elastic Co. Orchestrator Logs**. "
+            "Terms: `tenant.id: acme-retail` · `log.level: error` · `charge_payment` retries. That is U1–U6. "
+            "Time range **Last 2 hours**.",
+        ),
+        metric(0, 4, 12, 7, "DEBUG lines", debug_n, "count", "SkuCache flood", trend=True),
+        metric(12, 4, 12, 7, "INFO lines", info_n, "count", "baseline reserve", trend=True),
+        gauge(
+            24, 4, 12, 7, "DEBUG share", share, "debug_share",
+            shape="arc", min_col="min", max_col="max", goal_col="goal",
+            subtitle="goal ≤5%",
+        ),
+        xy(
+            36, 4, 12, 7,
+            "Volume by version",
+            version_bar, "service.version", ["count"],
+            layer="bar_horizontal",
+        ),
+        xy(
+            0, 11, 32, 16,
+            "Inventory log rate by level",
+            by_level, "bucket", ["count"],
+            layer="area_stacked",
+            breakdown="log.level",
+        ),
+        pie(32, 11, 16, 16, "Level mix", level_pie, "count", "log.level"),
+        xy(
+            0, 27, 24, 14,
+            "Loggers (count)",
+            by_logger, "log.logger", ["count"],
+            layer="bar_horizontal",
+            breakdown="log.level",
+        ),
+        xy(
+            24, 27, 24, 14,
+            "All Elastic Co. logs by service",
+            all_svc, "bucket", ["count"],
+            layer="area_stacked",
+            breakdown="service.name",
+        ),
+        markdown(
+            0, 41, 48, 3,
+            "### Beat 2 — Orchestrator (U1–U6)\n"
+            "Switch Log rate analysis to data view **Elastic Co. Orchestrator Logs**. "
+            "Expected terms: `tenant.id: acme-retail`, `log.level: error`, `orchestrator.task_id: charge_payment`.",
+        ),
+        metric(0, 44, 12, 7, "Orchestrator ERROR", orch_err, "count", "acme-retail retries", trend=True),
+        xy(
+            12, 44, 20, 14,
+            "Orchestrator log rate by level",
+            orch_by_level, "bucket", ["count"],
+            layer="area_stacked",
+            breakdown="log.level",
+        ),
+        xy(
+            32, 44, 16, 14,
+            "Orchestrator by tenant × level",
+            orch_by_tenant, "tenant.id", ["count"],
+            layer="bar_horizontal",
+            breakdown="log.level",
+        ),
+    ]
+    return {
+        "title": "Elastic Co. — Log Rate",
+        "description": (
+            "U7 beat 1: inventory SkuCache DEBUG. Beat 2: orchestrator acme-retail ERROR retries. "
+            "Use AIOps Log rate analysis on elasticco-logs then elasticco-orchestrator."
+        ),
+        "time_range": {"from": "now-2h", "to": "now"},
+        "options": {
+            "use_margins": True,
+            "sync_colors": True,
+            "sync_cursor": True,
+            "sync_tooltips": True,
+            "hide_panel_titles": False,
+        },
+        "query": {"expression": "labels.demo: elastic-co", "language": "kql"},
+        "panels": panels,
+    }
+
+
+def build_telemetry_gap() -> dict:
+    """U8 — notification-service logs silent while APM and pods stay healthy."""
+    logs_15m = _q(
+        "FROM logs-elasticco.notification-default",
+        f"| WHERE @timestamp >= NOW() - 2 hours AND {DEMO}",
+        "| STATS count = COUNT(*) WHERE @timestamp >= NOW() - 15 minutes",
+    )
+    logs_2h = _q(
+        "FROM logs-elasticco.notification-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*)",
+    )
+    apm_15m = _q(
+        "FROM traces-apm-default",
+        f"| WHERE @timestamp >= NOW() - 15 minutes AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "notification-service"',
+        "| STATS count = COUNT(*)",
+    )
+    logs_ts = _q(
+        "FROM logs-elasticco.notification-default",
+        f"| WHERE {TS} AND {DEMO}",
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    apm_ts = _q(
+        "FROM traces-apm-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE processor.event == "transaction" AND service.name == "notification-service"',
+        "| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 40, ?_tstart, ?_tend)",
+        "| SORT bucket",
+    )
+    pods = _q(
+        "FROM metrics-elasticco.k8s.pod-default",
+        f"| WHERE {TS} AND {DEMO}",
+        '| WHERE service.name == "notification-service"',
+        "| STATS cpu = AVG(kubernetes.pod.cpu.usage.nanocores), "
+        "restarts = MAX(kubernetes.pod.restart.count)",
+    )
+    last_seen = _q(
+        "FROM logs-elasticco.notification-default",
+        f"| WHERE @timestamp >= NOW() - 2 hours AND {DEMO}",
+        "| STATS last_seen = MAX(@timestamp)",
+    )
+
+    panels = [
+        markdown(
+            0, 0, 48, 4,
+            "## Elastic Co. — Log telemetry gap\n\n"
+            "**notification-service** logs went silent last ~20 minutes. "
+            "APM transactions and pod metrics still flow. "
+            "Triage: **telemetry failed, not the app.** "
+            "Alert `elasticco-log-telemetry-gap` opens a case. "
+            "Do **not** start `elasticco-detect-remediate`. "
+            "Close: restart elastic-agent / check ingest — not checkout rollback, not SkuCache INFO. "
+            "Time range **Last 2 hours**.",
+        ),
+        metric(0, 4, 12, 7, "Logs last 15m", logs_15m, "count", "expect 0", trend=True),
+        metric(12, 4, 12, 7, "APM txns last 15m", apm_15m, "count", "app still alive", trend=True),
+        metric(24, 4, 12, 7, "Logs in range", logs_2h, "count", "baseline exists", trend=True),
+        metric(36, 4, 12, 7, "Last log @", last_seen, "last_seen", "~20 min ago"),
+        xy(
+            0, 11, 24, 16,
+            "Notification logs (drop to zero)",
+            logs_ts, "bucket", ["count"],
+            layer="area",
+        ),
+        xy(
+            24, 11, 24, 16,
+            "Notification APM transactions (still flowing)",
+            apm_ts, "bucket", ["count"],
+            layer="area",
+        ),
+        markdown(
+            0, 27, 24, 8,
+            "### Triage\n\n"
+            "1. Alert `elasticco-log-telemetry-gap` firing → Observability case.\n"
+            "2. Discover **Elastic Co. Notification Logs** — last event ~20 min ago.\n"
+            "3. APM → **notification-service** — transactions continue.\n"
+            "4. EKS pod metrics — CPU/restarts healthy. **Fix ingest, not the app.**",
+        ),
+        metric(24, 27, 12, 8, "Pod CPU (avg)", pods, "cpu", "notification-service"),
+        metric(36, 27, 12, 8, "Pod restarts", pods, "restarts", "expect 0"),
+    ]
+    return {
+        "title": "Elastic Co. — Log Telemetry Gap",
+        "description": (
+            "U8: notification-service logs silent last ~20 min while APM and pods stay healthy. "
+            "Triage telemetry (agent/ingest), not rollback checkout-api."
+        ),
+        "time_range": {"from": "now-2h", "to": "now"},
+        "options": {
+            "use_margins": True,
+            "sync_colors": True,
+            "sync_cursor": True,
+            "sync_tooltips": True,
+            "hide_panel_titles": False,
+        },
+        "query": {"expression": "labels.demo: elastic-co", "language": "kql"},
+        "panels": panels,
+    }
+
+
 def _put_dashboard(dash_id: str, body: dict) -> str:
     r = requests.put(
         f"{KIBANA_URL}/api/dashboards/{dash_id}",
@@ -1059,6 +1315,8 @@ def _put_dashboard(dash_id: str, body: dict) -> str:
         "elasticco-distributed-traces": "dashboard-distributed-traces.json",
         "elasticco-e2e-tracing": "dashboard-e2e-tracing.json",
         "elasticco-eks-restarts": "dashboard-eks-restarts.json",
+        "elasticco-log-rate": "dashboard-log-rate.json",
+        "elasticco-telemetry-gap": "dashboard-telemetry-gap.json",
     }
     if dash_id in snapshots:
         (KIBANA_DIR / snapshots[dash_id]).write_text(json.dumps(body, indent=2) + "\n")
@@ -1085,10 +1343,20 @@ def publish_eks_restarts() -> str:
     return _put_dashboard("elasticco-eks-restarts", build_eks_restarts())
 
 
+def publish_log_rate() -> str:
+    return _put_dashboard("elasticco-log-rate", build_log_rate())
+
+
+def publish_telemetry_gap() -> str:
+    return _put_dashboard("elasticco-telemetry-gap", build_telemetry_gap())
+
+
 def publish_all() -> list[str]:
     return [
         publish_incident_overview(),
         publish_distributed_traces(),
         publish_e2e_tracing(),
         publish_eks_restarts(),
+        publish_log_rate(),
+        publish_telemetry_gap(),
     ]

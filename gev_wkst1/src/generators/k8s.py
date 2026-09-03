@@ -9,6 +9,15 @@ SCOPE = "all"
 CLUSTER_CLOUD = "aws"
 
 
+def _kill_times(world: World, start):
+    """Two OOM waves per checkout-api pod inside the 60-minute incident window."""
+    times = []
+    for i, pod in enumerate(world.pods_for("checkout-api")):
+        times.append((pod, start + timedelta(minutes=12 + i * 8)))
+        times.append((pod, start + timedelta(minutes=38 + i * 6)))
+    return times
+
+
 def _pod_resources(world: World, pod, cur, start, end, incident, progress, rng, restarts):
     """Memory/CPU for one pod. Only checkout-api OOMs during the incident."""
     checkout = world.service("checkout-api")
@@ -22,11 +31,18 @@ def _pod_resources(world: World, pod, cur, start, end, incident, progress, rng, 
     if pod.service == "checkout-api":
         version = bad_ver if incident else good_ver
         if incident:
-            base_mi = 180 + progress * 360 + checkout_idx * 20
-            mem = int(min(limit * 0.98, (base_mi + rng.randint(-10, 15)) * 1024 * 1024))
-            if progress > 0.35 + checkout_idx * 0.12 and rng.random() < 0.15:
-                restarts[pod.name] += 1
+            kills = _kill_times(world, start)
+            n = sum(1 for p, ts in kills if p.name == pod.name and cur >= ts)
+            restarts[pod.name] = n
+            just_killed = any(
+                p.name == pod.name and 0 <= (cur - ts).total_seconds() < 180
+                for p, ts in kills
+            )
+            if just_killed:
                 mem = int(80 * 1024 * 1024)
+            else:
+                base_mi = 180 + progress * 360 + checkout_idx * 20
+                mem = int(min(limit * 0.98, (base_mi + rng.randint(-10, 15)) * 1024 * 1024))
             cpu = int((50_000_000 + rng.randint(0, 40_000_000)) * 1.6)
         else:
             mem = int((140 + rng.randint(-20, 30)) * 1024 * 1024)
@@ -142,58 +158,54 @@ def emit_pod_metrics(world: World, t0, t1, anchor):
 
 
 def emit_k8s_events(world: World, t0, t1, anchor):
-    start, end = world.incident_window(anchor)
+    start, _end = world.incident_window(anchor)
     cluster = world.cluster["name"]
-    for i, pod in enumerate(world.pods_for("checkout-api")):
-        oom_ts = start + timedelta(minutes=12 + i * 8)
-        if not (t0 <= oom_ts < t1):
-            continue
-        yield DS_K8S_EVENT, {
-            "@timestamp": iso(oom_ts),
-            "data_stream": ds_meta("logs", "elasticco.k8s.event"),
-            "event": {"kind": "event", "category": ["process"], "type": ["info"]},
-            "orchestrator": {"cluster": {"name": cluster}},
-            "host": {"name": pod.node, "hostname": pod.node},
-            "kubernetes": {
-                "cluster": {"name": cluster},
-                "namespace": pod.namespace,
-                "pod": {"name": pod.name, "uid": pod.uid},
-                "node": {"name": pod.node},
-                "event": {
-                    "reason": "OOMKilled",
-                    "type": "Warning",
-                    "message": f"Container checkout-api in pod {pod.name} killed due to memory limit",
+    bad_ver = world.service("checkout-api").get("deploy_bad")
+    for pod, oom_ts in _kill_times(world, start):
+        if t0 <= oom_ts < t1:
+            yield DS_K8S_EVENT, {
+                "@timestamp": iso(oom_ts),
+                "data_stream": ds_meta("logs", "elasticco.k8s.event"),
+                "event": {"kind": "event", "category": ["process"], "type": ["info"]},
+                "orchestrator": {"cluster": {"name": cluster}},
+                "host": {"name": pod.node, "hostname": pod.node},
+                "kubernetes": {
+                    "cluster": {"name": cluster},
+                    "namespace": pod.namespace,
+                    "pod": {"name": pod.name, "uid": pod.uid},
+                    "node": {"name": pod.node},
+                    "event": {
+                        "reason": "OOMKilled",
+                        "type": "Warning",
+                        "message": f"Container checkout-api in pod {pod.name} killed due to memory limit",
+                    },
                 },
-            },
-            "message": f"OOMKilled: {pod.name} checkout-api exceeded memory limit {pod.mem_limit}",
-            "service": {
-                "name": "checkout-api",
-                "version": world.service("checkout-api").get("deploy_bad"),
-            },
-            "labels": base_labels(),
-            "tags": ["synthetic", "kubernetes", "oom"],
-        }
+                "message": f"OOMKilled: {pod.name} checkout-api exceeded memory limit {pod.mem_limit}",
+                "service": {"name": "checkout-api", "version": bad_ver},
+                "labels": base_labels(),
+                "tags": ["synthetic", "kubernetes", "oom"],
+            }
         backoff_ts = oom_ts + timedelta(seconds=45)
         if t0 <= backoff_ts < t1:
             yield DS_K8S_EVENT, {
                 "@timestamp": iso(backoff_ts),
                 "data_stream": ds_meta("logs", "elasticco.k8s.event"),
                 "event": {"kind": "event", "category": ["process"], "type": ["info"]},
-            "orchestrator": {"cluster": {"name": cluster}},
-            "host": {"name": pod.node, "hostname": pod.node},
-            "kubernetes": {
-                "cluster": {"name": cluster},
-                "namespace": pod.namespace,
-                "pod": {"name": pod.name, "uid": pod.uid},
-                "node": {"name": pod.node},
-                "event": {
-                    "reason": "BackOff",
+                "orchestrator": {"cluster": {"name": cluster}},
+                "host": {"name": pod.node, "hostname": pod.node},
+                "kubernetes": {
+                    "cluster": {"name": cluster},
+                    "namespace": pod.namespace,
+                    "pod": {"name": pod.name, "uid": pod.uid},
+                    "node": {"name": pod.node},
+                    "event": {
+                        "reason": "BackOff",
                         "type": "Warning",
                         "message": f"Back-off restarting failed container checkout-api in pod {pod.name}",
                     },
                 },
                 "message": f"BackOff restarting container checkout-api in {pod.name}",
-                "service": {"name": "checkout-api"},
+                "service": {"name": "checkout-api", "version": bad_ver},
                 "labels": base_labels(),
                 "tags": ["synthetic", "kubernetes"],
             }
@@ -216,7 +228,7 @@ def emit_checkout_logs(world: World, t0, t1, anchor):
             "data_stream": ds_meta("logs", "elasticco.checkout"),
             "message": (
                 f"order={h.order_id} tenant={h.tenant_id} trace_id={h.trace_id} "
-                f"db_wait_ms={rng.randint(2400, 3800)} status=slow_query"
+                f"db_wait_ms={rng.randint(2700, 2900)} status=slow_query"
             ),
             "log": {"level": "error"},
             "service": {"name": "checkout-api", "version": bad_ver},
@@ -234,12 +246,12 @@ def emit_checkout_logs(world: World, t0, t1, anchor):
             "tags": ["synthetic", "checkout"],
         }
 
-    for i, pod in enumerate(checkout_pods):
-        ts = start + timedelta(minutes=11 + i * 8)
-        if not (t0 <= ts < t1):
+    for pod, ts in _kill_times(world, start):
+        log_ts = ts - timedelta(seconds=12)
+        if not (t0 <= log_ts < t1):
             continue
         yield DS_CHECKOUT, {
-            "@timestamp": iso(ts),
+            "@timestamp": iso(log_ts),
             "data_stream": ds_meta("logs", "elasticco.checkout"),
             "message": (
                 f"FATAL java.lang.OutOfMemoryError: Java heap space "

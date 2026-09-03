@@ -1,0 +1,7 @@
+{
+  "index_patterns": ["logs-elasticco.inventory-*"],
+  "data_stream": {},
+  "priority": 500,
+  "composed_of": ["logs-elasticco.inventory"],
+  "_meta": { "demo": "elastic-co" }
+}

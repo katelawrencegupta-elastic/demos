@@ -264,10 +264,10 @@ def emit(world: World, t0: datetime, t1: datetime, anchor: datetime):
             n = max(1, int(base_calls * weight + rng.randint(0, 2)))
             # Latency: checkout spikes during incident
             if service == "checkout-api" and incident:
-                avg_ms = rng.randint(2400, 3600)
+                avg_ms = rng.randint(3000, 3200)
                 fails = max(0, int(n * 0.15))
             elif service == "edge-gateway" and incident:
-                avg_ms = rng.randint(2500, 3700)
+                avg_ms = rng.randint(3050, 3250)
                 fails = max(0, int(n * 0.12))
             else:
                 avg_ms = rng.randint(40, 180)
@@ -306,7 +306,7 @@ def emit(world: World, t0: datetime, t1: datetime, anchor: datetime):
             n = max(1, base_calls + rng.randint(0, 2))
             lat = base_ms
             if incident and caller == "checkout-api" and resource == "postgresql":
-                lat = rng.randint(2400, 3800)
+                lat = rng.randint(2700, 2900)
                 outcome = "failure" if rng.random() < 0.2 else "success"
             elif incident and caller in ("edge-gateway", "checkout-api") and resource in (
                 "checkout-api",

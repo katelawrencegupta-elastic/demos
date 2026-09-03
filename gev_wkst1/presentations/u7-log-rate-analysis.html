@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U7 · Log Rate Analysis — Elastic Co.</title>
+  <style>
+    :root {
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls { display: flex; flex-direction: column; gap: 0.45rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity 0.35s, transform 0.35s;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .slide-header { margin-bottom: 1.25rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 54rem; line-height: 1.55; margin: 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
+    .hero-stat .num { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .hero-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .hero-stats { grid-template-columns: 1fr; }
+      .toolbar { left: 0; }
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
+    }
+    .card-body { padding: 1rem; }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(181,121,42,0.4); }
+    .badge.ok { color: var(--success); border-color: rgba(63,111,78,0.4); }
+    .badge.danger { color: var(--danger); border-color: rgba(163,61,61,0.4); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: var(--surface-2); }
+    tr.clickable.selected td { background: var(--accent-dim); }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 4px;
+      font-family: var(--mono); font-size: 0.7rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+    }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .callout.warn { border-color: var(--warn); background: rgba(181,121,42,0.1); }
+    .callout.success { border-color: var(--success); background: rgba(63,111,78,0.1); }
+    .hist { display: flex; align-items: flex-end; gap: 3px; height: 120px; padding: 0.25rem 0; }
+    .hist span {
+      flex: 1; background: var(--surface-2); border-radius: 2px 2px 0 0; min-height: 4px;
+    }
+    .hist span.spike { background: var(--danger); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: var(--border); cursor: pointer; }
+    .dots button.active { background: var(--accent); }
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Co.</div>
+      <h1>U7 · Log rate analysis</h1>
+      <p>A log spike is not an outage until AIOps names the field-value combination that caused it.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlay">▶ Walk the analysis</button>
+        <button id="btnFullscreen">Fullscreen</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+        <section class="slide active">
+          <div class="slide-header">
+            <span class="pill">Use case 7</span><span class="pill">AIOps Labs</span>
+            <h2>Logs are on fire. Why?</h2>
+            <p>A second planted scenario — not the checkout OOM. <strong>inventory-service</strong> canary left <code>SkuCache</code> at DEBUG. Ingest volume cliffs. APM for inventory stays healthy. Close is restore INFO, not rollback checkout-api.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">Baseline</div><div class="lbl">Quiet INFO from inventory.Reserve every ~2 min</div></div>
+            <div class="hero-stat"><div class="num">Deviation</div><div class="lbl">DEBUG every 2s · last ~35 min · version 4.0.9</div></div>
+            <div class="hero-stat"><div class="num">Close</div><div class="lbl">Turn DEBUG off. Do not page. Do not kubectl.</div></div>
+          </div>
+          <div class="callout">
+            <strong>Promise</strong>
+            <p>Log rate analysis compares a spike to a baseline and ranks statistically significant field-value pairs — <code>log.level</code>, <code>log.logger</code>, <code>service.name</code> — instead of grepping millions of lines.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Histogram</span>
+            <h2>See the cliff, then ask why</h2>
+            <p>Discover or the Log Rate dashboard, Last 2 hours. The last ~35 minutes are a wall. Counting is not RCA.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Inventory log volume (schematic) <span class="badge danger">DEBUG flood</span></div>
+            <div class="card-body">
+              <div class="hist" id="hist"></div>
+              <p style="margin:0.75rem 0 0;color:var(--muted);font-size:0.82rem;">Quiet baseline → canary ships 4.0.9 with SkuCache DEBUG → ingest cost and noise, not checkout latency.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Significant terms</span>
+            <h2>What Log Rate Analysis should name</h2>
+            <p>Click the spike. Hover rows to overlay impact. Pin a term, copy as filter, open Discover or Log pattern analysis.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Field</th><th>Value</th><th>Why it wins</th></tr></thead>
+              <tbody>
+                <tr><td><code>log.level</code></td><td>debug</td><td>Baseline is INFO. The spike is a level change, not more errors.</td></tr>
+                <tr><td><code>log.logger</code></td><td>com.elasticco.inventory.SkuCache</td><td>One class left verbose after a canary.</td></tr>
+                <tr><td><code>service.name</code></td><td>inventory-service</td><td>Not checkout-api. Not the mesh.</td></tr>
+                <tr><td><code>service.version</code></td><td>4.0.9</td><td>Verbose canary vs quiet 4.0.8 INFO.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <strong>Not the checkout story</strong>
+            <p>Do not roll back checkout-api v2.4.1. APM inventory p95 is still fine. This is a log-volume incident (cost / noise). Restore INFO or revert the log config.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Walk</span>
+            <h2>Two data views, same product</h2>
+            <p>Primary path is the DEBUG flood. Optional: orchestrator-only analysis names the availability incident instead.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">Beats <span class="badge info" id="walkLabel">All</span></div>
+            <div class="card-body">
+              <table id="walkTable">
+                <thead><tr><th>#</th><th>Do</th><th>Say</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Beat 2</span><span class="pill">U1–U6</span>
+            <h2>Same product · Orchestrator Logs</h2>
+            <p>Switch Log rate analysis to <strong>Elastic Co. Orchestrator Logs</strong>. Click the spike in the last ~60 minutes. This is the checkout retry storm — not SkuCache.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Field</th><th>Value</th><th>Why it wins</th></tr></thead>
+              <tbody>
+                <tr><td><code>tenant.id</code></td><td>acme-retail</td><td>Peers globex-mart / initech-b2b stay on quiet INFO.</td></tr>
+                <tr><td><code>log.level</code></td><td>error</td><td>Baseline is INFO. The cliff is retries, not DEBUG.</td></tr>
+                <tr><td><code>orchestrator.task_id</code></td><td>charge_payment</td><td>DAG <code>fulfillment.checkout</code> retrying after checkout-api timeouts.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <strong>Do not mix closes</strong>
+            <p>Beat 1 (inventory DEBUG) → restore INFO. Beat 2 (orchestrator ERROR) → roll back checkout-api <code>v2.4.1</code> → <code>v2.4.0</code> on the case.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Kibana</span>
+            <h2>Where to stand</h2>
+            <p>Last 2 hours · <code>labels.demo: elastic-co</code>. Stream keeps both the DEBUG flood and the orchestrator ERROR storm through now.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Open this</th><th>Show</th></tr></thead>
+              <tbody id="kibanaTable"></tbody>
+            </table>
+          </div>
+          <div class="callout success">
+            <strong>Line</strong>
+            <p>A log spike is not an outage until Log Rate Analysis tells you which field-value combination caused it.</p>
+          </div>
+        </section>
+      </div>
+      <div class="toolbar">
+        <button id="btnPrev">← Prev</button>
+        <div class="dots" id="dots"></div>
+        <span class="mono" id="slideCounter">1 / 6</span>
+        <span style="color:var(--muted);font-size:0.75rem"><kbd>←</kbd> <kbd>→</kbd> · <kbd>F</kbd></span>
+        <button id="btnNext">Next →</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const SLIDES = ["Frame", "Histogram", "Terms", "Walk", "Beat 2", "Kibana"];
+
+    const WALKS = [
+      ["Discover · Elastic Co. Logs", "Histogram cliff in the last ~35 minutes. Counting is not RCA."],
+      ["ML → AIOps Labs → Log rate analysis", "Same data view. Click the spike. Baseline vs deviation brushes."],
+      ["Significant terms table", "debug · SkuCache · inventory-service · 4.0.9. Hover / pin / copy filter."],
+      ["APM inventory-service", "Latency still healthy. Do not page. Do not rollback checkout-api."],
+      ["Beat 2: Orchestrator Logs", "Switch data view. Terms: acme-retail · error · charge_payment. That is U1–U6."],
+    ];
+
+    const KIBANA = [
+      ["Discover · elasticco-logs or elasticco-inventory", "See the cliff; Last 2 hours"],
+      ["Machine Learning → AIOps Labs → Log rate analysis", "Click the spike; significant terms"],
+      ["Dashboard elasticco-log-rate", "Fallback — inventory on top, orchestrator tenant×level below"],
+      ["APM → inventory-service", "Prove traces are not beat 1"],
+      ["Log rate analysis · elasticco-orchestrator", "Beat 2 — acme-retail · error · charge_payment"],
+      ["Log pattern analysis (follow-on)", "SkuCache message groups or retry lines"],
+    ];
+
+    let currentSlide = 0;
+    let walkRow = -1;
+    let playTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function buildHist() {
+      const el = document.getElementById("hist");
+      const heights = [12, 14, 11, 13, 12, 15, 11, 14, 12, 13, 78, 92, 88, 95, 90];
+      heights.forEach((h, i) => {
+        const s = document.createElement("span");
+        s.style.height = h + "%";
+        if (i >= 10) s.classList.add("spike");
+        el.appendChild(s);
+      });
+    }
+
+    function buildWalk() {
+      const body = document.querySelector("#walkTable tbody");
+      WALKS.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.classList.add("clickable");
+        tr.innerHTML = `<td class="mono">${i + 1}</td><td>${row[0]}</td><td>${row[1]}</td>`;
+        tr.addEventListener("click", () => highlightWalk(i));
+        body.appendChild(tr);
+      });
+    }
+
+    function highlightWalk(i) {
+      walkRow = i;
+      document.querySelectorAll("#walkTable tbody tr").forEach((tr, n) => {
+        tr.classList.toggle("selected", n === i);
+      });
+      document.getElementById("walkLabel").textContent = `Beat ${i + 1} / ${WALKS.length}`;
+    }
+
+    function playWalk() {
+      clearInterval(playTimer);
+      goSlide(3);
+      let i = 0;
+      highlightWalk(0);
+      playTimer = setInterval(() => {
+        i++;
+        if (i >= WALKS.length) { clearInterval(playTimer); return; }
+        highlightWalk(i);
+      }, 1400);
+    }
+
+    const kBody = document.getElementById("kibanaTable");
+    KIBANA.forEach(([a, b]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+      kBody.appendChild(tr);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnPlay").addEventListener("click", playWalk);
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+
+    buildNav();
+    buildHist();
+    buildWalk();
+  </script>
+</body>
+</html>

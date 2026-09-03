@@ -3,22 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>U1 · Orchestrator Log Structuring — Elastic Stack</title>
+  <title>U1 · Orchestrator Log Structuring — Elastic Co.</title>
   <style>
     :root {
-      --bg: #0b0d0e;
-      --surface: #141619;
-      --surface-2: #1c1f24;
-      --border: #2a2f36;
-      --text: #e4e8ef;
-      --muted: #9aa3b2;
-      --accent: #00bfb3;
-      --accent-dim: rgba(0, 191, 179, 0.12);
-      --warn: #f5a524;
-      --success: #32d583;
-      --danger: #f97066;
-      --font: "Inter", "Segoe UI", system-ui, sans-serif;
-      --mono: "SF Mono", "Fira Code", "Consolas", monospace;
+      --bg: #f3efe6;
+      --surface: #fffcf7;
+      --surface-2: #ebe4d6;
+      --border: #d5ccbe;
+      --text: #2a2622;
+      --muted: #6d655c;
+      --accent: #9c4a32;
+      --accent-dim: rgba(156, 74, 50, 0.12);
+      --accent-border: rgba(156, 74, 50, 0.38);
+      --warn: #b5792a;
+      --success: #3f6f4e;
+      --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
     }
 
     * { box-sizing: border-box; }
@@ -45,7 +46,7 @@
       gap: 1rem;
     }
 
-    .brand { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
     .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
     .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
 
@@ -69,7 +70,7 @@
     .nav li button:hover { background: var(--surface-2); color: var(--text); }
     .nav li button.active {
       background: var(--accent-dim);
-      border-color: rgba(0, 191, 179, 0.35);
+      border-color: var(--accent-border);
       color: var(--text);
     }
     .nav .idx {
@@ -103,7 +104,7 @@
       cursor: pointer;
     }
     .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
-    .controls button.primary { background: var(--accent-dim); border-color: rgba(0,191,179,0.4); color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
 
     main {
       position: relative;
@@ -173,7 +174,7 @@
     }
     .badge.warn { color: var(--warn); border-color: rgba(245,165,36,0.35); }
     .badge.ok { color: var(--success); border-color: rgba(50,213,131,0.35); }
-    .badge.info { color: var(--accent); border-color: rgba(0,191,179,0.35); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
     .card-body { padding: 1rem; }
 
     .flow-wrap { width: 100%; overflow-x: auto; }
@@ -194,7 +195,7 @@
     code, .mono {
       font-family: var(--mono);
       font-size: 0.78rem;
-      color: #c9d4e3;
+      color: var(--text);
     }
 
     pre.doc {
@@ -269,7 +270,7 @@
     }
     .step-item.done { opacity: 0.55; }
     .step-item.active {
-      border-color: rgba(0,191,179,0.45);
+      border-color: var(--accent-border);
       background: var(--accent-dim);
     }
     .step-item .num { color: var(--muted); font-family: var(--mono); }
@@ -295,7 +296,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 0.65rem 1.25rem;
-      background: rgba(11, 13, 14, 0.92);
+      background: var(--surface);
       border-top: 1px solid var(--border);
       backdrop-filter: blur(8px);
     }
@@ -349,7 +350,7 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="brand">Elastic Observability</div>
+      <div class="brand">Elastic Co.</div>
       <h1>U1 · Orchestrator log structuring</h1>
       <p>Elastic stack components — ingest pipeline, data stream, Discover.</p>
       <ul class="nav" id="nav"></ul>
@@ -708,28 +709,28 @@
           const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
           line.setAttribute("x1", x - 12); line.setAttribute("y1", y + h/2);
           line.setAttribute("x2", x); line.setAttribute("y2", y + h/2);
-          line.setAttribute("stroke", "#2a2f36"); line.setAttribute("stroke-width", "1.5");
+          line.setAttribute("stroke", "#d5ccbe"); line.setAttribute("stroke-width", "1.5");
           svg.appendChild(line);
           const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
           poly.setAttribute("points", `${x},${y+h/2} ${x-6},${y+h/2-4} ${x-6},${y+h/2+4}`);
-          poly.setAttribute("fill", "#2a2f36");
+          poly.setAttribute("fill", "#d5ccbe");
           svg.appendChild(poly);
         }
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", x); rect.setAttribute("y", y);
         rect.setAttribute("width", w); rect.setAttribute("height", h);
         rect.setAttribute("rx", "6");
-        rect.setAttribute("fill", node.hot ? "rgba(0,191,179,0.12)" : "#1c1f24");
-        rect.setAttribute("stroke", node.hot ? "#00bfb3" : "#2a2f36");
+        rect.setAttribute("fill", node.hot ? "rgba(156,74,50,0.12)" : "#ebe4d6");
+        rect.setAttribute("stroke", node.hot ? "#9c4a32" : "#d5ccbe");
         rect.setAttribute("stroke-width", node.hot ? "2" : "1");
         const t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
         t1.setAttribute("x", x + w/2); t1.setAttribute("y", y + 20);
-        t1.setAttribute("text-anchor", "middle"); t1.setAttribute("fill", "#e4e8ef");
+        t1.setAttribute("text-anchor", "middle"); t1.setAttribute("fill", "#2a2622");
         t1.setAttribute("font-size", "11"); t1.setAttribute("font-weight", "600");
         t1.textContent = node.title;
         const t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
         t2.setAttribute("x", x + w/2); t2.setAttribute("y", y + 36);
-        t2.setAttribute("text-anchor", "middle"); t2.setAttribute("fill", "#9aa3b2");
+        t2.setAttribute("text-anchor", "middle"); t2.setAttribute("fill", "#6d655c");
         t2.setAttribute("font-size", "10");
         t2.textContent = node.sub;
         g.appendChild(rect); g.appendChild(t1); g.appendChild(t2);

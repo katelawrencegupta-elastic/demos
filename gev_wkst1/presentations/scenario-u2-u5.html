@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U2 + U5 · Trace to RCA — Elastic Co.</title>
+  <style>
+    :root {
+      --bg: #f3efe6; --surface: #fffcf7; --surface-2: #ebe4d6; --border: #d5ccbe;
+      --text: #2a2622; --muted: #6d655c; --accent: #9c4a32; --accent-dim: rgba(156,74,50,0.12);
+      --accent-border: rgba(156,74,50,0.38);
+      --warn: #b5792a; --success: #3f6f4e; --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
+    .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--surface);
+      padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .brand { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .sidebar h1 { font-size: 1rem; line-height: 1.35; margin: 0; font-weight: 600; }
+    .sidebar p { font-size: 0.78rem; color: var(--muted); margin: 0; line-height: 1.45; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
+      color: var(--muted); padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active { background: var(--accent-dim); border-color: var(--accent-border); color: var(--text); }
+    .nav .idx {
+      width: 1.4rem; height: 1.4rem; border-radius: 999px; border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls { display: flex; flex-direction: column; gap: 0.45rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.45rem 0.65rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+    }
+    .controls button:hover, .toolbar button:hover { border-color: var(--accent); }
+    .controls button.primary { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; padding: 2rem 2.5rem 5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none; transform: translateX(24px); transition: opacity 0.35s, transform 0.35s;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .slide-header { margin-bottom: 1.25rem; }
+    .pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.35rem;
+    }
+    .slide-header h2 { font-size: 1.65rem; margin: 0.5rem 0 0.35rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 54rem; line-height: 1.55; margin: 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .swim, .hero-stats { grid-template-columns: 1fr !important; }
+      .phase:not(:last-child)::after { content: none; }
+      .toolbar { left: 0; }
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .card-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600;
+    }
+    .card-body { padding: 1rem; }
+    .badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); font-weight: 600;
+    }
+    .badge.warn { color: var(--warn); border-color: rgba(181,121,42,0.4); }
+    .badge.ok { color: var(--success); border-color: rgba(63,111,78,0.4); }
+    .badge.danger { color: var(--danger); border-color: rgba(163,61,61,0.4); }
+    .badge.info { color: var(--accent); border-color: var(--accent-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    code, .mono { font-family: var(--mono); font-size: 0.78rem; color: var(--text); }
+    pre.doc {
+      margin: 0; padding: 0.85rem; background: var(--surface-2); border-radius: 4px;
+      font-family: var(--mono); font-size: 0.7rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+    }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.85rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem;
+    }
+    .callout strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 1.25rem; }
+    .hero-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; }
+    .hero-stat .num { font-size: 1.05rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+    .hero-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    .swim { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+    .phase {
+      position: relative;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem;
+    }
+    .phase:not(:last-child)::after {
+      content: "→"; position: absolute; right: -0.6rem; top: 0.85rem;
+      color: var(--accent); font-size: 1rem; z-index: 1;
+    }
+    .phase h3 {
+      margin: 0 0 0.65rem; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    }
+    .phase.hot { border-color: var(--accent-border); background: var(--accent-dim); }
+    .node {
+      display: block; width: 100%; text-align: left; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.55rem;
+      margin-bottom: 0.4rem; cursor: pointer; font: inherit; color: var(--text);
+    }
+    .node:last-child { margin-bottom: 0; }
+    .node:hover { border-color: var(--accent); }
+    .node.active { border-color: var(--accent); background: var(--accent-dim); }
+    .node.done { opacity: 0.55; }
+    .node .when { display: block; font-family: var(--mono); font-size: 0.65rem; color: var(--warn); }
+    .node .title { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 0.1rem; }
+    .pipeline-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .pipeline-controls .progress {
+      flex: 1; min-width: 140px; height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden;
+    }
+    .pipeline-controls .progress > span { display: block; height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+    .detail-panel {
+      padding: 0.85rem 1rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 4px; min-height: 7rem;
+    }
+    .detail-panel h4 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+    .detail-panel p { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+    .detail-panel p:last-child { margin-bottom: 0; }
+    .meta { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.65rem; }
+    .waterfall { display: grid; gap: 0.4rem; }
+    .wf-row {
+      display: grid; grid-template-columns: 8.5rem 1fr 3.6rem;
+      gap: 0.5rem; align-items: center; font-size: 0.78rem; cursor: pointer;
+      padding: 0.2rem 0.25rem; border-radius: 4px;
+    }
+    .wf-row:hover { background: var(--surface-2); }
+    .wf-row.active { background: var(--accent-dim); }
+    .wf-row.hot .wf-svc { color: var(--danger); }
+    .wf-svc { font-family: var(--mono); font-size: 0.72rem; font-weight: 600; }
+    .wf-bar-wrap { height: 16px; background: var(--surface-2); border-radius: 3px; position: relative; }
+    .wf-bar {
+      position: absolute; top: 0; height: 100%; border-radius: 3px; background: var(--accent);
+    }
+    .wf-bar.slow { background: var(--danger); }
+    .wf-ms { text-align: right; font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+    .bar-chart { display: grid; gap: 0.65rem; }
+    .bar-row { display: grid; grid-template-columns: 7.2rem 1fr 4rem; gap: 0.65rem; align-items: center; font-size: 0.82rem; }
+    .bar-track { height: 22px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .bar-fill.danger { background: var(--danger); }
+    .bar-fill.ok { background: var(--success); }
+    .bar-val { text-align: right; font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 220px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 1.25rem; background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.35rem; }
+    .dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: var(--border); cursor: pointer; }
+    .dots button.active { background: var(--accent); }
+    kbd {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.1rem 0.35rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">Elastic Co.</div>
+      <h1>U2 + U5 · Trace to RCA</h1>
+      <p>Waterfall names who is hurt and where time went. Agent Builder writes the same evidence into the case.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnPlay">▶ Walk the lab</button>
+        <button id="btnCopyPrompt">Copy RCA prompt</button>
+        <button id="btnCopyEsql">Copy tenant ES|QL</button>
+        <button id="btnFullscreen">Fullscreen</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+
+        <section class="slide active">
+          <div class="slide-header">
+            <span class="pill">Combined lab</span><span class="pill">U2 traces</span><span class="pill">U5 Agent Builder</span>
+            <h2>From the seven-hop request to a rollback on the case</h2>
+            <p>Same planted incident. Do not reset between surfaces. U2 answers <strong>who is hurt</strong> and <strong>where time went</strong>. U5 answers <strong>what to do</strong> — tool-backed RCA, then roll back checkout-api <code>v2.4.1</code> → <code>v2.4.0</code>.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="num">Detect</div><div class="lbl">App error-rate or native SLO names checkout-api / acme-retail</div></div>
+            <div class="hero-stat"><div class="num">Trace</div><div class="lbl">Seven hops · FOR UPDATE ~2.8s · peers stay near SLO</div></div>
+            <div class="hero-stat"><div class="num">Close</div><div class="lbl">elasticco-rca-agent → approve rollback into the case</div></div>
+          </div>
+          <div class="callout">
+            <strong>Promise</strong>
+            <p>You walk the waterfall by hand so the room trusts the evidence. Then the agent calls the same ES|QL — tenant p95, slow Postgres, OOM — and the case holds the audit. No terminal. No kubectl.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Visual workflow</span>
+            <h2>Click a beat, or press Walk</h2>
+            <p>Three phases, ten beats. Detect is U5’s entry. Trace is U2. RCA is U5’s close — the agent must match what you just showed on the waterfall.</p>
+          </div>
+          <div class="pipeline-controls">
+            <button id="btnStepBack">◀</button>
+            <button id="btnStepFwd">▶</button>
+            <button id="btnStepReset">Reset</button>
+            <div class="progress"><span id="tlProgress"></span></div>
+            <span class="mono" id="tlLabel">All beats</span>
+          </div>
+          <div class="swim" id="swim"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">This beat</div>
+              <div class="card-body"><div class="detail-panel" id="tlDetail"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head">Evidence / line</div>
+              <div class="card-body"><pre class="doc" id="tlEvidence"></pre></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">U2 in the room</span>
+            <h2>Who is hurt · where time went</h2>
+            <p>Dashboard <strong>Elastic Co. — End-to-End Tracing</strong> or APM waterfall. Filter <code>tenant.id: acme-retail</code>. Expand the Postgres span. Then prove peers are fine.</p>
+          </div>
+          <div class="pipeline-controls">
+            <button id="btnHopBack">◀</button>
+            <button id="btnHopFwd">▶</button>
+            <button id="btnHopPlay">Walk hops</button>
+            <div class="progress"><span id="hopProgress"></span></div>
+            <span class="mono" id="hopLabel">All hops</span>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Waterfall · trace 271f8e318871… <span class="badge danger">FOR UPDATE</span></div>
+              <div class="card-body">
+                <div class="waterfall" id="waterfall"></div>
+                <div class="detail-panel" style="margin-top:0.85rem;" id="hopDetail"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">checkout-api p95 by tenant <span class="badge info">ES|QL</span></div>
+              <div class="card-body">
+                <div class="bar-chart" id="tenantBars"></div>
+                <p style="margin:0.85rem 0 0;color:var(--muted);font-size:0.82rem;line-height:1.5;">
+                  <strong>Line:</strong> seven hops, one tenant label, time spent in FOR UPDATE. globex-mart and initech-b2b stay near the 400 ms SLO.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">U5 in the room</span>
+            <h2>Same evidence, written by the agent</h2>
+            <p>Do not invent counts. If tools return 0% errors, skip to the open case + <code>elasticco-checkout-correlated-rca</code>.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Paste into Agent Builder</div>
+              <div class="card-body">
+                <pre class="doc">checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.</pre>
+                <p style="margin:0.75rem 0 0;color:var(--muted);font-size:0.82rem;line-height:1.5;">Then: <strong>approve rollback to v2.4.0</strong>. Paste the comment into the Observability case (or use Cases/email tools if they appear).</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">Tools must match the waterfall</div>
+              <div class="card-body">
+                <table>
+                  <thead><tr><th>Tool</th><th>Must show</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>elasticco-rca-checkout-errors</code></td><td>acme-retail p95 vs peers</td></tr>
+                    <tr><td><code>elasticco-rca-slow-postgres</code></td><td>FOR UPDATE &gt;2s for acme-retail</td></tr>
+                    <tr><td><code>elasticco-rca-oom-restarts</code></td><td>OOMKilled / restart.count on checkout-api</td></tr>
+                    <tr><td><code>elasticco-rca-orchestrator-retries</code></td><td>DAG fulfillment.checkout</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <strong>Close</strong>
+            <p>Roll back checkout-api v2.4.1 → v2.4.0. The case thread is the audit. <code>cli incident</code> is facilitator-only — do not claim “without leaving Elastic” on a terminal path.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="slide-header">
+            <span class="pill">Kibana</span>
+            <h2>Tabs to pre-open</h2>
+            <p>Time range Last 2 hours · <code>labels.demo: elastic-co</code>. Stream <code>--tick 60</code> keeps the 60-minute window through now so U5 tools are not empty.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Open this</th><th>Show</th></tr></thead>
+              <tbody id="kibanaTable"></tbody>
+            </table>
+          </div>
+          <div class="callout">
+            <strong>If time is short</strong>
+            <p>Skip ES|QL in Discover — the E2E dashboard tenant lines are enough. If Agent Builder is cold, stop after the FOR UPDATE span + the open case. Never open a terminal unless they ask how it was seeded.</p>
+          </div>
+        </section>
+
+      </div>
+      <div class="toolbar">
+        <button id="btnPrev">← Prev</button>
+        <div class="dots" id="dots"></div>
+        <span class="mono" id="slideCounter">1 / 5</span>
+        <span style="color:var(--muted);font-size:0.75rem"><kbd>←</kbd> <kbd>→</kbd> · <kbd>F</kbd></span>
+        <button id="btnNext">Next →</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const SLIDES = ["Frame", "Visual workflow", "Waterfall", "Agent close", "Kibana"];
+
+    const PROMPT = "checkout-api is failing for acme-retail — reconstruct RCA and recommend one remediation.";
+
+    const TENANT_ESQL = `FROM traces-apm-default
+| WHERE @timestamp > NOW() - 2 hours
+| WHERE labels.demo == "elastic-co"
+| WHERE processor.event == "transaction" AND service.name == "checkout-api"
+| STATS p95 = PERCENTILE(transaction.duration.us, 95), n = COUNT(*) BY tenant.id
+| SORT p95 DESC`;
+
+    const STEPS = [
+      {
+        phase: 0, when: "U5 entry", title: "Alert or SLO",
+        detail: "APM Services / Service map badges checkout-api, or page on elasticco-app-checkout-error-rate or the native SLO elasticco-slo-checkout-availability. Both name checkout-api and acme-retail — not a host CPU threshold.",
+        kibana: "Alerts or Observability → SLOs",
+        product: "Detect",
+        evidence: "APM inventory / map badge\nelasticco-app-checkout-error-rate\nelasticco-slo-checkout-availability\nerror_rate > 10% · checkout-api · acme-retail"
+      },
+      {
+        phase: 0, when: "say", title: "Go to the request",
+        detail: "Do not add memory. Do not kubectl. The next question is the checkout path: who is hurt, and where did the latency go?",
+        kibana: "Leave Alerts open; switch to APM / E2E dashboard",
+        product: "Detect",
+        evidence: "Ignore: elasticco-noisy-node-cpu\nCorrelation (optional later): elasticco-checkout-correlated-rca\nNext surface: Elastic Co. — End-to-End Tracing"
+      },
+      {
+        phase: 1, when: "U2", title: "Seven hops",
+        detail: "One checkout crosses edge-gateway → identity-service → checkout-api → inventory / fraud / payments → postgres + redis + kafka → notification-service.",
+        kibana: "Dashboard Elastic Co. — End-to-End Tracing or APM Services",
+        product: "Trace",
+        evidence: "hops: 7\ntenant.id on every span\nservice.version: 2.4.1 on checkout-api"
+      },
+      {
+        phase: 1, when: "filter", title: "acme-retail only",
+        detail: "Filter tenant.id: acme-retail. Peer tenants stay on the dashboard for contrast — you need them in the p95 table, not in this waterfall.",
+        kibana: "APM KQL or dashboard tenant control",
+        product: "Trace",
+        evidence: "tenant.id: acme-retail\nhealthy: globex-mart, initech-b2b\nblast radius is one tenant, not the mesh"
+      },
+      {
+        phase: 1, when: "span", title: "FOR UPDATE ~2.8s",
+        detail: "Open a slow transaction. Expand postgresql — SELECT … FOR UPDATE on orders. That span is almost the whole 3.1s p95. Note service.version 2.4.1.",
+        kibana: "APM waterfall · expand db span",
+        product: "Trace",
+        evidence: "span.subtype: postgresql\nstatement: SELECT … FOR UPDATE … orders\nduration ≈ 2800 ms\nservice.version: 2.4.1"
+      },
+      {
+        phase: 1, when: "prove", title: "Tenant p95",
+        detail: "ES|QL PERCENTILE by tenant.id. acme-retail ~3.1s vs globex-mart / initech-b2b near 400ms SLO. Who is hurt is a table, not a guess.",
+        kibana: "Discover ES|QL or Dev Tools _query",
+        product: "Trace",
+        evidence: "acme-retail    p95 ≈ 3120 ms\nglobex-mart    p95 ≈ 180 ms\ninitech-b2b    p95 ≈ 210 ms"
+      },
+      {
+        phase: 1, when: "join", title: "Same trace.id",
+        detail: "Optional: copy 271f8e318871… into Discover orchestrator. Same DAG fulfillment.checkout retries. You do not need a second incident.",
+        kibana: "Discover · Elastic Co. Orchestrator Logs",
+        product: "Trace",
+        evidence: "trace.id: 271f8e318871e99f577feb2cb22cd2d3\njoins: APM waterfall ↔ orchestrator logs\nLine: seven hops, one tenant, time in FOR UPDATE."
+      },
+      {
+        phase: 2, when: "U5", title: "Paste the prompt",
+        detail: "Agent Builder → elasticco-rca-agent. The agent must call tools. Walk acme-retail p95 / FOR UPDATE / OOM from tool results — the same facts you just showed.",
+        kibana: "Agent Builder chat",
+        product: "RCA",
+        evidence: "checkout-api is failing for acme-retail —\nreconstruct RCA and recommend one remediation.\n\nMust not invent. Must not be 0% errors."
+      },
+      {
+        phase: 2, when: "tools", title: "Evidence matches",
+        detail: "Checkout-errors and slow-postgres tools should agree with the waterfall. OOM / restart tools explain why checkout is failing — same window, not a second mystery.",
+        kibana: "Tool results in the conversation",
+        product: "RCA",
+        evidence: "elasticco-rca-checkout-errors\nelasticco-rca-slow-postgres\nelasticco-rca-oom-restarts\nRoot cause: v2.4.1 CartCache.retainAll"
+      },
+      {
+        phase: 2, when: "done", title: "Rollback on the case",
+        detail: "Human: approve rollback to v2.4.0. Paste the agent’s comment into the open Observability case. If Cases/email capabilities appear, use those too.",
+        kibana: "Observability → Cases",
+        product: "RCA",
+        evidence: "Roll back checkout-api from v2.4.1 to v2.4.0.\nAudit: the case thread — not logs-elasticco.incident-default\nNo kubectl. No src.cli incident in front of the customer."
+      },
+    ];
+
+    const PHASES = [
+      { id: "detect", label: "1 · Detect · U5" },
+      { id: "trace", label: "2 · Trace · U2" },
+      { id: "rca", label: "3 · RCA · U5" },
+    ];
+
+    const HOPS = [
+      { n: 1, svc: "edge-gateway", span: "POST /checkout", ms: 2950, cum: 0,
+        detail: "Root transaction — acme-retail tenant.id on the document. Total e2e ~3 s." },
+      { n: 2, svc: "identity-service", span: "POST /v1/token/introspect", ms: 15, cum: 15,
+        detail: "Auth validation — fast, same for all tenants." },
+      { n: 3, svc: "checkout-api", span: "POST /v1/orders", ms: 2800, cum: 30,
+        detail: "Checkout orchestration — service.version 2.4.1 during the incident." },
+      { n: 4, svc: "inventory-service", span: "POST /v1/reserve", ms: 45, cum: 75,
+        detail: "SKU reservation — normal latency." },
+      { n: 5, svc: "orders-db", span: "SELECT … FOR UPDATE", ms: 2800, cum: 120, hot: true,
+        detail: "Postgres lock on orders — the span that answers “where did the time go?”" },
+      { n: 6, svc: "payments-api", span: "POST /v1/charge", ms: 90, cum: 2920,
+        detail: "Charge + ledger after the lock releases." },
+      { n: 7, svc: "notification-service", span: "TOPIC fulfillment.events", ms: 33, cum: 3010,
+        detail: "Async kafka — same trace.id." },
+    ];
+
+    const TENANTS = [
+      { id: "acme-retail", p95: 3120, blast: true },
+      { id: "globex-mart", p95: 180, blast: false },
+      { id: "initech-b2b", p95: 210, blast: false },
+    ];
+
+    const KIBANA = [
+      ["APM Services / Service map", "checkout-api alert badge — U5 entry"],
+      ["Alerts · elasticco-app-checkout-error-rate", "Same alert from the Alerts list — or native SLO"],
+      ["SLOs · elasticco-slo-checkout-availability", "What you page on (checkout-api / acme-retail)"],
+      ["Dashboard elasticco-e2e-tracing", "U2 primary — seven hops, tenant p95"],
+      ["APM → Trace sample", "Expand postgresql FOR UPDATE · note v2.4.1"],
+      ["Discover ES|QL (optional)", "PERCENTILE by tenant.id — skip if late"],
+      ["Discover orchestrator (optional)", "Same trace.id 271f8e318871…"],
+      ["Agent Builder · elasticco-rca-agent", "U5 close — paste the scripted prompt"],
+      ["Observability → Cases", "Rollback comment is the audit"],
+    ];
+
+    let currentSlide = 0;
+    let tlStep = -1;
+    let hopStep = -1;
+    let playTimer = null;
+    let hopTimer = null;
+
+    function buildNav() {
+      const nav = document.getElementById("nav");
+      const dots = document.getElementById("dots");
+      SLIDES.forEach((label, i) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.innerHTML = `<span class="idx">${i + 1}</span>${label}`;
+        btn.addEventListener("click", () => goSlide(i));
+        if (i === 0) btn.classList.add("active");
+        li.appendChild(btn); nav.appendChild(li);
+        const dot = document.createElement("button");
+        dot.addEventListener("click", () => goSlide(i));
+        if (i === 0) dot.classList.add("active");
+        dots.appendChild(dot);
+      });
+    }
+
+    function goSlide(n) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, n));
+      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.querySelectorAll(".dots button").forEach((el, i) => el.classList.toggle("active", i === currentSlide));
+      document.getElementById("slideCounter").textContent = `${currentSlide + 1} / ${SLIDES.length}`;
+    }
+
+    function buildSwim() {
+      const swim = document.getElementById("swim");
+      PHASES.forEach((ph, pi) => {
+        const col = document.createElement("div");
+        col.className = "phase";
+        col.dataset.phase = String(pi);
+        col.innerHTML = `<h3>${ph.label}</h3>`;
+        STEPS.forEach((s, i) => {
+          if (s.phase !== pi) return;
+          const btn = document.createElement("button");
+          btn.className = "node";
+          btn.dataset.step = String(i);
+          btn.innerHTML = `<span class="when">${s.when}</span><span class="title">${s.title}</span>`;
+          btn.addEventListener("click", () => { tlStep = i; updateTimeline(); });
+          col.appendChild(btn);
+        });
+        swim.appendChild(col);
+      });
+    }
+
+    function updateTimeline() {
+      document.querySelectorAll(".node").forEach(el => {
+        const n = +el.dataset.step;
+        el.classList.toggle("active", n === tlStep);
+        el.classList.toggle("done", tlStep >= 0 && n < tlStep);
+      });
+      document.querySelectorAll(".phase").forEach(el => {
+        const pi = +el.dataset.phase;
+        el.classList.toggle("hot", tlStep >= 0 && STEPS[tlStep].phase === pi);
+      });
+      const pct = tlStep < 0 ? 0 : ((tlStep + 1) / STEPS.length) * 100;
+      document.getElementById("tlProgress").style.width = pct + "%";
+      document.getElementById("tlLabel").textContent = tlStep < 0 ? "All beats" : `Beat ${tlStep + 1} / ${STEPS.length}`;
+      const s = tlStep >= 0 ? STEPS[tlStep] : null;
+      document.getElementById("tlDetail").innerHTML = s
+        ? `<h4>${s.title}</h4><p>${s.detail}</p><div class="meta"><span class="badge info">${s.product}</span><span class="badge">${s.kibana}</span></div>`
+        : `<h4>Lab path</h4><p>Detect (error-rate or SLO) → seven-hop waterfall + FOR UPDATE for acme-retail → Agent Builder tools match that evidence → rollback comment on the case.</p>`;
+      document.getElementById("tlEvidence").textContent = s
+        ? s.evidence
+        : "Select a beat.\nHero trace: 271f8e318871e99f577feb2cb22cd2d3\nRemediation: v2.4.1 → v2.4.0";
+    }
+
+    function playTimeline() {
+      clearInterval(playTimer);
+      clearInterval(hopTimer);
+      tlStep = -1;
+      updateTimeline();
+      goSlide(1);
+      let i = 0;
+      playTimer = setInterval(() => {
+        tlStep = i;
+        updateTimeline();
+        i++;
+        if (i >= STEPS.length) clearInterval(playTimer);
+      }, 1200);
+    }
+
+    function buildHops() {
+      const el = document.getElementById("waterfall");
+      const max = 3200;
+      HOPS.forEach((hop, i) => {
+        const row = document.createElement("div");
+        row.className = "wf-row" + (hop.hot ? " hot" : "");
+        row.dataset.hop = String(i);
+        const left = (hop.cum / max) * 100;
+        const width = Math.max(2, (hop.ms / max) * 100);
+        row.innerHTML = `<span class="wf-svc">${hop.svc}</span>
+          <div class="wf-bar-wrap"><div class="wf-bar${hop.hot ? " slow" : ""}" style="left:${left}%;width:${width}%"></div></div>
+          <span class="wf-ms">${hop.ms} ms</span>`;
+        row.addEventListener("click", () => { hopStep = i; updateHops(); });
+        el.appendChild(row);
+      });
+      const bars = document.getElementById("tenantBars");
+      TENANTS.forEach(t => {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        const pct = Math.min(100, (t.p95 / 3120) * 100);
+        row.innerHTML = `<span class="mono">${t.id}</span>
+          <div class="bar-track"><div class="bar-fill ${t.blast ? "danger" : "ok"}" style="width:${pct}%"></div></div>
+          <span class="bar-val">${t.p95} ms</span>`;
+        bars.appendChild(row);
+      });
+      updateHops();
+    }
+
+    function updateHops() {
+      document.querySelectorAll(".wf-row").forEach(el => {
+        el.classList.toggle("active", +el.dataset.hop === hopStep);
+      });
+      const pct = hopStep < 0 ? 0 : ((hopStep + 1) / HOPS.length) * 100;
+      document.getElementById("hopProgress").style.width = pct + "%";
+      document.getElementById("hopLabel").textContent = hopStep < 0 ? "All hops" : `Hop ${hopStep + 1} / ${HOPS.length}`;
+      const hop = hopStep >= 0 ? HOPS[hopStep] : null;
+      document.getElementById("hopDetail").innerHTML = hop
+        ? `<h4>${hop.svc} · ${hop.span}</h4><p>${hop.detail}</p>`
+        : `<h4>Full path</h4><p>Click a hop or Walk hops. The red bar is orders-db FOR UPDATE — almost the entire checkout latency for acme-retail.</p>`;
+    }
+
+    function playHops() {
+      clearInterval(hopTimer);
+      clearInterval(playTimer);
+      hopStep = -1;
+      updateHops();
+      goSlide(2);
+      let i = 0;
+      hopTimer = setInterval(() => {
+        hopStep = i;
+        updateHops();
+        i++;
+        if (i >= HOPS.length) clearInterval(hopTimer);
+      }, 900);
+    }
+
+    function copyText(text, btn, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = label;
+        setTimeout(() => { btn.textContent = orig; }, 1400);
+      });
+    }
+
+    const kBody = document.getElementById("kibanaTable");
+    KIBANA.forEach(([a, b]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${a}</td><td>${b}</td>`;
+      kBody.appendChild(tr);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => goSlide(currentSlide - 1));
+    document.getElementById("btnNext").addEventListener("click", () => goSlide(currentSlide + 1));
+    document.getElementById("btnStepBack").addEventListener("click", () => { tlStep = Math.max(-1, tlStep - 1); updateTimeline(); });
+    document.getElementById("btnStepFwd").addEventListener("click", () => { tlStep = Math.min(STEPS.length - 1, tlStep + 1); updateTimeline(); });
+    document.getElementById("btnStepReset").addEventListener("click", () => { tlStep = -1; updateTimeline(); });
+    document.getElementById("btnHopBack").addEventListener("click", () => { hopStep = Math.max(-1, hopStep - 1); updateHops(); });
+    document.getElementById("btnHopFwd").addEventListener("click", () => { hopStep = Math.min(HOPS.length - 1, hopStep + 1); updateHops(); });
+    document.getElementById("btnHopPlay").addEventListener("click", playHops);
+    document.getElementById("btnPlay").addEventListener("click", playTimeline);
+    document.getElementById("btnCopyPrompt").addEventListener("click", function () { copyText(PROMPT, this, "Copied prompt"); });
+    document.getElementById("btnCopyEsql").addEventListener("click", function () { copyText(TENANT_ESQL, this, "Copied ES|QL"); });
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") goSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft") goSlide(currentSlide - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+      if (e.key === " " && currentSlide === 1) { e.preventDefault(); playTimeline(); }
+      if (e.key === " " && currentSlide === 2) { e.preventDefault(); playHops(); }
+    });
+
+    buildNav();
+    buildSwim();
+    updateTimeline();
+    buildHops();
+  </script>
+</body>
+</html>

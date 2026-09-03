@@ -295,6 +295,8 @@ def emit_apm_internal(world: World, t0, t1, anchor):
                 young_time = rng.randint(8, 40) + (int(progress * 80) if incident else 0)
                 old_count = rng.randint(0, 2) + (int(progress * 6) if incident else 0)
                 old_time = rng.randint(5, 25) + (int(progress * 120) if incident else 0)
+                # jvm.gc.alloc is a cumulative bytes-allocated counter (Memory allocation panel).
+                alloc = int(heap_used * (80 + progress * 40) + rng.randint(0, 8) * 1024 * 1024)
                 doc["jvm"] = {
                     "memory": {
                         "heap": {
@@ -308,6 +310,7 @@ def emit_apm_internal(world: World, t0, t1, anchor):
                     "gc": {
                         "count": young_count + old_count,
                         "time": young_time + old_time,
+                        "alloc": alloc,
                     },
                 }
                 yield DS_APM_INTERNAL, doc
@@ -322,6 +325,31 @@ def emit_apm_internal(world: World, t0, t1, anchor):
                         "labels": {**base_labels(), "name": gc_name},
                     }
                     yield DS_APM_INTERNAL, gc_doc
+                # Heap pool docs — Metrics tab "Heap memory usage by pool" / "Heap memory pools"
+                # Lens formulas avg(pool.used)/avg(pool.max) grouped by labels.name.
+                eden = int(heap_used * 0.22)
+                survivor = int(heap_used * 0.03)
+                old = max(0, heap_used - eden - survivor)
+                for pool_name, used, pool_max in (
+                    ("G1 Eden Space", eden, max(eden + 1, int(heap_max * 0.30))),
+                    ("G1 Survivor Space", survivor, max(survivor + 1, int(heap_max * 0.05))),
+                    ("G1 Old Gen", old, max(old + 1, int(heap_max * 0.70))),
+                ):
+                    yield DS_APM_INTERNAL, {
+                        **doc,
+                        "jvm": {
+                            "memory": {
+                                "heap": {
+                                    "pool": {
+                                        "used": used,
+                                        "committed": min(pool_max, max(used, int(used * 1.15))),
+                                        "max": pool_max,
+                                    }
+                                }
+                            }
+                        },
+                        "labels": {**base_labels(), "name": pool_name},
+                    }
                 continue
             elif lang == "go":
                 doc["golang"] = {

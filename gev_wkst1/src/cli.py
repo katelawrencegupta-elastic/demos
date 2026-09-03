@@ -11,6 +11,8 @@ import requests
 from src.config import (
     DS_APM_INTERNAL,
     DS_CHECKOUT,
+    DS_INVENTORY,
+    DS_NOTIFICATION,
     DS_K8S_EVENT,
     DS_K8S_POD,
     DS_K8S_NODE,
@@ -150,6 +152,18 @@ def cmd_stream(args: argparse.Namespace):
             "  [live-incident] pinning incident window through now "
             "so 60-minute alerts stay firing"
         )
+        lr = world.cfg.get("log_rate")
+        if lr:
+            d = max(int(lr.get("duration_minutes", 35)), 15)
+            lr["start_offset_minutes"] = d
+            lr["duration_minutes"] = d
+            print("  [live-incident] pinning U7 log-rate DEBUG flood through now")
+        gap = world.cfg.get("telemetry_gap")
+        if gap:
+            d = max(int(gap.get("duration_minutes", 20)), 15)
+            gap["start_offset_minutes"] = d
+            gap["duration_minutes"] = d
+            print("  [live-incident] pinning U8 notification log silence through now")
     else:
         print(
             "  [warn] --no-live-incident: ticks are healthy recovery; "
@@ -218,7 +232,12 @@ def verify_alert_rules() -> bool:
         return False
 
     expected = json.loads(rules_file.read_text())
-    rules_with_cases = {"elasticco-checkout-correlated-rca", "elasticco-eks-pod-restarts"}
+    rules_with_cases = {
+        "elasticco-checkout-correlated-rca",
+        "elasticco-eks-pod-restarts",
+        "elasticco-log-telemetry-gap",
+    }
+    rules_with_workflow = {"elasticco-checkout-correlated-rca", "elasticco-eks-pod-restarts"}
     ok = True
 
     try:
@@ -252,6 +271,20 @@ def verify_alert_rules() -> bool:
         else:
             print(f"[ok] alert rule active: {name}")
 
+        if name != "elasticco-noisy-node-cpu" and rule.get("rule_type_id") == ".es-query":
+            params = remote.get("params") or {}
+            esql = ((params.get("esqlQuery") or {}).get("esql") or "")
+            grouped = params.get("groupBy") == "row"
+            has_svc = "BY service.name" in esql or "`service.name`" in esql
+            if grouped and has_svc:
+                print(f"[ok] {name}: service.name on alert (APM inventory / map)")
+            else:
+                print(
+                    f"[fail] {name}: missing per-row service.name "
+                    "— APM inventory/map will not badge checkout-api (re-run setup)"
+                )
+                ok = False
+
         if name in rules_with_cases:
             actions = remote.get("actions") or []
             has_cases = any(
@@ -264,6 +297,22 @@ def verify_alert_rules() -> bool:
                 print(
                     f"[fail] {name}: missing Cases connector "
                     "(re-run setup or attach system-connector-.cases in Kibana)"
+                )
+                ok = False
+
+        if name in rules_with_workflow:
+            actions = remote.get("actions") or []
+            has_wf = any(
+                a.get("id") == "system-connector-.workflows"
+                or a.get("actionTypeId") == ".workflows"
+                for a in actions
+            )
+            if has_wf:
+                print(f"[ok] {name}: Workflows connector attached")
+            else:
+                print(
+                    f"[fail] {name}: missing Run Workflow action "
+                    "(re-run setup after elasticco-detect-remediate exists)"
                 )
                 ok = False
 
@@ -312,6 +361,18 @@ def cmd_verify(args: argparse.Namespace):
 
     checks = [
         (
+            "orchestrator acme-retail ERROR retry storm",
+            DS_ORCHESTRATOR,
+            {
+                "bool": {
+                    "must": [
+                        {"term": {"tenant.id": world.blast_tenant["id"]}},
+                        {"term": {"log.level": "error"}},
+                    ]
+                }
+            },
+        ),
+        (
             "orchestrator structured tenant+trace",
             DS_ORCHESTRATOR,
             {
@@ -358,6 +419,23 @@ def cmd_verify(args: argparse.Namespace):
             {"query_string": {"query": "*OutOfMemory*", "fields": ["message"]}},
         ),
         (
+            "inventory SkuCache DEBUG flood",
+            DS_INVENTORY,
+            {
+                "bool": {
+                    "must": [
+                        {"term": {"log.level": "debug"}},
+                        {"term": {"log.logger": "com.elasticco.inventory.SkuCache"}},
+                    ]
+                }
+            },
+        ),
+        (
+            "notification-service log baseline (U8)",
+            DS_NOTIFICATION,
+            {"term": {"service.name": "notification-service"}},
+        ),
+        (
             "host CPU metrics",
             DS_HOST,
             {"exists": {"field": "system.cpu.total.norm.pct"}},
@@ -372,6 +450,18 @@ def cmd_verify(args: argparse.Namespace):
             DS_APM_INTERNAL,
             {"term": {"service.name": "checkout-api"}},
         ),
+        (
+            "APM JVM heap pool metrics (checkout-api)",
+            DS_APM_INTERNAL,
+            {
+                "bool": {
+                    "must": [
+                        {"term": {"service.name": "checkout-api"}},
+                        {"exists": {"field": "jvm.memory.heap.pool.used"}},
+                    ]
+                }
+            },
+        ),
     ]
 
     for label, index, query in checks:
@@ -383,6 +473,53 @@ def cmd_verify(args: argparse.Namespace):
             ok = False
         else:
             print(f"[ok] {label}: {n} hits")
+
+    # U8 — logs silent last 15m, APM still transacting
+    ntfy_15m = count(
+        DS_NOTIFICATION,
+        {
+            "bool": {
+                "must": [
+                    {"range": {"@timestamp": {"gte": "now-15m"}}},
+                    {"term": {"labels.demo": "elastic-co"}},
+                ]
+            }
+        },
+    )
+    if ntfy_15m < 0:
+        ok = False
+    elif ntfy_15m == 0:
+        print("[ok] notification-service logs last 15m: 0 (telemetry gap planted)")
+    else:
+        print(
+            f"[fail] notification-service logs last 15m: {ntfy_15m} "
+            "(gap not through now — re-run backfill --scope app_logs or start stream)"
+        )
+        ok = False
+
+    ntfy_apm_15m = count(
+        DS_TRACES,
+        {
+            "bool": {
+                "must": [
+                    {"range": {"@timestamp": {"gte": "now-15m"}}},
+                    {"term": {"labels.demo": "elastic-co"}},
+                    {"term": {"processor.event": "transaction"}},
+                    {"term": {"service.name": "notification-service"}},
+                ]
+            }
+        },
+    )
+    if ntfy_apm_15m < 0:
+        ok = False
+    elif ntfy_apm_15m == 0:
+        print(
+            "[fail] notification-service APM last 15m: 0 "
+            "(app looks down too — re-run backfill --scope apm or start stream)"
+        )
+        ok = False
+    else:
+        print(f"[ok] notification-service APM last 15m: {ntfy_apm_15m} txns (app alive)")
 
     # Correlation: same trace.id in orchestrator + traces
     if heroes:
@@ -411,7 +548,17 @@ def cmd_verify(args: argparse.Namespace):
 
             r = slo_kbn("GET", f"{SLO_API}/{SLO_ID}")
             if r.status_code == 200:
-                print(f"[ok] SLO {SLO_ID}")
+                summary = r.json().get("summary") or {}
+                status = (summary.get("status") or "unknown").upper()
+                sli = summary.get("sliValue")
+                if status == "NO_DATA":
+                    print(
+                        f"[fail] SLO {SLO_ID}: status=NO_DATA "
+                        "(indicator is not seeing traces — re-run setup)"
+                    )
+                    ok = False
+                else:
+                    print(f"[ok] SLO {SLO_ID}: status={status} sli={sli}")
             elif r.status_code in (403, 404):
                 print(f"[fail] SLO {SLO_ID}: {r.status_code}")
                 ok = False
@@ -430,6 +577,15 @@ def cmd_verify(args: argparse.Namespace):
         except Exception as exc:
             print(f"[fail] Agent Builder check: {exc}")
             ok = False
+        print("== Kibana Workflow ==")
+        try:
+            from src.workflows import verify_workflow
+
+            if not verify_workflow():
+                ok = False
+        except Exception as exc:
+            print(f"[fail] Workflow check: {exc}")
+            ok = False
 
     print(f"Kibana: {KIBANA_URL}")
     if not ok:
@@ -445,6 +601,17 @@ def cmd_agent(args: argparse.Namespace):
             raise SystemExit(1)
         return
     ensure_agent(fail_loud=getattr(args, "fail_loud", False))
+
+
+def cmd_workflow(args: argparse.Namespace):
+    """Provision the Kibana Workflow that stitches detect → RCA → case."""
+    from src.workflows import ensure_workflow, verify_workflow
+
+    if getattr(args, "verify_only", False):
+        if not verify_workflow():
+            raise SystemExit(1)
+        return
+    ensure_workflow(fail_loud=getattr(args, "fail_loud", False))
 
 
 def cmd_incident(args: argparse.Namespace):
@@ -477,27 +644,44 @@ def cmd_dashboards(_: argparse.Namespace):
     print(f"  Cases:                 {KIBANA_URL}/app/observability/cases")
     print(f"  AI Assistant:          {KIBANA_URL}/app/observabilityAIAssistant")
     print(f"  Agent Builder:         {KIBANA_URL}/app/agent_builder/chat")
+    print(f"  Workflows:             {KIBANA_URL}/app/workflows")
     print(f"  SLOs:                  {KIBANA_URL}/app/observability/slos")
     print(f"  Dashboard (incident):  {KIBANA_URL}/app/dashboards#/view/elasticco-incident-overview")
     print(f"  Dashboard (eks):       {KIBANA_URL}/app/dashboards#/view/elasticco-eks-restarts")
     print(f"  Dashboard (traces):    {KIBANA_URL}/app/dashboards#/view/elasticco-distributed-traces")
     print(f"  Dashboard (e2e):       {KIBANA_URL}/app/dashboards#/view/elasticco-e2e-tracing")
+    print(f"  Dashboard (log rate):  {KIBANA_URL}/app/dashboards#/view/elasticco-log-rate")
+    print(f"  Dashboard (telemetry): {KIBANA_URL}/app/dashboards#/view/elasticco-telemetry-gap")
+    print(f"  AIOps log rate:        {KIBANA_URL}/app/ml/aiops/log_rate_analysis")
     print(f"  Incidents (audit):     {KIBANA_URL}/app/discover#/?_a=(dataSource:(dataViewId:elasticco-incidents))")
+
+
+SCOPE_CHOICES = [
+    "all",
+    "orchestrator",
+    "apm",
+    "apm_deps",
+    "traces",
+    "k8s",
+    "infra",
+    "app_logs",
+]
 
 
 def main():
     p = argparse.ArgumentParser(description="Elastic Co. observability demo")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("setup", help="pipelines, templates, alerts, native SLO, Agent Builder").set_defaults(
-        func=cmd_setup
-    )
+    sub.add_parser(
+        "setup",
+        help="pipelines, templates, native SLO, Agent Builder, Workflow, alerts",
+    ).set_defaults(func=cmd_setup)
 
     s = sub.add_parser("sample", help="simulate/pipeline-check one doc per generator")
     s.add_argument(
         "--scope",
         default="all",
-        choices=["all", "orchestrator", "apm", "apm_deps", "traces", "k8s", "infra"],
+        choices=SCOPE_CHOICES,
     )
     s.set_defaults(func=cmd_sample)
 
@@ -506,7 +690,7 @@ def main():
     b.add_argument(
         "--scope",
         default="all",
-        choices=["all", "orchestrator", "apm", "apm_deps", "traces", "k8s", "infra"],
+        choices=SCOPE_CHOICES,
     )
     b.set_defaults(func=cmd_backfill)
 
@@ -515,7 +699,7 @@ def main():
     st.add_argument(
         "--scope",
         default="all",
-        choices=["all", "orchestrator", "apm", "apm_deps", "traces", "k8s", "infra"],
+        choices=SCOPE_CHOICES,
     )
     st.add_argument(
         "--live-incident",
@@ -530,7 +714,7 @@ def main():
     v.add_argument(
         "--alerts",
         action="store_true",
-        help="verify alert rules (exist, enabled, Cases, firing) plus native SLO and Agent Builder",
+        help="verify alert rules (exist, enabled, Cases, Workflows, firing) plus SLO, agent, workflow",
     )
     v.set_defaults(func=cmd_verify)
     sub.add_parser("dashboards", help="import Kibana assets + print links").set_defaults(
@@ -549,6 +733,19 @@ def main():
         help="exit non-zero if Agent Builder APIs reject the upsert",
     )
     ag.set_defaults(func=cmd_agent)
+
+    wf = sub.add_parser("workflow", help="provision Kibana Workflow detect-to-remediate")
+    wf.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="check workflow exists and is enabled; do not upsert",
+    )
+    wf.add_argument(
+        "--fail-loud",
+        action="store_true",
+        help="exit non-zero if Workflows APIs reject the upsert",
+    )
+    wf.set_defaults(func=cmd_workflow)
 
     inc = sub.add_parser(
         "incident",
