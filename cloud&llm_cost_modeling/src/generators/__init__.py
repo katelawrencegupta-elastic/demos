@@ -1,7 +1,7 @@
 from src.generators import (
     aws_billing, aws_billing_cur, aws_cloudtrail, aws_ec2_metrics,
-    aws_guardduty, aws_s3access, azure_activity, azure_billing,
-    elastic_ai, ess_billing_credits,
+    aws_guardduty, aws_s3access, aws_usage, azure_activity, azure_billing,
+    elastic_ai, ess_billing, ess_billing_credits,
     gcp_audit, gcp_billing,
     llm_anthropic, llm_apm, llm_azure_openai, llm_bedrock,
     llm_openai, llm_vertexai,
@@ -14,6 +14,14 @@ NAMED = {
     "aws_ec2_metrics": aws_ec2_metrics,
     "aws_billing": aws_billing,
     "aws_billing_cur": aws_billing_cur,
+    "aws_rds": aws_usage.aws_rds,
+    "aws_s3_daily_storage": aws_usage.aws_s3_daily_storage,
+    "aws_lambda": aws_usage.aws_lambda,
+    "aws_mq_activemq": aws_usage.aws_mq_activemq,
+    "aws_mq_rabbitmq": aws_usage.aws_mq_rabbitmq,
+    "aws_cloudwatch_usage": aws_usage.aws_cloudwatch_usage,
+    "kubeletstats": aws_usage.kubeletstats,
+    "ess_billing": ess_billing,
     "ess_billing_credits": ess_billing_credits,
     "gcp_audit": gcp_audit,
     "gcp_billing": gcp_billing,
@@ -48,12 +56,23 @@ ALL_NAMES = frozenset(NAMED)
 CLOUD = [
     aws_cloudtrail, aws_guardduty, aws_s3access, aws_ec2_metrics, aws_billing,
     aws_billing_cur,
-    ess_billing_credits,
+    aws_usage.aws_rds, aws_usage.aws_s3_daily_storage, aws_usage.aws_lambda,
+    aws_usage.aws_mq_activemq, aws_usage.aws_mq_rabbitmq,
+    aws_usage.aws_cloudwatch_usage, aws_usage.kubeletstats,
+    ess_billing, ess_billing_credits,
     gcp_audit, gcp_billing,
     azure_activity, azure_billing,
 ]
 
-ESS_BILLING = [ess_billing_credits]
+ESS_BILLING = [ess_billing, ess_billing_credits]
+
+FINOPS_USAGE = [
+    aws_billing,
+    aws_usage.aws_rds, aws_usage.aws_s3_daily_storage, aws_usage.aws_lambda,
+    aws_usage.aws_mq_activemq, aws_usage.aws_mq_rabbitmq,
+    aws_usage.aws_cloudwatch_usage, aws_usage.kubeletstats,
+    ess_billing,
+]
 
 LLM = [
     llm_openai.openai_completions, llm_openai.openai_embeddings,
@@ -104,6 +123,8 @@ def _by_scope(scope: str):
         return ELASTIC_AI
     if scope == "ess-billing":
         return ESS_BILLING
+    if scope == "finops-usage":
+        return FINOPS_USAGE
     return ALL
 
 

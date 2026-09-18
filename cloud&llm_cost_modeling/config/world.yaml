@@ -1,4 +1,4 @@
-# Meridian Dynamics -- fictional org powering all synthetic data.
+# Verdian Dynamics -- fictional org powering all synthetic data.
 # Everything downstream (activity, security findings, billing) derives from
 # this file plus the deterministic expansion in src/world/model.py.
 #
@@ -8,8 +8,8 @@
 # - ~120 EC2, ~46 GCE, ~27 Azure VMs; 25 identities
 # - Scenarios: crypto mining, ML burn, cost leak, S3 public exposure,
 #   GenAI shadow-IT ramp, Sunday ETL batch window
-company: Meridian Dynamics
-domain: meridiandynamics.io
+company: Verdian Dynamics
+domain: verdiandynamics.com
 seed: 42
 
 business_units:

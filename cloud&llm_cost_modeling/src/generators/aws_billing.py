@@ -4,13 +4,57 @@ Two flavors, mirroring the real integration:
 - CloudWatch EstimatedCharges (cumulative month-to-date), every 12h,
   per account and per account+service.
 - Cost Explorer daily groups (UnblendedCost et al) by SERVICE,
-  LINKED_ACCOUNT, and TAG cost_center.
+  LINKED_ACCOUNT, INSTANCE_TYPE, AZ, and TAG cost_center.
+
+SERVICE / INSTANCE_TYPE / AZ are slices of the same dollars as
+LINKED_ACCOUNT — dashboards must not add those grains together.
 """
 from datetime import timedelta
 
 from src.generators.common import aligned, metric_doc
+from src.profile import ce_account
 from src.world.costs import aws_daily_cost
 from src.world.scenarios import rng_for
+
+_TEMPLATE_OK = False
+
+
+def _ensure_ce_grain_template():
+    """Map INSTANCE_TYPE/AZ on every billing backing index (incl. empty write idx)."""
+    global _TEMPLATE_OK
+    if _TEMPLATE_OK:
+        return
+    from src.config import ELASTIC_URL, ES_HEADERS
+    import requests
+    body = {
+        "index_patterns": ["metrics-aws.billing-*"],
+        "data_stream": {},
+        "priority": 250,
+        "template": {
+            "mappings": {
+                "properties": {
+                    "aws": {"properties": {
+                        "billing": {"properties": {
+                            "group_by": {"properties": {
+                                "INSTANCE_TYPE": {"type": "keyword"},
+                                "AZ": {"type": "keyword"},
+                                "SERVICE": {"type": "keyword"},
+                                "LINKED_ACCOUNT": {"type": "keyword"},
+                                "COST_CENTER": {"type": "keyword"},
+                            }},
+                        }},
+                    }},
+                }
+            }
+        },
+    }
+    r = requests.put(
+        f"{ELASTIC_URL}/_index_template/meridian-aws-billing-ce-grains",
+        headers=ES_HEADERS, json=body, timeout=30)
+    if r.status_code >= 300:
+        print(f"  [warn] billing CE grain template: {r.status_code} {r.text[:200]}")
+    _TEMPLATE_OK = True
+
 
 DATA_STREAM = "metrics-aws.billing-default"
 DATASET = "aws.billing"
@@ -24,6 +68,7 @@ SERVICE_LABELS = {
     "AmazonCloudWatch": "AmazonCloudWatch",
     "AWSDataTransfer": "AWS Data Transfer",
     "AmazonGuardDuty": "Amazon GuardDuty",
+    "AmazonMQ": "Amazon MQ",
 }
 
 
@@ -34,7 +79,7 @@ def _base(world, ts, acct=None, period_h=12):
         doc["cloud"]["account"] = {"id": acct["id"], "name": acct["name"]}
         doc["aws"] = {"linked_account": {"id": acct["id"], "name": acct["name"]}}
     else:
-        payer = world.aws_accounts[0]
+        payer = ce_account(world.aws_accounts[0])
         doc["cloud"]["account"] = {"id": payer["id"], "name": payer["name"]}
         doc["aws"] = {}
     return doc
@@ -56,9 +101,24 @@ def _month_to_date(world, acct, service, ts, anchor):
     return round(total, 2)
 
 
+def _allocate(total: float, weights: dict) -> dict:
+    """Split `total` USD across keys proportional to weights; leftover to largest."""
+    if not weights or total <= 0:
+        return {}
+    s = sum(weights.values())
+    if s <= 0:
+        return {}
+    out = {k: round(total * w / s, 2) for k, w in weights.items()}
+    drift = round(total - sum(out.values()), 2)
+    if drift and out:
+        k = max(out, key=out.get)
+        out[k] = round(out[k] + drift, 2)
+    return out
+
+
 def _cost_explorer_doc(world, ts, day, group_key, group_type, group_value,
-                       amount, rng):
-    doc = _base(world, ts, period_h=24)
+                       amount, rng, acct=None):
+    doc = _base(world, ts, acct, period_h=24)
     doc["aws"]["billing"] = {
         "start_date": day.strftime("%Y-%m-%d"),
         "end_date": (day + timedelta(days=1)).strftime("%Y-%m-%d"),
@@ -75,14 +135,16 @@ def _cost_explorer_doc(world, ts, day, group_key, group_type, group_value,
 
 
 def emit(world, t0, t1, anchor):
+    _ensure_ce_grain_template()
     services = world.cfg["aws"]["services"]
 
     # ---- EstimatedCharges (every 12h, cumulative) --------------------------
     for ts in aligned(t0, t1, 12 * 60):
         for acct in world.aws_accounts:
+            billed = ce_account(acct)
             combos = [None] + services
             for svc in combos:
-                doc = _base(world, ts, acct)
+                doc = _base(world, ts, billed)
                 billing = {
                     "Currency": "USD",
                     "EstimatedCharges": int(_month_to_date(world, acct, svc, ts, anchor)),
@@ -102,16 +164,55 @@ def emit(world, t0, t1, anchor):
             a["id"]: {s: aws_daily_cost(world, a, s, day, anchor) for s in services}
             for a in world.aws_accounts
         }
+        # Peel Amazon MQ from CloudWatch so SERVICE still equals LINKED_ACCOUNT.
+        for acct in world.aws_accounts:
+            cw = totals_by_acct[acct["id"]]["AmazonCloudWatch"]
+            mq = round(cw * 0.16, 2)
+            totals_by_acct[acct["id"]]["AmazonCloudWatch"] = round(cw - mq, 2)
+            totals_by_acct[acct["id"]]["AmazonMQ"] = mq
 
-        for svc in services:
-            amount = round(sum(t[svc] for t in totals_by_acct.values()), 2)
-            yield _cost_explorer_doc(world, ts, day, "SERVICE", "DIMENSION",
-                                     SERVICE_LABELS[svc], amount, rng)
+        service_keys = list(services) + ["AmazonMQ"]
 
         for acct in world.aws_accounts:
-            amount = round(sum(totals_by_acct[acct["id"]].values()), 2)
-            yield _cost_explorer_doc(world, ts, day, "LINKED_ACCOUNT", "DIMENSION",
-                                     acct["name"], amount, rng)
+            billed = ce_account(acct)
+            by_svc = totals_by_acct[acct["id"]]
+
+            for svc in service_keys:
+                amount = round(by_svc[svc], 2)
+                yield _cost_explorer_doc(
+                    world, ts, day, "SERVICE", "DIMENSION",
+                    SERVICE_LABELS[svc], amount, rng, billed)
+
+            amount = round(sum(by_svc.values()), 2)
+            yield _cost_explorer_doc(
+                world, ts, day, "LINKED_ACCOUNT", "DIMENSION",
+                billed["id"], amount, rng, billed)
+
+            insts = world.ec2_in_account(acct["id"])
+            type_w, az_w = {}, {}
+            for inst in insts:
+                type_w[inst.itype] = type_w.get(inst.itype, 0) + inst.hourly_usd
+                az_w[inst.az] = az_w.get(inst.az, 0) + inst.hourly_usd
+
+            ec2_cost = by_svc["AmazonEC2"]
+            no_type = round(ec2_cost * 0.08, 2)
+            for itype, amt in _allocate(round(ec2_cost - no_type, 2), type_w).items():
+                yield _cost_explorer_doc(
+                    world, ts, day, "INSTANCE_TYPE", "DIMENSION",
+                    itype, amt, rng, billed)
+            if no_type:
+                yield _cost_explorer_doc(
+                    world, ts, day, "INSTANCE_TYPE", "DIMENSION",
+                    "NoInstanceType", no_type, rng, billed)
+
+            az_pool = round(ec2_cost * 0.75 + by_svc["AmazonRDS"] * 0.5, 2)
+            no_az = round(az_pool * 0.12, 2)
+            for az, amt in _allocate(round(az_pool - no_az, 2), az_w).items():
+                yield _cost_explorer_doc(
+                    world, ts, day, "AZ", "DIMENSION", az, amt, rng, billed)
+            if no_az:
+                yield _cost_explorer_doc(
+                    world, ts, day, "AZ", "DIMENSION", "NoAZ", no_az, rng, billed)
 
         # TAG cost_center attribution incl. the untagged bucket
         by_cc = {}

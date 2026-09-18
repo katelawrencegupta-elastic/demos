@@ -1,7 +1,7 @@
 # Multi-Cloud Synthetic Data Factory for Elastic
 
 Generates correlated synthetic AWS / GCP / Azure activity, security, and
-billing data for a fictional company (**Meridian Dynamics**) and ships it into
+billing data for a fictional company (**Verdian Dynamics**) and ships it into
 **native Elastic integration data streams** on **Elastic Cloud Serverless**,
 so out-of-the-box dashboards, Discover views, and detection content work
 against realistic-looking data.
@@ -102,6 +102,37 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), **FinOps dashboard
 → Budget posture** (gauges + SLO table), and **Agent Builder → chat** (`meridian-finops-ai-assistant`).
 
+### Live Verdian Dynamics FinOps (Cost Explorer objects)
+
+The synthetic factory is the default. To provision the **live** Verdian Dynamics FinOps space
+(Cost Explorer dashboards, rightsizing stream, workflows, SLOs/alerts, Agent Builder)
+without generating data:
+
+```bash
+# .env
+KIBANA_SPACE=finops
+FINOPS_PROFILE=live
+
+.venv/bin/python -m src.cli --profile live setup
+.venv/bin/python -m src.cli --profile live verify
+```
+
+`setup` / `dashboards` / `agent` / `budgets` / `verify` all honor `FINOPS_PROFILE=live`
+and will **not** overwrite the live dashboards with the synthetic CUR layout.
+
+Sources: `config/live/`, `kibana/live/`, `elasticsearch/live/`.
+
+Rightsizing queue (`finops-rightsizing-overview`) uses **Vega-Lite** panels plus an expanded
+recommendation catalog (downsize, upsize, stop_idle, delete_volume, migrate_generation,
+gp2_to_gp3, purchase_ri_sp, schedule_offhours, rightsize_lambda). Rebuild assets with:
+
+```bash
+.venv/bin/python scripts/generate_rightsizing_seed.py
+.venv/bin/python scripts/build_rightsizing_dashboard.py
+```
+
+Then re-run `--profile live setup` (force-reseeds when the stream is thin / always upserts on live setup).
+
 ### All commands
 
 ```bash
@@ -113,6 +144,7 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
+.venv/bin/python -m src.cli workflow             # live FinOps Kibana workflows (spend spike + rightsizing)
 .venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
 .venv/bin/python -m src.cli agent                # Meridian FinOps AI Assistant (Agent Builder)
 .venv/bin/python -m src.cli reindex-elastic-ai   # wipe + re-backfill Agent Builder / inference traces

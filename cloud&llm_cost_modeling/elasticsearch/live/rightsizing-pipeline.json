@@ -1,0 +1,106 @@
+{
+  "description": "Normalize Compute Optimizer (or equivalent) rightsizing recommendations for the FinOps space.",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "processors": [
+    {
+      "set": {
+        "override": false,
+        "field": "@timestamp",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "event.kind",
+        "value": "event"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "event.dataset",
+        "value": "finops.rightsizing"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "data_stream.type",
+        "value": "logs"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "data_stream.dataset",
+        "value": "finops.rightsizing"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "data_stream.namespace",
+        "value": "default"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "cloud.provider",
+        "value": "aws"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "finops.rightsizing.status",
+        "ignore_missing": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "finops.rightsizing.action",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "finops.rightsizing.status",
+        "value": "open"
+      }
+    },
+    {
+      "set": {
+        "override": false,
+        "field": "finops.rightsizing.currency",
+        "value": "USD"
+      }
+    },
+    {
+      "fingerprint": {
+        "ignore_missing": true,
+        "fields": [
+          "cloud.account.id",
+          "finops.rightsizing.resource_arn",
+          "finops.rightsizing.finding",
+          "finops.rightsizing.recommended_type"
+        ],
+        "target_field": "finops.rightsizing.id"
+      }
+    },
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    }
+  ]
+}

@@ -386,7 +386,7 @@ def budget_posture_section(y: int):
         markdown(
             0, 0, 48, 4,
             "## Budget posture\n\n"
-            "Meridian treats cloud + LLM spend as error budgets. Thresholds come from "
+            "Verdian Dynamics treats cloud + LLM spend as error budgets. Thresholds come from "
             "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
             f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
             f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
@@ -397,7 +397,7 @@ def budget_posture_section(y: int):
             f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
             f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
             f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
-            f"**Meridian FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
+            f"**Verdian Dynamics FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
             f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
         ),
         gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
@@ -416,7 +416,7 @@ def budget_posture_section(y: int):
               checkout_vs_alert, "spend", shape="arc",
               min_col="min", max_col="max", goal_col="goal",
               subtitle="USD LLM (APM)"),
-        table(0, 16, 48, 10, "Meridian spend SLO posture (error budget)",
+        table(0, 16, 48, 10, "Verdian Dynamics spend SLO posture (error budget)",
               slo_posture,
               rows=["slo.name", "status"],
               metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
@@ -454,7 +454,7 @@ def build_classic_dashboard():
     panels = build_classic_sections(None, label, vtitle)
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability — classic",
+        "title": "[Verdian Dynamics] FinOps & LLM Observability — classic",
         "description": (
             "Classic layout scoped to the active workshop variant: cost allocation, "
             "security→cost (when AWS security data is seeded), and LLM observability."
@@ -481,9 +481,9 @@ def build_dashboard():
     panels = build_baseline_sections(None, label, vtitle)
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability",
+        "title": "[Verdian Dynamics] FinOps & LLM Observability",
         "description": (
-            "Variant-scoped Meridian FinOps + LLM dashboard: only panels for integrations "
+            "Variant-scoped Verdian Dynamics FinOps + LLM dashboard: only panels for integrations "
             "included in the active workshop fork."
         ),
         "time_range": win,
@@ -560,6 +560,10 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
     Classic is the older table/bar layout with the security→cost section.
     The -dynamic Kibana id is kept as an alias of baseline for existing links.
     """
+    from src.profile import is_live
+    if is_live():
+        from src.live_dashboards import publish as live_publish
+        return live_publish()
     v = active_variant()
     if not v.is_all:
         include_baseline = v.dashboards.get("baseline", False)

@@ -1,6 +1,7 @@
 """CLI: setup | sample | backfill | stream | verify."""
 import argparse
 import json
+import os
 import time
 from datetime import timedelta
 
@@ -45,8 +46,10 @@ def _scope_default():
 
 
 def _print_variant():
+    from src.profile import finops_profile
     v = active_variant()
     print(f"== variant: {v.id} — {v.title} ==")
+    print(f"== finops profile: {finops_profile()} ==")
 
 
 def _resolve_scope(args) -> str:
@@ -511,12 +514,18 @@ def main():
     p = argparse.ArgumentParser(
         prog="synthcloud",
         description="Multi-cloud + LLM synthetic data factory for Elastic")
+    p.add_argument(
+        "--profile",
+        choices=["synthetic", "live"],
+        default=None,
+        help="synthetic=Meridian factory (default); live=Verdian Dynamics Cost Explorer FinOps objects",
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("setup", help="install integrations, APM mappings, patch TSDS, check access")
     s_sample = sub.add_parser("sample", help="validate one doc per log generator")
     s_sample.add_argument(
         "--scope",
-        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing"],
+        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing", "finops-usage"],
         default=None,
         help="generator scope (default: active variant)",
     )
@@ -524,7 +533,7 @@ def main():
     b.add_argument("--days", type=int, default=120)
     b.add_argument(
         "--scope",
-        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing"],
+        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing", "finops-usage"],
         default=None,
         help="generator scope (default: active variant)",
     )
@@ -532,14 +541,14 @@ def main():
     s.add_argument("--tick", type=int, default=60)
     s.add_argument(
         "--scope",
-        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing"],
+        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing", "finops-usage"],
         default=None,
         help="generator scope (default: active variant)",
     )
     v = sub.add_parser("verify", help="doc counts and scenario spot checks")
     v.add_argument(
         "--scope",
-        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing"],
+        choices=["all", "cloud", "llm", "openai-extra", "elastic-ai", "ess-billing", "finops-usage"],
         default=None,
         help="generator scope (default: active variant)",
     )
@@ -563,6 +572,10 @@ def main():
         "agent",
         help="provision Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)",
     )
+    sub.add_parser(
+        "workflow",
+        help="provision live FinOps Kibana workflows (spend spike + rightsizing)",
+    )
     ri = sub.add_parser(
         "reindex-elastic-ai",
         help="wipe synthetic Agent Builder + inference usage docs, re-backfill elastic-ai",
@@ -576,6 +589,8 @@ def main():
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     sub.add_parser("variants", help="list workshop fork profiles")
     args = p.parse_args()
+    if args.profile:
+        os.environ["FINOPS_PROFILE"] = args.profile
 
     if args.cmd == "setup":
         from src import setup_cmd
@@ -591,7 +606,13 @@ def main():
         cmd_stream(args.tick, _resolve_scope(args))
     elif args.cmd == "verify":
         _print_variant()
-        cmd_verify(_resolve_scope(args))
+        from src.profile import is_live
+        if is_live():
+            from src.live_setup import verify as live_verify
+            if not live_verify():
+                raise SystemExit(1)
+        else:
+            cmd_verify(_resolve_scope(args))
     elif args.cmd == "dashboards":
         from src.dashboards import publish
         _print_variant()
@@ -611,6 +632,9 @@ def main():
     elif args.cmd == "agent":
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=True)
+    elif args.cmd == "workflow":
+        from src.workflows import ensure_workflows
+        ensure_workflows(fail_loud=True)
     elif args.cmd == "reindex-elastic-ai":
         from src.elastic_ai_reindex import reindex_elastic_ai
         reindex_elastic_ai(args.days, all_docs=args.all)

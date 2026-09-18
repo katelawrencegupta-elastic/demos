@@ -44,7 +44,7 @@ AGENTS = [
         "bus": ["ecommerce", "mlplatform", "corpit", "fintech"],
     },
     {
-        "id": "meridian-finops-ai-assistant", "name": "Meridian FinOps AI Assistant", "weight": 16,
+        "id": "meridian-finops-ai-assistant", "name": "Verdian Dynamics FinOps AI Assistant", "weight": 16,
         "feature_id": "agent_builder",
         "parent_feature_id": "agent_builder_parent",
         "feature_name": "Agent Builder",

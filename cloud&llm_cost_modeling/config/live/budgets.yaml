@@ -1,0 +1,190 @@
+# Live Verdian Dynamics FinOps budgets — Cost Explorer (metrics-aws.billing-*),
+# not CUR. Calibrated against the finops space on 2026-09-07.
+
+tags:
+  - finops
+  - verdian-dynamics
+
+budgets:
+  aws_mtd_budget_usd: 77000
+  aws_trailing_30d_budget_usd: 80000
+  aws_monthly_usd: 77000
+  aws_daily_ceiling_usd: 3000
+  staging_daily_ceiling_usd: 2000
+  staging_daily_alert_usd: 2000
+  monitoring_daily_ceiling_usd: 900
+  esf_daily_ceiling_usd: 800
+  inference_daily_tokens: 10000000
+  inference_7d_tokens: 20000000
+  dod_latest_floor_usd: 2000
+  dod_ratio: 1.3
+  service_dod_ratio: 1.5
+  service_dod_floor_usd: 100
+  completeness_min_linked_usd: 1000
+  completeness_ratio: 0.9
+  # unused synthetic keys kept so shared formatters do not KeyError
+  checkout_daily_ceiling_usd: 0.50
+  checkout_7d_alert_usd: 4.0
+  gcp_ml_7d_alert_usd: 4000
+
+slos:
+  - id: meridian-slo-aws-daily-spend
+    name: "[Verdian Dynamics] AWS daily unblended under budget"
+    description: >
+      Daily AWS Cost Explorer unblended cost across linked accounts must stay
+      at or below the org ceiling.
+    index: metrics-aws.billing-default
+    filter: 'aws.billing.group_definition.key : "LINKED_ACCOUNT"'
+    field: aws.billing.UnblendedCost.amount
+    ceiling_key: aws_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: meridian-slo-staging-cost-leak
+    name: "[Verdian Dynamics] Stage account daily spend healthy"
+    description: >
+      Daily Cost Explorer unblended cost for the stage account must stay at or
+      below the stage ceiling.
+    index: metrics-aws.billing-default
+    filter: >-
+      aws.billing.group_definition.key : "LINKED_ACCOUNT" and
+      aws.billing.group_by.LINKED_ACCOUNT : "{stage_account_id}"
+    field: aws.billing.UnblendedCost.amount
+    ceiling_key: staging_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: gev-finops-slo-monitoring-daily
+    name: "[Verdian Dynamics] Monitoring account daily unblended under budget"
+    description: >
+      Daily Cost Explorer unblended cost for the monitoring account must stay
+      at or below the monitoring ceiling.
+    index: metrics-aws.billing-default
+    filter: >-
+      aws.billing.group_definition.key : "LINKED_ACCOUNT" and
+      aws.billing.group_by.LINKED_ACCOUNT : "{monitoring_account_id}"
+    field: aws.billing.UnblendedCost.amount
+    ceiling_key: monitoring_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: gev-finops-slo-esf-daily
+    name: "[Verdian Dynamics] ESF accounts daily unblended under budget"
+    description: >
+      Daily Cost Explorer unblended cost for the ESF account pair combined
+      must stay at or below the ESF ceiling.
+    index: metrics-aws.billing-default
+    filter: >-
+      aws.billing.group_definition.key : "LINKED_ACCOUNT" and
+      (aws.billing.group_by.LINKED_ACCOUNT : "{esf_account_a}" or
+      aws.billing.group_by.LINKED_ACCOUNT : "{esf_account_b}")
+    field: aws.billing.UnblendedCost.amount
+    ceiling_key: esf_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: meridian-slo-llm-checkout-spend
+    name: "[Verdian Dynamics] Elastic Inference (Agent Builder) daily token budget"
+    description: >
+      Daily Elastic Inference token usage for Kibana Agent Builder must stay
+      at or below the token ceiling. This meters Elastic's assistant, not
+      application / Bedrock LLM cost.
+    index: logs-elastic.inference_token_usage-default
+    filter: 'inference.feature_id : "agent_builder"'
+    field: token_usage.total_tokens
+    ceiling_key: inference_daily_tokens
+    burn_rate_alert: true
+
+alerts:
+  - id: gev-finops-alert-calendar-mtd
+    name: "[Verdian Dynamics] AWS calendar-month unblended over MTD budget"
+    schedule: 1h
+    time_window_size: 31
+    time_window_unit: d
+    message: "FinOps: calendar-month linked-account unblended spend exceeded ${aws_mtd_budget_usd:,}"
+    esql: |
+      FROM metrics-aws.billing-default
+      | WHERE aws.billing.group_definition.key == "LINKED_ACCOUNT"
+        AND @timestamp >= DATE_TRUNC(1 month, NOW())
+      | STATS spend = SUM(aws.billing.UnblendedCost.amount)
+      | WHERE spend > {aws_mtd_budget_usd}
+
+  - id: meridian-alert-aws-mtd-budget
+    name: "[Verdian Dynamics] AWS trailing-30d spend over monthly budget"
+    schedule: 1h
+    time_window_size: 30
+    time_window_unit: d
+    message: "FinOps: AWS trailing-30d unblended spend exceeded ${aws_trailing_30d_budget_usd:,}"
+    esql: |
+      FROM metrics-aws.billing-default
+      | WHERE aws.billing.group_definition.key == "LINKED_ACCOUNT"
+      | STATS spend = SUM(aws.billing.UnblendedCost.amount)
+      | WHERE spend > {aws_trailing_30d_budget_usd}
+
+  - id: gev-finops-alert-dod-spike
+    name: "[Verdian Dynamics] AWS linked-account day-over-day spend spike"
+    schedule: 1h
+    time_window_size: 5
+    time_window_unit: d
+    workflow_id: gev-finops-spend-spike-case
+    message: "FinOps: latest linked-account day is >{dod_ratio}x the prior-days average"
+    esql: |
+      FROM metrics-aws.billing-default
+      | WHERE aws.billing.group_definition.key == "LINKED_ACCOUNT"
+      | STATS daily = SUM(aws.billing.UnblendedCost.amount) BY day = BUCKET(@timestamp, 1d)
+      | STATS latest = LAST(daily, day), prev_sum = SUM(daily), n = COUNT(daily)
+      | EVAL baseline = (prev_sum - latest) / (n - 1)
+      | WHERE n >= 4 AND latest > baseline * {dod_ratio} AND latest > {dod_latest_floor_usd}
+
+  - id: meridian-alert-staging-daily
+    name: "[Verdian Dynamics] Stage account daily spend over ceiling"
+    schedule: 1h
+    time_window_size: 1
+    time_window_unit: d
+    workflow_id: gev-finops-spend-spike-case
+    message: "FinOps: {stage_account_name} daily unblended spend exceeded ${staging_daily_alert_usd:,}"
+    esql: |
+      FROM metrics-aws.billing-default
+      | WHERE aws.billing.group_definition.key == "LINKED_ACCOUNT"
+          AND aws.billing.group_by.LINKED_ACCOUNT == "{stage_account_id}"
+      | STATS spend = SUM(aws.billing.UnblendedCost.amount)
+      | WHERE spend > {staging_daily_alert_usd}
+
+  - id: gev-finops-alert-service-dod-spike
+    name: "[Verdian Dynamics] AWS SERVICE day-over-day spend spike"
+    schedule: 1h
+    time_window_size: 8
+    time_window_unit: d
+    workflow_id: gev-finops-spend-spike-case
+    message: "FinOps: a SERVICE+account day is >{service_dod_ratio}x its prior-days average and >${service_dod_floor_usd:,}"
+    esql: |
+      FROM metrics-aws.billing-default
+      | WHERE aws.billing.group_definition.key == "SERVICE"
+      | STATS daily = SUM(aws.billing.UnblendedCost.amount) BY day = BUCKET(@timestamp, 1 day), aws.billing.group_by.SERVICE, cloud.account.id
+      | STATS latest = LAST(daily, day), prev_sum = SUM(daily), n = COUNT(daily)
+          BY aws.billing.group_by.SERVICE, cloud.account.id
+      | EVAL baseline = (prev_sum - latest) / (n - 1)
+      | WHERE n >= 4 AND latest > baseline * {service_dod_ratio} AND latest > {service_dod_floor_usd}
+      | SORT latest DESC
+      | LIMIT 20
+
+  - id: gev-finops-alert-service-completeness
+    name: "[Verdian Dynamics] Cost Explorer SERVICE grouping incomplete vs linked accounts"
+    schedule: 1h
+    time_window_size: 2
+    time_window_unit: d
+    message: "FinOps: Cost Explorer SERVICE grouping is under {completeness_ratio:.0%} of LINKED_ACCOUNT spend"
+    esql: |
+      FROM metrics-aws.billing-default
+      | STATS linked = SUM(CASE(aws.billing.group_definition.key == "LINKED_ACCOUNT", aws.billing.UnblendedCost.amount, 0)),
+              service = SUM(CASE(aws.billing.group_definition.key == "SERVICE", aws.billing.UnblendedCost.amount, 0))
+      | EVAL ratio = service / linked
+      | WHERE linked > {completeness_min_linked_usd} AND ratio < {completeness_ratio}
+
+  - id: meridian-alert-llm-agent-loop
+    name: "[Verdian Dynamics] Elastic Inference (Agent Builder) 7d token burn"
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    message: "FinOps: Agent Builder inference tokens exceeded {inference_7d_tokens:,} over 7d"
+    esql: |
+      FROM logs-elastic.inference_token_usage-default
+      | WHERE inference.feature_id == "agent_builder"
+      | STATS tokens = SUM(token_usage.total_tokens)
+      | WHERE tokens > {inference_7d_tokens}

@@ -55,7 +55,7 @@ variants:
       - apm
 
   aws:
-    title: "Meridian FinOps — AWS"
+    title: "Verdian Dynamics FinOps — AWS"
     fork_dir: cloud-llm-cost-modeling-aws
     default_scope: all
     generators:
@@ -65,6 +65,14 @@ variants:
       - aws_ec2_metrics
       - aws_billing
       - aws_billing_cur
+      - aws_rds
+      - aws_s3_daily_storage
+      - aws_lambda
+      - aws_mq_activemq
+      - aws_mq_rabbitmq
+      - aws_cloudwatch_usage
+      - kubeletstats
+      - ess_billing
       - ess_billing_credits
       - bedrock_invocation
       - bedrock_runtime
@@ -74,6 +82,7 @@ variants:
       - aws
       - aws_bedrock
       - aws_billing
+      - ess_billing
       - apm
     setup:
       tsds: true

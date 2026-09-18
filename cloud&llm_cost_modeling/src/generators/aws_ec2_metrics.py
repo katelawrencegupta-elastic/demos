@@ -1,5 +1,49 @@
 """EC2 CloudWatch-style metrics -> metrics-aws.ec2_metrics-default (5-min period)."""
+import requests
+
+from src.config import ELASTIC_URL, ES_HEADERS
 from src.generators.common import aligned, metric_doc
+from src.world.model import stable_uuid
+from src.world.scenarios import (compromised_instance, crypto_incident_active,
+                                 diurnal, rng_for)
+
+DATA_STREAM = "metrics-aws.ec2_metrics-default"
+DATASET = "aws.ec2_metrics"
+PERIOD_MIN = 5
+CUSTOM_PIPELINE = "metrics-aws.ec2_metrics@custom"
+
+CORES = {"t3.medium": 2, "m5.large": 2, "m5.xlarge": 4, "c5.2xlarge": 8,
+         "r5.large": 2, "g4dn.xlarge": 4}
+
+
+def ensure_cpu_restore_pipeline() -> None:
+    """Fleet renames CPUUtilization.avg -> host.cpu.usage; restore percent for ES|QL."""
+    body = {
+        "description": "Copy host.cpu.usage back to CPUUtilization.avg as percent",
+        "processors": [{
+            "script": {
+                "lang": "painless",
+                "source": (
+                    "if (ctx.host?.cpu?.usage != null) {"
+                    "  if (ctx.aws == null) ctx.aws = [:];"
+                    "  if (ctx.aws.ec2 == null) ctx.aws.ec2 = [:];"
+                    "  if (ctx.aws.ec2.metrics == null) ctx.aws.ec2.metrics = [:];"
+                    "  if (ctx.aws.ec2.metrics.CPUUtilization == null) "
+                    "    ctx.aws.ec2.metrics.CPUUtilization = [:];"
+                    "  ctx.aws.ec2.metrics.CPUUtilization.avg = "
+                    "    Math.round(ctx.host.cpu.usage * 100);"
+                    "}"
+                ),
+            }
+        }],
+    }
+    r = requests.put(
+        f"{ELASTIC_URL}/_ingest/pipeline/{CUSTOM_PIPELINE}",
+        headers=ES_HEADERS, json=body, timeout=30)
+    if r.status_code >= 300:
+        print(f"  [warn] {CUSTOM_PIPELINE}: {r.status_code} {r.text[:200]}")
+    else:
+        print(f"  [ok] ingest pipeline {CUSTOM_PIPELINE}")
 from src.world.model import stable_uuid
 from src.world.scenarios import (compromised_instance, crypto_incident_active,
                                  diurnal, rng_for)
@@ -18,8 +62,8 @@ def _cpu(world, inst, ts, anchor):
     val = base * (0.55 + 0.9 * diurnal(ts)) * (0.85 + rng.random() * 0.3)
     if crypto_incident_active(world, ts, anchor) and \
             inst.instance_id == compromised_instance(world).instance_id:
-        return rng.randint(96, 99)
-    return int(max(1, min(94, val)))
+        return float(rng.randint(96, 99))
+    return float(max(1, min(94, val)))
 
 
 def emit(world, t0, t1, anchor):
@@ -59,7 +103,7 @@ def emit(world, t0, t1, anchor):
                                    "dns_name": f"ec2-{inst.public_ip.replace('.', '-')}.compute-1.amazonaws.com"},
                     },
                     "metrics": {
-                        "CPUUtilization": {"avg": cpu},
+                        "CPUUtilization": {"avg": float(cpu)},
                         "NetworkIn": {"sum": net_in, "rate": net_in // (PERIOD_MIN * 60)},
                         "NetworkOut": {"sum": net_out, "rate": net_out // (PERIOD_MIN * 60)},
                         "NetworkPacketsIn": {"sum": net_in // 900},

@@ -1,0 +1,452 @@
+version: "1"
+name: FinOps rightsizing — case, evidence, auto approve
+enabled: true
+description: >
+  Copy of gev-finops-rightsize-case without HITL. Creates or updates an
+  Observability case, pulls the rec plus 14d EC2 CPU / RDS DBLoad evidence,
+  classifies risk, auto-approves the recommended handoff (approve_ticket /
+  park_infeasible / reject_false_positive), and writes in_progress or hidden
+  onto the rightsizing queue. Never ModifyInstanceAttribute or StopInstances.
+triggers:
+  - type: alert
+  - type: manual
+    inputs:
+      - name: arn
+        type: string
+        required: false
+        description: finops.rightsizing.resource_arn. If empty, investigates the top open rec.
+      - name: lookback
+        type: string
+        required: false
+        description: ES|QL duration for utilization (default "14 days").
+settings:
+  timeout: 2h
+  concurrency:
+    key: "{{ inputs.arn | default: 'top-open' }}|{{ event.alerts[0].kibana.alert.status | default: 'manual' }}"
+    max: 1
+    strategy: queue
+steps:
+  - name: extract
+    type: data.set
+    with:
+      arn: "{%- assign a = inputs.arn -%}{%- if a == nil or a == '' -%}{%- assign a = event.alerts[0].kibana.alert.grouping['finops.rightsizing.resource_arn'] -%}{%- endif -%}{%- if a == nil or a == '' -%}{%- assign a = '*' -%}{%- endif -%}{{ a | strip }}"
+      lookback: "{%- assign v = inputs.lookback -%}{%- if v == nil or v == '' -%}14 days{%- else -%}{{ v | strip }}{%- endif -%}"
+      alert_status: "{%- assign s = event.alerts[0].kibana.alert.status -%}{%- if s == nil or s == '' -%}active{%- else -%}{{ s | strip }}{%- endif -%}"
+      rule_name: "{%- assign n = event.rule.name -%}{%- if n == nil or n == '' -%}manual{%- else -%}{{ n | strip }}{%- endif -%}"
+
+  - name: rec_query
+    type: elasticsearch.esql.query
+    on-failure:
+      continue: true
+    with:
+      format: json
+      query: |
+        FROM logs-finops.rightsizing-*
+        | WHERE @timestamp > NOW() - 90 days
+        {%- if steps.extract.output.arn != "*" %}
+            AND finops.rightsizing.resource_arn == "{{ steps.extract.output.arn }}"
+        {%- else %}
+            AND finops.rightsizing.status IN ("open", "in_progress")
+        {%- endif %}
+        | SORT finops.rightsizing.estimated_monthly_savings DESC, @timestamp DESC
+        | KEEP finops.rightsizing.resource_arn, finops.rightsizing.resource_name,
+               finops.rightsizing.action, finops.rightsizing.finding,
+               finops.rightsizing.current_type, finops.rightsizing.recommended_type,
+               finops.rightsizing.estimated_monthly_savings,
+               finops.rightsizing.performance_risk, finops.rightsizing.status,
+               finops.rightsizing.resource_type, cloud.account.id,
+               cloud.instance.id, cloud.region
+        | LIMIT 5
+
+  - name: identity
+    type: data.set
+    with:
+      arn: "{%- assign a = steps.extract.output.arn -%}{%- if a == '*' -%}top-open{%- else -%}{{ a }}{%- endif -%}"
+      title: "[FinOps] Rightsizing — {{ steps.extract.output.arn }}"
+      dedup_tag: "rightsize-{{ steps.extract.output.arn }}"
+      dash_url: "{{ kibanaUrl }}/s/finops/app/dashboards#/view/finops-rightsizing-overview"
+      instance_id: "{%- assign a = steps.extract.output.arn -%}{%- assign parts = a | split: '/' -%}{{ parts | last }}"
+
+  - name: find_open
+    type: cases.findCases
+    with:
+      owner: observability
+      status:
+        - open
+        - in-progress
+      tags:
+        - "{{ steps.identity.output.dedup_tag }}"
+      category: rightsizing
+      sortField: updatedAt
+      sortOrder: desc
+      perPage: 5
+
+  - name: recovered_closeout
+    type: if
+    condition: 'event.alerts[0].kibana.alert.status : "recovered"'
+    steps:
+      - name: recovered_has_case
+        type: if
+        condition: "steps.find_open.output.total > 0"
+        steps:
+          - name: recovered_comment
+            type: cases.addComment
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+              comment: |
+                Alert recovered for `{{ steps.extract.output.arn }}`. Case left open.
+      - name: recovered_done
+        type: data.set
+        with:
+          done: "true"
+
+  - name: active_path
+    type: if
+    condition: 'not event.alerts[0].kibana.alert.status : "recovered"'
+    steps:
+      - name: upsert_case
+        type: if
+        condition: "steps.find_open.output.total > 0"
+        steps:
+          - name: update_existing
+            type: cases.updateCase
+            on-failure:
+              continue: true
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+              updates:
+                status: in-progress
+          - name: existing_id
+            type: data.set
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+        else:
+          - name: create_case
+            type: cases.createCase
+            with:
+              title: "{{ steps.identity.output.title }}"
+              description: |
+                Rightsizing investigation.
+
+                - ARN: `{{ steps.extract.output.arn }}`
+                - Rule: `{{ steps.extract.output.rule_name }}`
+
+                Validate utilization before any change. Auto-approve records the
+                RCA handoff and updates the rightsizing queue. Do not resize or
+                stop the instance from this workflow.
+              tags:
+                - finops
+                - rightsizing
+                - auto-approve
+                - "{{ steps.identity.output.dedup_tag }}"
+              category: rightsizing
+              severity: medium
+              owner: observability
+              customFields:
+                - key: resource-arn
+                  type: text
+                  value: "{{ steps.extract.output.arn }}"
+                - key: recommended-action
+                  type: text
+                  value: investigate
+                - key: approval-status
+                  type: text
+                  value: pending
+          - name: new_id
+            type: data.set
+            with:
+              case_id: "{{ steps.create_case.output.case.id }}"
+
+      - name: resolve_id
+        type: data.set
+        with:
+          case_id: "{%- assign existing = steps.find_open.output.cases[0].id -%}{%- if existing and existing != '' -%}{{ existing }}{%- else -%}{{ steps.create_case.output.case.id }}{%- endif -%}"
+
+      - name: kickoff_comment
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## Investigation started
+
+            - ARN: `{{ steps.extract.output.arn }}`
+            - Instance id (from ARN): `{{ steps.identity.output.instance_id }}`
+            - Lookback: {{ steps.extract.output.lookback }}
+            - Queue: {{ steps.identity.output.dash_url }}
+            - Rec rows: ${{ steps.rec_query.output.values | json }}
+
+      - name: persist_in_progress
+        type: data.parseJson
+        source: |
+          [
+          {%- assign rows = steps.rec_query.output.values -%}
+          {%- if rows.size > 0 -%}
+          {%- assign item = rows[0] -%}
+          {%- assign region = item[12] -%}{%- if region == nil or region == "" -%}{%- assign region = "us-west-2" -%}{%- endif -%}
+          {"create":{"_index":"logs-finops.rightsizing-default"}},{"cloud":{"provider":"aws","account":{"id":{{ item[10] | json }}},"region":{{ region | json }},"instance":{"id":{{ item[11] | json }}}},"finops":{"rightsizing":{"status":"in_progress","action":{{ item[2] | json }},"finding":{{ item[3] | json }},"resource_type":{{ item[9] | json }},"resource_arn":{{ item[0] | json }},"resource_name":{{ item[1] | json }},"current_type":{{ item[4] | json }},"recommended_type":{{ item[5] | json }},"performance_risk":{{ item[7] | json }},"lookback_days":14,"estimated_monthly_savings":{{ item[6] | json }},"owner":"finops-workflow","source":"rightsize_workflow","case_id":{{ steps.resolve_id.output.case_id | json }}}}}
+          {%- endif -%}
+          ]
+      - name: index_in_progress
+        type: elasticsearch.bulk
+        if: "{{ steps.persist_in_progress.output | size }} > 0"
+        on-failure:
+          continue: true
+        with:
+          operations: "${{ steps.persist_in_progress.output }}"
+
+      - name: evidence_cpu
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.ec2_metrics-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+            {%- if steps.identity.output.instance_id != "*" and steps.identity.output.instance_id != "top-open" and steps.identity.output.instance_id != "" %}
+                AND cloud.instance.id == "{{ steps.identity.output.instance_id }}"
+            {%- endif %}
+            | STATS cpu_avg = AVG(aws.ec2.metrics.CPUUtilization.avg),
+                    cpu_p95 = PERCENTILE(aws.ec2.metrics.CPUUtilization.avg, 95),
+                    samples = COUNT(*)
+                BY cloud.instance.id, cloud.instance.name, cloud.machine.type, cloud.account.id
+            | SORT cpu_avg ASC
+            | LIMIT 10
+
+      - name: evidence_rds
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.rds-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+                AND aws.rds.metrics.DBLoad.avg IS NOT NULL
+            | STATS dbload_avg = AVG(aws.rds.metrics.DBLoad.avg), samples = COUNT(*)
+                BY aws.dimensions.DBInstanceIdentifier, cloud.account.id
+            | SORT dbload_avg ASC
+            | LIMIT 8
+
+      - name: classify
+        type: ai.classify
+        with:
+          includeRationale: true
+          fallbackCategory: risky
+          temperature: 0
+          categories:
+            - name: safe_downsize
+              description: OVER_PROVISIONED / downsize rec and CPU p95 is under ~20% (or instance is clearly idle vs current type).
+            - name: idle_stop
+              description: IDLE finding or CPU avg under ~2% for the lookback. Stop/idle is the action, not a smaller type.
+            - name: risky
+              description: UNDER_PROVISIONED, high p95 vs the finding, missing util rows, or evidence conflicts with the rec.
+            - name: infeasible
+              description: Demo/hidden sample, HA constraint mentioned, or owner already parked it.
+          instructions: |
+            You are a FinOps analyst validating a Compute Optimizer-style rec.
+            Prefer safe_downsize when finding is OVER_PROVISIONED and CPU p95 is low.
+            Prefer idle_stop when finding is IDLE or CPU avg < 2.
+            Prefer risky when CPU evidence is missing or high.
+            Prefer infeasible when hidden_reason or seeded_sample appears, or ARN is a sample volume.
+            Do not invent CPU values. Do not claim the instance was changed.
+          input: |
+            ARN: {{ steps.extract.output.arn }}
+            INSTANCE_ID: {{ steps.identity.output.instance_id }}
+            REC_COLUMNS: ${{ steps.rec_query.output.columns | json }}
+            REC_VALUES: ${{ steps.rec_query.output.values | json }}
+            CPU_COLUMNS: ${{ steps.evidence_cpu.output.columns | json }}
+            CPU_VALUES: ${{ steps.evidence_cpu.output.values | json }}
+            RDS_COLUMNS: ${{ steps.evidence_rds.output.columns | json }}
+            RDS_VALUES: ${{ steps.evidence_rds.output.values | json }}
+
+      - name: map_rca
+        type: data.set
+        with:
+          fix_id: "{%- assign c = steps.classify.output.category -%}{%- if c == 'safe_downsize' or c == 'idle_stop' -%}approve_ticket{%- elsif c == 'infeasible' -%}park_infeasible{%- else -%}reject_false_positive{%- endif -%}"
+          severity: "{%- assign c = steps.classify.output.category -%}{%- if c == 'safe_downsize' or c == 'idle_stop' -%}medium{%- elsif c == 'risky' -%}low{%- else -%}low{%- endif -%}"
+
+      - name: rca
+        type: ai.prompt
+        with:
+          temperature: 0
+          systemPrompt: |
+            You are a FinOps analyst writing a case comment. Use only the rec
+            JSON and utilization JSON. Do not invent CPU or savings.
+            recommended_fix_id must match the provided fix_id.
+            Never claim AWS was mutated. Propose a change ticket only.
+          prompt: |
+            Write an RCA for a rightsizing recommendation.
+
+            Class: {{ steps.classify.output.category }}
+            Rationale: {{ steps.classify.output.rationale }}
+            fix_id: {{ steps.map_rca.output.fix_id }}
+            ARN: {{ steps.extract.output.arn }}
+
+            REC: ${{ steps.rec_query.output.values | json }}
+            CPU: ${{ steps.evidence_cpu.output.values | json }}
+            RDS: ${{ steps.evidence_rds.output.values | json }}
+          schema:
+            type: object
+            properties:
+              summary:
+                type: string
+              likely_cause:
+                type: string
+              util_vs_rec:
+                type: string
+              recommended_fix_id:
+                type: string
+              remediation_steps:
+                type: array
+                items:
+                  type: string
+              evidence_bullets:
+                type: array
+                items:
+                  type: string
+            required:
+              - summary
+              - likely_cause
+              - util_vs_rec
+              - recommended_fix_id
+              - remediation_steps
+
+      - name: set_severity
+        type: cases.setSeverity
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          severity: "{{ steps.map_rca.output.severity }}"
+
+      - name: set_rca_class
+        type: cases.setCustomField
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: rca-class
+          value: "{{ steps.classify.output.category }}"
+
+      - name: set_proposed_fix
+        type: cases.setCustomField
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: proposed-fix
+          value: "{{ steps.map_rca.output.fix_id }}"
+
+      - name: set_action_field
+        type: cases.setCustomField
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: recommended-action
+          value: "{{ steps.classify.output.category }}"
+
+      - name: write_rca
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## RCA
+
+            - **Class:** `{{ steps.classify.output.category }}`
+            - **Recommended fix_id:** `{{ steps.map_rca.output.fix_id }}`
+            - **ARN:** `{{ steps.extract.output.arn }}`
+
+            **Summary:** {{ steps.rca.output.content.summary }}
+
+            **Likely cause:** {{ steps.rca.output.content.likely_cause }}
+
+            **Util vs rec:** {{ steps.rca.output.content.util_vs_rec }}
+
+            **Evidence:**
+            {%- for b in steps.rca.output.content.evidence_bullets %}
+            - {{ b }}
+            {%- endfor %}
+
+            **Proposed ticket (not applied):**
+            {%- for s in steps.rca.output.content.remediation_steps %}
+            - {{ s }}
+            {%- endfor %}
+
+            Auto-path next: this workflow sets `approval-status` from the
+            recommended fix and writes `in_progress` or `hidden` onto the
+            rightsizing queue. It never calls StopInstances or
+            ModifyInstanceAttribute.
+
+      - name: auto_decision
+        type: data.set
+        with:
+          decision: "{%- assign f = steps.map_rca.output.fix_id -%}{%- if f == 'park_infeasible' -%}park_infeasible{%- elsif f == 'reject_false_positive' -%}reject_false_positive{%- else -%}approve_ticket{%- endif -%}"
+          notes: >
+            Auto-approved by gev-finops-rightsize-auto-approve from RCA
+            class {{ steps.classify.output.category }}. No AWS mutation.
+
+      - name: set_approval_status
+        type: cases.setCustomField
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: approval-status
+          value: "{{ steps.auto_decision.output.decision }}"
+
+      - name: maybe_infeasible
+        type: if
+        condition: 'steps.auto_decision.output.decision : "park_infeasible"'
+        steps:
+          - name: set_infeasible
+            type: cases.setCustomField
+            on-failure:
+              continue: true
+            with:
+              case_id: "{{ steps.resolve_id.output.case_id }}"
+              owner: observability
+              field_name: infeasible
+              value: "true"
+
+      - name: after_approval
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## Auto-approved
+
+            - **Decision:** `{{ steps.auto_decision.output.decision }}`
+            - **Notes:** {{ steps.auto_decision.output.notes }}
+            - **Class was:** `{{ steps.classify.output.category }}`
+            - **Queue:** {{ steps.identity.output.dash_url }}
+
+            No AWS mutation was performed. If `approve_ticket`, open a change
+            ticket for the owning team.
+
+      - name: persist_hitl_status
+        type: data.set
+        with:
+          status: "{%- assign d = steps.auto_decision.output.decision -%}{%- if d == 'park_infeasible' or d == 'reject_false_positive' -%}hidden{%- else -%}in_progress{%- endif -%}"
+          hidden_reason: "{%- assign d = steps.auto_decision.output.decision -%}{%- if d == 'park_infeasible' -%}auto_infeasible{%- elsif d == 'reject_false_positive' -%}false_positive{%- else -%}{%- endif -%}"
+      - name: build_hitl_rec
+        type: data.parseJson
+        source: |
+          [
+          {%- assign rows = steps.rec_query.output.values -%}
+          {%- if rows.size > 0 -%}
+          {%- assign item = rows[0] -%}
+          {%- assign region = item[12] -%}{%- if region == nil or region == "" -%}{%- assign region = "us-west-2" -%}{%- endif -%}
+          {"create":{"_index":"logs-finops.rightsizing-default"}},{"cloud":{"provider":"aws","account":{"id":{{ item[10] | json }}},"region":{{ region | json }},"instance":{"id":{{ item[11] | json }}}},"finops":{"rightsizing":{"status":{{ steps.persist_hitl_status.output.status | json }},"hidden_reason":{{ steps.persist_hitl_status.output.hidden_reason | json }},"action":{{ item[2] | json }},"finding":{{ item[3] | json }},"resource_type":{{ item[9] | json }},"resource_arn":{{ item[0] | json }},"resource_name":{{ item[1] | json }},"current_type":{{ item[4] | json }},"recommended_type":{{ item[5] | json }},"performance_risk":{{ item[7] | json }},"lookback_days":14,"estimated_monthly_savings":{{ item[6] | json }},"owner":"finops-workflow","source":"rightsize_workflow","case_id":{{ steps.resolve_id.output.case_id | json }}}}}
+          {%- endif -%}
+          ]
+      - name: index_hitl_rec
+        type: elasticsearch.bulk
+        if: "{{ steps.build_hitl_rec.output | size }} > 0"
+        on-failure:
+          continue: true
+        with:
+          operations: "${{ steps.build_hitl_rec.output }}"

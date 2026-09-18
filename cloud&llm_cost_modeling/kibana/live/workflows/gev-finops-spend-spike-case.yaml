@@ -1,0 +1,579 @@
+version: "1"
+name: FinOps spend spike — case, RCA, HITL
+enabled: true
+description: >
+  Day-over-day or stage-ceiling spend alert. Creates or updates an Observability
+  case, gathers Cost Explorer and utilization evidence, classifies RCA, and
+  waits for HITL. Never StopInstances, ModifyInstanceAttribute, or RDS modify.
+triggers:
+  - type: alert
+  - type: manual
+    inputs:
+      - name: account
+        type: string
+        required: false
+        description: AWS account id (cloud.account.id). Default * except stage-daily → 985408759551.
+      - name: service
+        type: string
+        required: false
+        description: Cost Explorer SERVICE name, or * for all.
+      - name: lookback
+        type: string
+        required: false
+        description: ES|QL duration (default "14 days").
+settings:
+  timeout: 26h
+  concurrency:
+    key: "{{ event.rule.name | default: 'manual' }}|{{ inputs.account | default: '*' }}|{{ inputs.service | default: '*' }}|{{ event.alerts[0].kibana.alert.status | default: 'manual' }}"
+    max: 1
+    strategy: queue
+steps:
+  - name: extract
+    type: data.set
+    with:
+      rule_name: "{%- assign n = event.rule.name -%}{%- if n == nil or n == '' -%}manual{%- else -%}{{ n | strip }}{%- endif -%}"
+      lookback: "{%- assign v = inputs.lookback -%}{%- if v == nil or v == '' -%}14 days{%- else -%}{{ v | strip }}{%- endif -%}"
+      account: "{%- assign n = event.rule.name -%}{%- assign a = inputs.account -%}{%- if a != nil and a != '' -%}{{ a | strip }}{%- elsif n contains 'Stage' or n contains 'stage' -%}985408759551{%- else -%}*{%- endif -%}"
+      service: "{%- assign s = inputs.service -%}{%- if s == nil or s == '' -%}*{%- else -%}{{ s | strip }}{%- endif -%}"
+      alert_status: "{%- assign s = event.alerts[0].kibana.alert.status -%}{%- if s == nil or s == '' -%}active{%- else -%}{{ s | strip }}{%- endif -%}"
+
+  - name: identity
+    type: data.set
+    with:
+      title: "[FinOps] Spend spike — {{ steps.extract.output.account }} / {{ steps.extract.output.service }}"
+      dedup_tag: "spend-{{ steps.extract.output.account }}-{{ steps.extract.output.service }}"
+      dash_url: "{{ kibanaUrl }}/s/finops/app/dashboards#/view/finops-aws-billing-overview-unblended?_g=(time:(from:now-30d,to:now))"
+
+  - name: find_open
+    type: cases.findCases
+    with:
+      owner: observability
+      status:
+        - open
+        - in-progress
+      tags:
+        - "{{ steps.identity.output.dedup_tag }}"
+      category: finops
+      sortField: updatedAt
+      sortOrder: desc
+      perPage: 5
+
+  - name: recovered_closeout
+    type: if
+    condition: 'event.alerts[0].kibana.alert.status : "recovered"'
+    steps:
+      - name: recovered_has_case
+        type: if
+        condition: "steps.find_open.output.total > 0"
+        steps:
+          - name: get_recovered_case
+            type: cases.getCase
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+              include_comments: false
+          - name: recovered_approval
+            type: data.set
+            with:
+              approval_status: "{%- assign st = 'unknown' -%}{%- assign fields = steps.get_recovered_case.output.case.customFields -%}{%- if fields == nil -%}{%- assign fields = steps.get_recovered_case.output.customFields -%}{%- endif -%}{%- for f in fields -%}{%- if f.key == 'approval-status' -%}{%- assign st = f.value -%}{%- endif -%}{%- endfor -%}{{ st }}"
+          - name: recovered_comment
+            type: cases.addComment
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+              comment: |
+                ## Recovered
+
+                Spend signal recovered for account `{{ steps.extract.output.account }}`
+                / service `{{ steps.extract.output.service }}`.
+                Approval status: `{{ steps.recovered_approval.output.approval_status }}`.
+          - name: maybe_close
+            type: if
+            condition: 'not steps.recovered_approval.output.approval_status : "pending"'
+            steps:
+              - name: close_recovered
+                type: cases.closeCase
+                with:
+                  case_id: "{{ steps.find_open.output.cases[0].id }}"
+      - name: recovered_done
+        type: data.set
+        with:
+          done: "true"
+
+  - name: active_path
+    type: if
+    condition: 'not event.alerts[0].kibana.alert.status : "recovered"'
+    steps:
+      - name: upsert_case
+        type: if
+        condition: "steps.find_open.output.total > 0"
+        steps:
+          - name: update_existing
+            type: cases.updateCase
+            on-failure:
+              continue: true
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+              updates:
+                status: in-progress
+          - name: existing_id
+            type: data.set
+            with:
+              case_id: "{{ steps.find_open.output.cases[0].id }}"
+          - name: reopen_note
+            type: cases.addComment
+            with:
+              case_id: "{{ steps.existing_id.output.case_id }}"
+              comment: |
+                ## Alert re-fired
+
+                Rule: `{{ steps.extract.output.rule_name }}`
+                Account / service: `{{ steps.extract.output.account }}` /
+                `{{ steps.extract.output.service }}`
+                Reason: {{ event.alerts[0].kibana.alert.reason }}
+        else:
+          - name: create_case
+            type: cases.createCase
+            with:
+              title: "{{ steps.identity.output.title }}"
+              description: |
+                Spend moved vs the recent Cost Explorer baseline.
+
+                - Account: `{{ steps.extract.output.account }}`
+                - Service: `{{ steps.extract.output.service }}`
+                - Rule: `{{ steps.extract.output.rule_name }}`
+
+                Do not stop instances or resize resources until HITL.
+                Quote LINKED_ACCOUNT as the bill; SERVICE is a slice.
+              tags:
+                - finops
+                - spend-anomaly
+                - "{{ steps.identity.output.dedup_tag }}"
+              category: finops
+              severity: medium
+              owner: observability
+              customFields:
+                - key: resource-arn
+                  type: text
+                  value: "account/{{ steps.extract.output.account }}"
+                - key: recommended-action
+                  type: text
+                  value: investigate
+                - key: cloud-account-id
+                  type: text
+                  value: "{{ steps.extract.output.account }}"
+                - key: billing-service
+                  type: text
+                  value: "{{ steps.extract.output.service }}"
+                - key: approval-status
+                  type: text
+                  value: pending
+          - name: new_id
+            type: data.set
+            with:
+              case_id: "{{ steps.create_case.output.case.id }}"
+
+      - name: resolve_id
+        type: data.set
+        with:
+          case_id: "{%- assign existing = steps.find_open.output.cases[0].id -%}{%- if existing and existing != '' -%}{{ existing }}{%- else -%}{{ steps.create_case.output.case.id }}{%- endif -%}"
+
+      - name: kickoff_comment
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## Investigation started
+
+            Workflow fired for **{{ steps.extract.output.rule_name }}**.
+
+            - Account: `{{ steps.extract.output.account }}`
+            - Service: `{{ steps.extract.output.service }}`
+            - Lookback: {{ steps.extract.output.lookback }}
+            - Dashboard: {{ steps.identity.output.dash_url }}
+            - Case: {{ kibanaUrl }}/s/finops/app/observability/cases/{{ steps.resolve_id.output.case_id }}
+
+      - name: evidence_linked
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.billing-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+                AND aws.billing.group_definition.key == "LINKED_ACCOUNT"
+            {%- if steps.extract.output.account != "*" and steps.extract.output.account != "unknown" %}
+                AND cloud.account.id == "{{ steps.extract.output.account }}"
+            {%- endif %}
+            | STATS spend = SUM(aws.billing.UnblendedCost.amount)
+                BY day = BUCKET(@timestamp, 1 day), cloud.account.id
+            | SORT day DESC
+            | LIMIT 40
+
+      - name: evidence_service
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.billing-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+                AND aws.billing.group_definition.key == "SERVICE"
+            {%- if steps.extract.output.account != "*" and steps.extract.output.account != "unknown" %}
+                AND cloud.account.id == "{{ steps.extract.output.account }}"
+            {%- endif %}
+            {%- if steps.extract.output.service != "*" %}
+                AND aws.billing.group_by.SERVICE == "{{ steps.extract.output.service }}"
+            {%- endif %}
+            | STATS spend = SUM(aws.billing.UnblendedCost.amount)
+                BY aws.billing.group_by.SERVICE, cloud.account.id
+            | SORT spend DESC
+            | LIMIT 15
+
+      - name: evidence_dod
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.billing-default
+            | WHERE aws.billing.group_definition.key == "SERVICE"
+            | STATS daily = SUM(aws.billing.UnblendedCost.amount)
+                BY day = BUCKET(@timestamp, 1 day), aws.billing.group_by.SERVICE, cloud.account.id
+            | STATS latest = LAST(daily, day), prev_sum = SUM(daily), n = COUNT(daily)
+                BY aws.billing.group_by.SERVICE, cloud.account.id
+            | EVAL baseline = (prev_sum - latest) / (n - 1)
+            | WHERE n >= 4 AND latest > baseline * 1.5 AND latest > 100
+            | SORT latest DESC
+            | LIMIT 15
+
+      - name: evidence_ec2
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.ec2_metrics-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+            {%- if steps.extract.output.account != "*" and steps.extract.output.account != "unknown" %}
+                AND cloud.account.id == "{{ steps.extract.output.account }}"
+            {%- endif %}
+            | STATS cpu_avg = AVG(aws.ec2.metrics.CPUUtilization.avg),
+                    cpu_p95 = PERCENTILE(aws.ec2.metrics.CPUUtilization.avg, 95)
+                BY cloud.instance.id, cloud.instance.name, cloud.machine.type, cloud.account.id, cloud.region
+            | WHERE cpu_avg < 5
+            | SORT cpu_avg ASC
+            | KEEP cloud.account.id, cloud.instance.id, cloud.instance.name, cloud.machine.type, cloud.region, cpu_avg, cpu_p95
+            | LIMIT 10
+
+      - name: evidence_rds
+        type: elasticsearch.esql.query
+        on-failure:
+          continue: true
+        with:
+          format: json
+          query: |
+            FROM metrics-aws.rds-*
+            | WHERE @timestamp > NOW() - {{ steps.extract.output.lookback }}
+                AND aws.rds.metrics.DBLoad.avg IS NOT NULL
+            {%- if steps.extract.output.account != "*" and steps.extract.output.account != "unknown" %}
+                AND cloud.account.id == "{{ steps.extract.output.account }}"
+            {%- endif %}
+            | STATS dbload_avg = AVG(aws.rds.metrics.DBLoad.avg), samples = COUNT(*)
+                BY aws.dimensions.DBInstanceIdentifier, cloud.account.id, cloud.region
+            | SORT dbload_avg ASC
+            | KEEP cloud.account.id, aws.dimensions.DBInstanceIdentifier, cloud.region, dbload_avg, samples
+            | LIMIT 8
+
+      - name: classify
+        type: ai.classify
+        with:
+          includeRationale: true
+          fallbackCategory: unknown
+          temperature: 0
+          categories:
+            - name: expected_growth
+              description: Spend rose with known usage (new env, SP purchase line, planned scale). Not a leak.
+            - name: orphaned_idle
+              description: Dollars up or still high while EC2 CPU or RDS DBLoad is near idle. Likely unused resources.
+            - name: new_service
+              description: A SERVICE line appeared or jumped that was not in the prior baseline (new product or SKU).
+            - name: completeness_gap
+              description: SERVICE grain is far below LINKED_ACCOUNT; do not quote the service table as the bill.
+            - name: unknown
+              description: Evidence missing, grains conflict, or the jump is unexplained.
+          instructions: |
+            You are a FinOps analyst. Classify the spend movement for account
+            {{ steps.extract.output.account }} / service {{ steps.extract.output.service }}.
+            Prefer orphaned_idle when low-CPU or low-DBLoad rows exist in the same account.
+            Prefer completeness_gap when SERVICE totals look far below linked-account.
+            Prefer expected_growth for Savings Plans for AWS Compute usage as the top SERVICE.
+            Do not invent USD values. Do not recommend stopping instances.
+          input: |
+            RULE: {{ steps.extract.output.rule_name }}
+            ALERT_REASON: {{ event.alerts[0].kibana.alert.reason }}
+            ACCOUNT: {{ steps.extract.output.account }}
+            SERVICE: {{ steps.extract.output.service }}
+
+            LINKED_COLUMNS: ${{ steps.evidence_linked.output.columns | json }}
+            LINKED_VALUES: ${{ steps.evidence_linked.output.values | json }}
+
+            SERVICE_COLUMNS: ${{ steps.evidence_service.output.columns | json }}
+            SERVICE_VALUES: ${{ steps.evidence_service.output.values | json }}
+
+            DOD_COLUMNS: ${{ steps.evidence_dod.output.columns | json }}
+            DOD_VALUES: ${{ steps.evidence_dod.output.values | json }}
+
+            EC2_COLUMNS: ${{ steps.evidence_ec2.output.columns | json }}
+            EC2_VALUES: ${{ steps.evidence_ec2.output.values | json }}
+
+            RDS_COLUMNS: ${{ steps.evidence_rds.output.columns | json }}
+            RDS_VALUES: ${{ steps.evidence_rds.output.values | json }}
+
+      - name: persist_idle_recs
+        type: if
+        condition: 'steps.classify.output.category : "orphaned_idle"'
+        steps:
+          - name: build_ec2_bulk
+            type: data.parseJson
+            source: |
+              [
+              {%- assign rows = steps.evidence_ec2.output.values -%}
+              {%- for item in rows -%}
+              {%- assign region = item[4] -%}{%- if region == nil or region == "" -%}{%- assign region = "us-west-2" -%}{%- endif -%}
+              {%- capture arn -%}arn:aws:ec2:{{ region }}:{{ item[0] }}:instance/{{ item[1] }}{%- endcapture -%}
+              {%- capture rec_id -%}wf-ec2-{{ item[0] }}-{{ item[1] }}{%- endcapture -%}
+              {"create":{"_index":"logs-finops.rightsizing-default","_id":{{ rec_id | json }}}},{"cloud":{"provider":"aws","account":{"id":{{ item[0] | json }}},"region":{{ region | json }},"instance":{"id":{{ item[1] | json }},"name":{{ item[2] | json }}},"machine":{"type":{{ item[3] | json }}}},"finops":{"rightsizing":{"status":"open","action":"stop_idle","finding":"IDLE","resource_type":"ec2","resource_arn":{{ arn | json }},"resource_name":{{ item[2] | json }},"current_type":{{ item[3] | json }},"recommended_type":"review","performance_risk":"Low","lookback_days":14,"estimated_monthly_savings":0,"owner":"finops-workflow","source":"spend_spike_workflow","case_id":{{ steps.resolve_id.output.case_id | json }}}}}{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+              ]
+          - name: index_ec2_recs
+            type: elasticsearch.bulk
+            if: "{{ steps.build_ec2_bulk.output | size }} > 0"
+            on-failure:
+              continue: true
+            with:
+              operations: "${{ steps.build_ec2_bulk.output }}"
+          - name: build_rds_bulk
+            type: data.parseJson
+            source: |
+              [
+              {%- assign rows = steps.evidence_rds.output.values -%}
+              {%- for item in rows -%}
+              {%- assign region = item[2] -%}{%- if region == nil or region == "" -%}{%- assign region = "us-west-2" -%}{%- endif -%}
+              {%- capture arn -%}arn:aws:rds:{{ region }}:{{ item[0] }}:db:{{ item[1] }}{%- endcapture -%}
+              {%- capture rec_id -%}wf-rds-{{ item[0] }}-{{ item[1] }}{%- endcapture -%}
+              {"create":{"_index":"logs-finops.rightsizing-default","_id":{{ rec_id | json }}}},{"cloud":{"provider":"aws","account":{"id":{{ item[0] | json }}},"region":{{ region | json }}},"finops":{"rightsizing":{"status":"open","action":"stop_idle","finding":"IDLE","resource_type":"rds","resource_arn":{{ arn | json }},"resource_name":{{ item[1] | json }},"current_type":"rds","recommended_type":"review","performance_risk":"Low","lookback_days":14,"estimated_monthly_savings":0,"owner":"finops-workflow","source":"spend_spike_workflow","case_id":{{ steps.resolve_id.output.case_id | json }}}}}{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+              ]
+          - name: index_rds_recs
+            type: elasticsearch.bulk
+            if: "{{ steps.build_rds_bulk.output | size }} > 0"
+            on-failure:
+              continue: true
+            with:
+              operations: "${{ steps.build_rds_bulk.output }}"
+          - name: persist_comment
+            type: cases.addComment
+            on-failure:
+              continue: true
+            with:
+              case_id: "{{ steps.resolve_id.output.case_id }}"
+              comment: |
+                ## Queue write
+
+                Class `orphaned_idle` — idle EC2/RDS rows were written to
+                `logs-finops.rightsizing-default` (`source: spend_spike_workflow`).
+                They appear on [Rightsizing queue]({{ kibanaUrl }}/s/finops/app/dashboards#/view/finops-rightsizing-overview)
+                after the latest transform (~5 min). Estimated savings are **$0**
+                (do not invent USD). Re-runs use `create` + stable id so they do not duplicate.
+
+                EC2 rows: ${{ steps.evidence_ec2.output.values | size }}
+                RDS rows: ${{ steps.evidence_rds.output.values | size }}
+
+      - name: map_rca
+        type: data.set
+        with:
+          fix_id: "{%- assign c = steps.classify.output.category -%}{%- if c == 'orphaned_idle' -%}page_owner{%- elsif c == 'new_service' -%}page_owner{%- elsif c == 'completeness_gap' -%}park{%- elsif c == 'expected_growth' -%}false_positive{%- else -%}page_owner{%- endif -%}"
+          severity: "{%- assign c = steps.classify.output.category -%}{%- if c == 'orphaned_idle' or c == 'new_service' -%}high{%- elsif c == 'completeness_gap' -%}medium{%- else -%}low{%- endif -%}"
+
+      - name: rca
+        type: ai.prompt
+        with:
+          temperature: 0
+          systemPrompt: |
+            You are a FinOps analyst writing a case comment. Use only the
+            evidence JSON and the already-chosen RCA class. Do not invent USD.
+            If a values array is empty, say the query returned no rows.
+            recommended_fix_id must be exactly the provided fix_id.
+            Never claim AWS resources were stopped or resized.
+            Quote LINKED_ACCOUNT as the bill; SERVICE is a slice of the same dollars.
+          prompt: |
+            Write an RCA for a Cost Explorer spend movement.
+
+            RCA class: {{ steps.classify.output.category }}
+            Classifier rationale: {{ steps.classify.output.rationale }}
+            Recommended fix_id: {{ steps.map_rca.output.fix_id }}
+            Account: {{ steps.extract.output.account }}
+            Service: {{ steps.extract.output.service }}
+            Rule: {{ steps.extract.output.rule_name }}
+
+            LINKED: ${{ steps.evidence_linked.output.values | json }}
+            SERVICE: ${{ steps.evidence_service.output.values | json }}
+            DOD: ${{ steps.evidence_dod.output.values | json }}
+            EC2_LOW_CPU: ${{ steps.evidence_ec2.output.values | json }}
+            RDS_DBLOAD: ${{ steps.evidence_rds.output.values | json }}
+          schema:
+            type: object
+            properties:
+              summary:
+                type: string
+              likely_cause:
+                type: string
+              what_moved:
+                type: string
+              util_join:
+                type: string
+              recommended_fix_id:
+                type: string
+              remediation_steps:
+                type: array
+                items:
+                  type: string
+              evidence_bullets:
+                type: array
+                items:
+                  type: string
+            required:
+              - summary
+              - likely_cause
+              - what_moved
+              - util_join
+              - recommended_fix_id
+              - remediation_steps
+
+      - name: set_severity
+        type: cases.setSeverity
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          severity: "{{ steps.map_rca.output.severity }}"
+
+      - name: set_rca_class
+        type: cases.setCustomField
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: rca-class
+          value: "{{ steps.classify.output.category }}"
+
+      - name: set_proposed_fix
+        type: cases.setCustomField
+        on-failure:
+          continue: true
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: proposed-fix
+          value: "{{ steps.map_rca.output.fix_id }}"
+
+      - name: write_rca
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## RCA
+
+            - **Class:** `{{ steps.classify.output.category }}`
+            - **Recommended fix_id:** `{{ steps.map_rca.output.fix_id }}`
+            - **Severity:** {{ steps.map_rca.output.severity }}
+            - **Classifier rationale:** {{ steps.classify.output.rationale }}
+
+            **Summary:** {{ steps.rca.output.content.summary }}
+
+            **Likely cause:** {{ steps.rca.output.content.likely_cause }}
+
+            **What moved:** {{ steps.rca.output.content.what_moved }}
+
+            **Util join:** {{ steps.rca.output.content.util_join }}
+
+            **Evidence:**
+            {%- for b in steps.rca.output.content.evidence_bullets %}
+            - {{ b }}
+            {%- endfor %}
+
+            **Proposed next step (not applied):**
+            {%- for s in steps.rca.output.content.remediation_steps %}
+            - {{ s }}
+            {%- endfor %}
+
+            Approve or reject in the workflow execution HITL form. Resume only from Kibana.
+            This workflow never stops or resizes AWS resources.
+
+      - name: approve_fix
+        type: waitForInput
+        timeout: 24h
+        on-failure:
+          fallback:
+            - name: hitl_timeout_note
+              type: cases.addComment
+              with:
+                case_id: "{{ steps.resolve_id.output.case_id }}"
+                comment: |
+                  HITL timed out after 24h. `approval-status` remains pending. No AWS change was made.
+        with:
+          message: |
+            ## Page an owner for this spend movement?
+
+            **RCA class:** `{{ steps.classify.output.category }}`
+            **Recommended:** `{{ steps.map_rca.output.fix_id }}`
+
+            {{ steps.rca.output.content.summary }}
+
+            [Case]({{ kibanaUrl }}/s/finops/app/observability/cases/{{ steps.resolve_id.output.case_id }})
+
+            **page_owner** records that someone should take the ticket.
+            **park** keeps it out of the active queue.
+            **false_positive** is expected growth or a grain artifact.
+            No instance will be stopped.
+          schema:
+            type: object
+            properties:
+              decision:
+                type: string
+                enum:
+                  - page_owner
+                  - park
+                  - false_positive
+                description: HITL decision
+              notes:
+                type: string
+                description: Optional notes for the case
+            required:
+              - decision
+
+      - name: set_approval_status
+        type: cases.setCustomField
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          owner: observability
+          field_name: approval-status
+          value: "{%- assign d = steps.approve_fix.output.response.decision -%}{%- if d == nil or d == '' -%}{%- assign d = steps.approve_fix.output.decision -%}{%- endif -%}{{ d }}"
+
+      - name: after_approval
+        type: cases.addComment
+        with:
+          case_id: "{{ steps.resolve_id.output.case_id }}"
+          comment: |
+            ## HITL decision
+
+            - **Decision:** `{%- assign d = steps.approve_fix.output.response.decision -%}{%- if d == nil or d == '' -%}{%- assign d = steps.approve_fix.output.decision -%}{%- endif -%}{{ d }}`
+            - **Notes:** {%- assign n = steps.approve_fix.output.response.notes -%}{%- if n == nil or n == '' -%}{%- assign n = steps.approve_fix.output.notes -%}{%- endif -%}{{ n }}
+            - **Recommended class was:** `{{ steps.classify.output.category }}`
+
+            No AWS mutation was performed. Follow the owning team's change process
+            if an idle resource should be stopped or a ticket opened.

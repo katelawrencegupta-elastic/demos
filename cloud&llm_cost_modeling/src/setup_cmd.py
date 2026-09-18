@@ -4,7 +4,7 @@ import json
 
 import requests
 
-from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL
+from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_ROOT, KIBANA_URL
 from src.time_window import demo_window
 
 PACKAGES = [
@@ -19,6 +19,14 @@ TSDS_PATCH = [
     "metrics-aws.ec2_metrics",
     "metrics-aws_bedrock.runtime",
     "metrics-aws_bedrock.guardrails",
+    "metrics-aws.rds",
+    "metrics-aws.lambda",
+    "metrics-aws.s3_daily_storage",
+    "metrics-aws.cloudwatch_metrics",
+    "metrics-aws.usage",
+    "metrics-aws_mq.activemq_metrics",
+    "metrics-aws_mq.rabbitmq_metrics",
+    "metrics-ess_billing.billing",
 ]
 
 TEMPLATE_KEYS = ("index_patterns", "template", "composed_of", "priority",
@@ -33,7 +41,7 @@ def ensure_packages():
         print("  [skip] no Fleet packages for this variant")
         return
     for pkg in packages:
-        r = requests.get(f"{KIBANA_URL}/api/fleet/epm/packages/{pkg}",
+        r = requests.get(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
                          headers=KBN_HEADERS, timeout=60)
         r.raise_for_status()
         item = r.json()["item"]
@@ -41,7 +49,7 @@ def ensure_packages():
             print(f"  [ok] package {pkg} {item['version']} already installed")
             continue
         print(f"  installing package {pkg} ...")
-        r = requests.post(f"{KIBANA_URL}/api/fleet/epm/packages/{pkg}",
+        r = requests.post(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
                           headers=KBN_HEADERS, json={}, timeout=600)
         if r.status_code >= 300:
             # APM is often unavailable via Fleet on Serverless (built-in OTel).
@@ -61,6 +69,9 @@ def patch_tsds_templates():
     for name in TSDS_PATCH:
         r = requests.get(f"{ELASTIC_URL}/_index_template/{name}",
                          headers=ES_HEADERS, timeout=60)
+        if r.status_code == 404:
+            print(f"  [skip] {name} template not installed")
+            continue
         r.raise_for_status()
         tpl = r.json()["index_templates"][0]["index_template"]
         idx = tpl.get("template", {}).get("settings", {}).get("index", {})
@@ -376,6 +387,11 @@ def patch_inference_token_usage_dashboard():
 
 
 def run():
+    from src.profile import is_live
+    if is_live():
+        from src.live_setup import run as live_run
+        live_run(fail_loud=False)
+        return
     from src.variant import active_variant
     v = active_variant()
     print(f"== variant: {v.id} — {v.title} ==")
@@ -435,7 +451,7 @@ def run():
         from src.budgets import ensure_budgets
         ensure_budgets(fail_loud=False)
     if v.setup_enabled("agent"):
-        print("== Meridian FinOps AI Assistant ==")
+        print("== Verdian Dynamics FinOps AI Assistant ==")
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=False)
     print("setup complete.")

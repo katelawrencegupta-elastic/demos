@@ -1,0 +1,10 @@
+# Live Verdian Dynamics AWS account map (Cost Explorer LINKED_ACCOUNT ids).
+stage:
+  id: "985408759551"
+  name: apm-stage
+monitoring:
+  id: "041298796264"
+  name: monitoring
+esf:
+  - id: "439106060789"
+  - id: "119672459156"

@@ -1,0 +1,68 @@
+{
+  "index_patterns": [
+    "finops-rightsizing-latest*"
+  ],
+  "template": {
+    "mappings": {
+      "dynamic": true,
+      "properties": {
+        "cloud": {
+          "properties": {
+            "instance": {
+              "properties": {
+                "id": { "type": "keyword" }
+              }
+            },
+            "provider": { "type": "keyword" },
+            "region": { "type": "keyword" },
+            "account": {
+              "properties": {
+                "name": { "type": "keyword" },
+                "id": { "type": "keyword" }
+              }
+            }
+          }
+        },
+        "@timestamp": { "type": "date" },
+        "event": {
+          "properties": {
+            "ingested": { "type": "date" },
+            "kind": { "type": "keyword" },
+            "dataset": { "type": "keyword" }
+          }
+        },
+        "finops": {
+          "properties": {
+            "rightsizing": {
+              "properties": {
+                "owner": { "type": "keyword" },
+                "performance_risk": { "type": "keyword" },
+                "lookback_days": { "type": "integer" },
+                "resource_type": { "type": "keyword" },
+                "source": { "type": "keyword" },
+                "finding": { "type": "keyword" },
+                "hidden_reason": { "type": "keyword" },
+                "current_type": { "type": "keyword" },
+                "estimated_monthly_savings": { "type": "double" },
+                "resource_arn": { "type": "keyword" },
+                "case_id": { "type": "keyword" },
+                "action": { "type": "keyword" },
+                "currency": { "type": "keyword" },
+                "id": { "type": "keyword" },
+                "resource_name": { "type": "keyword" },
+                "recommended_type": { "type": "keyword" },
+                "status": { "type": "keyword" },
+                "realized_savings": { "type": "double" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "composed_of": [],
+  "priority": 600,
+  "_meta": {
+    "description": "Transform dest for finops-rightsizing-latest. Explicit mappings so ES|QL can see status / estimated_monthly_savings."
+  }
+}
