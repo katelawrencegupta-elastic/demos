@@ -44,7 +44,7 @@ If time is short, **cut lab 3 CLI** and keep the namespace decision plus lab 2 `
 .venv/bin/python scripts/create_kibana.py
 ```
 
-Confirm Kibana login on `https://klg-slb-workshop-arch02-939ab5.kb.us-central1.gcp.cloud.es.io`.
+Confirm Kibana login on `https://klgslbdemo-c07dc6.kb.us-central1.gcp.elastic.cloud`.
 
 Do not paste API keys into slides or chat transcripts.
 

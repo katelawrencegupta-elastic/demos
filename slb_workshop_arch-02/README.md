@@ -1,14 +1,14 @@
 # ARCH-02 — Lifecycle, Governance & Standards
 
 Hands-on companion to the SLB Architect enablement session (Wed Sep 23, 2026).
-This workshop cluster is **Elastic Cloud Hosted** (`f427dfc2751c468f942dcf7e7d46b323`).
+This workshop cluster is **Elastic Cloud Serverless** (`klgslbdemo`).
 
 Deck: [SLB - Enablement - ARCH 02](https://docs.google.com/presentation/d/1fowlbV3TjGpYHDFuX1lVrsjyZmpJ8uC6/edit)
 
 | | URL |
 |---|---|
-| Elasticsearch | `https://f427dfc2751c468f942dcf7e7d46b323.us-central1.gcp.cloud.es.io:443` |
-| Kibana | `https://klg-slb-workshop-arch02-939ab5.kb.us-central1.gcp.cloud.es.io` |
+| Elasticsearch | `https://klgslbdemo-c07dc6.es.us-central1.gcp.elastic.cloud:443` |
+| Kibana | `https://klgslbdemo-c07dc6.kb.us-central1.gcp.elastic.cloud` |
 
 The deck is **80% design review, 20% product evidence**. These labs are the evidence. The deliverable is the six governance artifacts in `artifacts/`, not a click-by-click product tour.
 
@@ -20,7 +20,8 @@ The deck is **80% design review, 20% product evidence**. These labs are the evid
 4. [Governance blueprint](labs/04-governance-blueprint.md) (~20 min) — fill the artifacts
 
 Facilitator notes: [labs/facilitator.md](labs/facilitator.md)  
-Talk track (60 min lecture, no labs): [labs/talk-track-60.md](labs/talk-track-60.md)
+Talk track (60 min lecture, no labs): [labs/talk-track-60.md](labs/talk-track-60.md)  
+Lab slides (open in a browser): [presentations/arch-02-labs.html](presentations/arch-02-labs.html)
 
 ## Setup
 
