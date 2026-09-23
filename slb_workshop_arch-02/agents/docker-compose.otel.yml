@@ -1,0 +1,66 @@
+# Standalone Elastic Agents in otel mode — EDOT-native path for ARCH-02.
+# Not Fleet-enrolled. Config is this YAML (git-owned). See agents/README.md.
+#
+# Contrast with docker-compose.yml (Fleet-managed, System allow-list).
+# Start: docker compose --env-file .env -f agents/docker-compose.otel.yml up -d
+x-agent: &agent
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.5.1
+  user: root
+  restart: unless-stopped
+  env_file:
+    - ../.env
+  environment:
+    ELASTIC_AGENT_OTEL: "true"
+    # Managed OTLP (same ApiKey as ELASTIC_API_KEY from .env)
+    ELASTIC_OTLP_ENDPOINT: https://klgslbdemo-c07dc6.ingest.us-central1.gcp.elastic.cloud
+  command: ["--config=/etc/otel/otel-agent.yml"]
+  volumes:
+    - ./otel-agent.yml:/etc/otel/otel-agent.yml:ro
+
+services:
+  # reservoir-apps: domain team granted EDOT-native (vendor-neutral collector YAML).
+  edot-01:
+    <<: *agent
+    container_name: slb-arch02-otel-01
+    hostname: aks-arch-edot-01
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      ELASTIC_OTLP_ENDPOINT: https://klgslbdemo-c07dc6.ingest.us-central1.gcp.elastic.cloud
+      AGENT_ID: arch02-otel-01
+      HOST_NAME: aks-arch-edot-01
+      TEAM: reservoir-apps
+      DEPLOYMENT_ENVIRONMENT: prod
+    ports:
+      - "14317:4317"
+      - "14318:4318"
+
+  edot-02:
+    <<: *agent
+    container_name: slb-arch02-otel-02
+    hostname: aks-arch-edot-02
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      ELASTIC_OTLP_ENDPOINT: https://klgslbdemo-c07dc6.ingest.us-central1.gcp.elastic.cloud
+      AGENT_ID: arch02-otel-02
+      HOST_NAME: aks-arch-edot-02
+      TEAM: reservoir-apps
+      DEPLOYMENT_ENVIRONMENT: prod
+    ports:
+      - "15317:4317"
+      - "15318:4318"
+
+  # Same team, nonprod namespace via resource attribute — not a new Fleet policy.
+  edot-nonprod:
+    <<: *agent
+    container_name: slb-arch02-otel-nonprod
+    hostname: aks-arch-edot-nonprod
+    environment:
+      ELASTIC_AGENT_OTEL: "true"
+      ELASTIC_OTLP_ENDPOINT: https://klgslbdemo-c07dc6.ingest.us-central1.gcp.elastic.cloud
+      AGENT_ID: arch02-otel-nonprod
+      HOST_NAME: aks-arch-edot-nonprod
+      TEAM: reservoir-apps
+      DEPLOYMENT_ENVIRONMENT: nonprod
+    ports:
+      - "16317:4317"
+      - "16318:4318"

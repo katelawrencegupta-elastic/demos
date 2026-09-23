@@ -19,9 +19,10 @@ The deck is **80% design review, 20% product evidence**. These labs are the evid
 3. [Dataset / namespace taxonomy and template ownership](labs/03-taxonomy-and-templates.md) (~20 min)
 4. [Governance blueprint](labs/04-governance-blueprint.md) (~20 min) — fill the artifacts
 
+Session deck (open in a browser): [presentations/arch-02.html](presentations/arch-02.html)  
 Facilitator notes: [labs/facilitator.md](labs/facilitator.md)  
 Talk track (60 min lecture, no labs): [labs/talk-track-60.md](labs/talk-track-60.md)  
-Lab slides (open in a browser): [presentations/arch-02-labs.html](presentations/arch-02-labs.html)
+Lab slides: [presentations/arch-02-labs.html](presentations/arch-02-labs.html)
 
 ## Setup
 
@@ -34,11 +35,22 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/verify.py
 .venv/bin/python scripts/compare_schema.py
 .venv/bin/python scripts/create_kibana.py
+.venv/bin/python agents/enroll.py
 ```
 
 Reset with `.venv/bin/python scripts/teardown.py`.
 
-`.env` is gitignored. Required variables: `ELASTIC_URL`, `ELASTIC_API_KEY`, `KIBANA_URL`.
+Collectors (optional live evidence for lab 4):
+
+```bash
+.venv/bin/python agents/enroll.py                                      # Fleet path
+docker compose --env-file .env -f agents/docker-compose.otel.yml up -d # EDOT-native path
+.venv/bin/python agents/factory.py sample --count 40
+```
+
+See [agents/README.md](agents/README.md).
+
+`.env` is gitignored. Required variables: `ELASTIC_URL`, `ELASTIC_API_KEY`, `KIBANA_URL`, `ELASTIC_OTLP_ENDPOINT`.
 
 Kibana evidence is **Discover** data views (ECS vs OTel) plus `scripts/verify.py`. Dev Tools queries are in the labs.
 

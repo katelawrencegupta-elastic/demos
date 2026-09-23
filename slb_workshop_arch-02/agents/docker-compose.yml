@@ -1,0 +1,68 @@
+# Fleet-managed Elastic Agents for ARCH-02.
+# Enroll with: .venv/bin/python agents/enroll.py
+name: slb-arch02
+x-agent: &agent
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.5.1
+  user: root
+  restart: unless-stopped
+  env_file:
+    - ../.env
+  environment:
+    FLEET_ENROLL: "1"
+    FLEET_URL: ${FLEET_URL}
+    FLEET_INSECURE: "false"
+
+services:
+  platform-01:
+    <<: *agent
+    container_name: slb-arch02-agent-platform-01
+    hostname: aks-arch-01
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN_PLATFORM}
+      ELASTIC_AGENT_TAGS: workshop,arch-02,platform,prod,aks-arch-01
+    volumes:
+      - agent-platform-01-state:/usr/share/elastic-agent/state
+
+  platform-02:
+    <<: *agent
+    container_name: slb-arch02-agent-platform-02
+    hostname: aks-arch-02
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN_PLATFORM}
+      ELASTIC_AGENT_TAGS: workshop,arch-02,platform,prod,aks-arch-02
+    volumes:
+      - agent-platform-02-state:/usr/share/elastic-agent/state
+
+  drilling-01:
+    <<: *agent
+    container_name: slb-arch02-agent-drilling-01
+    hostname: aks-arch-03
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN_DRILLING}
+      ELASTIC_AGENT_TAGS: workshop,arch-02,drilling,prod,aks-arch-03
+    volumes:
+      - agent-drilling-01-state:/usr/share/elastic-agent/state
+
+  nonprod-01:
+    <<: *agent
+    container_name: slb-arch02-agent-nonprod-01
+    hostname: aks-arch-nonprod
+    environment:
+      FLEET_ENROLL: "1"
+      FLEET_URL: ${FLEET_URL}
+      FLEET_ENROLLMENT_TOKEN: ${FLEET_ENROLLMENT_TOKEN_NONPROD}
+      ELASTIC_AGENT_TAGS: workshop,arch-02,platform,nonprod,aks-arch-nonprod
+    volumes:
+      - agent-nonprod-01-state:/usr/share/elastic-agent/state
+
+volumes:
+  agent-platform-01-state:
+  agent-platform-02-state:
+  agent-drilling-01-state:
+  agent-nonprod-01-state:

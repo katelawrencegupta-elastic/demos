@@ -3,7 +3,7 @@
 **Session:** Lifecycle, Governance & Standards (lecture)  
 **When:** Wed Sep 23, 2026 · ARCH-02  
 **Audience:** Architects  
-**Visual:** keep the governance-decisions slide (deck slide 3) on screen after the open.  
+**Visual:** keep the governance-decisions slide (deck slide 2) on screen after the open. Eight-slide lecture deck: `presentations/arch-02.html`.  
 **Live cluster:** Elastic Cloud Hosted `f427dfc2751c468f942dcf7e7d46b323`
 
 This is a **design review**. Do not start Docker or enroll agents. Hands-on lives in labs 1–4. Show Kibana only when a decision needs evidence (retention table, schema miss).
@@ -112,7 +112,7 @@ Platform owns base component templates. Teams extend via `@custom` (see `logs-wo
 
 ## 49:00–57:00 · Artifacts + questions
 
-Leave with six named deliverables (slides 10 / `artifacts/`):
+Leave with six named deliverables (deck slide 7 / `artifacts/`):
 
 1. Retention class matrix  
 2. Dataset / namespace taxonomy  

@@ -1,0 +1,64 @@
+# Elastic Agent in otel mode (EDOT collector). Not Fleet-enrolled.
+# Config lives in git — that is the governance surface for this path.
+# Supported sink on this project: Managed OTLP (not APM Server OTLP).
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 1s
+  resource/agent:
+    attributes:
+      - key: deployment.environment
+        value: ${env:DEPLOYMENT_ENVIRONMENT}
+        action: upsert
+      - key: host.name
+        value: ${env:HOST_NAME}
+        action: upsert
+      - key: service.instance.id
+        value: ${env:AGENT_ID}
+        action: upsert
+      - key: team
+        value: ${env:TEAM}
+        action: upsert
+      - key: telemetry.collector
+        value: elastic-agent-otel
+        action: upsert
+      - key: telemetry.workshop
+        value: arch-02
+        action: upsert
+
+exporters:
+  otlphttp/motlp:
+    endpoint: ${env:ELASTIC_OTLP_ENDPOINT}
+    headers:
+      Authorization: ApiKey ${env:ELASTIC_API_KEY}
+    sending_queue:
+      enabled: true
+      sizer: bytes
+      queue_size: 50000000
+      block_on_overflow: true
+      batch:
+        flush_timeout: 1s
+        min_size: 1000000
+        max_size: 4000000
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [resource/agent, batch]
+      exporters: [otlphttp/motlp]
+    traces:
+      receivers: [otlp]
+      processors: [resource/agent, batch]
+      exporters: [otlphttp/motlp]
+    metrics:
+      receivers: [otlp]
+      processors: [resource/agent, batch]
+      exporters: [otlphttp/motlp]

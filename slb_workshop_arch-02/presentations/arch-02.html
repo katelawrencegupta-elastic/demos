@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARCH-02 — Lifecycle, Governance &amp; Standards</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --surface: #fffcf7;
+      --surface-2: #ebe4d6;
+      --border: #d5ccbe;
+      --text: #2a2622;
+      --muted: #6d655c;
+      --accent: #9c4a32;
+      --accent-dim: rgba(156, 74, 50, 0.12);
+      --accent-border: rgba(156, 74, 50, 0.38);
+      --warn: #b5792a;
+      --success: #3f6f4e;
+      --danger: #a33d3d;
+      --font: "Segoe UI", "Helvetica Neue", Georgia, system-ui, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+    .app { display: grid; grid-template-columns: 228px 1fr; height: 100vh; }
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.1rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .brand {
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 650;
+    }
+    .sidebar h1 { font-size: 0.98rem; line-height: 1.3; margin: 0; font-weight: 650; }
+    .sidebar p { font-size: 0.73rem; color: var(--muted); margin: 0; line-height: 1.4; }
+    .nav { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+    .nav li button {
+      width: 100%; text-align: left; background: transparent;
+      border: 1px solid transparent; color: var(--muted);
+      padding: 0.42rem 0.48rem; border-radius: 8px; cursor: pointer;
+      font: inherit; font-size: 0.74rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .nav li button:hover { background: var(--surface-2); color: var(--text); }
+    .nav li button.active {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--text);
+    }
+    .nav .idx {
+      width: 1.25rem; height: 1.25rem; border-radius: 999px;
+      border: 1px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; flex-shrink: 0;
+    }
+    .nav li button.active .idx { border-color: var(--accent); color: var(--accent); }
+    .controls {
+      display: flex; flex-direction: column; gap: 0.36rem;
+      border-top: 1px solid var(--border); padding-top: 0.7rem;
+    }
+    .controls button, .toolbar button {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 0.38rem 0.52rem;
+      font: inherit; font-size: 0.74rem; cursor: pointer;
+    }
+    .controls button.primary {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+    main { position: relative; overflow: hidden; }
+    .slides { height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0;
+      padding: 1.35rem 2rem 4.6rem;
+      overflow-y: auto; opacity: 0; pointer-events: none;
+      transform: translateX(18px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+    .pill {
+      display: inline-block; font-size: 0.62rem; font-weight: 650;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.14rem 0.44rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--accent); margin-right: 0.24rem;
+    }
+    .slide-header { margin-bottom: 0.75rem; }
+    .slide-header h2 { font-size: 1.42rem; margin: 0.28rem 0 0.2rem; font-weight: 650; }
+    .slide-header p { color: var(--muted); max-width: 58rem; line-height: 1.45; margin: 0; font-size: 0.9rem; }
+    .lede { font-size: 0.95rem; color: var(--text); max-width: 54rem; line-height: 1.5; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .toolbar { left: 0; }
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .card-head {
+      padding: 0.52rem 0.8rem; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 650;
+    }
+    .card-body { padding: 0.7rem 0.8rem; }
+    .card-body p { margin: 0 0 0.4rem; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+    .card-body p:last-child { margin-bottom: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    th, td { text-align: left; padding: 0.36rem 0.48rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 650; font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: none; }
+    code { font-family: var(--mono); font-size: 0.74rem; }
+    pre.doc {
+      margin: 0 0 0.7rem; padding: 0.6rem 0.75rem; background: var(--surface-2); border-radius: 8px;
+      font-family: var(--mono); font-size: 0.82rem; line-height: 1.45; overflow-x: auto; white-space: pre-wrap;
+    }
+    .hl { color: var(--accent); }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.6rem 0.7rem;
+    }
+    .stat label { display: block; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+    .stat strong { display: block; font-size: 0.9rem; line-height: 1.3; }
+    .stat span { display: block; color: var(--muted); font-size: 0.74rem; margin-top: 0.18rem; line-height: 1.35; }
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--accent-dim);
+      padding: 0.55rem 0.8rem; border-radius: 0 8px 8px 0; margin-top: 0.7rem;
+    }
+    .callout.ok { border-color: var(--success); background: rgba(63, 111, 78, 0.08); }
+    .callout.warn { border-color: var(--warn); background: rgba(181, 121, 42, 0.1); }
+    .callout strong { display: block; margin-bottom: 0.12rem; font-size: 0.82rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.8rem; line-height: 1.4; }
+    ul.clean { margin: 0; padding-left: 1rem; color: var(--muted); font-size: 0.8rem; line-height: 1.45; }
+    ul.clean li + li { margin-top: 0.12rem; }
+    .q { font-size: 0.86rem; margin: 0 0 0.42rem; line-height: 1.4; }
+    .q:last-child { margin-bottom: 0; }
+    .q span { color: var(--accent); font-weight: 650; margin-right: 0.3rem; }
+    .stack { display: flex; flex-direction: column; gap: 0.7rem; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 228px; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 1.1rem; background: var(--surface); border-top: 1px solid var(--border);
+    }
+    .dots { display: flex; gap: 0.28rem; flex-wrap: wrap; max-width: 52%; }
+    .dots button {
+      width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0;
+      background: var(--border); cursor: pointer;
+    }
+    .dots button.active { background: var(--accent); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">SLB enablement · Architects</div>
+      <h1>ARCH-02 lecture</h1>
+      <p>60 min design review. Eight slides. Decisions, not product tours.</p>
+      <ul class="nav" id="nav"></ul>
+      <div class="controls">
+        <button class="primary" id="btnFullscreen">Fullscreen (F)</button>
+        <button id="btnPrev">← Previous</button>
+        <button id="btnNext">Next →</button>
+      </div>
+    </aside>
+    <main>
+      <div class="slides">
+
+        <section class="slide" data-title="Brief">
+          <div class="slide-header">
+            <span class="pill">SME track · Architects</span>
+            <span class="pill">60 min</span>
+            <h2>ARCH-02 — Lifecycle, Governance &amp; Standards</h2>
+            <p class="lede">Good architecture needs governance to match. This session is a design review — four problems you must decide before the platform scales, not a product tour.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">01 · ILM / retention strategy</div>
+              <div class="card-body">
+                <p>Long-term platform design starts with named classes — by value, cost, and compliance — not a pile of ILM JSON copied from the last cluster.</p>
+                <ul class="clean">
+                  <li><strong>Policy first.</strong> Classes such as platform metrics, app logs, audit, and traces. Namespace can change retention of the same dataset (prod vs nonprod).</li>
+                  <li><strong>Mechanism second.</strong> Serverless uses DSL (<code>data_retention</code>). Hosted uses ILM tiers or, in 9.5+, DSL with <code>frozen_after</code>. Cover both; do not hardcode one.</li>
+                  <li><strong>Decide today.</strong> What data deserves different retention, and who owns the exception when a team wants longer.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">02 · Fleet-managed vs standalone</div>
+              <div class="card-body">
+                <p>An operating-model choice. Both paths store telemetry in Elasticsearch. They are not operationally interchangeable.</p>
+                <ul class="clean">
+                  <li><strong>Fleet-managed Agent.</strong> Central policy, health, and versions from Kibana. Use where central governance is required. Trade-off: less collector flexibility.</li>
+                  <li><strong>Standalone / EDOT-native.</strong> Full OTel flexibility. Config lifecycle (version, approve, promote, audit) becomes the team’s problem on day one — or it is a snowflake.</li>
+                  <li><strong>Decide today.</strong> Who is allowed which path. Supported: EDOT SDKs + Managed OTLP or Agent Gateway. Unsupported: EDOT + APM Server OTLP.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">03 · ECS vs OTel semantic conventions</div>
+              <div class="card-body">
+                <p>Elastic donated ECS to OTel (2023) and is converging on SemConv. 9.5 ships the alignment dictionary — not one merged authoring schema.</p>
+                <ul class="clean">
+                  <li><strong>Not every mismatch is a rename.</strong> Clean mappings, equivalent-but-renamed (<code>trace.id</code> / <code>trace_id</code>, <code>message</code> / <code>body.text</code>), translation-required, and a metrics data-model gap that aliases cannot fix.</li>
+                  <li><strong>Working proposal.</strong> OTel-native for new telemetry. ECS only while Fleet is the source of truth. Mixed authoring on one stream is prohibited.</li>
+                  <li><strong>Decide today.</strong> Default schema for the next three years, and where translation is allowed vs banned.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">04 · Ownership &amp; reusable standards</div>
+              <div class="card-body">
+                <p>Central standards plus team autonomy inside guardrails. 200 engineers across three sites cannot run on tribal knowledge. Uncontrolled dataset creation is the fastest path back to five tools.</p>
+                <ul class="clean">
+                  <li><strong>Taxonomy.</strong> <code>&lt;type&gt;-&lt;dataset&gt;-&lt;namespace&gt;</code>. Dataset is a signal shape, not one stream per microservice. Namespace = environment unless you write a different rule.</li>
+                  <li><strong>Split.</strong> Platform owns templates, classes, naming, and schema guardrails. Teams own instrumentation, approved collectors, and dashboards on standard fields. Extend via <code>@custom</code> — no mapping forks.</li>
+                  <li><strong>Decide today.</strong> Who may create a dataset, who approves a new field, and how fast the exception process is.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <strong>Thesis — do not repeat the 5-tool mess</strong>
+            <p>SLB is consolidating 5+ tools into one platform. OTel / EDOT expands the governance surface; it does not shrink it. The APIs are not the hard part. Inconsistent streams, templates, pipelines, and schemas across workstreams are. Objective: controlled consistency. If you leave with concepts and no owners, you have not done the session.</p>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Seven decisions">
+          <div class="slide-header">
+            <span class="pill">Governance</span>
+            <h2>Seven decisions architects must make</h2>
+            <p>Product features will not decide these. Leave this slide up after the open — it is the session map.</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Decision</th><th>The question</th><th>Working stance</th></tr></thead>
+              <tbody>
+                <tr><td>Retention classes</td><td>What data deserves different retention?</td><td>Classify by value, cost, and compliance — not by index name.</td></tr>
+                <tr><td>Lifecycle mechanism</td><td>When ILM? When data stream lifecycle?</td><td>Cover both. If both exist, ILM wins unless you say otherwise.</td></tr>
+                <tr><td>Collection model</td><td>Who is allowed Fleet vs EDOT-native?</td><td>Fleet where central policy is required. EDOT-native only with external config governance on day one.</td></tr>
+                <tr><td>Schema standard</td><td>Where is translation required? Where is mixed authoring prohibited?</td><td>OTel-native for new telemetry. One model per stream.</td></tr>
+                <tr><td>Dataset / namespace</td><td>Who can create datasets? What does namespace <em>mean</em>?</td><td>Namespace = environment unless you write a different rule.</td></tr>
+                <tr><td>Template ownership</td><td>Who owns base mappings? How do teams extend?</td><td>Platform owns base. Teams extend via <code>@custom</code>. No mapping forks.</td></tr>
+                <tr><td>Exception process</td><td>What needs central approval, and how fast?</td><td>Name the role and the SLA. “The platform” is not an owner.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Retention">
+          <div class="slide-header">
+            <span class="pill">01 · Retention</span>
+            <h2>Policy first, mechanism second</h2>
+            <p>Do not define governance as “ILM settings.” Name classes, then map each class to a lever. A 7-day workshop retention is not a platform design.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Data stream lifecycle (DSL)</div>
+              <div class="card-body">
+                <p>Serverless lever: <code>data_retention</code> on the stream. ILM APIs return 410 here — that is expected.</p>
+                <p>Hosted 9.5+: <code>frozen_after</code> searchable snapshots are GA. DSL vs ILM is now a real choice, not a Serverless-only story.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">ILM + data tiers</div>
+              <div class="card-body">
+                <p>Hosted / self-managed: hot → warm → cold → frozen → delete. Restore SLAs for audit need frozen / searchable snapshots.</p>
+                <p>If both ILM and DSL are attached, ILM wins unless you say otherwise. Do not attach both by accident.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:0.7rem">
+            <table>
+              <thead><tr><th>Class</th><th>Why it exists</th><th>Serverless DSL</th><th>Hosted ILM mapping</th></tr></thead>
+              <tbody>
+                <tr><td>Platform metrics</td><td>High volume, high query frequency</td><td>7d</td><td>hot → delete 7d</td></tr>
+                <tr><td>Application logs</td><td>Incident investigation + trend</td><td>30d prod / 14d nonprod</td><td>hot → warm 7d → delete 30d</td></tr>
+                <tr><td>Audit / security</td><td>Compliance drives policy</td><td>90d stand-in for 1y+</td><td>hot → warm → cold → frozen → 365d</td></tr>
+                <tr><td>Traces (sampled)</td><td>Cost-sensitive at volume</td><td>3d</td><td>hot → delete 3d</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <strong>Do not copy Serverless templates onto hosted blindly</strong>
+            <p>Namespace can carry a different retention of the same dataset (<code>logs-workshop.app-prod</code> vs <code>-nonprod</code>). Unsanctioned streams such as <code>logs-rogue.drilling-prod</code> skip the contract — that is the failure mode, not a missing ILM JSON file.</p>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Collection">
+          <div class="slide-header">
+            <span class="pill">02 · Collection</span>
+            <h2>Fleet-managed vs standalone — an operating-model choice</h2>
+            <p>Both paths store telemetry in Elasticsearch. They are not operationally interchangeable. Architects decide <em>who</em> is allowed which path — do not re-argue Agent vs OTel (SRE-01 already covered that).</p>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th></th><th>Fleet-managed Elastic Agent</th><th>Standalone / EDOT-native</th></tr></thead>
+              <tbody>
+                <tr><td>Best for</td><td>Shared platform collectors, regulated hosts, any fleet that must look the same tomorrow</td><td>App teams that need a vendor-neutral collector and custom processors</td></tr>
+                <tr><td>Who owns config</td><td>Fleet policy in Kibana. Platform owns the integration allow-list and rollouts.</td><td>The team. Git (or equivalent) version, approve, promote, audit — before first prod ship.</td></tr>
+                <tr><td>Health &amp; versions</td><td>Visible in Fleet. Drift is a Fleet problem.</td><td>You build the inventory. Unmanaged binaries are invisible until they break ingest.</td></tr>
+                <tr><td>Flexibility</td><td>Integrations and Agent policy. Slower path for custom OTel processors.</td><td>Full collector graph. That flexibility is why governance must exist on day one.</td></tr>
+                <tr><td>Failure mode</td><td>Policy sprawl — every team gets a one-off integration instead of a standard package.</td><td>A snowflake collector. Switching later is allowed and <strong>not free</strong> (re-instrument, re-map, re-train).</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid-2" style="margin-top:0.7rem">
+            <div class="card">
+              <div class="card-head">Who is allowed which path</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li><strong>Default to Fleet</strong> wherever central policy, health, or a regulated host is required.</li>
+                  <li><strong>EDOT-native is an exception,</strong> not a preference. Grant it by team type, not by whoever asked first.</li>
+                  <li>If SLB allows the path, the config-governance model must exist <em>before</em> first prod ship — versioned config, approval, promotion, audit. Otherwise it is not a standard.</li>
+                  <li>Record the decision: which team types are on EDOT-native on day one, and who reviews the next request.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">EDOT support boundary (do not re-litigate)</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li><strong>Supported:</strong> EDOT SDKs + Managed OTLP endpoint, or EDOT SDKs + Elastic Agent Gateway. This is the path for new EDOT work.</li>
+                  <li><strong>Unsupported:</strong> EDOT SDKs + APM Server OTLP. May function. Elastic will not support it if it breaks. Do not let a workstream pick this by accident.</li>
+                  <li>SRE-01 already ran the operator lab. Architects only decide eligibility and the exception SLA — not the collector internals.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Schema">
+          <div class="slide-header">
+            <span class="pill">03 · Schema</span>
+            <h2>ECS → OTel — Elastic is converging on the standard</h2>
+            <p>April 2023: Elastic donated ECS to OpenTelemetry and committed to converge with SemConv. That is a <em>direction</em>, not a single merge event. 9.5 is the first Stack release where that convergence is operational for architects.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Why Elastic moved to OTel</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li><strong>Industry standard.</strong> Vendor-neutral SemConv + OTLP is how most new instrumentation ships. ECS alone was becoming a second dialect.</li>
+                  <li><strong>EDOT / Agent-as-collector.</strong> Elastic’s path for new app telemetry is OTel-native ingest (<code>mapping_mode: otel</code>), not “translate everything to classic ECS first.”</li>
+                  <li><strong>One destination, two histories.</strong> Fleet integrations and classic APM still emit ECS. New EDOT paths store OTel layout (<code>resource.attributes.*</code>, <code>body.text</code>, <code>severity_text</code>).</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">What “unified” means in 9.5</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li><strong>Alignment dictionary ships.</strong> ECS <code>9.5.0</code> ↔ OTel SemConv <code>1.38.0</code> — identical, equivalent, related, metric, and non-applicable mappings are documented. See <a href="https://www.elastic.co/docs/reference/ecs/ecs-otel-alignment-overview" target="_blank" rel="noreferrer">alignment overview</a>.</li>
+                  <li><strong>Query bridges, not one schema.</strong> Passthrough fields and aliases let many OTel docs answer ECS-style queries (e.g. <code>service.name</code>). Compatibility is incomplete — not every field has an alias.</li>
+                  <li><strong>Still two authoring models.</strong> Convergence ≠ one field name at write time. Architects still pick a canonical model per stream.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:0.7rem">
+            <div class="card-head">Four buckets — alignment docs are the dictionary, not the policy</div>
+            <table>
+              <thead><tr><th>Bucket</th><th>Example</th><th>What breaks</th></tr></thead>
+              <tbody>
+                <tr><td>Identical / clean</td><td>Many resource attributes ↔ ECS field sets</td><td>Usually nothing if you pick one and alias</td></tr>
+                <tr><td>Equivalent, renamed</td><td><code>trace.id</code> ↔ <code>trace_id</code> · <code>message</code> ↔ <code>body.text</code> · <code>log.level</code> ↔ <code>severity_text</code></td><td>Discover, dashboards, alerting — the same incident is invisible across schemas</td></tr>
+                <tr><td>Related / translation required</td><td>Semantics overlap but are not identical</td><td>Aliasing lies; you need a transform, not a field alias</td></tr>
+                <tr><td>Metrics data-model gap</td><td>OTel metrics (name, type, dimensions) ≠ ECS metric-like fields</td><td>Cannot be solved by renaming. Do not promise a global alias layer for metrics.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid-3" style="margin-top:0.7rem">
+            <div class="stat"><label>Default</label><strong>OTel-native for new telemetry</strong><span>New logs and traces use OTel fielding. Match Elastic’s direction — a three-year target-state decision.</span></div>
+            <div class="stat"><label>Exception</label><strong>ECS only while Fleet is source of truth</strong><span>Do not rewrite those streams in place. Translation is a migration cost, not a standing dual-write.</span></div>
+            <div class="stat"><label>Prohibited</label><strong>Mixed authoring on one stream</strong><span>One stream does not accept both <code>log.level</code> and <code>severity_text</code>. Pick one model per dataset.</span></div>
+          </div>
+          <div class="callout warn">
+            <strong>9.5 makes governance harder to skip, not optional</strong>
+            <p>Passthrough and aliases reduce query pain — they do not erase dual schemas on disk. Alignment increases the need for a written standard. Decide the default now; do not wait for “full unification.”</p>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Ownership">
+          <div class="slide-header">
+            <span class="pill">04 · Ownership</span>
+            <h2>Taxonomy, templates, and who may change what</h2>
+            <p>Central standards plus team autonomy inside guardrails. Uncontrolled dataset creation is the fastest path back to fragmentation.</p>
+          </div>
+          <pre class="doc">&lt;type&gt;-&lt;dataset&gt;-&lt;namespace&gt;   →   <span class="hl">logs</span>-workshop.app-prod</pre>
+          <div class="card" style="margin-bottom:0.7rem">
+            <table>
+              <thead><tr><th>Part</th><th>Meaning</th><th>Working proposal</th></tr></thead>
+              <tbody>
+                <tr><td><code>type</code></td><td>logs / metrics / traces</td><td>No other types without an exception</td></tr>
+                <tr><td><code>dataset</code></td><td>Signal shape or bounded context</td><td>Not one dataset per microservice. <code>workshop.app</code>, not <code>svc-drilling-api-v3</code></td></tr>
+                <tr><td><code>namespace</code></td><td>The tenancy knob</td><td><strong>Environment</strong> (<code>prod</code> / <code>nonprod</code>). If you pick team or region instead, write it down. “prod”, “drilling”, “us-east”, “alice-test” in the same slot has no governance value.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">Central platform owns</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li>Approved integrations, base component templates, shared ingest processors</li>
+                  <li>Retention classes, lifecycle policies, namespace / dataset naming</li>
+                  <li>Schema guardrails (ECS vs OTel policy), cross-team dashboards and SLO standards</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">Domain teams own</div>
+              <div class="card-body">
+                <ul class="clean">
+                  <li>Service instrumentation, OTel adoption, approved collector deploy (Fleet or EDOT)</li>
+                  <li>Team dashboards on <em>standard</em> fields; service SLOs and team alerts</li>
+                  <li>Limited custom attributes under policy; exception requests for new datasets / fields</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <strong>The only approved way to add a field</strong>
+            <p>Extend via <code>@custom</code> (example: <code>logs-workshop.app@custom</code> → <code>slb.well_id</code>). A team dashboard that needs a new field is an exception, not a local mapping fork.</p>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Decide">
+          <div class="slide-header">
+            <span class="pill">Leave with this</span>
+            <h2>Six artifacts and four decisions</h2>
+            <p>Owners must be roles, not “the platform.” Do not skip Q2 or Q3. If Q3 is not environment, change the streams before the next session.</p>
+          </div>
+          <div class="grid-3">
+            <div class="stat"><label>1</label><strong>Retention class matrix</strong><span>Category × duration × mechanism × cost — hosted and Serverless columns.</span></div>
+            <div class="stat"><label>2</label><strong>Dataset / namespace taxonomy</strong><span>What namespace means. Who may create a dataset.</span></div>
+            <div class="stat"><label>3</label><strong>Schema decision policy</strong><span>OTel default. Where translation is allowed. Mixed authoring banned.</span></div>
+            <div class="stat"><label>4</label><strong>Collection model standard</strong><span>Fleet vs EDOT-native by team type, plus the unsupported path.</span></div>
+            <div class="stat"><label>5</label><strong>Template ownership model</strong><span>Base vs <code>@custom</code>. No forks. Who reviews extensions.</span></div>
+            <div class="stat"><label>6</label><strong>Exception process</strong><span>What needs approval (datasets, fields, templates, pipelines) and the SLA.</span></div>
+          </div>
+          <div class="card" style="margin-top:0.7rem">
+            <div class="card-body">
+              <p class="q"><span>Q1</span> Who owns retention classes and exception approval — and does that match who should own them at 10× scale?</p>
+              <p class="q"><span>Q2</span> Should new telemetry default to OTel-native, with ECS-compatible paths only for migration exceptions?</p>
+              <p class="q"><span>Q3</span> What should namespace represent: environment, team, region, or tenancy boundary?</p>
+              <p class="q"><span>Q4</span> What always needs central approval: new datasets, custom fields, template changes, or new ingest pipelines?</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide" data-title="Checkout">
+          <div class="slide-header">
+            <span class="pill">Close</span>
+            <h2>Checkout — no notes</h2>
+            <p>If the room cannot answer these, the ownership model is still tribal. Promise from minute 0: they can name retention classes, say who owns templates, and say whether a new dataset is allowed without a meeting.</p>
+          </div>
+          <div class="grid-3">
+            <div class="stat"><label>1</label><strong>One retention class</strong><span>Name it, say why it exists, and give the mechanism on Serverless vs hosted.</span></div>
+            <div class="stat"><label>2</label><strong>One thing only platform may change</strong><span>Templates, classes, or naming — pick one and defend why it is not a team choice.</span></div>
+            <div class="stat"><label>3</label><strong>One thing a team may change</strong><span>Without an exception — and one they cannot. If both answers are “ask platform,” autonomy is fiction.</span></div>
+          </div>
+          <div class="callout ok">
+            <strong>Hands-on companion</strong>
+            <p>Labs 1–4 are the evidence (retention table, schema miss, taxonomy, <code>@custom</code>). Open <code>presentations/arch-02-labs.html</code> when you switch from lecture to workshop. Never cut from the lecture: policy-before-mechanism, mixed-authoring prohibition, Q1–Q4.</p>
+          </div>
+        </section>
+
+      </div>
+      <div class="toolbar">
+        <div class="dots" id="dots"></div>
+        <div style="display:flex;gap:0.45rem;align-items:center">
+          <span id="counter" style="font-family:var(--mono);font-size:0.74rem;color:var(--muted)"></span>
+          <button id="btnPrev2">←</button>
+          <button id="btnNext2">→</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const nav = document.getElementById("nav");
+    const dots = document.getElementById("dots");
+    const counter = document.getElementById("counter");
+    let current = 0;
+
+    function go(i) {
+      current = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, n) => s.classList.toggle("active", n === current));
+      nav.querySelectorAll("button").forEach((b, n) => b.classList.toggle("active", n === current));
+      dots.querySelectorAll("button").forEach((b, n) => b.classList.toggle("active", n === current));
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      location.hash = String(current + 1);
+    }
+
+    slides.forEach((slide, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<button type="button"><span class="idx">${i + 1}</span>${slide.dataset.title}</button>`;
+      li.querySelector("button").addEventListener("click", () => go(i));
+      nav.appendChild(li);
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.title = slide.dataset.title;
+      dot.addEventListener("click", () => go(i));
+      dots.appendChild(dot);
+    });
+
+    document.getElementById("btnPrev").addEventListener("click", () => go(current - 1));
+    document.getElementById("btnNext").addEventListener("click", () => go(current + 1));
+    document.getElementById("btnPrev2").addEventListener("click", () => go(current - 1));
+    document.getElementById("btnNext2").addEventListener("click", () => go(current + 1));
+    document.getElementById("btnFullscreen").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+    document.addEventListener("keydown", (e) => {
+      if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(current + 1); }
+      if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(current - 1); }
+      if (e.key === "Home") go(0);
+      if (e.key === "End") go(slides.length - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+
+    const fromHash = parseInt(location.hash.replace("#", ""), 10);
+    go(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+  </script>
+</body>
+</html>
