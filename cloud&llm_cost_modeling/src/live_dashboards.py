@@ -28,9 +28,25 @@ HUB_BACKUP_IDS = {
     "ffd600e5-2862-4bf4-8556-2ef8872c5ba5": "kibana-inference-token-usage",
     "4e3d2263-42f4-43ce-bd12-dd7863f18804": "ess_billing-billingdashboard",
     "952b4e0a-1a55-4794-8c57-d26b8c6d9086": "ess_billing-creditsdashboard",
+    # Prior finops-space Fleet installs (ids rotate on each space install)
+    "94e01542-b7d9-51c6-85ca-e5d1d87f8dde": "ess_billing-billingdashboard",
+    "a993ca71-5d10-5438-b5e3-6af50291ba28": "ess_billing-creditsdashboard",
+    "170c8161-d5f6-4f3b-b459-4bbfdef379e0": "ess_billing-billingdashboard",
+    "8eb7824a-1c91-4dcc-ada9-3ee361aef8e7": "ess_billing-creditsdashboard",
 }
 HUB_DASHBOARD_IDS = dict(HUB_BACKUP_IDS)
 OOTB_HUB_DASHBOARDS = tuple(OOTB_HUB_TITLES.keys())
+
+# Hub tab labels → Fleet/OOTB id (used when destination UUID is stale/unknown).
+# FinOps Meridian tabs use "ESS Billing" / "ESS Credits"; the OOTB ESS package
+# dashboards themselves label the same tabs "Billing" / "Credits".
+HUB_LINK_LABELS = {
+    "Inference tokens": "kibana-inference-token-usage",
+    "ESS Billing": "ess_billing-billingdashboard",
+    "ESS Credits": "ess_billing-creditsdashboard",
+    "Billing": "ess_billing-billingdashboard",
+    "Credits": "ess_billing-creditsdashboard",
+}
 _KIBANA_HOST_RE = re.compile(r"https://[^/\s)]+\.kb\.[^/\s)]+elastic\.cloud")
 
 
@@ -67,6 +83,8 @@ def publish() -> list[str]:
         urls.append(url)
     _pin_time_ranges()
     _rewrite_billing_esql()
+    _fix_billing_dashboard_filters()
+    _fix_svs_ess_panels()
     ensure_hub_ootb()
     _refresh_billing_data_view()
     return urls
@@ -101,6 +119,242 @@ def _pin_time_ranges() -> None:
             print(f"  [warn] pin time range {did}: {r.status_code} {r.text[:200]}")
         else:
             print(f"  [ok] pinned {did} {win['from'][:10]} → {win['to'][:10]}")
+
+
+# Text fields that dynamic-mapping left non-aggregatable on metrics-aws.billing-*.
+# Dashboard KQL / options-list controls must hit the .keyword multi-field.
+# Do NOT include data_stream.* — Fleet data streams map those as plain keyword
+# (no .keyword multi-field). Rewriting them blanks ESS Cloud panels.
+_BILLING_TEXT_FIELDS = (
+    "aws.billing.group_definition.key",
+    "aws.billing.group_definition.type",
+    "cloud.account.id",
+    "cloud.account.name",
+)
+
+# Accidental .keyword suffixes that must be stripped from KQL on ESS / DS fields.
+_BARE_KEYWORD_FIELDS = (
+    "data_stream.dataset",
+    "data_stream.namespace",
+    "data_stream.type",
+)
+
+
+def _rewrite_billing_kql(expr: str) -> str:
+    """Point KQL exact-match filters at .keyword multi-fields."""
+    if not isinstance(expr, str) or not expr.strip():
+        return expr
+    out = expr
+    for field in sorted(_BILLING_TEXT_FIELDS, key=len, reverse=True):
+        kw = f"{field}.keyword"
+        # Replace bare field refs that are not already `.keyword`.
+        parts = out.split(kw)
+        parts = [p.replace(field, kw) for p in parts]
+        out = kw.join(parts)
+    return out
+
+
+def _is_esql(text: str) -> bool:
+    """True for ES|QL (must keep bare field names — .keyword multi-fields vary by index)."""
+    if not isinstance(text, str):
+        return False
+    head = text.lstrip()[:80].upper()
+    return head.startswith("FROM ") or "\n| " in text or text.lstrip().startswith("|")
+
+
+def _revert_esql_keyword_fields(q: str) -> str:
+    """Undo accidental .keyword suffixes inside ES|QL (breaks rightsizing / mixed maps)."""
+    if not isinstance(q, str):
+        return q
+    out = q
+    for field in sorted(_BILLING_TEXT_FIELDS + _BARE_KEYWORD_FIELDS, key=len, reverse=True):
+        out = out.replace(f"{field}.keyword", field)
+    return out
+
+
+def _revert_bare_keyword_kql(expr: str) -> str:
+    """Strip .keyword from fields that are already keyword (ESS / data_stream.*)."""
+    if not isinstance(expr, str) or not expr.strip():
+        return expr
+    out = expr
+    for field in sorted(_BARE_KEYWORD_FIELDS, key=len, reverse=True):
+        out = out.replace(f"{field}.keyword", field)
+    return out
+
+
+def _fix_billing_panel_filters(obj):
+    """Rewrite Lens/KQL filters to .keyword; leave ES|QL on bare field names."""
+    if isinstance(obj, dict):
+        # ES|QL data_source: restore bare fields, do not keyword-ize
+        if obj.get("type") == "esql" and isinstance(obj.get("query"), str):
+            return {
+                **{k: _fix_billing_panel_filters(v) for k, v in obj.items()
+                   if k != "query"},
+                "query": _revert_esql_keyword_fields(obj["query"]),
+            }
+        out = {}
+        for k, v in obj.items():
+            if k in ("expression", "query") and isinstance(v, str):
+                if _is_esql(v):
+                    out[k] = _revert_esql_keyword_fields(v)
+                elif (
+                    "group_definition.key" in v
+                    or "data_stream.dataset" in v
+                    or "cloud.account.id" in v
+                ):
+                    # Keyword-ize AWS text fields, then undo data_stream.* damage.
+                    rewritten = _rewrite_billing_kql(v)
+                    out[k] = _revert_bare_keyword_kql(rewritten)
+                else:
+                    out[k] = v
+            elif k == "field_name" and v in _BILLING_TEXT_FIELDS:
+                out[k] = f"{v}.keyword"
+            elif k == "field" and v in _BILLING_TEXT_FIELDS:
+                out[k] = f"{v}.keyword"
+            elif k == "fields" and isinstance(v, list):
+                out[k] = [
+                    f"{f}.keyword" if f in _BILLING_TEXT_FIELDS else f
+                    for f in v
+                ]
+            else:
+                out[k] = _fix_billing_panel_filters(v)
+        return out
+    if isinstance(obj, list):
+        return [_fix_billing_panel_filters(v) for v in obj]
+    if isinstance(obj, str) and _is_esql(obj):
+        return _revert_esql_keyword_fields(obj)
+    if isinstance(obj, str) and (
+            "group_definition.key :" in obj or 'group_definition.key:"' in obj
+            or "data_stream.dataset :" in obj
+            or "data_stream.dataset.keyword" in obj):
+        return _revert_bare_keyword_kql(_rewrite_billing_kql(obj))
+    return obj
+
+
+def _fix_billing_dashboard_filters() -> None:
+    """Patch live Cost Explorer dashboards after import (Serverless text maps)."""
+    for did in (
+        "finops-aws-billing-overview-unblended",
+        "finops-spend-vs-savings",
+        "meridian-finops-llm-observability-dynamic-aws",
+    ):
+        r = requests.get(
+            f"{KIBANA_URL}/api/dashboards/{did}",
+            headers=KBN_HEADERS,
+            timeout=30,
+        )
+        if r.status_code != 200:
+            print(f"  [warn] billing filter fix GET {did}: {r.status_code}")
+            continue
+        body = r.json().get("data") or r.json()
+        fixed = _fix_billing_panel_filters(body)
+        if fixed == body:
+            print(f"  [ok] billing filters already keyword-safe on {did}")
+            continue
+        r = requests.put(
+            f"{KIBANA_URL}/api/dashboards/{did}",
+            headers=KBN_HEADERS,
+            json=fixed,
+            timeout=60,
+        )
+        if r.status_code >= 300:
+            print(f"  [warn] billing filter fix {did}: {r.status_code} {r.text[:200]}")
+        else:
+            print(f"  [ok] rewrote text-field KQL filters on {did}")
+
+
+def _fix_svs_ess_panels() -> None:
+    """Repair spend-vs-savings Elastic Cloud panels after the .keyword KQL bug.
+
+    Also ignore the AWS Account ID control (ESS uses Elastic org id) and prefer
+    deployment_name in the table (package 1.9 shape).
+    """
+    did = "finops-spend-vs-savings"
+    r = requests.get(f"{KIBANA_URL}/api/dashboards/{did}", headers=KBN_HEADERS, timeout=30)
+    if r.status_code != 200:
+        print(f"  [warn] svs ESS fix GET: {r.status_code}")
+        return
+    body = r.json().get("data") or r.json()
+    panels = list(body.get("panels") or [])
+    changed = False
+    for i, p in enumerate(panels):
+        if not isinstance(p, dict) or p.get("id") not in ("svs-ess", "svs-ess-kpi"):
+            continue
+        cfg = dict(p.get("config") or {})
+        cfg["ignore_global_filters"] = True
+        # Ensure dataset filter does not use the non-existent .keyword multi-field.
+        if p.get("id") == "svs-ess-kpi":
+            metrics = list(cfg.get("metrics") or [])
+            for j, m in enumerate(metrics):
+                m = dict(m)
+                filt = dict(m.get("filter") or {})
+                expr = filt.get("expression") or ""
+                if "data_stream.dataset" in expr:
+                    filt["expression"] = _revert_bare_keyword_kql(expr)
+                    filt["language"] = filt.get("language") or "kql"
+                    m["filter"] = filt
+                    metrics[j] = m
+                    changed = True
+            cfg["metrics"] = metrics
+        if p.get("id") == "svs-ess":
+            q = dict(cfg.get("query") or {})
+            if "data_stream.dataset" in (q.get("expression") or ""):
+                q["expression"] = _revert_bare_keyword_kql(q.get("expression") or "")
+                cfg["query"] = q
+            # Prefer deployment_name (OOTB package grain) then line item name.
+            cfg["title"] = "Elastic Cloud by deployment (ECU)"
+            cfg["rows"] = [
+                {
+                    "operation": "terms",
+                    "label": "Deployment",
+                    "fields": ["ess.billing.deployment_name"],
+                    "limit": 12,
+                    "rank_by": {"type": "metric", "metric_index": 0, "direction": "desc"},
+                    "visible": True,
+                    "alignment": "left",
+                    "color": {"type": "auto"},
+                    "click_filter": False,
+                },
+                {
+                    "operation": "terms",
+                    "label": "Type",
+                    "fields": ["ess.billing.deployment_type"],
+                    "limit": 8,
+                    "rank_by": {"type": "metric", "metric_index": 0, "direction": "desc"},
+                    "visible": True,
+                    "alignment": "left",
+                    "color": {"type": "auto"},
+                    "click_filter": False,
+                },
+                {
+                    "operation": "terms",
+                    "label": "Line item",
+                    "fields": ["ess.billing.name"],
+                    "limit": 8,
+                    "rank_by": {"type": "metric", "metric_index": 0, "direction": "desc"},
+                    "visible": True,
+                    "alignment": "left",
+                    "color": {"type": "auto"},
+                    "click_filter": False,
+                },
+            ]
+            changed = True
+        panels[i] = {**p, "config": cfg}
+        changed = True
+    if not changed:
+        print("  [warn] svs ESS panels not found on dashboard")
+        return
+    body["panels"] = panels
+    r = requests.put(
+        f"{KIBANA_URL}/api/dashboards/{did}",
+        headers=KBN_HEADERS,
+        json=body,
+        timeout=60,
+    )
+    if r.status_code >= 300:
+        print(f"  [warn] svs ESS fix PUT: {r.status_code} {r.text[:300]}")
+    else:
+        print("  [ok] spend-vs-savings Elastic Cloud panels repaired (bare dataset KQL + ignore account)")
 
 
 _BILLING_ESQL_FIELDS = (
@@ -173,11 +427,12 @@ FROM metrics-aws.ec2_metrics-*
     AND cloud.instance.name IS NOT NULL
 | STATS cpu = ROUND(AVG(host.cpu.usage) * 100, 1)
     BY t = DATE_TRUNC(1 week, @timestamp), instance = cloud.instance.name
+| EVAL week = SUBSTRING(TO_STRING(t), 0, 10)
 | INLINE STATS avg_cpu = AVG(cpu) BY instance
 | INLINE STATS cutoff_lo = PERCENTILE(avg_cpu, 10), cutoff_hi = PERCENTILE(avg_cpu, 90)
 | WHERE avg_cpu <= cutoff_lo OR avg_cpu >= cutoff_hi
-| SORT avg_cpu ASC, instance ASC, t ASC
-| KEEP t, instance, cpu
+| SORT avg_cpu ASC, instance ASC, week ASC
+| KEEP week, instance, cpu
 """
 
 
@@ -186,6 +441,10 @@ def _tune_rightsizing_heatmap(obj):
 
     The vendored heatmap plotted every instance id across 24 buckets, hit the
     ES|QL 1000-row cap, and packed ~90 long labels into a short panel.
+
+    Use string week labels + ordinal X — temporal DATE_TRUNC weeks render as
+    near-zero-width bands on Serverless heatmaps (same blank-panel bug as
+    spend-vs-savings monthly).
     """
     if not isinstance(obj, dict):
         if isinstance(obj, list):
@@ -203,21 +462,27 @@ def _tune_rightsizing_heatmap(obj):
         )
         cfg["ignore_global_filters"] = True
         cfg["data_source"] = {"type": "esql", "query": _RIGHTSIZING_HEATMAP_QUERY}
-        cfg["x"] = {"column": "t", "label": "Week"}
+        cfg["x"] = {"column": "week", "label": "Week"}
         cfg["y"] = {"column": "instance", "label": "Instance"}
         cfg["metric"] = {
             "column": "cpu",
             "label": "CPU %",
             "color": {"type": "auto"},
         }
+        cfg["styling"] = {"cells": {"labels": {"visible": False}}}
+        cfg["legend"] = {
+            "visibility": "visible",
+            "position": "right",
+            "truncate_after_lines": 1,
+        }
         cfg["axis"] = {
             "x": {
                 "title": {"text": "", "visible": False},
                 "labels": {"visible": True, "orientation": "angled"},
-                "scale": "temporal",
+                "scale": "ordinal",
             },
             "y": {
-                "title": {"visible": False},
+                "title": {"text": "", "visible": False},
                 "labels": {"visible": True},
             },
         }
@@ -257,6 +522,173 @@ def _shift_rightsizing_heatmap_panels(panels: list) -> list:
     return shifted
 
 
+_SVS_HEAT_QUERY = """\
+FROM metrics-aws.billing-*
+| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend
+  AND aws.billing.group_definition.key == "LINKED_ACCOUNT"
+| EVAL account = CASE(
+    COALESCE(aws.billing.group_by.LINKED_ACCOUNT, cloud.account.id) == "985408759551", "apm-stage",
+    COALESCE(aws.billing.group_by.LINKED_ACCOUNT, cloud.account.id) == "041298796264", "monitoring",
+    COALESCE(aws.billing.group_by.LINKED_ACCOUNT, cloud.account.id) == "439106060789", "ESF-4391",
+    COALESCE(aws.billing.group_by.LINKED_ACCOUNT, cloud.account.id) == "119672459156", "ESF-1196",
+    COALESCE(aws.billing.group_by.LINKED_ACCOUNT, cloud.account.id)
+  ),
+  month = CONCAT(
+    TO_STRING(DATE_EXTRACT("year", @timestamp)), "-",
+    CASE(DATE_EXTRACT("month_of_year", @timestamp) < 10, "0", ""),
+    TO_STRING(DATE_EXTRACT("month_of_year", @timestamp))
+  )
+| STATS spend = ROUND(SUM(aws.billing.UnblendedCost.amount), 2)
+    BY month, account
+| WHERE spend IS NOT NULL
+| SORT account ASC, month ASC
+"""
+
+# Spend heatmap: monthly string labels + ordinal X (temporal DATE_TRUNC
+# months render as near-zero-width bands → blank panel). Tall slot avoids
+# overflow into the next row on Serverless.
+_SVS_HEAT_H = 28
+_SVS_ACT_HEAT_H = 18
+
+
+def _tune_spend_vs_savings_heatmap(obj):
+    """Keep heatmaps from overflowing onto panels below."""
+    if not isinstance(obj, dict):
+        if isinstance(obj, list):
+            return [_tune_spend_vs_savings_heatmap(v) for v in obj]
+        return obj
+    panels = obj.get("panels")
+    if isinstance(panels, list) and any(
+            p.get("id") == "svs-heat" for p in panels if isinstance(p, dict)):
+        return {**obj, "panels": _shift_svs_heatmap_panels(panels)}
+    if obj.get("id") == "svs-heat" and obj.get("type") == "vis":
+        cfg = dict(obj.get("config") or {})
+        cfg["title"] = "Spend heatmap: account × month (LINKED_ACCOUNT unblended)"
+        cfg["ignore_global_filters"] = False
+        cfg["data_source"] = {"type": "esql", "query": _SVS_HEAT_QUERY}
+        cfg["x"] = {"column": "month", "label": "Month"}
+        cfg["y"] = {"column": "account", "label": "Account"}
+        cfg["metric"] = {
+            "column": "spend",
+            "label": "Unblended USD",
+            "color": {"type": "auto"},
+        }
+        cfg["legend"] = {
+            "visibility": "visible",
+            "position": "right",
+            "truncate_after_lines": 1,
+        }
+        cfg["styling"] = {"cells": {"labels": {"visible": False}}}
+        cfg["axis"] = {
+            "x": {
+                "title": {"text": "", "visible": False},
+                "labels": {"visible": True, "orientation": "horizontal"},
+                "scale": "ordinal",
+            },
+            "y": {
+                "title": {"text": "", "visible": False},
+                "labels": {"visible": True},
+            },
+        }
+        grid = dict(obj.get("grid") or {})
+        grid["h"] = max(int(grid.get("h") or 0), _SVS_HEAT_H)
+        return {**obj, "config": cfg, "grid": grid}
+    if obj.get("id") == "svs-act-heat" and obj.get("type") == "vis":
+        # Cell value labels collide on small cells; hide them + legend.
+        cfg = dict(obj.get("config") or {})
+        styling = dict(cfg.get("styling") or {})
+        cells = dict(styling.get("cells") or {})
+        labels = dict(cells.get("labels") or {})
+        labels["visible"] = False
+        cells["labels"] = labels
+        styling["cells"] = cells
+        cfg["styling"] = styling
+        cfg["legend"] = {
+            "visibility": "hidden",
+            "position": "right",
+            "truncate_after_lines": 1,
+        }
+        cfg["axis"] = {
+            "x": {
+                "title": {"text": "", "visible": False},
+                "labels": {"visible": True, "orientation": "angled"},
+                "scale": "ordinal",
+            },
+            "y": {
+                "title": {"text": "", "visible": False},
+                "labels": {"visible": True},
+            },
+        }
+        grid = dict(obj.get("grid") or {})
+        grid["h"] = max(int(grid.get("h") or 0), _SVS_ACT_HEAT_H)
+        return {**obj, "config": cfg, "grid": grid}
+    return {k: _tune_spend_vs_savings_heatmap(v) for k, v in obj.items()}
+
+
+def _shift_svs_heatmap_panels(panels: list) -> list:
+    """Retune heatmaps and assign non-overlapping grid rows (idempotent)."""
+    by_id = {}
+    order = []
+    for p in panels:
+        pid = p.get("id")
+        order.append(pid)
+        if pid in ("svs-heat", "svs-act-heat"):
+            by_id[pid] = _tune_spend_vs_savings_heatmap(p)
+        else:
+            by_id[pid] = p
+
+    heat = by_id.get("svs-heat")
+    if not heat:
+        return panels
+    heat_g = dict(heat.get("grid") or {})
+    heat_g.update({"x": 0, "y": 36, "w": 48, "h": _SVS_HEAT_H})
+    heat = {**heat, "grid": heat_g}
+    by_id["svs-heat"] = heat
+    y = 36 + _SVS_HEAT_H  # 64
+
+    # Row: spend / identified by account
+    for pid, x in (("svs-spend-acct", 0), ("svs-id-acct", 24)):
+        if pid in by_id:
+            g = dict(by_id[pid].get("grid") or {})
+            g.update({"x": x, "y": y, "w": 24, "h": 14})
+            by_id[pid] = {**by_id[pid], "grid": g}
+    y += 14  # 78
+
+    # Row: services / actions
+    for pid, x in (("svs-svc", 0), ("svs-act", 24)):
+        if pid in by_id:
+            g = dict(by_id[pid].get("grid") or {})
+            g.update({"x": x, "y": y, "w": 24, "h": 14})
+            by_id[pid] = {**by_id[pid], "grid": g}
+    y += 14  # 92
+
+    # Bubble alone full width (side-by-side with act-heat looked stacked)
+    if "svs-scatter" in by_id:
+        g = dict(by_id["svs-scatter"].get("grid") or {})
+        g.update({"x": 0, "y": y, "w": 48, "h": 16})
+        by_id["svs-scatter"] = {**by_id["svs-scatter"], "grid": g}
+    y += 16  # 108
+
+    # Action heatmap alone full width
+    if "svs-act-heat" in by_id:
+        g = dict(by_id["svs-act-heat"].get("grid") or {})
+        g.update({"x": 0, "y": y, "w": 48, "h": _SVS_ACT_HEAT_H})
+        by_id["svs-act-heat"] = {**by_id["svs-act-heat"], "grid": g}
+    y += _SVS_ACT_HEAT_H  # 126
+
+    # Row: ESS
+    if "svs-ess-kpi" in by_id:
+        g = dict(by_id["svs-ess-kpi"].get("grid") or {})
+        g.update({"x": 0, "y": y, "w": 12, "h": 6})
+        by_id["svs-ess-kpi"] = {**by_id["svs-ess-kpi"], "grid": g}
+    if "svs-ess" in by_id:
+        g = dict(by_id["svs-ess"].get("grid") or {})
+        g.update({"x": 12, "y": y, "w": 36, "h": 12})
+        by_id["svs-ess"] = {**by_id["svs-ess"], "grid": g}
+
+    return [by_id[pid] for pid in order if pid in by_id]
+
+
 def _rewrite_billing_esql() -> None:
     for did in DASHBOARD_IDS:
         r = requests.get(
@@ -268,7 +700,8 @@ def _rewrite_billing_esql() -> None:
             print(f"  [warn] dashboard GET {did}: {r.status_code}")
             continue
         body = r.json().get("data") or r.json()
-        rewritten = _tune_rightsizing_heatmap(_rewrite_obj(body))
+        rewritten = _tune_spend_vs_savings_heatmap(
+            _tune_rightsizing_heatmap(_rewrite_obj(body)))
         r = requests.put(
             f"{KIBANA_URL}/api/dashboards/{did}",
             headers=KBN_HEADERS,
@@ -522,7 +955,12 @@ def _retarget_hub_links() -> None:
     if not mapping:
         print("  [warn] no hub targets resolved; skip retarget")
         return
-    for did in DASHBOARD_IDS:
+    # Meridian FinOps dashboards + the space-local ESS Billing/Credits copies.
+    # OOTB package assets ship Fleet ids (ess_billing-*) which 404 in non-default
+    # spaces; rewrite those self-tabs to the UUIDs that exist here.
+    hub_local = tuple(dict.fromkeys(
+        mapping[fid] for fid in OOTB_HUB_DASHBOARDS if fid in mapping))
+    for did in DASHBOARD_IDS + hub_local:
         r = requests.get(
             f"{KIBANA_URL}/api/dashboards/{did}",
             headers=KBN_HEADERS, timeout=30)
@@ -543,6 +981,17 @@ def _retarget_hub_links() -> None:
 def _retarget_hub_obj(obj, mapping=None):
     mapping = mapping or HUB_DASHBOARD_IDS
     if isinstance(obj, dict):
+        # Links panel entries: prefer label→current space id so rotating Fleet
+        # UUIDs (each space install) never leave dead hub tabs.
+        if obj.get("type") == "dashboardLink":
+            out = {k: _retarget_hub_obj(v, mapping) for k, v in obj.items()}
+            label = out.get("label")
+            fleet_id = HUB_LINK_LABELS.get(label) if isinstance(label, str) else None
+            if fleet_id and fleet_id in mapping:
+                out["destination"] = mapping[fleet_id]
+            elif isinstance(out.get("destination"), str) and out["destination"] in mapping:
+                out["destination"] = mapping[out["destination"]]
+            return out
         out = {}
         is_dash_ref = obj.get("type") == "dashboard"
         for k, v in obj.items():

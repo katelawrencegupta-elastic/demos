@@ -20,7 +20,12 @@ _TEMPLATE_OK = False
 
 
 def _ensure_ce_grain_template():
-    """Map INSTANCE_TYPE/AZ on every billing backing index (incl. empty write idx)."""
+    """Map CE grains + group_definition key as keyword on every billing index.
+
+    Without this, dynamic mapping makes ``group_definition.key`` a text field.
+    Dashboard KQL / Lens term filters then fail or return empty on Serverless
+    (non-aggregatable text); panels error with field / filter issues.
+    """
     global _TEMPLATE_OK
     if _TEMPLATE_OK:
         return
@@ -33,8 +38,23 @@ def _ensure_ce_grain_template():
         "template": {
             "mappings": {
                 "properties": {
+                    "data_stream": {"properties": {
+                        "dataset": {"type": "keyword"},
+                        "namespace": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                    }},
+                    "cloud": {"properties": {
+                        "account": {"properties": {
+                            "id": {"type": "keyword"},
+                            "name": {"type": "keyword"},
+                        }},
+                    }},
                     "aws": {"properties": {
                         "billing": {"properties": {
+                            "group_definition": {"properties": {
+                                "key": {"type": "keyword"},
+                                "type": {"type": "keyword"},
+                            }},
                             "group_by": {"properties": {
                                 "INSTANCE_TYPE": {"type": "keyword"},
                                 "AZ": {"type": "keyword"},

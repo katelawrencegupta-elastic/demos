@@ -117,6 +117,11 @@ FINOPS_PROFILE=live
 .venv/bin/python -m src.cli --profile live verify
 ```
 
+Live setup also **enables GenAI token usage tracking** (Stack Management → GenAI
+Settings) and **installs the Elastic Billing (`ess_billing`) Fleet integration**,
+then pins the OOTB Billing / Credits / Inference Token Usage dashboards into
+the FinOps space.
+
 `setup` / `dashboards` / `agent` / `budgets` / `verify` all honor `FINOPS_PROFILE=live`
 and will **not** overwrite the live dashboards with the synthetic CUR layout.
 

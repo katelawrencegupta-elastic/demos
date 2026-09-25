@@ -265,8 +265,8 @@ steps:
             {%- if steps.extract.output.account != "*" and steps.extract.output.account != "unknown" %}
                 AND cloud.account.id == "{{ steps.extract.output.account }}"
             {%- endif %}
-            | STATS cpu_avg = AVG(aws.ec2.metrics.CPUUtilization.avg),
-                    cpu_p95 = PERCENTILE(aws.ec2.metrics.CPUUtilization.avg, 95)
+            | STATS cpu_avg = ROUND(AVG(host.cpu.usage) * 100, 1),
+                    cpu_p95 = ROUND(PERCENTILE(host.cpu.usage, 95) * 100, 1)
                 BY cloud.instance.id, cloud.instance.name, cloud.machine.type, cloud.account.id, cloud.region
             | WHERE cpu_avg < 5
             | SORT cpu_avg ASC

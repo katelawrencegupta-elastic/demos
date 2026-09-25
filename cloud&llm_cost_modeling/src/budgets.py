@@ -404,6 +404,23 @@ def ensure_budgets(fail_loud: bool = False) -> None:
     for spec in cfg.get("alerts") or []:
         _upsert_rule(spec["id"], _esql_rule_body(spec, mapping), fail_loud)
 
+    # SLOs created before backfill (or with empty transforms) stay NO_DATA / N/A
+    # until reset. Auto-recover any that still have no SLI summary.
+    stale = []
+    r = _kbn("GET", SLO_API, params={"perPage": 100})
+    if r.status_code == 200:
+        known = {s["id"] for s in cfg.get("slos") or []}
+        for s in r.json().get("results") or []:
+            sid = s.get("id")
+            if sid not in known:
+                continue
+            status = (s.get("summary") or {}).get("status")
+            if status in (None, "NO_DATA"):
+                stale.append(sid)
+    if stale:
+        print(f"== Recover {len(stale)} SLO(s) with NO_DATA ==")
+        recover_slos(fail_loud=fail_loud, slo_ids=stale)
+
 
 def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> None:
     """Reset Meridian spend SLOs (recreate transforms + reprocess SLI data).

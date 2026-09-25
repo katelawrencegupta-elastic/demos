@@ -588,6 +588,40 @@ def main():
     )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     sub.add_parser("variants", help="list workshop fork profiles")
+    smoke = sub.add_parser(
+        "smoke",
+        help="FinOps / variant smoke test with pass/fail report",
+    )
+    smoke.add_argument(
+        "--fix",
+        action="store_true",
+        help="attempt auto-remediation for known failures then re-check",
+    )
+    smoke.add_argument(
+        "--deep",
+        action="store_true",
+        help="also execute workflows and wait for completion (live suite)",
+    )
+    smoke.add_argument(
+        "--live",
+        action="store_true",
+        help="run the live Verdian FinOps suite (default when --profile live)",
+    )
+    smoke.add_argument(
+        "--variant",
+        default=None,
+        help="smoke one workshop variant from config/variants.yaml (e.g. aws, openai)",
+    )
+    smoke.add_argument(
+        "--all-variants",
+        action="store_true",
+        help="smoke every workshop variant; with --live also run live FinOps suite",
+    )
+    smoke.add_argument(
+        "--json-out",
+        default=None,
+        help="write machine-readable report JSON to this path",
+    )
     args = p.parse_args()
     if args.profile:
         os.environ["FINOPS_PROFILE"] = args.profile
@@ -641,6 +675,61 @@ def main():
     elif args.cmd == "backup":
         from src.backup import run as backup_run
         backup_run()
+    elif args.cmd == "smoke":
+        from src.live_smoke import print_report, run_smoke, write_report_json
+        from src.profile import is_live
+        from src.variant import list_variant_ids
+        from src.variant_smoke import (
+            matrix_ok,
+            print_matrix,
+            run_all_variants_smoke,
+            run_variant_smoke,
+            write_matrix_json,
+        )
+
+        want_live = args.live or (
+            (is_live() or args.profile == "live")
+            and not args.variant
+            and not args.all_variants
+        )
+        if args.all_variants:
+            reports = run_all_variants_smoke(
+                include_live=args.live or is_live() or args.profile == "live",
+                fix=args.fix,
+                deep=args.deep,
+            )
+            print_matrix(reports)
+            if args.json_out:
+                write_matrix_json(reports, args.json_out)
+            if not matrix_ok(reports):
+                raise SystemExit(1)
+        elif args.variant:
+            if args.variant not in list_variant_ids():
+                known = ", ".join(list_variant_ids())
+                raise SystemExit(f"Unknown variant {args.variant!r} (known: {known})")
+            report = run_variant_smoke(args.variant, fix=args.fix)
+            print_report(report)
+            if args.json_out:
+                write_report_json(report, args.json_out)
+            if not report.ok:
+                raise SystemExit(1)
+        elif want_live:
+            report = run_smoke(fix=args.fix, deep=args.deep)
+            print_report(report)
+            if args.json_out:
+                write_report_json(report, args.json_out)
+            if not report.ok:
+                raise SystemExit(1)
+        else:
+            # Synthetic profile default: active workshop variant
+            from src.variant import active_variant
+
+            report = run_variant_smoke(active_variant().id, fix=args.fix)
+            print_report(report)
+            if args.json_out:
+                write_report_json(report, args.json_out)
+            if not report.ok:
+                raise SystemExit(1)
     elif args.cmd == "variants":
         for vid, title, fork_dir in list_variants():
             mark = " (active)" if vid == active_variant().id else ""

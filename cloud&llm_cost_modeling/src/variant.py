@@ -74,10 +74,8 @@ def _resolve_ootb_labels(catalog: dict[str, Any], spec: dict[str, Any]) -> froze
     return frozenset(labels)
 
 
-@lru_cache(maxsize=1)
-def active_variant() -> Variant:
-    catalog = _load_catalog()
-    vid = _active_id()
+def _build_variant(vid: str, catalog: dict[str, Any] | None = None) -> Variant:
+    catalog = catalog or _load_catalog()
     variants = catalog.get("variants") or {}
     if vid not in variants:
         known = ", ".join(sorted(variants))
@@ -96,12 +94,26 @@ def active_variant() -> Variant:
     )
 
 
+def get_variant(vid: str) -> Variant:
+    """Load a workshop variant by id (does not change the active variant)."""
+    return _build_variant(vid)
+
+
+@lru_cache(maxsize=1)
+def active_variant() -> Variant:
+    return _build_variant(_active_id())
+
+
 def list_variants() -> list[tuple[str, str, str]]:
     catalog = _load_catalog()
     out = []
     for vid, spec in (catalog.get("variants") or {}).items():
         out.append((vid, spec["title"], spec["fork_dir"]))
     return sorted(out, key=lambda x: (x[0] != "all", x[0]))
+
+
+def list_variant_ids() -> list[str]:
+    return [vid for vid, _, _ in list_variants()]
 
 
 def filter_o_otb_links(ootb: dict[str, str]) -> dict[str, str]:

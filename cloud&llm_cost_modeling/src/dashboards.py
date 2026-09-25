@@ -56,6 +56,7 @@ OOTB = {
     "Amazon Bedrock Guardrails": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
     "GCP Vertex AI Metrics": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
     "APM Monitoring Overview": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
+    "[Elastic] Inference Token Usage": DASHBOARD_ID_INFERENCE_USAGE,
 }
 
 

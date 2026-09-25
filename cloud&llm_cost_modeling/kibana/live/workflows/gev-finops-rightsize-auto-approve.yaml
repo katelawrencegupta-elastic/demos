@@ -206,8 +206,8 @@ steps:
             {%- if steps.identity.output.instance_id != "*" and steps.identity.output.instance_id != "top-open" and steps.identity.output.instance_id != "" %}
                 AND cloud.instance.id == "{{ steps.identity.output.instance_id }}"
             {%- endif %}
-            | STATS cpu_avg = AVG(aws.ec2.metrics.CPUUtilization.avg),
-                    cpu_p95 = PERCENTILE(aws.ec2.metrics.CPUUtilization.avg, 95),
+            | STATS cpu_avg = ROUND(AVG(host.cpu.usage) * 100, 1),
+                    cpu_p95 = ROUND(PERCENTILE(host.cpu.usage, 95) * 100, 1),
                     samples = COUNT(*)
                 BY cloud.instance.id, cloud.instance.name, cloud.machine.type, cloud.account.id
             | SORT cpu_avg ASC

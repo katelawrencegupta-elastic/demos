@@ -311,8 +311,8 @@ ESS_BILLING_DASHBOARDS = (
 
 def pin_ess_billing_dashboards():
     """Pin OOTB ESS Billing + Credits dashboards to the demo backfill window."""
-    for did in ESS_BILLING_DASHBOARDS:
-        _pin_dashboard_time_range(did)
+    from src.ess_billing_health import pin_ess_billing_dashboards_all_spaces
+    pin_ess_billing_dashboards_all_spaces()
 
 
 INFERENCE_TOKEN_USAGE_DATA_VIEW_ID = "kibana-inference-token-usage"
