@@ -52,12 +52,21 @@ from src.rightsizing import DEST_INDEX as RIGHTSIZING_DEST
 from src.rightsizing import TRANSFORM_ID as RIGHTSIZING_TRANSFORM
 from src.workflows import WORKFLOW_IDS
 
+# Prior workflow ids (GEV / pre-rename) — wipe so renames do not leave orphans.
+LEGACY_WORKFLOW_IDS = (
+    "gev-finops-spend-spike-case",
+    "gev-finops-spend-spike-hitl",
+    "gev-finops-spend-spike-auto-approve",
+    "gev-finops-rightsize-case",
+    "gev-finops-rightsize-auto-approve",
+)
+
 DASHBOARD_BASES = (
     "elk-finops-llm-observability",
     "elk-finops-llm-observability-classic",
     "elk-finops-llm-observability-dynamic",
     "elk-ai-assistant-inference-usage",
-    # prior company-name ids — delete on reset so renames do not leave orphans
+    # prior Meridian ids — delete on reset so renames do not leave orphans
     "meridian-finops-llm-observability",
     "meridian-finops-llm-observability-classic",
     "meridian-finops-llm-observability-dynamic",
@@ -66,7 +75,7 @@ DASHBOARD_BASES = (
 
 LIVE_DASHBOARD_IDS = (
     "elk-finops-llm-observability-dynamic-aws",
-    "meridian-finops-llm-observability-dynamic-aws",  # prior id
+    "meridian-finops-llm-observability-dynamic-aws",  # prior Meridian id
     "finops-aws-billing-overview-unblended",
     "finops-spend-vs-savings",
     "finops-rightsizing-overview",
@@ -170,7 +179,7 @@ def delete_rightsizing_transform() -> None:
 
 def delete_workflows() -> None:
     print("== Remove FinOps workflows ==")
-    for wid in WORKFLOW_IDS:
+    for wid in (*WORKFLOW_IDS, *LEGACY_WORKFLOW_IDS):
         r = _kbn("DELETE", f"/api/workflows/workflow/{wid}")
         if r.status_code == 404:
             continue

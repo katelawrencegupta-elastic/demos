@@ -532,7 +532,7 @@ def check_esql_panel_queries() -> tuple[bool, str]:
 def check_workflow_run_auto(*, deep: bool) -> tuple[bool, str]:
     if not deep:
         return True, "skipped (pass --deep)"
-    wid = "gev-finops-spend-spike-auto-approve"
+    wid = "elk-finops-spend-spike-auto-approve"
     r = requests.post(
         f"{KIBANA_URL}/api/workflows/workflow/{wid}/run",
         headers=KBN_HEADERS,

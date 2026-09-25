@@ -332,7 +332,7 @@ def build_panels(kept: list[dict]) -> list[dict]:
                 "migrate_generation, gp2_to_gp3, purchase_ri_sp, schedule_offhours, "
                 "rightsize_lambda.\n"
                 "- Bubble chart: hover for action mix; copy ARN from the table "
-                "into `gev-finops-rightsize-run`.\n"
+                "into `elk-finops-rightsize-run`.\n"
                 "- Scatter / heatmap / RDS are live CloudWatch **evidence**, not recs.\n"
                 "- Spike-workflow idle rows may show **$0** — do not invent USD.\n\n"
                 "[Spend vs savings](/s/finops/app/dashboards#/view/finops-spend-vs-savings)"
@@ -530,7 +530,7 @@ def main() -> None:
 
     # Drop standalone vega-rs visualization objects (unused; panels are by-value)
     order = [k for k in order if not (
-        k[0] == "visualization" and str(k[1]).startswith("gev-finops-vega-rs-")
+        k[0] == "visualization" and str(k[1]).startswith("elk-finops-vega-rs-")
     )]
     by_id = {k: v for k, v in by_id.items() if k in set(order) or k == dash_key}
     if dash_key not in order:
