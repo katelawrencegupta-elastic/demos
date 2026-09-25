@@ -102,7 +102,7 @@ def emit(world, t0, t1, anchor):
                 b["tokens"] += ev.input_tokens + ev.output_tokens
             hour = nxt
 
-        acct = next((a for a in world.aws_accounts if a["name"] == "meridian-mlops"),
+        acct = next((a for a in world.aws_accounts if a["name"] == "elk-mlops"),
                     world.aws_accounts[0])
         for model_id, b in bedrock_by_model.items():
             if b["cost"] < 0.01:

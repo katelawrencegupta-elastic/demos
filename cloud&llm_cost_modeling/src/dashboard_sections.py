@@ -1,4 +1,4 @@
-"""Variant-scoped Meridian FinOps dashboard sections."""
+"""Variant-scoped ELK Co FinOps dashboard sections."""
 from __future__ import annotations
 
 from src.dashboard_caps import DashboardCaps, TS, caps_from_variant
@@ -11,6 +11,7 @@ from src.dashboards import (
     budget_posture_section,
     dash_id,
     gauge,
+    hub_tabs_panel,
     links_panel,
     markdown,
     metric,
@@ -72,6 +73,10 @@ def _intro_lines(caps: DashboardCaps, label: str, vtitle: str) -> str:
             f" Security→cost (crypto / S3) on the "
             f"[classic](#/view/{dash_id('classic')}) layout."
         )
+    if caps.vertex:
+        lines.append(" Includes GCP Vertex AI prompt logs, latency, and audit.")
+    if caps.azure_openai:
+        lines.append(" Includes Azure OpenAI logs, tokens by deployment, and billing.")
     if caps.budgets:
         lines.append(
             f"\n\n**Budgets:** [FinOps AI Assistant]({AGENT_CHAT_URL}) · "
@@ -300,11 +305,12 @@ def _baseline_provider_packs(caps: DashboardCaps) -> list:
         ])
     if caps.ai_dashboard:
         family.append(("AI Assistant & inference usage", dash_id("ai")))
-    family.append(("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE))
+    if caps.inference:
+        family.append(("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE))
     ootb = list(_ootb_items())
-    ootb_extra = [
-        ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-    ]
+    ootb_extra = []
+    if caps.inference:
+        ootb_extra.append(("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE))
     if caps.ai_dashboard:
         ootb_extra.append(("AI Assistant & inference usage", dash_id("ai")))
     return [
@@ -527,11 +533,13 @@ def build_baseline_sections(caps: DashboardCaps | None, label: str, vtitle: str)
         sections.append(section(title, y, panels))
         y += _section_height(panels) + 2
 
+    # AWS-hub-style horizontal tabs across Overview + variant OOTB packs.
+    push("FinOps dashboards", [hub_tabs_panel(caps)])
     push("Scoreboard — sparkline KPIs", _baseline_scoreboard(caps, label, vtitle, q))
     push("Allocation — stacked bars, area, waffle", _baseline_allocation(caps, q))
     push("Usage vs cost — dual axis", _baseline_usage_cost(caps, q))
     if caps.budgets:
-        sections.append(budget_posture_section(y))
+        sections.append(budget_posture_section(y, caps))
         y += _section_height(sections[-1].get("panels") or []) + 2
     push("Amazon Bedrock — native integration", _baseline_bedrock_native(caps, q))
     push("Anthropic — native metrics", _baseline_anthropic_native(caps, q))
@@ -580,7 +588,7 @@ def _classic_security(caps: DashboardCaps, q: dict) -> list:
     return [
         markdown(0, 0, 48, 3,
                  "## Security incidents that move spend\n\n"
-                 "Crypto-mining and S3 exposure scenarios on `meridian-dev` / fintech."),
+                 "Crypto-mining and S3 exposure scenarios on `elk-dev` / fintech."),
         metric(0, 3, 12, 5, "GuardDuty findings", q["gd_all"], "findings"),
         metric(12, 3, 12, 5, "Crypto findings", q["gd_crypto"], "crypto"),
         metric(24, 3, 12, 5, "S3 policy findings", q["gd_s3"], "s3_findings"),
@@ -749,6 +757,7 @@ def build_classic_sections(caps: DashboardCaps | None, label: str, vtitle: str) 
         sections.append(section(title, y, panels))
         y += _section_height(panels) + 2
 
+    push("FinOps dashboards", [hub_tabs_panel(caps)])
     push("FinOps integration — native provider dashboards", [
         markdown(0, 0, 20, 10,
                  "OOTB Elastic integration dashboards for this variant. "
@@ -760,7 +769,7 @@ def build_classic_sections(caps: DashboardCaps | None, label: str, vtitle: str) 
     push("Cost allocation", _classic_allocation(caps, q))
     push("Engineering & Ops — usage correlated with cost", _classic_engineering(caps, q))
     if caps.budgets:
-        sections.append(budget_posture_section(y))
+        sections.append(budget_posture_section(y, caps))
         y += _section_height(sections[-1].get("panels") or []) + 2
     push("LLM traces — end-to-end call, tokens, and cost", _classic_llm_traces(caps, q))
     push("Funnel — which user flows consume the most tokens", _classic_llm_funnel(caps, q))

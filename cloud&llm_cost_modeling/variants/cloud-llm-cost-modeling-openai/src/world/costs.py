@@ -64,7 +64,7 @@ def gcp_daily_cost(world, proj, service_desc, day, anchor) -> float:
         cost *= 0.9 + rng.random() * 0.2
     else:
         cost = GCP_SERVICE_BASES[service_desc] * ENV_FACTOR[proj["env"]]
-        if proj["id"] == "meridian-data-warehouse" and service_desc == "BigQuery":
+        if proj["id"] == "elk-data-warehouse" and service_desc == "BigQuery":
             cost *= 3.2                      # the warehouse is BigQuery-heavy
         cost *= 0.85 + rng.random() * 0.3
     sc = world.scenarios["ml_burn"]

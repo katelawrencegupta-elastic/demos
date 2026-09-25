@@ -2,17 +2,41 @@
 import argparse
 import json
 import os
+import sys
 import time
 from datetime import timedelta
 
 import requests
 
-from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL
-from src.generators import select
-from src.sink.elastic import BulkSink, es_search
-from src.variant import active_variant, list_variants
-from src.world.model import load_world
-from src.world.scenarios import utcnow
+# Honor --deployment before src.config loads connection globals.
+def _early_deployment_from_argv() -> None:
+    argv = sys.argv[1:]
+    for i, arg in enumerate(argv):
+        if arg == "--deployment" and i + 1 < len(argv):
+            os.environ["FINOPS_DEPLOYMENT"] = argv[i + 1]
+            return
+        if arg.startswith("--deployment="):
+            os.environ["FINOPS_DEPLOYMENT"] = arg.split("=", 1)[1]
+            return
+
+
+_early_deployment_from_argv()
+
+from src.config import (  # noqa: E402
+    ACTIVE_DEPLOYMENT,
+    ELASTIC_URL,
+    ES_HEADERS,
+    KBN_HEADERS,
+    KIBANA_URL,
+    apply_deployment,
+    deployment_summary,
+    list_deployments,
+)
+from src.generators import select  # noqa: E402
+from src.sink.elastic import BulkSink, es_search  # noqa: E402
+from src.variant import active_variant, list_variants  # noqa: E402
+from src.world.model import load_world  # noqa: E402
+from src.world.scenarios import utcnow  # noqa: E402
 
 # Fields that must exist after native integration pipeline parsing
 PARSE_CHECKS = {
@@ -510,15 +534,32 @@ def cmd_verify(scope: str):
         raise SystemExit(1)
 
 
+def _print_deployment() -> None:
+    s = deployment_summary()
+    print(
+        f"== deployment: {s['deployment']}  variant={s['variant']}  "
+        f"profile={s['profile']} =="
+    )
+    print(f"  elastic: {s['elastic']}")
+    print(f"  kibana:  {s['kibana']}  (space={s['space']})")
+
+
 def main():
     p = argparse.ArgumentParser(
         prog="synthcloud",
         description="Multi-cloud + LLM synthetic data factory for Elastic")
     p.add_argument(
+        "--deployment",
+        default=None,
+        metavar="NAME",
+        help="named Elastic Cloud target from .env (DEPLOY_<NAME>_*; "
+             "also FINOPS_DEPLOYMENT)",
+    )
+    p.add_argument(
         "--profile",
         choices=["synthetic", "live"],
         default=None,
-        help="synthetic=Meridian factory (default); live=Verdian Dynamics Cost Explorer FinOps objects",
+        help="synthetic=ELK Co factory (default); live=ELK Co Cost Explorer FinOps objects",
     )
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("setup", help="install integrations, APM mappings, patch TSDS, check access")
@@ -566,11 +607,11 @@ def main():
     )
     sub.add_parser(
         "recover-slos",
-        help="reset all Meridian spend SLOs (recreate transforms + reprocess SLI)",
+        help="reset all ELK Co spend SLOs (recreate transforms + reprocess SLI)",
     )
     sub.add_parser(
         "agent",
-        help="provision Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)",
+        help="provision ELK Co FinOps AI Assistant (Agent Builder + ES|QL tools)",
     )
     sub.add_parser(
         "workflow",
@@ -588,6 +629,10 @@ def main():
     )
     sub.add_parser("backup", help="snapshot Kibana/Fleet/ES objects into ./elastic")
     sub.add_parser("variants", help="list workshop fork profiles")
+    sub.add_parser(
+        "deployments",
+        help="list named Elastic Cloud targets from .env (DEPLOY_<NAME>_*)",
+    )
     smoke = sub.add_parser(
         "smoke",
         help="FinOps / variant smoke test with pass/fail report",
@@ -605,7 +650,7 @@ def main():
     smoke.add_argument(
         "--live",
         action="store_true",
-        help="run the live Verdian FinOps suite (default when --profile live)",
+        help="run the live ELK Co FinOps suite (default when --profile live)",
     )
     smoke.add_argument(
         "--variant",
@@ -623,8 +668,21 @@ def main():
         help="write machine-readable report JSON to this path",
     )
     args = p.parse_args()
+    if args.deployment:
+        apply_deployment(args.deployment)
+        # Refresh local aliases in case early-argv and --deployment differ.
+        import src.config as _cfg
+        global ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL, ACTIVE_DEPLOYMENT
+        ELASTIC_URL = _cfg.ELASTIC_URL
+        ES_HEADERS = _cfg.ES_HEADERS
+        KBN_HEADERS = _cfg.KBN_HEADERS
+        KIBANA_URL = _cfg.KIBANA_URL
+        ACTIVE_DEPLOYMENT = _cfg.ACTIVE_DEPLOYMENT
     if args.profile:
         os.environ["FINOPS_PROFILE"] = args.profile
+
+    if args.cmd not in ("variants", "deployments"):
+        _print_deployment()
 
     if args.cmd == "setup":
         from src import setup_cmd
@@ -640,8 +698,8 @@ def main():
         cmd_stream(args.tick, _resolve_scope(args))
     elif args.cmd == "verify":
         _print_variant()
-        from src.profile import is_live
-        if is_live():
+        from src.profile import uses_live_aws_hub
+        if uses_live_aws_hub():
             from src.live_setup import verify as live_verify
             if not live_verify():
                 raise SystemExit(1)
@@ -704,10 +762,12 @@ def main():
             if not matrix_ok(reports):
                 raise SystemExit(1)
         elif args.variant:
-            if args.variant not in list_variant_ids():
+            from src.variant import canonicalize_variant_id, list_variant_ids
+            vid = canonicalize_variant_id(args.variant)
+            if vid not in list_variant_ids():
                 known = ", ".join(list_variant_ids())
                 raise SystemExit(f"Unknown variant {args.variant!r} (known: {known})")
-            report = run_variant_smoke(args.variant, fix=args.fix)
+            report = run_variant_smoke(vid, fix=args.fix)
             print_report(report)
             if args.json_out:
                 write_report_json(report, args.json_out)
@@ -731,10 +791,37 @@ def main():
             if not report.ok:
                 raise SystemExit(1)
     elif args.cmd == "variants":
+        from src.variant import VARIANT_ALIASES
         for vid, title, fork_dir in list_variants():
             mark = " (active)" if vid == active_variant().id else ""
             print(f"  {vid:14}  {fork_dir}{mark}")
             print(f"                 {title}")
+        for old, new in sorted(VARIANT_ALIASES.items()):
+            print(f"  {old:14}  alias of {new}")
+    elif args.cmd == "deployments":
+        names = list_deployments()
+        active = ACTIVE_DEPLOYMENT or os.environ.get("FINOPS_DEPLOYMENT", "").strip()
+        if not names:
+            print("  (no DEPLOY_<NAME>_ELASTIC_URL entries in .env)")
+            print("  Add named targets, then set FINOPS_DEPLOYMENT=<name>")
+            return
+        for name in names:
+            mark = " (active)" if name == (active or "").lower().replace("-", "_") else ""
+            url = os.environ.get(f"DEPLOY_{name.upper()}_ELASTIC_URL", "")
+            variant = os.environ.get(f"DEPLOY_{name.upper()}_VARIANT", "")
+            profile = os.environ.get(f"DEPLOY_{name.upper()}_FINOPS_PROFILE", "")
+            space = os.environ.get(f"DEPLOY_{name.upper()}_KIBANA_SPACE", "")
+            print(f"  {name:14}{mark}")
+            print(f"                 {url}")
+            extras = []
+            if variant:
+                extras.append(f"variant={variant}")
+            if profile:
+                extras.append(f"profile={profile}")
+            if space:
+                extras.append(f"space={space}")
+            if extras:
+                print(f"                 {', '.join(extras)}")
 
 
 if __name__ == "__main__":

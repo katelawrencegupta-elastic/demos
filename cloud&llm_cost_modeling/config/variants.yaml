@@ -2,11 +2,26 @@
 # setup steps, and dashboard publishing to one cloud or integration pack.
 #
 # Materialize forks:  python scripts/fork_project.py --all
-# Active fork:         config/active_variant.yaml  (or MERIDIAN_VARIANT env)
+# Active fork:         config/active_variant.yaml  (or FINOPS_VARIANT / DEPLOY_<NAME>_VARIANT)
+# Active Elastic Cloud: FINOPS_DEPLOYMENT=<name> matching DEPLOY_<NAME>_* in .env
+#
+# `always` is unioned into every variant (generators, setup, dashboards, OOTB).
+
+# Elastic AI Assistant + inference usage — installed on every workshop variant.
+always:
+  generators:
+    - agent_builder_traces
+    - inference_token_usage
+  setup:
+    inference: true
+  dashboards:
+    ai: true
+  ootb_links:
+    - inference
 
 variants:
   all:
-    title: "Meridian FinOps & LLM Observability — full multi-cloud"
+    title: "ELK Co FinOps & LLM Observability — full multi-cloud"
     fork_dir: cloud-llm-cost-modeling-all
     default_scope: all
     generators: all
@@ -52,10 +67,9 @@ variants:
       - azure_openai
       - bedrock
       - vertexai
-      - apm
 
   aws:
-    title: "Verdian Dynamics FinOps — AWS"
+    title: "ELK Co FinOps — AWS"
     fork_dir: cloud-llm-cost-modeling-aws
     default_scope: all
     generators:
@@ -102,10 +116,9 @@ variants:
       - ess_billing
       - aws_cur
       - bedrock
-      - apm
 
   gcp:
-    title: "Meridian FinOps — GCP"
+    title: "ELK Co FinOps — GCP + Vertex AI"
     fork_dir: cloud-llm-cost-modeling-gcp
     default_scope: all
     generators:
@@ -132,10 +145,9 @@ variants:
     ootb_links:
       - gcp_billing
       - vertexai
-      - apm
 
   azure:
-    title: "Meridian FinOps — Azure"
+    title: "ELK Co FinOps — Azure + Azure OpenAI"
     fork_dir: cloud-llm-cost-modeling-azure
     default_scope: all
     generators:
@@ -163,10 +175,9 @@ variants:
     ootb_links:
       - azure_billing
       - azure_openai
-      - apm
 
   openai:
-    title: "Meridian LLM Observability — OpenAI"
+    title: "ELK Co LLM Observability — OpenAI"
     fork_dir: cloud-llm-cost-modeling-openai
     default_scope: all
     generators:
@@ -193,10 +204,9 @@ variants:
       ai: false
     ootb_links:
       - openai
-      - apm
 
   anthropic:
-    title: "Meridian LLM Observability — Anthropic"
+    title: "ELK Co LLM Observability — Anthropic"
     fork_dir: cloud-llm-cost-modeling-anthropic
     default_scope: all
     generators:
@@ -220,10 +230,9 @@ variants:
       ai: false
     ootb_links:
       - anthropic
-      - apm
 
   bedrock:
-    title: "Meridian LLM Observability — Amazon Bedrock"
+    title: "ELK Co LLM Observability — Amazon Bedrock"
     fork_dir: cloud-llm-cost-modeling-bedrock
     default_scope: all
     generators:
@@ -247,63 +256,12 @@ variants:
       ai: false
     ootb_links:
       - bedrock
-      - apm
 
-  vertexai:
-    title: "Meridian LLM Observability — GCP Vertex AI"
-    fork_dir: cloud-llm-cost-modeling-vertexai
-    default_scope: all
-    generators:
-      - vertex_prompt_logs
-      - vertex_metrics
-      - vertex_audit_logs
-      - llm_apm
-    packages:
-      - gcp_vertexai
-      - apm
-    setup:
-      vertexai: true
-      apm: true
-      budgets: false
-      agent: false
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false
-      ai: false
-    ootb_links:
-      - vertexai
-      - apm
-
-  azure-openai:
-    title: "Meridian LLM Observability — Azure OpenAI"
-    fork_dir: cloud-llm-cost-modeling-azure-openai
-    default_scope: all
-    generators:
-      - azure_openai_logs
-      - azure_openai_metrics
-      - azure_openai_billing
-      - llm_apm
-    packages:
-      - azure_openai
-      - azure_billing
-      - apm
-    setup:
-      azure_openai: true
-      apm: true
-      budgets: false
-      agent: false
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false
-      ai: false
-    ootb_links:
-      - azure_openai
-      - apm
+  # vertexai is an alias of gcp; azure-openai is an alias of azure
+  # (see src/variant.py VARIANT_ALIASES).
 
   elastic-ai:
-    title: "Meridian Elastic AI Assistant & inference usage"
+    title: "ELK Co Elastic AI Assistant & inference usage"
     fork_dir: cloud-llm-cost-modeling-elastic-ai
     default_scope: all
     generators:
@@ -346,7 +304,5 @@ ootb_groups:
     - "Amazon Bedrock Guardrails"
   vertexai:
     - "GCP Vertex AI Metrics"
-  apm:
-    - "APM Monitoring Overview"
   inference:
     - "[Elastic] Inference Token Usage"

@@ -1,6 +1,6 @@
-# Meridian LLM Observability — OpenAI
+# ELK Co LLM Observability — OpenAI
 
-Provider/integration-scoped fork of the Meridian synthetic data factory.
+Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `openai`
 - **Source:** `cloud&llm_cost_modeling`

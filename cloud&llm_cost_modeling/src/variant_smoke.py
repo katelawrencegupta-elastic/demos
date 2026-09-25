@@ -1,4 +1,4 @@
-"""Variant-scoped Meridian smoke checks driven by config/variants.yaml.
+"""Variant-scoped FinOps smoke checks driven by config/variants.yaml.
 
 Usage (via CLI):
   .venv/bin/python -m src.cli smoke --variant aws
@@ -26,16 +26,16 @@ from src.live_smoke import (
 from src.variant import Variant, get_variant, list_variant_ids
 
 
-_MERIDIAN_DASH_BASES = {
-    "baseline": "meridian-finops-llm-observability",
-    "classic": "meridian-finops-llm-observability-classic",
-    "dynamic": "meridian-finops-llm-observability-dynamic",
-    "ai": "meridian-ai-assistant-inference-usage",
+_FINOPS_DASH_BASES = {
+    "baseline": "elk-finops-llm-observability",
+    "classic": "elk-finops-llm-observability-classic",
+    "dynamic": "elk-finops-llm-observability-dynamic",
+    "ai": "elk-ai-assistant-inference-usage",
 }
 
 
 def _dash_id(which: str, variant: Variant) -> str:
-    return _MERIDIAN_DASH_BASES[which] + variant.dash_suffix()
+    return _FINOPS_DASH_BASES[which] + variant.dash_suffix()
 
 
 def _generator_streams(variant: Variant) -> list[tuple[str, str]]:
@@ -86,6 +86,108 @@ def check_fleet_package(pkg: str) -> tuple[bool, str]:
     return True, f"v{ver} ({status})"
 
 
+def check_no_foreign_packages(variant: Variant) -> tuple[bool, str]:
+    """Fail if another cloud's workshop-managed Fleet pack is still installed."""
+    if variant.is_all:
+        return True, "skipped (variant=all)"
+    from src.setup_cmd import MANAGED_PACKAGES, _package_status
+
+    wanted = set(variant.packages)
+    extras = []
+    for pkg in MANAGED_PACKAGES:
+        if pkg in wanted:
+            continue
+        status, ver = _package_status(pkg)
+        if status == "installed":
+            extras.append(f"{pkg}@{ver}" if ver else pkg)
+    if extras:
+        return False, f"foreign packages still installed: {', '.join(extras)}"
+    return True, "Fleet packages match variant"
+
+
+def fix_foreign_packages() -> tuple[bool, str]:
+    from src.setup_cmd import reconcile_packages
+
+    reconcile_packages()
+    return True, "reconcile_packages"
+
+
+def check_finops_dashboard_links(variant: Variant) -> tuple[bool, str]:
+    """Every dashboardLink on published FinOps boards must resolve (no 404s)."""
+    import re
+
+    from src.dashboards import dashboard_exists
+    from src.profile import is_live
+
+    which_enabled = [
+        w for w, on in (variant.dashboards or {}).items()
+        if on and w in _FINOPS_DASH_BASES
+    ]
+    # Live AWS publishes the dynamic hub only — baseline/classic/ai-suffixed ids are not present.
+    if is_live() and variant.id == "aws":
+        which_enabled = [w for w in which_enabled if w not in ("baseline", "classic", "ai")]
+        if "dynamic" not in which_enabled:
+            which_enabled.append("dynamic")
+    if not which_enabled:
+        return True, "no FinOps dashboards enabled"
+
+    view_re = re.compile(r"#/view/([A-Za-z0-9._-]+)")
+    broken: list[str] = []
+    checked = 0
+
+    def walk(panels, dash_id: str):
+        nonlocal checked
+        for p in panels or []:
+            cfg = p.get("config") or {}
+            if p.get("type") == "links":
+                for link in cfg.get("links") or []:
+                    ltype = link.get("type") or "dashboardLink"
+                    dest = link.get("destination") or ""
+                    label = link.get("label") or "?"
+                    if ltype == "externalLink" or str(dest).startswith("/"):
+                        checked += 1
+                        if not dest.startswith("/"):
+                            broken.append(f"{dash_id}:{label}->bad external {dest!r}")
+                        continue
+                    if ltype != "dashboardLink":
+                        continue
+                    checked += 1
+                    if not dashboard_exists(dest):
+                        broken.append(f"{dash_id}:{label}->{dest}")
+            if p.get("type") == "markdown":
+                for m in view_re.finditer(cfg.get("content") or ""):
+                    checked += 1
+                    dest = m.group(1)
+                    if not dashboard_exists(dest):
+                        broken.append(f"{dash_id}:md->{dest}")
+            walk(p.get("panels") or [], dash_id)
+
+    for which in which_enabled:
+        did = _dash_id(which, variant)
+        r = requests.get(
+            f"{KIBANA_URL}/api/dashboards/{did}",
+            headers=KBN_HEADERS,
+            timeout=60,
+        )
+        if r.status_code != 200:
+            broken.append(f"{did}:dashboard({r.status_code})")
+            continue
+        walk((r.json().get("data") or {}).get("panels") or [], did)
+
+    if broken:
+        return False, "; ".join(broken[:8])
+    return True, f"{checked} links ok across {len(which_enabled)} dashboards"
+
+
+def fix_finops_dashboard_links() -> tuple[bool, str]:
+    """Republish FinOps dashboards so hub/OOTB links resolve."""
+    from src.dashboards import clear_dashboard_exists_cache, publish
+
+    clear_dashboard_exists_cache()
+    publish()
+    return True, "republished FinOps dashboards"
+
+
 def check_ootb_dashboard(label: str, saved_id: str) -> tuple[bool, str]:
     """OOTB Fleet dashboards live in the default space; hub copies may be remapped."""
     for base, tag in ((KIBANA_URL, "space"), (KIBANA_ROOT, "default")):
@@ -97,33 +199,28 @@ def check_ootb_dashboard(label: str, saved_id: str) -> tuple[bool, str]:
         if r.status_code == 200:
             title = (r.json().get("data") or {}).get("title") or label
             return True, f"{title} [{tag}]"
-    # APM overview id drifts across versions; accept traces as evidence.
-    if "APM" in label.upper():
-        ok, detail = check_stream_docs("traces-apm-*", 1)
-        if ok:
-            return True, f"id missing; {detail}"
     return False, f"missing id={saved_id} (space+default)"
 
 
-def check_meridian_dashboard(which: str, variant: Variant) -> tuple[bool, str]:
-    """Resolve Meridian layout id for a variant; tolerate live hub aliases."""
+def check_finops_dashboard(which: str, variant: Variant) -> tuple[bool, str]:
+    """Resolve FinOps layout id for a variant; tolerate live hub aliases."""
     from src.profile import is_live
 
     candidates = [_dash_id(which, variant)]
-    base = _MERIDIAN_DASH_BASES[which]
+    base = _FINOPS_DASH_BASES[which]
     if not variant.is_all and base not in candidates:
         candidates.append(base)
-    # Live Verdian AWS hub uses the dynamic-aws id primarily.
+    # Live ELK Co AWS hub uses the dynamic-aws id primarily.
     if is_live() and variant.id == "aws" and which == "dynamic":
-        live_id = "meridian-finops-llm-observability-dynamic-aws"
+        live_id = "elk-finops-llm-observability-dynamic-aws"
         if live_id not in candidates:
             candidates.insert(0, live_id)
     if is_live() and variant.id == "aws" and which in ("baseline", "classic"):
-        # Live FinOps publishes a focused hub set rather than full Meridian layouts.
+        # Live FinOps publishes a focused hub set rather than full FinOps layouts.
         return True, f"skipped on live (layout={which}; hub uses dynamic-aws)"
     if is_live() and which == "ai":
         # Live ships the Elastic inference usage dashboard (not variant-suffixed).
-        for extra in ("kibana-inference-token-usage", "meridian-ai-assistant-inference-usage"):
+        for extra in ("kibana-inference-token-usage", "elk-ai-assistant-inference-usage"):
             if extra not in candidates:
                 candidates.append(extra)
 
@@ -245,6 +342,15 @@ def run_variant_smoke(variant_id: str, *, fix: bool = False) -> SmokeReport:
             do_fix=False,
         )
 
+    _check(
+        results,
+        "pkg_scope",
+        "Fleet packages match cloud variant",
+        lambda v=variant: check_no_foreign_packages(v),
+        fix=fix_foreign_packages,
+        do_fix=fix,
+    )
+
     for gen_name, stream in _generator_streams(variant):
         _check(
             results,
@@ -257,15 +363,24 @@ def run_variant_smoke(variant_id: str, *, fix: bool = False) -> SmokeReport:
     for which, enabled in (variant.dashboards or {}).items():
         if not enabled:
             continue
-        if which not in _MERIDIAN_DASH_BASES:
+        if which not in _FINOPS_DASH_BASES:
             continue
         _check(
             results,
             f"dash_{which}",
-            f"Meridian dashboard {which}",
-            lambda w=which, v=variant: check_meridian_dashboard(w, v),
+            f"FinOps dashboard {which}",
+            lambda w=which, v=variant: check_finops_dashboard(w, v),
             do_fix=False,
         )
+
+    _check(
+        results,
+        "dash_links",
+        "FinOps dashboard links (no 404s)",
+        lambda v=variant: check_finops_dashboard_links(v),
+        fix=fix_finops_dashboard_links,
+        do_fix=fix,
+    )
 
     for label in sorted(variant.ootb_link_labels):
         saved = OOTB.get(label)

@@ -2,11 +2,11 @@
 # setup steps, and dashboard publishing to one cloud or integration pack.
 #
 # Materialize forks:  python scripts/fork_project.py --all
-# Active fork:         config/active_variant.yaml  (or MERIDIAN_VARIANT env)
+# Active fork:         config/active_variant.yaml  (or FINOPS_VARIANT env)
 
 variants:
   all:
-    title: "Meridian FinOps & LLM Observability — full multi-cloud"
+    title: "ELK Co FinOps & LLM Observability — full multi-cloud"
     fork_dir: cloud-llm-cost-modeling-all
     default_scope: all
     generators: all
@@ -55,7 +55,7 @@ variants:
       - apm
 
   aws:
-    title: "Meridian FinOps — AWS"
+    title: "ELK Co FinOps — AWS"
     fork_dir: cloud-llm-cost-modeling-aws
     default_scope: all
     generators:
@@ -96,7 +96,7 @@ variants:
       - apm
 
   gcp:
-    title: "Meridian FinOps — GCP"
+    title: "ELK Co FinOps — GCP"
     fork_dir: cloud-llm-cost-modeling-gcp
     default_scope: all
     generators:
@@ -126,7 +126,7 @@ variants:
       - apm
 
   azure:
-    title: "Meridian FinOps — Azure"
+    title: "ELK Co FinOps — Azure"
     fork_dir: cloud-llm-cost-modeling-azure
     default_scope: all
     generators:
@@ -157,7 +157,7 @@ variants:
       - apm
 
   openai:
-    title: "Meridian LLM Observability — OpenAI"
+    title: "ELK Co LLM Observability — OpenAI"
     fork_dir: cloud-llm-cost-modeling-openai
     default_scope: all
     generators:
@@ -187,7 +187,7 @@ variants:
       - apm
 
   anthropic:
-    title: "Meridian LLM Observability — Anthropic"
+    title: "ELK Co LLM Observability — Anthropic"
     fork_dir: cloud-llm-cost-modeling-anthropic
     default_scope: all
     generators:
@@ -214,7 +214,7 @@ variants:
       - apm
 
   bedrock:
-    title: "Meridian LLM Observability — Amazon Bedrock"
+    title: "ELK Co LLM Observability — Amazon Bedrock"
     fork_dir: cloud-llm-cost-modeling-bedrock
     default_scope: all
     generators:
@@ -241,7 +241,7 @@ variants:
       - apm
 
   vertexai:
-    title: "Meridian LLM Observability — GCP Vertex AI"
+    title: "ELK Co LLM Observability — GCP Vertex AI"
     fork_dir: cloud-llm-cost-modeling-vertexai
     default_scope: all
     generators:
@@ -267,7 +267,7 @@ variants:
       - apm
 
   azure-openai:
-    title: "Meridian LLM Observability — Azure OpenAI"
+    title: "ELK Co LLM Observability — Azure OpenAI"
     fork_dir: cloud-llm-cost-modeling-azure-openai
     default_scope: all
     generators:
@@ -294,7 +294,7 @@ variants:
       - apm
 
   elastic-ai:
-    title: "Meridian Elastic AI Assistant & inference usage"
+    title: "ELK Co Elastic AI Assistant & inference usage"
     fork_dir: cloud-llm-cost-modeling-elastic-ai
     default_scope: all
     generators:

@@ -1,4 +1,4 @@
-"""Object-only provision for the live Verdian Dynamics FinOps profile."""
+"""Object-only provision for the live ELK Co FinOps profile."""
 from __future__ import annotations
 
 import requests
@@ -85,7 +85,7 @@ def run(fail_loud: bool = False) -> None:
     from src.budgets import ensure_budgets
     ensure_budgets(fail_loud=fail_loud)
 
-    print("== Verdian Dynamics FinOps AI Assistant ==")
+    print("== ELK Co FinOps AI Assistant ==")
     from src.agent_builder import ensure_agent
     ensure_agent(fail_loud=fail_loud)
 

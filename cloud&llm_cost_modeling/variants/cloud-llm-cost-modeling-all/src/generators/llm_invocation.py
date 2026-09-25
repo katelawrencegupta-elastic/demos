@@ -4,7 +4,7 @@ ORPHAN — not registered in src.generators.select() / ALL. Live LLM traffic
 goes through native provider generators + llm_apm. Kept for reference only.
 
 Documents follow OpenTelemetry GenAI semantic conventions (gen_ai.*) plus
-Meridian org labels so spend can be attributed to BU / app / cost_center
+ELK Co org labels so spend can be attributed to BU / app / cost_center
 and correlated with cloud activity.
 """
 from src.generators.common import iso, poisson_count, spread

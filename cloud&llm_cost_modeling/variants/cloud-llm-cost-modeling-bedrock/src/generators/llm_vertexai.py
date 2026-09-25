@@ -63,7 +63,7 @@ class _VertexPromptLogs:
         from src.world.scenarios import rng_for
         rng = rng_for("vertex_pr", t0.isoformat())
         proj = next(p for p in world.cfg["gcp"]["projects"]
-                    if p["id"] == "meridian-ml-prod")
+                    if p["id"] == "elk-ml-prod")
         for ev in iter_events(world, t0, t1, anchor):
             if ev.model["provider"] != "google":
                 continue
@@ -119,7 +119,7 @@ class _VertexPromptLogs:
 
 def _endpoint_id(model_id: str) -> str:
     slug = model_id.replace(".", "-").replace("_", "-")
-    return f"meridian-{slug}-endpoint"
+    return f"elk-{slug}-endpoint"
 
 
 class _VertexMetrics:
@@ -145,7 +145,7 @@ class _VertexMetrics:
 
         from src.world.scenarios import rng_for
         proj = next(p for p in world.cfg["gcp"]["projects"]
-                    if p["id"] == "meridian-ml-prod")
+                    if p["id"] == "elk-ml-prod")
         region = world.cfg["gcp"]["regions"][0]
         for (mark, model_id), b in buckets.items():
             ts = datetime.fromtimestamp(mark, tz=timezone.utc)
@@ -298,8 +298,8 @@ class _VertexAuditLogs:
         hours = (t1 - t0).total_seconds() / 3600
         mult = activity_multiplier(world, t0, anchor)
         projects = [p for p in world.cfg["gcp"]["projects"]
-                    if p["id"] in ("meridian-ml-prod", "meridian-genai-poc",
-                                   "meridian-data-warehouse")]
+                    if p["id"] in ("elk-ml-prod", "elk-genai-poc",
+                                   "elk-data-warehouse")]
         if not projects:
             projects = world.cfg["gcp"]["projects"][:1]
         region = world.cfg["gcp"]["regions"][0]

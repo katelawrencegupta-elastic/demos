@@ -1,14 +1,14 @@
-# Live Verdian Dynamics FinOps AI Assistant — Cost Explorer + rightsizing + workflows.
+# Live ELK Co FinOps AI Assistant — Cost Explorer + rightsizing + workflows.
 
 agent:
-  id: meridian-finops-ai-assistant
-  name: Verdian Dynamics FinOps AI Assistant
+  id: elk-finops-ai-assistant
+  name: ELK Co FinOps AI Assistant
   description: >
     Answers questions about live AWS Cost Explorer spend, spend SLOs, and the
     rightsizing queue. Ground answers in ES|QL tools. Can start spend-spike and
     rightsizing HITL or auto-approve workflows. Never changes AWS resources.
   labels:
-    - verdian-dynamics
+    - elk-co
     - finops
   avatar_color: "#0B6E4F"
   avatar_symbol: FO
@@ -24,7 +24,7 @@ attach_tools:
   - platform.core.execute_esql
 
 instructions: |
-  You are the **Verdian Dynamics FinOps AI Assistant**.
+  You are the **ELK Co FinOps AI Assistant**.
 
   ## Data that is live (use these, never CUR/GCP/Azure)
   - Bill: `metrics-aws.billing-*` Cost Explorer. Quote **LINKED_ACCOUNT** unblended as the total. SERVICE / INSTANCE_TYPE / AZ are slices of the same dollars — do not add them together. SERVICE can be incomplete vs linked.
@@ -43,22 +43,22 @@ instructions: |
 
   ## Detection (wake without being told the issue)
   When the user asks about spend, burn, budget, FinOps, "what's expensive", anomalies, or opens you with no specifics:
-  1. Run `gev-finops-slo-posture` and `gev-finops-aws-spend` with days=30.
-  2. Run `gev-finops-aws-top-accounts` and `gev-finops-aws-top-services` with days=30.
-  3. If stage is mentioned or SLO for staging looks hot, run `gev-finops-stage-spend` days=7.
-  4. Run `gev-finops-rightsizing-queue`.
+  1. Run `elk-finops-slo-posture` and `elk-finops-aws-spend` with days=30.
+  2. Run `elk-finops-aws-top-accounts` and `elk-finops-aws-top-services` with days=30.
+  3. If stage is mentioned or SLO for staging looks hot, run `elk-finops-stage-spend` days=7.
+  4. Run `elk-finops-rightsizing-queue`.
   Summarize USD with the lookback window. If errorBudgetRemaining < 0, say the SLO is **violated**.
 
   ## Investigation
-  - Spend jump / leak: `gev-finops-aws-top-services`, `gev-finops-low-cpu` (days=14), `gev-finops-rds-idle` (days=14). Join the SERVICE that moved to idle util in the same account.
-  - Rightsizing: `gev-finops-rightsizing-queue` then `gev-finops-low-cpu` for that `cloud.instance.id`.
+  - Spend jump / leak: `elk-finops-aws-top-services`, `elk-finops-low-cpu` (days=14), `elk-finops-rds-idle` (days=14). Join the SERVICE that moved to idle util in the same account.
+  - Rightsizing: `elk-finops-rightsizing-queue` then `elk-finops-low-cpu` for that `cloud.instance.id`.
   You may also `platform.core.execute_esql` for a named instance id or account.
 
   ## Case / workflow (after you have evidence)
-  - Spend movement (HITL): `gev-finops-spike-run` (optional account, service, lookback). HITL: page_owner | park | false_positive. Approve in the **Kibana workflow execution**, not in chat.
-  - Spend movement (auto): `gev-finops-spike-run-auto-approve` — same case + evidence + RCA, then auto-sets approval from RCA and writes orphaned_idle rows to the rightsizing queue. No wait.
-  - Rightsizing rec (HITL): `gev-finops-rightsize-run` with `arn` when you have one. HITL: approve_ticket | park_infeasible | reject_false_positive.
-  - Rightsizing rec (auto): `gev-finops-rightsize-run-auto-approve` — same case + evidence + RCA, then auto-sets approval and writes in_progress or hidden onto the rightsizing queue. No wait.
+  - Spend movement (HITL): `elk-finops-spike-run` (optional account, service, lookback). HITL: page_owner | park | false_positive. Approve in the **Kibana workflow execution**, not in chat.
+  - Spend movement (auto): `elk-finops-spike-run-auto-approve` — same case + evidence + RCA, then auto-sets approval from RCA and writes orphaned_idle rows to the rightsizing queue. No wait.
+  - Rightsizing rec (HITL): `elk-finops-rightsize-run` with `arn` when you have one. HITL: approve_ticket | park_infeasible | reject_false_positive.
+  - Rightsizing rec (auto): `elk-finops-rightsize-run-auto-approve` — same case + evidence + RCA, then auto-sets approval and writes in_progress or hidden onto the rightsizing queue. No wait.
   When the user wants a case without waiting, use the auto-approve tools. Prefer the dedicated workflow tools over raw execute_workflow.
 
   ## Dashboards
@@ -76,7 +76,7 @@ instructions: |
   - If waiting_for_input, point at the execution.
 
 tools:
-  - id: gev-finops-aws-spend
+  - id: elk-finops-aws-spend
     type: esql
     description: >
       AWS Cost Explorer LINKED_ACCOUNT unblended spend for the last N days vs
@@ -97,7 +97,7 @@ tools:
       | EVAL daily_slo_ceiling_usd = {aws_daily_ceiling_usd}
       | EVAL pct_of_mtd_budget = total_spend / monthly_budget_usd * 100
 
-  - id: gev-finops-aws-top-accounts
+  - id: elk-finops-aws-top-accounts
     type: esql
     description: >
       Top AWS linked accounts by Cost Explorer unblended spend over the last N days.
@@ -113,7 +113,7 @@ tools:
       | SORT spend DESC
       | LIMIT 12
 
-  - id: gev-finops-aws-top-services
+  - id: elk-finops-aws-top-services
     type: esql
     description: >
       Top AWS products by Cost Explorer SERVICE grouping unblended spend over the
@@ -131,7 +131,7 @@ tools:
       | SORT spend DESC
       | LIMIT 12
 
-  - id: gev-finops-stage-spend
+  - id: elk-finops-stage-spend
     type: esql
     description: >
       Stage account unblended spend over the last N days vs the daily SLO ceiling.
@@ -150,19 +150,19 @@ tools:
       | EVAL daily_slo_ceiling_usd = {staging_daily_ceiling_usd}
       | EVAL over_slo = avg_daily > daily_slo_ceiling_usd
 
-  - id: gev-finops-slo-posture
+  - id: elk-finops-slo-posture
     type: esql
     description: >
-      Current FinOps spend SLO posture (gev-finops-slo-* and meridian-slo-*).
+      Current FinOps spend SLO posture (elk-finops-slo-* and elk-slo-*).
       errorBudgetRemaining < 0 means violated.
     esql: |
       FROM .slo-observability.summary-v3.6
-      | WHERE slo.id LIKE "gev-finops-slo-*" OR slo.id LIKE "meridian-slo-*"
+      | WHERE slo.id LIKE "elk-finops-slo-*" OR slo.id LIKE "elk-slo-*"
       | KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp
       | EVAL violated = errorBudgetRemaining < 0
       | SORT slo.name
 
-  - id: gev-finops-rightsizing-queue
+  - id: elk-finops-rightsizing-queue
     type: esql
     description: >
       Open + in_progress rightsizing recs (identified monthly savings). Actions include
@@ -182,7 +182,7 @@ tools:
       | SORT identified_usd DESC
       | LIMIT 40
 
-  - id: gev-finops-low-cpu
+  - id: elk-finops-low-cpu
     type: esql
     description: >
       Lowest average CPU EC2 instances over the last N days from live CloudWatch.
@@ -201,7 +201,7 @@ tools:
       | SORT cpu_avg ASC
       | LIMIT 15
 
-  - id: gev-finops-rds-idle
+  - id: elk-finops-rds-idle
     type: esql
     description: >
       Lowest RDS DBLoad instances over the last N days. CPUUtilization is not
@@ -219,30 +219,30 @@ tools:
       | SORT dbload_avg ASC
       | LIMIT 15
 
-  - id: gev-finops-spike-run
+  - id: elk-finops-spike-run
     type: workflow
-    workflow_id: gev-finops-spend-spike-case
+    workflow_id: elk-finops-spend-spike-hitl
     description: >
       Spend-spike RCA: case + Cost Explorer/util evidence + classify + HITL.
       Optional inputs: account, service, lookback. Never stops instances.
 
-  - id: gev-finops-spike-run-auto-approve
+  - id: elk-finops-spike-run-auto-approve
     type: workflow
-    workflow_id: gev-finops-spend-spike-auto-approve
+    workflow_id: elk-finops-spend-spike-auto-approve
     description: >
       Auto-approve spend-spike RCA: case + evidence + classify, then auto
       page_owner/park/false_positive from RCA. Never stops instances.
 
-  - id: gev-finops-rightsize-run
+  - id: elk-finops-rightsize-run
     type: workflow
-    workflow_id: gev-finops-rightsize-case
+    workflow_id: elk-finops-rightsize-case
     description: >
       Rightsizing investigation: case + rec + 14d CPU/RDS evidence + RCA + HITL.
       Optional input: arn. Never ModifyInstanceAttribute / StopInstances.
 
-  - id: gev-finops-rightsize-run-auto-approve
+  - id: elk-finops-rightsize-run-auto-approve
     type: workflow
-    workflow_id: gev-finops-rightsize-auto-approve
+    workflow_id: elk-finops-rightsize-auto-approve
     description: >
       Auto-approve rightsizing investigation: case + rec + evidence + RCA, then
       auto approve_ticket/park_infeasible/reject_false_positive. Never changes AWS.

@@ -82,7 +82,7 @@
       }
     },
     "_meta": {
-      "description": "Meridian gen_ai span fields + 180d retention for ES|QL dashboards",
+      "description": "ELK Co gen_ai span fields + 180d retention for ES|QL dashboards",
       "managed": false
     }
   }

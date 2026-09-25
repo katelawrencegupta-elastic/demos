@@ -1,10 +1,10 @@
 [
   {
-    "id": "meridian-finops-aws-spend",
+    "id": "elk-finops-aws-spend",
     "type": "esql",
     "description": "AWS CUR unblended spend for the last N days: total, daily average, and percent of monthly budget. Use when asked about AWS spend, monthly budget, or CUR totals.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -24,11 +24,11 @@
     }
   },
   {
-    "id": "meridian-finops-aws-top-accounts",
+    "id": "elk-finops-aws-top-accounts",
     "type": "esql",
     "description": "Top AWS linked accounts by CUR unblended cost over the last N days. Use for allocation / which account is driving spend.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -48,16 +48,16 @@
     }
   },
   {
-    "id": "meridian-finops-staging-leak",
+    "id": "elk-finops-staging-leak",
     "type": "esql",
-    "description": "meridian-staging account spend over the last N days vs the daily SLO ceiling. Use when asked about staging cost leak, orphaned resources, or meridian-staging.",
+    "description": "elk-staging account spend over the last N days vs the daily SLO ceiling. Use when asked about staging cost leak, orphaned resources, or elk-staging.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
     "configuration": {
-      "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND aws_billing.cur.line_item.usage_account_name == \"meridian-staging\"\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| EVAL lookback_days = ?days::integer\n| EVAL avg_daily = spend / lookback_days\n| EVAL daily_slo_ceiling_usd = 150\n| EVAL daily_alert_floor_usd = 200\n| EVAL over_slo_ceiling = avg_daily > daily_slo_ceiling_usd",
+      "query": "FROM metrics-aws_billing.cur-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND aws_billing.cur.line_item.usage_account_name == \"elk-staging\"\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| EVAL lookback_days = ?days::integer\n| EVAL avg_daily = spend / lookback_days\n| EVAL daily_slo_ceiling_usd = 150\n| EVAL daily_alert_floor_usd = 200\n| EVAL over_slo_ceiling = avg_daily > daily_slo_ceiling_usd",
       "params": {
         "days": {
           "type": "integer",
@@ -72,11 +72,11 @@
     }
   },
   {
-    "id": "meridian-finops-llm-spend-by-app",
+    "id": "elk-finops-llm-spend-by-app",
     "type": "esql",
     "description": "LLM cost from APM gen_ai spans by service.name over the last N days. Use for LLM burn, checkout-assistant, or app-level LLM FinOps.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -96,11 +96,11 @@
     }
   },
   {
-    "id": "meridian-finops-cloud-mix",
+    "id": "elk-finops-cloud-mix",
     "type": "esql",
     "description": "Total cloud billing spend by provider (AWS CUR, GCP billing, Azure billing) over the last N days. Use for multi-cloud spend mix questions.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -120,16 +120,16 @@
     }
   },
   {
-    "id": "meridian-finops-gcp-ml-burn",
+    "id": "elk-finops-gcp-ml-burn",
     "type": "esql",
-    "description": "GCP billing for meridian-ml-prod over the last N days. Use for ML platform burn or Vertex/GCE cost spike scenarios.",
+    "description": "GCP billing for elk-ml-prod over the last N days. Use for ML platform burn or Vertex/GCE cost spike scenarios.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
     "configuration": {
-      "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND gcp.billing.project_name == \"meridian-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| EVAL lookback_days = ?days::integer\n| EVAL alert_floor_usd = 4000\n| EVAL over_alert_floor = spend > alert_floor_usd",
+      "query": "FROM metrics-gcp.billing-default\n| WHERE @timestamp >= NOW() - ?days::integer * 1 day\n  AND gcp.billing.project_name == \"elk-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| EVAL lookback_days = ?days::integer\n| EVAL alert_floor_usd = 4000\n| EVAL over_alert_floor = spend > alert_floor_usd",
       "params": {
         "days": {
           "type": "integer",
@@ -144,16 +144,16 @@
     }
   },
   {
-    "id": "meridian-finops-slo-posture",
+    "id": "elk-finops-slo-posture",
     "type": "esql",
-    "description": "Current Meridian spend SLO posture: error budget remaining and consumed. errorBudgetRemaining < 0 means violated. Use for SLO health questions.",
+    "description": "Current ELK Co spend SLO posture: error budget remaining and consumed. errorBudgetRemaining < 0 means violated. Use for SLO health questions.",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
     "configuration": {
-      "query": "FROM .slo-observability.summary-v3.6\n| WHERE slo.id LIKE \"meridian-*\"\n| KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp\n| EVAL violated = errorBudgetRemaining < 0\n| SORT slo.name",
+      "query": "FROM .slo-observability.summary-v3.6\n| WHERE slo.id LIKE \"elk-*\"\n| KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp\n| EVAL violated = errorBudgetRemaining < 0\n| SORT slo.name",
       "params": {}
     },
     "readonly": false,

@@ -404,7 +404,7 @@ def run():
         from src.budgets import ensure_budgets
         ensure_budgets(fail_loud=False)
     if v.setup_enabled("agent"):
-        print("== Meridian FinOps AI Assistant ==")
+        print("== ELK Co FinOps AI Assistant ==")
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=False)
     print("setup complete.")

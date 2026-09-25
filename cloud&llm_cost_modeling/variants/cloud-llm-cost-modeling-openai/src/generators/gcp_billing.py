@@ -35,7 +35,7 @@ def emit(world, t0, t1, anchor):
                 doc["cloud"] = {
                     "provider": "gcp",
                     "account": {"id": cfg["billing_account_id"],
-                                "name": "Meridian Dynamics Billing"},
+                                "name": "ELK Co Billing"},
                     "project": {"id": proj["id"], "name": proj["id"]},
                     "region": cfg["regions"][0],
                 }

@@ -1,6 +1,6 @@
-# Meridian FinOps — Azure
+# ELK Co FinOps — Azure
 
-Provider/integration-scoped fork of the Meridian synthetic data factory.
+Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `azure`
 - **Source:** `cloud&llm_cost_modeling`

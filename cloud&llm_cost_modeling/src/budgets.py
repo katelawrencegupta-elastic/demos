@@ -1,4 +1,4 @@
-"""Provision Meridian FinOps spend SLOs and ES|QL budget alert rules.
+"""Provision ELK Co FinOps spend SLOs and ES|QL budget alert rules.
 
 Calibration probes (run against live cluster before tightening YAML)::
 
@@ -9,7 +9,7 @@ Calibration probes (run against live cluster before tightening YAML)::
 
     FROM metrics-aws_billing.cur-default
     | WHERE @timestamp >= NOW() - 14 days
-      AND aws_billing.cur.line_item.usage_account_name == "meridian-staging"
+      AND aws_billing.cur.line_item.usage_account_name == "elk-staging"
     | STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)
     | STATS avg = AVG(daily)
 
@@ -20,7 +20,7 @@ Calibration probes (run against live cluster before tightening YAML)::
 
     FROM metrics-gcp.billing-default
     | WHERE @timestamp >= NOW() - 7 days
-      AND gcp.billing.project_name == "meridian-ml-prod"
+      AND gcp.billing.project_name == "elk-ml-prod"
     | STATS cost_7d = SUM(gcp.billing.total)
 """
 from __future__ import annotations
@@ -34,7 +34,7 @@ import yaml
 from src.config import KBN_HEADERS, KIBANA_URL, ROOT
 
 BUDGETS_CONFIG = ROOT / "config" / "budgets.yaml"
-TAGS = ["meridian", "finops", "workshop"]
+TAGS = ["elk-co", "finops", "workshop"]
 WORKFLOWS_CONNECTOR = "system-connector-.workflows"
 
 SLO_API = f"{KIBANA_URL}/api/observability/slos"
@@ -42,8 +42,8 @@ RULE_API = f"{KIBANA_URL}/api/alerting/rule"
 
 
 def load_budgets() -> dict:
-    from src.profile import LIVE_DIR, is_live
-    path = LIVE_DIR / "budgets.yaml" if is_live() else BUDGETS_CONFIG
+    from src.profile import LIVE_DIR, uses_live_aws_hub
+    path = LIVE_DIR / "budgets.yaml" if uses_live_aws_hub() else BUDGETS_CONFIG
     with open(path) as f:
         return yaml.safe_load(f)
 
@@ -56,10 +56,10 @@ def budget_numbers(cfg: dict | None = None) -> dict:
 
 def substitutions(cfg: dict | None = None) -> dict:
     """Numbers + live account ids + kibana_url for YAML `.format()`."""
-    from src.profile import is_live, live_accounts
+    from src.profile import uses_live_aws_hub, live_accounts
     cfg = cfg or load_budgets()
     mapping = dict(cfg["budgets"])
-    if is_live():
+    if uses_live_aws_hub():
         mapping.update(live_accounts())
     mapping["kibana_url"] = KIBANA_URL
     return mapping
@@ -158,7 +158,7 @@ def _esql_for_alert(spec: dict, mapping: dict) -> str:
     if kind == "staging_daily":
         return (
             "FROM metrics-aws_billing.cur-default\n"
-            '| WHERE aws_billing.cur.line_item.usage_account_name == "meridian-staging"\n'
+            '| WHERE aws_billing.cur.line_item.usage_account_name == "elk-staging"\n'
             "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n"
             f"| WHERE spend > {nums['staging_daily_alert_usd']}"
         )
@@ -172,7 +172,7 @@ def _esql_for_alert(spec: dict, mapping: dict) -> str:
     if kind == "gcp_ml_7d":
         return (
             "FROM metrics-gcp.billing-default\n"
-            '| WHERE gcp.billing.project_name == "meridian-ml-prod"\n'
+            '| WHERE gcp.billing.project_name == "elk-ml-prod"\n'
             "| STATS spend = SUM(gcp.billing.total)\n"
             f"| WHERE spend > {nums['gcp_ml_7d_alert_usd']}"
         )
@@ -286,7 +286,7 @@ def _esql_rule_body(spec: dict, mapping: dict) -> dict:
 
 
 def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
-    from src.profile import is_live
+    from src.profile import uses_live_aws_hub
     windows = [
         {
             "id": str(uuid.uuid4()),
@@ -305,7 +305,7 @@ def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
             "actionGroup": "slo.burnRate.medium",
         },
     ]
-    if is_live():
+    if uses_live_aws_hub():
         windows.append({
             "id": str(uuid.uuid4()),
             "burnRateThreshold": 10.0,
@@ -423,10 +423,10 @@ def ensure_budgets(fail_loud: bool = False) -> None:
 
 
 def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> None:
-    """Reset Meridian spend SLOs (recreate transforms + reprocess SLI data).
+    """Reset ELK Co spend SLOs (recreate transforms + reprocess SLI data).
 
     Uses POST /api/observability/slos/{id}/_reset. When *slo_ids* is omitted,
-    resets all Meridian SLOs from config plus any flagged outdated in definitions.
+    resets all ELK Co SLOs from config plus any flagged outdated in definitions.
     """
     cfg = load_budgets()
     ids = set(slo_ids or [])
@@ -438,7 +438,7 @@ def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> N
                 if spec.get("id"):
                     ids.add(spec["id"])
 
-    print("== Recover Meridian SLOs (reset) ==")
+    print("== Recover ELK Co SLOs (reset) ==")
     for slo_id in sorted(ids):
         r = _kbn("POST", f"{SLO_API}/{slo_id}/_reset")
         if r.status_code >= 300:
@@ -454,7 +454,7 @@ def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> N
 
 
 def verify_budgets() -> bool:
-    """Return True if all Meridian budget SLOs/rules exist and rules are enabled."""
+    """Return True if all ELK Co budget SLOs/rules exist and rules are enabled."""
     cfg = load_budgets()
     ok = True
     print("== FinOps budgets / SLOs ==")

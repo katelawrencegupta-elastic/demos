@@ -1,4 +1,4 @@
-# Meridian Dynamics -- fictional org powering all synthetic data.
+# ELK Co -- fictional org powering all synthetic data.
 # Everything downstream (activity, security findings, billing) derives from
 # this file plus the deterministic expansion in src/world/model.py.
 #
@@ -8,8 +8,8 @@
 # - ~120 EC2, ~46 GCE, ~27 Azure VMs; 25 identities
 # - Scenarios: crypto mining, ML burn, cost leak, S3 public exposure,
 #   GenAI shadow-IT ramp, Sunday ETL batch window
-company: Meridian Dynamics
-domain: meridiandynamics.io
+company: ELK Co
+domain: elkdynamics.io
 seed: 42
 
 business_units:
@@ -34,86 +34,86 @@ aws:
   regions: [us-east-1, us-west-2, eu-west-1]
   accounts:
     - id: "111111111111"
-      name: meridian-prod
+      name: elk-prod
       env: prod
       business_unit: ecommerce
       ec2_count: 30
-      s3_buckets: [meridian-prod-assets, meridian-prod-orders, meridian-prod-media, meridian-prod-backups, meridian-prod-events]
+      s3_buckets: [elk-prod-assets, elk-prod-orders, elk-prod-media, elk-prod-backups, elk-prod-events]
     - id: "222222222222"
-      name: meridian-staging
+      name: elk-staging
       env: staging
       business_unit: ecommerce
       ec2_count: 14
-      s3_buckets: [meridian-staging-assets, meridian-staging-fixtures]
+      s3_buckets: [elk-staging-assets, elk-staging-fixtures]
     - id: "333333333333"
-      name: meridian-dev
+      name: elk-dev
       env: dev
       business_unit: ecommerce
       ec2_count: 16
-      s3_buckets: [meridian-dev-scratch, meridian-dev-builds]
+      s3_buckets: [elk-dev-scratch, elk-dev-builds]
     - id: "444444444444"
-      name: meridian-security
+      name: elk-security
       env: prod
       business_unit: corpit
       ec2_count: 5
-      s3_buckets: [meridian-sec-audit]
+      s3_buckets: [elk-sec-audit]
     - id: "555555555555"
-      name: meridian-logging
+      name: elk-logging
       env: prod
       business_unit: corpit
       ec2_count: 5
-      s3_buckets: [meridian-central-logs, meridian-cloudtrail-archive]
+      s3_buckets: [elk-central-logs, elk-cloudtrail-archive]
     - id: "666666666666"
-      name: meridian-sandbox
+      name: elk-sandbox
       env: dev
       business_unit: skunkworks
       ec2_count: 12
       s3_buckets: [mrdn-skunk-data, mrdn-skunk-models, mrdn-skunk-llm-corpus]
     - id: "777777777777"
-      name: meridian-mlops
+      name: elk-mlops
       env: prod
       business_unit: mlplatform
       ec2_count: 16
-      s3_buckets: [meridian-ml-features, meridian-ml-artifacts]
+      s3_buckets: [elk-ml-features, elk-ml-artifacts]
     - id: "888888888888"
-      name: meridian-fintech-prod
+      name: elk-fintech-prod
       env: prod
       business_unit: fintech
       ec2_count: 14
-      s3_buckets: [meridian-fintech-exports, meridian-fintech-data, meridian-fintech-audit]
+      s3_buckets: [elk-fintech-exports, elk-fintech-data, elk-fintech-audit]
     - id: "999999999999"
-      name: meridian-fintech-dev
+      name: elk-fintech-dev
       env: dev
       business_unit: fintech
       ec2_count: 8
-      s3_buckets: [meridian-fintech-dev-scratch]
+      s3_buckets: [elk-fintech-dev-scratch]
   services: [AmazonEC2, AmazonS3, AmazonRDS, AWSLambda, AmazonEKS, AmazonCloudWatch, AWSDataTransfer, AmazonGuardDuty]
 
 gcp:
   billing_account_id: 01A2B3-C4D5E6-F7A8B9
   regions: [us-central1, us-east4]
   projects:
-    - id: meridian-ml-prod
+    - id: elk-ml-prod
       number: "731945820164"
       env: prod
       business_unit: mlplatform
       gce_count: 18
-    - id: meridian-ml-dev
+    - id: elk-ml-dev
       number: "731945820165"
       env: dev
       business_unit: mlplatform
       gce_count: 8
-    - id: meridian-data-warehouse
+    - id: elk-data-warehouse
       number: "731945820166"
       env: prod
       business_unit: mlplatform
       gce_count: 6
-    - id: meridian-experiments
+    - id: elk-experiments
       number: "731945820167"
       env: dev
       business_unit: skunkworks
       gce_count: 6
-    - id: meridian-genai-poc
+    - id: elk-genai-poc
       number: "731945820168"
       env: dev
       business_unit: skunkworks
@@ -131,19 +131,19 @@ azure:
   region: eastus
   subscriptions:
     - id: 3a7c2d91-4e8f-4b2a-a1d5-9c6b8e0f3a72
-      name: meridian-corp-prod
+      name: elk-corp-prod
       env: prod
       business_unit: corpit
       resource_groups: [rg-corp-identity, rg-corp-vdi, rg-corp-shared-svcs]
       vm_count: 14
     - id: b5e9f0a3-1c2d-4f6e-8a9b-7d4c5e2f1a08
-      name: meridian-corp-dev
+      name: elk-corp-dev
       env: dev
       business_unit: corpit
       resource_groups: [rg-dev-apps, rg-dev-sandbox]
       vm_count: 8
     - id: c8d2e4f6-3a5b-4c7d-9e1f-2a4b6c8d0e13
-      name: meridian-skunk-az
+      name: elk-skunk-az
       env: dev
       business_unit: skunkworks
       resource_groups: [rg-skunk-genai, rg-skunk-misc]
@@ -182,24 +182,24 @@ identities:
 # Scenario windows are expressed in days relative to "now" (negative = past).
 scenarios:
   crypto_incident:
-    aws_account: "333333333333"     # meridian-dev
+    aws_account: "333333333333"     # elk-dev
     start_day: -12
     end_day: -9
   ml_burn:
-    gcp_project: meridian-ml-prod
+    gcp_project: elk-ml-prod
     start_day: -20
     end_day: -16
     cost_multiplier: 3.8
   cost_leak:
-    aws_account: "222222222222"     # meridian-staging: orphaned resources, spend w/o activity
+    aws_account: "222222222222"     # elk-staging: orphaned resources, spend w/o activity
     daily_cost_usd: 340.0
   s3_exposure:
     aws_account: "888888888888"     # fintech-prod: bucket accidentally made public
-    bucket: meridian-fintech-exports
+    bucket: elk-fintech-exports
     start_day: -6
     end_day: -4
   genai_ramp:
-    gcp_project: meridian-genai-poc  # skunkworks shadow-IT GPU spend, ramping up
+    gcp_project: elk-genai-poc  # skunkworks shadow-IT GPU spend, ramping up
     start_day: -15
     end_multiplier: 2.8
   # --- LLM-specific narratives ---

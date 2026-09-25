@@ -30,7 +30,7 @@ def _record(world, rng, ts, sub, op, scope_kind):
     else:
         rg = rng.choice(sub["resource_groups"])
         if scope_kind == "storage":
-            name = f"stmeridian{rng.randint(100, 999)}"
+            name = f"stelk{rng.randint(100, 999)}"
             resource_id = (f"/SUBSCRIPTIONS/{sub['id'].upper()}/RESOURCEGROUPS/{rg.upper()}"
                            f"/PROVIDERS/MICROSOFT.STORAGE/STORAGEACCOUNTS/{name.upper()}")
         elif scope_kind == "rg":

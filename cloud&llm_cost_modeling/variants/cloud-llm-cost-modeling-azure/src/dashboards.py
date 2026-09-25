@@ -1,4 +1,4 @@
-"""Publish Meridian FinOps + LLM Observability Kibana dashboards.
+"""Publish ELK Co FinOps + LLM Observability Kibana dashboards.
 
 Uses the Kibana Dashboards API (inline ES|QL visualizations) so the panels
 query native integration data streams already in the project.
@@ -13,10 +13,10 @@ from src.config import KBN_HEADERS, KIBANA_URL
 from src.time_window import demo_window, window_label
 from src.variant import active_variant, filter_o_otb_links
 
-DASHBOARD_ID = "meridian-finops-llm-observability"
-DASHBOARD_ID_CLASSIC = "meridian-finops-llm-observability-classic"
-DASHBOARD_ID_DYNAMIC = "meridian-finops-llm-observability-dynamic"  # alias of baseline
-DASHBOARD_ID_AI = "meridian-ai-assistant-inference-usage"
+DASHBOARD_ID = "elk-finops-llm-observability"
+DASHBOARD_ID_CLASSIC = "elk-finops-llm-observability-classic"
+DASHBOARD_ID_DYNAMIC = "elk-finops-llm-observability-dynamic"  # alias of baseline
+DASHBOARD_ID_AI = "elk-ai-assistant-inference-usage"
 DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
 
 
@@ -352,7 +352,7 @@ def budget_posture_section(y: int):
     staging_vs_ceil = _q(
         "FROM metrics-aws_billing.cur-default",
         f"| WHERE {TS}",
-        '| WHERE aws_billing.cur.line_item.usage_account_name == "meridian-staging"',
+        '| WHERE aws_billing.cur.line_item.usage_account_name == "elk-staging"',
         "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
         "| SORT day DESC", "| LIMIT 1",
         f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
@@ -376,7 +376,7 @@ def budget_posture_section(y: int):
     slo_posture = _q(
         # Canonical summary alias (ignore_global_filters on panel — no @timestamp).
         "FROM .slo-observability.summary-v3.6",
-        '| WHERE slo.id LIKE "meridian-*" AND status != "NO_DATA"',
+        '| WHERE slo.id LIKE "elk-*" AND status != "NO_DATA"',
         "| EVAL eb_remaining_pct = ROUND(errorBudgetRemaining * 100, 1)",
         "| KEEP slo.name, status, eb_remaining_pct, errorBudgetConsumed, sliValue",
         "| SORT status DESC, slo.name",
@@ -386,7 +386,7 @@ def budget_posture_section(y: int):
         markdown(
             0, 0, 48, 4,
             "## Budget posture\n\n"
-            "Meridian treats cloud + LLM spend as error budgets. Thresholds come from "
+            "ELK Co treats cloud + LLM spend as error budgets. Thresholds come from "
             "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
             f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
             f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
@@ -397,7 +397,7 @@ def budget_posture_section(y: int):
             f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
             f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
             f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
-            f"**Meridian FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
+            f"**ELK Co FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
             f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
         ),
         gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
@@ -411,12 +411,12 @@ def budget_posture_section(y: int):
         gauge(24, 4, 12, 12, "Staging latest day vs SLO ceiling",
               staging_vs_ceil, "spend", shape="arc",
               min_col="min", max_col="max", goal_col="goal",
-              subtitle="meridian-staging"),
+              subtitle="elk-staging"),
         gauge(36, 4, 12, 12, "checkout-assistant window vs alert",
               checkout_vs_alert, "spend", shape="arc",
               min_col="min", max_col="max", goal_col="goal",
               subtitle="USD LLM (APM)"),
-        table(0, 16, 48, 10, "Meridian spend SLO posture (error budget)",
+        table(0, 16, 48, 10, "ELK Co spend SLO posture (error budget)",
               slo_posture,
               rows=["slo.name", "status"],
               metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
@@ -493,7 +493,7 @@ def build_classic_dashboard():
                      "These are the **out-of-the-box Elastic integration dashboards** installed from "
                      "Fleet packages (`ess_billing`, `aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, "
                      "`azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\n"
-                     "This Meridian dashboard is the cross-provider overlay; provider packs remain "
+                     "This ELK Co dashboard is the cross-provider overlay; provider packs remain "
                      "the source of truth for CUR line items, PTU, Guardrails, etc.\n\n"
                      "Elastic AI Assistant / Agent Builder usage and the managed inference token "
                      "dashboard are linked at right."),
@@ -509,7 +509,7 @@ def build_classic_dashboard():
         ]),
         section("Overview — multi-cloud + LLM spend", 12, [
             markdown(0, 0, 48, 3,
-                     "## Meridian Dynamics — FinOps & LLM Observability\n\n"
+                     "## ELK Co — FinOps & LLM Observability\n\n"
                      "Cost allocation across AWS accounts, GCP projects, and Azure subscriptions, "
                      "correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, "
                      "latency, quality) for every application flow.\n\n"
@@ -517,8 +517,8 @@ def build_classic_dashboard():
                      "Republish after backfill to refresh.\n\n"
                      f"**Baseline (stacked bars/areas):** "
                      f"[FinOps & LLM Observability](#/view/{dash_id('baseline')}).\n\n"
-                     "**Scenario callouts:** cost leak on `meridian-staging` · crypto mining (−12..−9, "
-                     "`meridian-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp "
+                     "**Scenario callouts:** cost leak on `elk-staging` · crypto mining (−12..−9, "
+                     "`elk-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp "
                      "(from −15) · LLM agent-loop (`checkout-assistant`) · model migration "
                      "(`support-copilot` openai→anthropic) · cache-miss (`rag-research`).\n\n"
                      "**Budget posture:** spend SLOs + ES|QL alerts — see the Budget posture section "
@@ -534,12 +534,12 @@ def build_classic_dashboard():
         section("Security → cost — crypto mining & S3 exposure", 36, [
             markdown(0, 0, 48, 3,
                      "## Security incidents that move spend\n\n"
-                     "**Crypto-mining** (days −12..−9, `meridian-dev`): GuardDuty "
+                     "**Crypto-mining** (days −12..−9, `elk-dev`): GuardDuty "
                      "`CryptoCurrency:EC2/BitcoinTool.B`, CloudTrail brute-force from "
                      "`185.220.101.34`, CPU pegged, EC2 cost spike.\n\n"
                      "**S3 public exposure** (days −6..−4, fintech): "
                      "`Policy:S3/BucketAnonymousAccessGranted`, `PutBucketPolicy`, anonymous scrapes "
-                     "of `meridian-fintech-exports`, data-transfer cost.\n\n"
+                     "of `elk-fintech-exports`, data-transfer cost.\n\n"
                      "Open OOTB GuardDuty / CloudTrail Discover with the same time range for drill-down."),
             metric(0, 3, 12, 5, "GuardDuty findings",
                    _q("FROM logs-aws.guardduty-default",
@@ -647,7 +647,7 @@ def build_classic_dashboard():
             markdown(0, 0, 48, 2,
                      "Infrastructure usage (EC2 network throughput, CloudTrail API volume) plotted "
                      "alongside CUR EC2 spend so ops can see whether cost moves with work. "
-                     "Watch `meridian-staging` for the cost-leak pattern (spend without matching activity)."),
+                     "Watch `elk-staging` for the cost-leak pattern (spend without matching activity)."),
             xy(0, 2, 24, 11, "AWS EC2 daily unblended cost",
                _q("FROM metrics-aws_billing.cur-default",
                   f"| WHERE {TS} AND aws_billing.cur.product.product == \"AmazonEC2\"",
@@ -868,7 +868,7 @@ def build_classic_dashboard():
         ]),
         section("Funnel — which user flows consume the most tokens", 330, [
             markdown(0, 0, 48, 3,
-                     "Each `service.name` is a Meridian user flow (`checkout-assistant`, `support-copilot`, "
+                     "Each `service.name` is an ELK Co user flow (`checkout-assistant`, `support-copilot`, "
                      "`rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. "
                      "Shadow-IT (`skunk-agent-lab`, `prompt-playground`) and the agent-loop scenario show up here."),
             xy(0, 3, 28, 14, "Tokens consumed by user flow",
@@ -897,11 +897,11 @@ def build_classic_dashboard():
     ]
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability — classic",
+        "title": "[ELK Co] FinOps & LLM Observability — classic",
         "description": (
             "Classic layout: cross-cloud cost allocation tables and bars, security→cost "
             "(crypto / S3), usage-to-cost correlation, and LLM observability tables. "
-            "The baseline dashboard is meridian-finops-llm-observability."
+            "The baseline dashboard is elk-finops-llm-observability."
         ),
         "time_range": win,
         "options": {
@@ -917,7 +917,7 @@ def build_classic_dashboard():
 
 
 def build_dashboard():
-    """Baseline Meridian FinOps + LLM dashboard (stacked bars/areas, gauges, waffles)."""
+    """Baseline ELK Co FinOps + LLM dashboard (stacked bars/areas, gauges, waffles)."""
     win = demo_window()
     label = window_label()
     vtitle = active_variant().title
@@ -1085,14 +1085,14 @@ def build_dashboard():
         section("Scoreboard — sparkline KPIs", 0, [
             markdown(0, 0, 48, 4,
                      f"## {vtitle}\n\n"
-                     "Baseline Meridian FinOps + LLM view: stacked bars/areas, gauges, "
+                     "Baseline ELK Co FinOps + LLM view: stacked bars/areas, gauges, "
                      "waffles, tag clouds, and dual-axis usage vs cost.\n\n"
                      f"Time range: **{label}**. "
                      f"Security→cost (crypto / S3) lives on the "
                      f"[classic](#/view/{dash_id('classic')}).\n\n"
                      f"[Open classic](#/view/{dash_id('classic')}) · "
                      f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n"
-                     f"**Budgets:** [Meridian FinOps AI Assistant]({AGENT_CHAT_URL}) · "
+                     f"**Budgets:** [ELK Co FinOps AI Assistant]({AGENT_CHAT_URL}) · "
                      f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
                      f"`python -m src.cli agent`.\n\n"
                      f"**ESS billing:** "
@@ -1196,9 +1196,9 @@ def build_dashboard():
     ]
 
     return {
-        "title": "[Meridian] FinOps & LLM Observability",
+        "title": "[ELK Co] FinOps & LLM Observability",
         "description": (
-            "Baseline Meridian FinOps + LLM dashboard: stacked bars and areas, "
+            "Baseline ELK Co FinOps + LLM dashboard: stacked bars and areas, "
             "gauges, waffles, tag clouds, and dual-axis usage vs cost."
         ),
         "time_range": win,
@@ -1271,7 +1271,7 @@ def _put_dashboard(dash_id, body):
 
 def publish(include_baseline=True, include_classic=False, include_dynamic_alias=True,
             include_ai=True):
-    """Publish Meridian dashboards.
+    """Publish ELK Co dashboards.
 
     Baseline is the current stacked-bar/area layout (former \"dynamic\").
     Classic is the older table/bar layout with the security→cost section.

@@ -37,9 +37,9 @@ CATALOG = [
     (3, "cloudwatch", "PutMetricAlarm", False, "svc"),
 ]
 ACCT_WEIGHTS = {
-    "meridian-prod": 5, "meridian-staging": 2, "meridian-dev": 2,
-    "meridian-security": 1, "meridian-logging": 1, "meridian-sandbox": 1.5,
-    "meridian-mlops": 3, "meridian-fintech-prod": 3.5, "meridian-fintech-dev": 1.5,
+    "elk-prod": 5, "elk-staging": 2, "elk-dev": 2,
+    "elk-security": 1, "elk-logging": 1, "elk-sandbox": 1.5,
+    "elk-mlops": 3, "elk-fintech-prod": 3.5, "elk-fintech-dev": 1.5,
 }
 SDK_UA = "aws-sdk-go/1.44.289 (go1.21.4; linux; amd64)"
 CONSOLE_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"

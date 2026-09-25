@@ -1,0 +1,19 @@
+{
+  "id": "elk-finops-slo-posture",
+  "type": "esql",
+  "description": "Current ELK Co spend SLO posture: error budget remaining and consumed. errorBudgetRemaining < 0 means violated. Use for SLO health questions.",
+  "tags": [
+    "elk",
+    "finops",
+    "workshop"
+  ],
+  "configuration": {
+    "query": "FROM .slo-observability.summary-v3.6\n| WHERE slo.id LIKE \"elk-*\"\n| KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp\n| EVAL violated = errorBudgetRemaining < 0\n| SORT slo.name",
+    "params": {}
+  },
+  "readonly": false,
+  "experimental": false,
+  "confirmation": {
+    "askUser": "never"
+  }
+}

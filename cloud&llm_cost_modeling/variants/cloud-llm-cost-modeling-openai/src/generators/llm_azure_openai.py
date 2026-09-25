@@ -11,7 +11,7 @@ from src.world.model import stable_uuid
 
 SCOPE = "llm"
 SAMPLE = 0.4
-AOAI_ACCOUNT = "meridian-aoai"
+AOAI_ACCOUNT = "elk-aoai"
 AOAI_RG = "rg-corp-shared-svcs"
 # OOTB [Azure OpenAI] Billing filters match_phrase on this exact keyword.
 AOAI_RESOURCE_TYPE = "Microsoft.CognitiveServices"
@@ -19,7 +19,7 @@ AOAI_RESOURCE_TYPE = "Microsoft.CognitiveServices"
 
 def _aoai_sub(world):
     return next(s for s in world.cfg["azure"]["subscriptions"]
-                if s["name"] == "meridian-corp-prod")
+                if s["name"] == "elk-corp-prod")
 
 
 def _aoai_resource_id(sub):
@@ -93,9 +93,9 @@ class _AzureOpenAILogs:
                     hits["custom_blocklists"] = {
                         "filtered": True,
                         "id": rng.choice([
-                            "meridian-blocklist-pii",
-                            "meridian-blocklist-competitors",
-                            "meridian-blocklist-secrets",
+                            "elk-blocklist-pii",
+                            "elk-blocklist-competitors",
+                            "elk-blocklist-secrets",
                         ]),
                     }
                 success = False

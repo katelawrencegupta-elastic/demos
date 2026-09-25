@@ -1,4 +1,4 @@
-"""FinOps provision profile: synthetic (Meridian factory) vs live Verdian Dynamics."""
+"""FinOps provision profile: synthetic (ELK Co factory) vs live ELK Co."""
 from __future__ import annotations
 
 import os
@@ -32,6 +32,14 @@ def is_live() -> bool:
     return finops_profile() == "live"
 
 
+def uses_live_aws_hub() -> bool:
+    """Cost Explorer / rightsizing Kibana objects are AWS-variant only."""
+    if not is_live():
+        return False
+    from src.variant import active_variant
+    return active_variant().id == "aws"
+
+
 @lru_cache(maxsize=1)
 def live_accounts() -> dict:
     path = LIVE_DIR / "accounts.yaml"
@@ -59,15 +67,15 @@ def live_path(*parts: str) -> Path:
 # (stage, monitoring, ESF-a, ESF-b). Multiple world accounts can share a slot;
 # CE docs still sum correctly by live account id.
 _LIVE_SLOT = {
-    "222222222222": 0,  # meridian-staging
-    "333333333333": 0,  # meridian-dev
-    "555555555555": 1,  # meridian-logging
-    "444444444444": 1,  # meridian-security
-    "111111111111": 2,  # meridian-prod
-    "888888888888": 2,  # meridian-fintech-prod
-    "777777777777": 3,  # meridian-mlops
-    "666666666666": 3,  # meridian-sandbox
-    "999999999999": 3,  # meridian-fintech-dev
+    "222222222222": 0,  # elk-staging
+    "333333333333": 0,  # elk-dev
+    "555555555555": 1,  # elk-logging
+    "444444444444": 1,  # elk-security
+    "111111111111": 2,  # elk-prod
+    "888888888888": 2,  # elk-fintech-prod
+    "777777777777": 3,  # elk-mlops
+    "666666666666": 3,  # elk-sandbox
+    "999999999999": 3,  # elk-fintech-dev
 }
 
 

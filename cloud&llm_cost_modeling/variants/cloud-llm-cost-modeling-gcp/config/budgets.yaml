@@ -1,13 +1,13 @@
-# Meridian FinOps spend budgets — intentionally tight so workshop demos show
+# ELK Co FinOps spend budgets — intentionally tight so workshop demos show
 # breached SLOs / Active alerts against the seeded timeline.
 # Calibrated 2026-08-27 against Serverless backfill (~120d):
 #   AWS CUR 30d total ~$220k, daily avg ~$7.4k
-#   meridian-staging daily ~$1.0k (cost_leak)
+#   elk-staging daily ~$1.0k (cost_leak)
 #   checkout-assistant 7d LLM ~$5.5 (agent-loop spike days $2–3.5)
-#   meridian-ml-prod GCP 7d ~$7.2k
+#   elk-ml-prod GCP 7d ~$7.2k
 
 tags:
-  - meridian
+  - elk
   - finops
   - workshop
 
@@ -19,11 +19,11 @@ budgets:
   staging_daily_alert_usd: 200
   checkout_daily_ceiling_usd: 0.50 # agent-loop days $2–3.5; normal ~$0.45–0.58 → chronic breach
   checkout_7d_alert_usd: 4.0       # 7d sum ~$5.5
-  gcp_ml_7d_alert_usd: 4000        # meridian-ml-prod 7d ~$7.2k
+  gcp_ml_7d_alert_usd: 4000        # elk-ml-prod 7d ~$7.2k
 
 slos:
-  - id: meridian-slo-aws-daily-spend
-    name: "[Meridian] AWS daily unblended under budget"
+  - id: elk-slo-aws-daily-spend
+    name: "[ELK Co] AWS daily unblended under budget"
     description: >
       Daily AWS CUR unblended cost must stay at or below the FinOps ceiling.
       Crypto-mining (−12..−9) and organic growth burn error budget.
@@ -33,19 +33,19 @@ slos:
     ceiling_key: aws_daily_ceiling_usd
     burn_rate_alert: false
 
-  - id: meridian-slo-staging-cost-leak
-    name: "[Meridian] Staging account daily spend healthy"
+  - id: elk-slo-staging-cost-leak
+    name: "[ELK Co] Staging account daily spend healthy"
     description: >
-      meridian-staging daily CUR spend under a healthy baseline. The ongoing
+      elk-staging daily CUR spend under a healthy baseline. The ongoing
       cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.
     index: metrics-aws_billing.cur-default
-    filter: 'aws_billing.cur.line_item.usage_account_name : "meridian-staging"'
+    filter: 'aws_billing.cur.line_item.usage_account_name : "elk-staging"'
     field: aws_billing.cur.line_item.unblended_cost
     ceiling_key: staging_daily_ceiling_usd
     burn_rate_alert: true
 
-  - id: meridian-slo-llm-checkout-spend
-    name: "[Meridian] checkout-assistant daily LLM cost"
+  - id: elk-slo-llm-checkout-spend
+    name: "[ELK Co] checkout-assistant daily LLM cost"
     description: >
       Daily gen_ai span cost for checkout-assistant under ceiling. The
       llm_agent_loop scenario (−8..−6, ×12) burns this budget.
@@ -56,33 +56,33 @@ slos:
     burn_rate_alert: true
 
 alerts:
-  - id: meridian-alert-aws-mtd-budget
-    name: "[Meridian] AWS trailing-30d spend over monthly budget"
+  - id: elk-alert-aws-mtd-budget
+    name: "[ELK Co] AWS trailing-30d spend over monthly budget"
     description: Trailing 30-day CUR unblended cost exceeds the monthly FinOps budget.
     schedule: 1h
     time_window_size: 30
     time_window_unit: d
     kind: aws_mtd
 
-  - id: meridian-alert-staging-daily
-    name: "[Meridian] Staging cost-leak daily burn"
-    description: meridian-staging daily CUR spend above cost-leak alert floor.
+  - id: elk-alert-staging-daily
+    name: "[ELK Co] Staging cost-leak daily burn"
+    description: elk-staging daily CUR spend above cost-leak alert floor.
     schedule: 1h
     time_window_size: 1
     time_window_unit: d
     kind: staging_daily
 
-  - id: meridian-alert-llm-agent-loop
-    name: "[Meridian] checkout-assistant LLM burn"
+  - id: elk-alert-llm-agent-loop
+    name: "[ELK Co] checkout-assistant LLM burn"
     description: 7-day LLM cost for checkout-assistant above agent-loop floor.
     schedule: 1h
     time_window_size: 7
     time_window_unit: d
     kind: checkout_7d
 
-  - id: meridian-alert-gcp-ml-burn
-    name: "[Meridian] ML platform GCP project burn"
-    description: 7-day GCP billing for meridian-ml-prod above ML-burn floor.
+  - id: elk-alert-gcp-ml-burn
+    name: "[ELK Co] ML platform GCP project burn"
+    description: 7-day GCP billing for elk-ml-prod above ML-burn floor.
     schedule: 1h
     time_window_size: 7
     time_window_unit: d

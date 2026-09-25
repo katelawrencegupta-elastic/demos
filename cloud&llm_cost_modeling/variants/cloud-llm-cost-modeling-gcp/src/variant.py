@@ -47,7 +47,7 @@ def _load_catalog() -> dict[str, Any]:
 
 
 def _active_id() -> str:
-    env = os.environ.get("MERIDIAN_VARIANT", "").strip()
+    env = os.environ.get("FINOPS_VARIANT", "").strip()
     if env:
         return env
     if ACTIVE_FILE.is_file():

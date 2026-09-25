@@ -1,6 +1,6 @@
-# Meridian LLM Observability — Anthropic
+# ELK Co LLM Observability — Anthropic
 
-Provider/integration-scoped fork of the Meridian synthetic data factory.
+Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `anthropic`
 - **Source:** `cloud&llm_cost_modeling`

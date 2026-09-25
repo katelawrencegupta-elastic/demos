@@ -1,4 +1,4 @@
-"""Import live Verdian Dynamics FinOps dashboards (Lens/Vega saved objects)."""
+"""Import live ELK Co FinOps dashboards (Lens/Vega saved objects)."""
 from __future__ import annotations
 
 import re
@@ -10,7 +10,7 @@ from src.config import KBN_HEADERS, KIBANA_ROOT, KIBANA_SPACE, KIBANA_URL, ROOT
 NDJSON = ROOT / "kibana" / "live" / "dashboards.ndjson"
 
 DASHBOARD_IDS = (
-    "meridian-finops-llm-observability-dynamic-aws",
+    "elk-finops-llm-observability-dynamic-aws",
     "finops-aws-billing-overview-unblended",
     "finops-spend-vs-savings",
     "finops-rightsizing-overview",
@@ -38,7 +38,7 @@ HUB_DASHBOARD_IDS = dict(HUB_BACKUP_IDS)
 OOTB_HUB_DASHBOARDS = tuple(OOTB_HUB_TITLES.keys())
 
 # Hub tab labels → Fleet/OOTB id (used when destination UUID is stale/unknown).
-# FinOps Meridian tabs use "ESS Billing" / "ESS Credits"; the OOTB ESS package
+# FinOps ELK Co tabs use "ESS Billing" / "ESS Credits"; the OOTB ESS package
 # dashboards themselves label the same tabs "Billing" / "Credits".
 HUB_LINK_LABELS = {
     "Inference tokens": "kibana-inference-token-usage",
@@ -236,7 +236,7 @@ def _fix_billing_dashboard_filters() -> None:
     for did in (
         "finops-aws-billing-overview-unblended",
         "finops-spend-vs-savings",
-        "meridian-finops-llm-observability-dynamic-aws",
+        "elk-finops-llm-observability-dynamic-aws",
     ):
         r = requests.get(
             f"{KIBANA_URL}/api/dashboards/{did}",
@@ -955,7 +955,7 @@ def _retarget_hub_links() -> None:
     if not mapping:
         print("  [warn] no hub targets resolved; skip retarget")
         return
-    # Meridian FinOps dashboards + the space-local ESS Billing/Credits copies.
+    # ELK Co FinOps dashboards + the space-local ESS Billing/Credits copies.
     # OOTB package assets ship Fleet ids (ess_billing-*) which 404 in non-default
     # spaces; rewrite those self-tabs to the UUIDs that exist here.
     hub_local = tuple(dict.fromkeys(

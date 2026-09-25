@@ -37,7 +37,7 @@ def _user(world, bu, rng):
 
 def _ids(app_id):
     return {
-        "project_id": f"proj_meridian_{app_id.replace('-', '_')}",
+        "project_id": f"proj_elk_{app_id.replace('-', '_')}",
         "api_key_id": f"key_{app_id[:12]}",
     }
 
@@ -259,8 +259,8 @@ class _OpenAIRateLimits:
                     "object": "project.rate_limit",
                     "id": f"rl_{app_id[:8]}_{model[:12]}",
                     "model": model,
-                    "project_id": f"proj_meridian_{app_id.replace('-', '_')}",
-                    "project_name": f"Meridian {app_id}",
+                    "project_id": f"proj_elk_{app_id.replace('-', '_')}",
+                    "project_name": f"ELK Co {app_id}",
                     "project_status": "active",
                     "max_requests_per_1_minute": int(rpm * jitter),
                     "max_requests_per_1_day": int(rpm * jitter) * 60 * 12,

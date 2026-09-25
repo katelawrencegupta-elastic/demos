@@ -138,7 +138,7 @@ models:
     output_per_m: 16.50
     cached_input_per_m: 0.275
     ops: [chat]
-    deployment: meridian-gpt54-eastus
+    deployment: elk-gpt54-eastus
   - id: gpt-4o-mini
     provider: azure_openai
     family: gpt-4o
@@ -147,9 +147,9 @@ models:
     output_per_m: 0.66
     cached_input_per_m: 0.0825
     ops: [chat]
-    deployment: meridian-gpt4omini-eastus
+    deployment: elk-gpt4omini-eastus
 
-# Application workloads that call LLMs — tied to Meridian BUs.
+# Application workloads that call LLMs — tied to ELK Co BUs.
 apps:
   - id: checkout-assistant
     bu: ecommerce

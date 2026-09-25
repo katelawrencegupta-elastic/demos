@@ -47,24 +47,24 @@ _POLICY_TRACE = {
 def _guardrails(acct_id: str, region: str) -> list[dict]:
     return [
         {
-            "id": "meridianpii0block01",
-            "name": "meridian-pii-block",
+            "id": "elkpii0block01",
+            "name": "elk-pii-block",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/meridianpii0block01"),
+                    "guardrail/elkpii0block01"),
             "version": "2",
         },
         {
-            "id": "meridiantoxicontent1",
-            "name": "meridian-toxic-content",
+            "id": "elktoxicontent1",
+            "name": "elk-toxic-content",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/meridiantoxicontent1"),
+                    "guardrail/elktoxicontent1"),
             "version": "3",
         },
         {
-            "id": "meridiantopicdeny001",
-            "name": "meridian-topic-deny",
+            "id": "elktopicdeny001",
+            "name": "elk-topic-deny",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/meridiantopicdeny001"),
+                    "guardrail/elktopicdeny001"),
             "version": "1",
         },
     ]
@@ -162,7 +162,7 @@ class _BedrockInvocation:
     def emit(self, world, t0, t1, anchor):
         from src.world.scenarios import rng_for
         rng = rng_for("bedrock_inv", t0.isoformat())
-        acct = next((a for a in world.aws_accounts if a["name"] == "meridian-mlops"),
+        acct = next((a for a in world.aws_accounts if a["name"] == "elk-mlops"),
                     world.aws_accounts[0])
         for ev in iter_events(world, t0, t1, anchor):
             if ev.model["provider"] != "aws_bedrock":
@@ -252,7 +252,7 @@ class _BedrockRuntime:
             if rng.random() < 0.02:
                 b["images"] += 1
 
-        acct = next((a for a in world.aws_accounts if a["name"] == "meridian-mlops"),
+        acct = next((a for a in world.aws_accounts if a["name"] == "elk-mlops"),
                     world.aws_accounts[0])
         for (mark, model_id), b in buckets.items():
             ts = datetime.fromtimestamp(mark, tz=timezone.utc)
@@ -297,7 +297,7 @@ class _BedrockGuardrails:
                 "intervened": 0, "text_units": 0,
             }),
         })
-        acct = next((a for a in world.aws_accounts if a["name"] == "meridian-mlops"),
+        acct = next((a for a in world.aws_accounts if a["name"] == "elk-mlops"),
                     world.aws_accounts[0])
         region = "us-east-1"
         rails = _guardrails(acct["id"], region)

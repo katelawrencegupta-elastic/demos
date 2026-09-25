@@ -1,6 +1,6 @@
-# Meridian FinOps & LLM Observability — full multi-cloud
+# ELK Co FinOps & LLM Observability — full multi-cloud
 
-Provider/integration-scoped fork of the Meridian synthetic data factory.
+Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `all`
 - **Source:** `cloud&llm_cost_modeling`

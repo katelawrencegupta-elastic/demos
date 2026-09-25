@@ -142,7 +142,7 @@
     ],
     "generation": 1,
     "status": "GREEN",
-    "template": "meridian-inference-token-usage",
+    "template": "elk-inference-token-usage",
     "ilm_policy": null,
     "hidden": false,
     "system": false,

@@ -1,7 +1,7 @@
 """Wipe + re-backfill Elastic AI Assistant synthetic data streams.
 
 Used after renaming Agent Builder agent IDs (e.g. finops-copilot →
-meridian-finops-ai-assistant) so dashboards and verify stay aligned.
+elk-finops-ai-assistant) so dashboards and verify stay aligned.
 """
 from __future__ import annotations
 

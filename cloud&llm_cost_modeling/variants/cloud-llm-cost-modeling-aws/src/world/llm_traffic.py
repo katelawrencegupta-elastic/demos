@@ -1,4 +1,4 @@
-"""Shared Meridian LLM traffic engine.
+"""Shared ELK Co LLM traffic engine.
 
 Yields per-request UsageEvent objects used by native provider generators
 (OpenAI usage buckets, Anthropic metrics, Bedrock invocations, APM traces, etc.).

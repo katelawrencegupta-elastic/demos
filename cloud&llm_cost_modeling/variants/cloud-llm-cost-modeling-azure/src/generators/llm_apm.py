@@ -70,7 +70,7 @@ def ensure_apm_genai_mappings(fail_loud: bool = False):
             "mappings": {"properties": GENAI_PROPERTIES},
         },
         "_meta": {
-            "description": "Meridian gen_ai span fields + 180d retention for ES|QL dashboards",
+            "description": "ELK Co gen_ai span fields + 180d retention for ES|QL dashboards",
             "managed": False,
         },
     }

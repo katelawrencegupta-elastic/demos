@@ -85,11 +85,11 @@ def emit(world, t0, t1, anchor):
     projects = world.cfg["gcp"]["projects"]
     proj_weights = []
     for p in projects:
-        if p["id"] == "meridian-ml-prod":
+        if p["id"] == "elk-ml-prod":
             proj_weights.append(4)
-        elif p["id"] == "meridian-data-warehouse":
+        elif p["id"] == "elk-data-warehouse":
             proj_weights.append(3)
-        elif p["id"] == "meridian-genai-poc":
+        elif p["id"] == "elk-genai-poc":
             proj_weights.append(2)
         else:
             proj_weights.append(1.5)

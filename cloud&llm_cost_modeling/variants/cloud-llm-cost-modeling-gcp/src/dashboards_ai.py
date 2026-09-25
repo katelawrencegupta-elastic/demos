@@ -1,4 +1,4 @@
-"""Publish Meridian Elastic AI Assistant + inference usage dashboard."""
+"""Publish ELK Co Elastic AI Assistant + inference usage dashboard."""
 from src.dashboards import (
     DASHBOARD_ID_INFERENCE_USAGE, TS, dash_id,
     gauge, links_panel, markdown, metric, pie, section, table,
@@ -144,7 +144,7 @@ def build_ai_assistant_dashboard():
     panels = [
         section("Elastic AI — Assistant, Agent Builder, and inference", 0, [
             markdown(0, 0, 48, 4,
-                     "## Meridian Dynamics — Elastic AI Assistant & inference usage\n\n"
+                     "## ELK Co — Elastic AI Assistant & inference usage\n\n"
                      "Native **Agent Builder** OTel traces (`traces-agent_builder.otel-default`) "
                      "plus **inference token usage** (`logs-elastic.inference_token_usage-default`) "
                      "for Observability / Security AI Assistant, Agent Builder copilots, "
@@ -236,7 +236,7 @@ def build_ai_assistant_dashboard():
                      "- `logs-elastic.inference_token_usage-default` — feature-attributed tokens\n\n"
                      "Enable Kibana **GenAI Settings → Token usage tracking** for the "
                      "managed `[Elastic] Inference Token Usage` dashboard on live traffic."),
-            links_panel(24, 0, 24, 8, "Meridian FinOps family", [
+            links_panel(24, 0, 24, 8, "ELK Co FinOps family", [
                 ("FinOps & LLM Observability (baseline)", dash_id("baseline")),
                 ("FinOps & LLM — classic", dash_id("classic")),
                 ("FinOps & LLM — dynamic alias", dash_id("dynamic")),
@@ -247,7 +247,7 @@ def build_ai_assistant_dashboard():
     ]
 
     return {
-        "title": "[Meridian] Elastic AI Assistant & inference usage",
+        "title": "[ELK Co] Elastic AI Assistant & inference usage",
         "description": (
             "Observability / Security AI Assistant and Agent Builder operations "
             "(conversations, tokens, latency, tools) plus Elastic inference usage "

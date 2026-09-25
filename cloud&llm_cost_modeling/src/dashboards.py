@@ -1,4 +1,4 @@
-"""Publish Meridian FinOps + LLM Observability Kibana dashboards.
+"""Publish ELK Co FinOps + LLM Observability Kibana dashboards.
 
 Uses the Kibana Dashboards API (inline ES|QL visualizations) so the panels
 query native integration data streams already in the project.
@@ -9,15 +9,27 @@ import requests
 
 from src.agent_builder import AGENT_CHAT_URL, agent_id
 from src.budgets import budget_numbers
-from src.config import KBN_HEADERS, KIBANA_URL
+from src.config import KBN_HEADERS, KIBANA_ROOT, KIBANA_URL
 from src.time_window import demo_window, window_label
 from src.variant import active_variant, filter_o_otb_links
 
-DASHBOARD_ID = "meridian-finops-llm-observability"
-DASHBOARD_ID_CLASSIC = "meridian-finops-llm-observability-classic"
-DASHBOARD_ID_DYNAMIC = "meridian-finops-llm-observability-dynamic"  # alias of baseline
-DASHBOARD_ID_AI = "meridian-ai-assistant-inference-usage"
+DASHBOARD_ID = "elk-finops-llm-observability"
+DASHBOARD_ID_CLASSIC = "elk-finops-llm-observability-classic"
+DASHBOARD_ID_DYNAMIC = "elk-finops-llm-observability-dynamic"  # alias of baseline
+DASHBOARD_ID_AI = "elk-ai-assistant-inference-usage"
 DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
+
+# Short labels appended to the ELK Co hub title.
+DASHBOARD_SCOPE_LABELS = {
+    "all": "",
+    "aws": "AWS",
+    "gcp": "GCP + Vertex AI",
+    "azure": "Azure + Azure OpenAI",
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "bedrock": "Amazon Bedrock",
+    "elastic-ai": "Elastic AI",
+}
 
 
 def dash_id(which: str) -> str:
@@ -31,8 +43,68 @@ def dash_id(which: str) -> str:
     return bases[which] + active_variant().dash_suffix()
 
 
+def finops_dashboard_title(*, classic: bool = False) -> str:
+    """`[ELK Co] FinOps & LLM Observability` plus the variant scope."""
+    v = active_variant()
+    base = "[ELK Co] FinOps & LLM Observability"
+    scope = DASHBOARD_SCOPE_LABELS.get(v.id, v.id)
+    title = f"{base} — {scope}" if scope else base
+    if classic:
+        title += " — classic"
+    return title
+
+
+def finops_dashboard_description(*, classic: bool = False) -> str:
+    v = active_variant()
+    layout = "Classic layout" if classic else "Baseline layout"
+    scope = DASHBOARD_SCOPE_LABELS.get(v.id) or v.title
+    if v.is_all:
+        return f"{layout}: multi-cloud FinOps + LLM observability."
+    return (
+        f"{layout} for {scope}: only panels whose data is seeded by the "
+        f"{v.id} workshop variant."
+    )
+
+
+_DASH_EXISTS_CACHE: dict[str, bool] = {}
+
+
+def clear_dashboard_exists_cache() -> None:
+    _DASH_EXISTS_CACHE.clear()
+
+
+def dashboard_exists(did: str) -> bool:
+    """True if the Dashboards API can load this id in the active or default space."""
+    if not did or did.startswith("/"):
+        return True
+    if did in _DASH_EXISTS_CACHE:
+        return _DASH_EXISTS_CACHE[did]
+    for base in (KIBANA_URL, KIBANA_ROOT):
+        try:
+            r = requests.get(
+                f"{base}/api/dashboards/{did}",
+                headers=KBN_HEADERS, timeout=20,
+            )
+        except requests.RequestException:
+            continue
+        if r.status_code == 200:
+            _DASH_EXISTS_CACHE[did] = True
+            return True
+    _DASH_EXISTS_CACHE[did] = False
+    return False
+
+
+def resolve_link_item(label: str, dest: str, *, short: str | None = None):
+    """Normalize an OOTB/hub tab item to ``(display_label, destination)``."""
+    return (short or label, dest)
+
+
 def _ootb_items():
-    return list(filter_o_otb_links(OOTB).items())
+    """Variant-filtered OOTB dashboard links."""
+    return [
+        resolve_link_item(label, dest)
+        for label, dest in filter_o_otb_links(OOTB).items()
+    ]
 
 # Resolved at publish time (see src.time_window); kept as module attrs for imports.
 _WINDOW = demo_window()
@@ -55,7 +127,6 @@ OOTB = {
     "Amazon Bedrock Overview": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
     "Amazon Bedrock Guardrails": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
     "GCP Vertex AI Metrics": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
-    "APM Monitoring Overview": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
     "[Elastic] Inference Token Usage": DASHBOARD_ID_INFERENCE_USAGE,
 }
 
@@ -303,27 +374,110 @@ def table(x, y, w, h, title, query, rows, metrics, ignore_global_filters=False):
     }
 
 
-def links_panel(x, y, w, h, title, items):
+def links_panel(x, y, w, h, title, items, *, layout=None, hide_title=False,
+                open_in_new_tab=True, use_filters=False):
+    """Links embeddable. Use layout='horizontal' for AWS-hub-style tab bars.
+
+    Each item is ``(label, destination)`` for a dashboard link, or
+    ``(label, destination, "externalLink")`` for an app/path URL (e.g. ``/app/apm``).
+    """
+    links = []
+    for item in items:
+        if len(item) == 3:
+            label, dest, ltype = item
+        else:
+            label, dest = item[0], item[1]
+            ltype = "externalLink" if str(dest).startswith("/") else "dashboardLink"
+        if ltype == "externalLink":
+            links.append({
+                "label": label,
+                "type": "externalLink",
+                "destination": dest,
+                "options": {"open_in_new_tab": open_in_new_tab},
+            })
+        else:
+            links.append({
+                "label": label,
+                "type": "dashboardLink",
+                "destination": dest,
+                "options": {
+                    "use_filters": use_filters,
+                    "use_time_range": True,
+                    "open_in_new_tab": open_in_new_tab,
+                },
+            })
+    cfg = {
+        "title": title,
+        "hide_title": hide_title,
+        "links": links,
+    }
+    if layout:
+        cfg["layout"] = layout
     return {
         "grid": _grid(x, y, w, h),
         "type": "links",
-        "config": {
-            "title": title,
-            "links": [
-                {
-                    "label": label,
-                    "type": "dashboardLink",
-                    "destination": dest,
-                    "options": {
-                        "use_filters": False,
-                        "use_time_range": True,
-                        "open_in_new_tab": True,
-                    },
-                }
-                for label, dest in items
-            ],
-        },
+        "config": cfg,
     }
+
+
+# Short hub-tab labels (AWS live hub style) for OOTB + family dashboards.
+_HUB_TAB_SHORT = {
+    "GCP Billing Overview": "GCP Billing",
+    "Azure Billing Overview": "Azure Billing",
+    "AWS CUR — current month": "AWS CUR",
+    "AWS CUR — all time": "AWS CUR (all time)",
+    "GCP Vertex AI Metrics": "Vertex AI",
+    "Azure OpenAI Overview": "Azure OpenAI",
+    "Azure OpenAI Billing": "Azure OpenAI Billing",
+    "Amazon Bedrock Overview": "Bedrock",
+    "Amazon Bedrock Guardrails": "Bedrock Guardrails",
+    "OpenAI Usage Overview": "OpenAI",
+    "Anthropic Cost & Billing": "Anthropic",
+    "[Elastic] Inference Token Usage": "Inference tokens",
+    "[Metrics ESS Billing] Billing dashboard": "ESS Billing",
+    "[Metrics ESS Billing] Credits dashboard": "ESS Credits",
+}
+
+# Stable left→right order matching the AWS hub (Overview first, then billing,
+# provider LLM, inference, ESS).
+_HUB_TAB_OOTB_ORDER = (
+    "GCP Billing Overview",
+    "Azure Billing Overview",
+    "AWS CUR — current month",
+    "GCP Vertex AI Metrics",
+    "Azure OpenAI Overview",
+    "Amazon Bedrock Overview",
+    "OpenAI Usage Overview",
+    "Anthropic Cost & Billing",
+    "[Elastic] Inference Token Usage",
+    "[Metrics ESS Billing] Billing dashboard",
+    "[Metrics ESS Billing] Credits dashboard",
+)
+
+
+def hub_tabs_items(caps=None):
+    """Horizontal hub-tab destinations for the active workshop variant."""
+    from src.dashboard_caps import caps_from_variant
+    caps = caps or caps_from_variant()
+    items = [("Overview", dash_id("baseline"))]
+    ootb = filter_o_otb_links(OOTB)
+    for full in _HUB_TAB_OOTB_ORDER:
+        dest = ootb.get(full)
+        if dest:
+            items.append(resolve_link_item(
+                full, dest, short=_HUB_TAB_SHORT.get(full, full)))
+    if caps.ai_dashboard:
+        items.append(("AI Assistant", dash_id("ai")))
+    return items
+
+
+def hub_tabs_panel(caps=None):
+    """Full-width horizontal FinOps tab bar (same UX as the AWS live hub)."""
+    return links_panel(
+        0, 0, 48, 5, "FinOps dashboards", hub_tabs_items(caps),
+        layout="horizontal", hide_title=False,
+        open_in_new_tab=False, use_filters=True,
+    )
 
 
 def section(title, y, panels, collapsed=False):
@@ -335,94 +489,139 @@ def section(title, y, panels, collapsed=False):
     }
 
 
-def budget_posture_section(y: int):
-    """FinOps spend vs ceilings — mirrors config/budgets.yaml + SLO/alert deep links."""
+def budget_posture_section(y: int, caps=None):
+    """FinOps spend vs ceilings — gauges match the active workshop variant."""
+    from src.dashboard_caps import caps_from_variant
+    caps = caps or caps_from_variant()
     b = budget_numbers()
-    aws_mtd = float(b["aws_monthly_usd"])
-    staging_ceil = float(b["staging_daily_ceiling_usd"])
     checkout_7d = float(b["checkout_7d_alert_usd"])
-    aws_daily = float(b["aws_daily_ceiling_usd"])
     checkout_daily = float(b["checkout_daily_ceiling_usd"])
+    bullets = []
+    gauges = []
 
-    mtd_vs_budget = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)",
-        f"| EVAL budget = {aws_mtd}, min = 0, max = budget * 2, goal = budget",
-    )
-    staging_vs_ceil = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        '| WHERE aws_billing.cur.line_item.usage_account_name == "meridian-staging"',
-        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day DESC", "| LIMIT 1",
-        f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
-        "| KEEP spend, budget, min, max, goal",
-    )
-    checkout_vs_alert = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\" AND service.name == \"checkout-assistant\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS spend = SUM(cost)",
-        f"| EVAL budget = {checkout_7d}, min = 0, max = budget * 3, goal = budget",
-    )
-    aws_daily_vs_ceil = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day DESC", "| LIMIT 1",
-        f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
-        "| KEEP spend, budget, min, max, goal",
-    )
+    if caps.aws_cur:
+        aws_mtd = float(b["aws_monthly_usd"])
+        staging_ceil = float(b["staging_daily_ceiling_usd"])
+        aws_daily = float(b["aws_daily_ceiling_usd"])
+        bullets.extend([
+            f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}",
+            f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)",
+        ])
+        gauges.extend([
+            ("AWS window spend vs monthly budget", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)",
+                f"| EVAL budget = {aws_mtd}, min = 0, max = budget * 2, goal = budget",
+            ), "USD (goal = budget)"),
+            ("Latest AWS daily vs SLO ceiling", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) "
+                "BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "USD / day"),
+            ("Staging latest day vs SLO ceiling", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                '| WHERE aws_billing.cur.line_item.usage_account_name == "elk-staging"',
+                "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) "
+                "BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "elk-staging"),
+        ])
+
+    if caps.gcp_billing:
+        gcp_ml = float(b["gcp_ml_7d_alert_usd"])
+        gcp_daily_goal = gcp_ml / 7.0
+        bullets.append(
+            f"- **GCP elk-ml-prod 7d alert:** ${gcp_ml:,.0f} "
+            f"(~${gcp_daily_goal:,.0f}/day)"
+        )
+        gauges.extend([
+            ("GCP ML project vs 7d alert", _q(
+                "FROM metrics-gcp.billing-default", f"| WHERE {TS}",
+                '| WHERE gcp.billing.project_name == "elk-ml-prod"',
+                "| STATS spend = SUM(gcp.billing.total)",
+                f"| EVAL budget = {gcp_ml}, min = 0, max = budget * 3, goal = budget",
+            ), "elk-ml-prod"),
+            ("Latest GCP daily vs 7d/7 goal", _q(
+                "FROM metrics-gcp.billing-default", f"| WHERE {TS}",
+                "| STATS daily = SUM(gcp.billing.total) BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {gcp_daily_goal}, min = 0, "
+                "max = budget * 4, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "USD / day"),
+        ])
+
+    if caps.azure_billing:
+        gauges.append((
+            "Azure pretax (window)",
+            _q(
+                "FROM metrics-azure.billing-default", f"| WHERE {TS}",
+                "| STATS spend = SUM(azure.billing.pretax_cost)",
+                "| EVAL budget = spend, min = 0, max = spend * 2, goal = spend",
+            ),
+            "USD pretax",
+        ))
+        bullets.append("- **Azure pretax:** window total (no dedicated SLO ceiling in budgets.yaml).")
+
+    if caps.llm_apm:
+        bullets.append(
+            f"- **checkout-assistant daily SLO ceiling:** ${checkout_daily:.2f} · "
+            f"**7d alert floor:** ${checkout_7d:.2f} (agent-loop)"
+        )
+        gauges.append((
+            "checkout-assistant window vs alert",
+            _q(
+                "FROM traces-apm-default",
+                f'| WHERE {TS} AND span.subtype == "gen_ai" AND service.name == "checkout-assistant"',
+                "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
+                "| STATS spend = SUM(cost)",
+                f"| EVAL budget = {checkout_7d}, min = 0, max = budget * 3, goal = budget",
+            ),
+            "USD LLM (APM)",
+        ))
+
     slo_posture = _q(
-        # Canonical summary alias (ignore_global_filters on panel — no @timestamp).
         "FROM .slo-observability.summary-v3.6",
-        '| WHERE slo.id LIKE "meridian-*" AND status != "NO_DATA"',
+        '| WHERE slo.id LIKE "elk-*" AND status != "NO_DATA"',
         "| EVAL eb_remaining_pct = ROUND(errorBudgetRemaining * 100, 1)",
         "| KEEP slo.name, status, eb_remaining_pct, errorBudgetConsumed, sliValue",
         "| SORT status DESC, slo.name",
     )
-
-    return section("Budget posture — spend SLOs & alerts", y, [
-        markdown(
-            0, 0, 48, 4,
-            "## Budget posture\n\n"
-            "Verdian Dynamics treats cloud + LLM spend as error budgets. Thresholds come from "
-            "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
-            f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
-            f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
-            f"- **checkout-assistant daily SLO ceiling:** ${checkout_daily:.2f} · "
-            f"**7d alert floor:** ${checkout_7d:.2f} (agent-loop)\n\n"
-            "**Workshop posture:** AWS daily + staging cost-leak SLOs should show **VIOLATED**; "
-            "checkout-assistant breaches during the agent-loop window (−8..−6).\n\n"
-            f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
-            f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
-            f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
-            f"**Verdian Dynamics FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
-            f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
-        ),
-        gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
-              mtd_vs_budget, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD (goal = budget)"),
-        gauge(12, 4, 12, 12, "Latest AWS daily vs SLO ceiling",
-              aws_daily_vs_ceil, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD / day"),
-        gauge(24, 4, 12, 12, "Staging latest day vs SLO ceiling",
-              staging_vs_ceil, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="meridian-staging"),
-        gauge(36, 4, 12, 12, "checkout-assistant window vs alert",
-              checkout_vs_alert, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD LLM (APM)"),
-        table(0, 16, 48, 10, "Verdian Dynamics spend SLO posture (error budget)",
-              slo_posture,
-              rows=["slo.name", "status"],
-              metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
-              ignore_global_filters=True),
-    ])
+    intro = (
+        "## Budget posture\n\n"
+        "ELK Co treats cloud + LLM spend as error budgets. Thresholds come from "
+        "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
+        + ("\n".join(bullets) + "\n\n" if bullets else "")
+        + f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
+        f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
+        f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
+        f"**ELK Co FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
+        f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`."
+    )
+    panels = [markdown(0, 0, 48, 4, intro)]
+    if gauges:
+        w = max(48 // len(gauges), 8)
+        for i, (title, query, subtitle) in enumerate(gauges):
+            panels.append(gauge(
+                i * w, 4, w, 12, title, query, "spend", shape="arc",
+                min_col="min", max_col="max", goal_col="goal", subtitle=subtitle,
+            ))
+        table_y = 16
+    else:
+        table_y = 4
+    panels.append(table(
+        0, table_y, 48, 10, "ELK Co spend SLO posture (error budget)",
+        slo_posture,
+        rows=["slo.name", "status"],
+        metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
+        ignore_global_filters=True,
+    ))
+    return section("Budget posture — spend SLOs & alerts", y, panels)
 
 
 def _ensure_data_view(view_id, title, time_field="@timestamp"):
@@ -455,11 +654,8 @@ def build_classic_dashboard():
     panels = build_classic_sections(None, label, vtitle)
 
     return {
-        "title": "[Verdian Dynamics] FinOps & LLM Observability — classic",
-        "description": (
-            "Classic layout scoped to the active workshop variant: cost allocation, "
-            "security→cost (when AWS security data is seeded), and LLM observability."
-        ),
+        "title": finops_dashboard_title(classic=True),
+        "description": finops_dashboard_description(classic=True),
         "time_range": win,
         "options": {
             "use_margins": True,
@@ -474,7 +670,7 @@ def build_classic_dashboard():
 
 
 def build_dashboard():
-    """Baseline Meridian FinOps + LLM dashboard (variant-scoped panels)."""
+    """Baseline ELK Co FinOps + LLM dashboard (variant-scoped panels)."""
     from src.dashboard_sections import build_baseline_sections
     win = demo_window()
     label = window_label()
@@ -482,11 +678,8 @@ def build_dashboard():
     panels = build_baseline_sections(None, label, vtitle)
 
     return {
-        "title": "[Verdian Dynamics] FinOps & LLM Observability",
-        "description": (
-            "Variant-scoped Verdian Dynamics FinOps + LLM dashboard: only panels for integrations "
-            "included in the active workshop fork."
-        ),
+        "title": finops_dashboard_title(),
+        "description": finops_dashboard_description(),
         "time_range": win,
         "options": {
             "use_margins": True,
@@ -555,17 +748,20 @@ def _put_dashboard(dash_id, body):
 
 def publish(include_baseline=True, include_classic=False, include_dynamic_alias=True,
             include_ai=True):
-    """Publish Meridian dashboards.
+    """Publish FinOps dashboards.
 
     Baseline is the current stacked-bar/area layout (former \"dynamic\").
     Classic is the older table/bar layout with the security→cost section.
     The -dynamic Kibana id is kept as an alias of baseline for existing links.
     """
-    from src.profile import is_live
-    if is_live():
+    from src.profile import uses_live_aws_hub
+
+    if uses_live_aws_hub():
         from src.live_dashboards import publish as live_publish
         return live_publish()
+    clear_dashboard_exists_cache()
     v = active_variant()
+    print(f"== {finops_dashboard_title()} (variant={v.id}) ==")
     if not v.is_all:
         include_baseline = v.dashboards.get("baseline", False)
         include_classic = v.dashboards.get("classic", False)

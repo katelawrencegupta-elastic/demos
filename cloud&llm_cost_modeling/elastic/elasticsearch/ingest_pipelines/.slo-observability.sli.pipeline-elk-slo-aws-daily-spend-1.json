@@ -1,0 +1,102 @@
+{
+  "name": ".slo-observability.sli.pipeline-elk-slo-aws-daily-spend-1",
+  "description": "Ingest pipeline for SLO rollup data [id: elk-slo-aws-daily-spend, revision: 1]",
+  "_meta": {
+    "description": "Ingest pipeline for SLO rollup data",
+    "version": 3.6,
+    "managed_by": "observability",
+    "managed": true
+  },
+  "created_date_millis": 1787861657042,
+  "processors": [
+    {
+      "set": {
+        "field": "_id",
+        "value": "{{{_id}}}-elk-slo-aws-daily-spend-1"
+      }
+    },
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{{_ingest.timestamp}}}"
+      }
+    },
+    {
+      "set": {
+        "field": "slo.id",
+        "value": "elk-slo-aws-daily-spend"
+      }
+    },
+    {
+      "set": {
+        "field": "slo.name",
+        "value": "[ELK Co] AWS daily unblended under budget"
+      }
+    },
+    {
+      "set": {
+        "field": "slo.tags",
+        "value": [
+          "elk",
+          "finops",
+          "workshop"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "slo.revision",
+        "value": 1
+      }
+    },
+    {
+      "set": {
+        "field": "spaceId",
+        "value": "default"
+      }
+    },
+    {
+      "date_index_name": {
+        "date_formats": [
+          "UNIX_MS",
+          "ISO8601",
+          "yyyy-MM-dd'T'HH:mm:ss.SSSXX"
+        ],
+        "field": "@timestamp",
+        "date_rounding": "d",
+        "index_name_prefix": ".slo-observability.sli-v3.6."
+      }
+    },
+    {
+      "dot_expander": {
+        "ignore_failure": true,
+        "path": "slo.groupings",
+        "field": "*",
+        "if": "ctx.slo.groupings != null"
+      }
+    },
+    {
+      "set": {
+        "description": "Generated the instanceId field based on the groupings field",
+        "field": "slo.instanceId",
+        "value": "*"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "ignore_failure": true,
+        "name": "slo-rollup-global@custom",
+        "description": "Global custom pipeline for all SLO rollup data"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "ignore_failure": true,
+        "name": "slo-elk-slo-aws-daily-spend@custom"
+      }
+    }
+  ],
+  "modified_date_millis": 1787861657042
+}

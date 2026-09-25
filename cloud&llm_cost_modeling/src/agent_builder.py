@@ -10,10 +10,10 @@ import yaml
 
 from src.budgets import substitutions
 from src.config import KBN_HEADERS, KIBANA_URL, ROOT
-from src.profile import LIVE_DIR, is_live
+from src.profile import LIVE_DIR, uses_live_aws_hub
 
-TAGS = ["meridian", "finops", "workshop"]
-LIVE_TAGS = ["verdian-dynamics", "finops"]
+TAGS = ["elk-co", "finops", "workshop"]
+LIVE_TAGS = ["elk-co", "finops"]
 
 TOOLS_API = f"{KIBANA_URL}/api/agent_builder/tools"
 AGENTS_API = f"{KIBANA_URL}/api/agent_builder/agents"
@@ -21,7 +21,7 @@ AGENT_CHAT_URL = f"{KIBANA_URL}/app/agent_builder/chat"
 
 
 def agent_config_path():
-    return LIVE_DIR / "finops_agent.yaml" if is_live() else ROOT / "config" / "finops_agent.yaml"
+    return LIVE_DIR / "finops_agent.yaml" if uses_live_aws_hub() else ROOT / "config" / "finops_agent.yaml"
 
 
 def load_agent_config() -> dict:
@@ -38,11 +38,11 @@ def _kbn(method: str, url: str, **kwargs):
 def _tags(cfg: dict | None = None) -> list:
     cfg = cfg or load_agent_config()
     agent = cfg.get("agent") or {}
-    return list(agent.get("labels") or (LIVE_TAGS if is_live() else TAGS))
+    return list(agent.get("labels") or (LIVE_TAGS if uses_live_aws_hub() else TAGS))
 
 
 def _budgets_block(mapping: dict) -> str:
-    if is_live():
+    if uses_live_aws_hub():
         return "\n".join([
             f"- Calendar MTD linked unblended alert: ${mapping['aws_mtd_budget_usd']:,.0f}",
             f"- Trailing-30d budget alert: ${mapping['aws_trailing_30d_budget_usd']:,.0f}",
@@ -62,7 +62,7 @@ def _budgets_block(mapping: dict) -> str:
         f"- Staging daily alert floor: ${mapping['staging_daily_alert_usd']:,.0f}",
         f"- checkout-assistant daily SLO ceiling: ${mapping['checkout_daily_ceiling_usd']:.2f}",
         f"- checkout-assistant 7d alert floor: ${mapping['checkout_7d_alert_usd']:.2f}",
-        f"- GCP meridian-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+        f"- GCP elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
     ])
 
 
@@ -206,7 +206,7 @@ def ensure_agent(fail_loud: bool = False) -> None:
         if extra not in tool_ids:
             tool_ids.append(extra)
 
-    print("== Verdian Dynamics FinOps AI Assistant ==" if is_live()
+    print("== ELK Co FinOps AI Assistant ==" if uses_live_aws_hub()
           else "== FinOps AI Assistant ==")
     agent = cfg["agent"]
     body = _agent_body(cfg, tool_ids, mapping)

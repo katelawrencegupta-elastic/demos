@@ -1,4 +1,4 @@
-"""Provision live Verdian Dynamics FinOps Kibana Workflows.
+"""Provision live ELK Co FinOps Kibana Workflows.
 
 API refs:
   POST /api/workflows/workflow
@@ -19,10 +19,10 @@ WORKFLOWS_API = f"{KIBANA_URL}/api/workflows"
 WORKFLOW_APP_URL = f"{KIBANA_URL}/app/workflows"
 
 WORKFLOW_IDS = (
-    "gev-finops-spend-spike-case",
-    "gev-finops-spend-spike-auto-approve",
-    "gev-finops-rightsize-case",
-    "gev-finops-rightsize-auto-approve",
+    "elk-finops-spend-spike-hitl",
+    "elk-finops-spend-spike-auto-approve",
+    "elk-finops-rightsize-case",
+    "elk-finops-rightsize-auto-approve",
 )
 
 # Observability Cases custom fields required by the FinOps workflow YAML.

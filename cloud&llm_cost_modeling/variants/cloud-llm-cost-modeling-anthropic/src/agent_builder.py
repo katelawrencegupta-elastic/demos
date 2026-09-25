@@ -1,7 +1,7 @@
-"""Provision Meridian FinOps AI Assistant (Elastic Agent Builder).
+"""Provision ELK Co FinOps AI Assistant (Elastic Agent Builder).
 
 Creates ES|QL tools and a chat agent that answer billing, SLO, and alert
-questions against the seeded Meridian demo data.
+questions against the seeded ELK Co demo data.
 
 API refs:
   POST/PUT /api/agent_builder/tools
@@ -16,7 +16,7 @@ from src.budgets import budget_numbers
 from src.config import KBN_HEADERS, KIBANA_URL, ROOT
 
 AGENT_CONFIG = ROOT / "config" / "finops_agent.yaml"
-TAGS = ["meridian", "finops", "workshop"]
+TAGS = ["elk", "finops", "workshop"]
 
 TOOLS_API = f"{KIBANA_URL}/api/agent_builder/tools"
 AGENTS_API = f"{KIBANA_URL}/api/agent_builder/agents"
@@ -42,7 +42,7 @@ def _budgets_block(nums: dict) -> str:
         f"- Staging daily alert floor: ${nums['staging_daily_alert_usd']:,.0f}",
         f"- checkout-assistant daily SLO ceiling: ${nums['checkout_daily_ceiling_usd']:.2f}",
         f"- checkout-assistant 7d alert floor: ${nums['checkout_7d_alert_usd']:.2f}",
-        f"- GCP meridian-ml-prod 7d alert floor: ${nums['gcp_ml_7d_alert_usd']:,.0f}",
+        f"- GCP elk-ml-prod 7d alert floor: ${nums['gcp_ml_7d_alert_usd']:,.0f}",
     ]
     return "\n".join(lines)
 
@@ -167,7 +167,7 @@ def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
 
 
 def ensure_agent(fail_loud: bool = False) -> None:
-    """Upsert FinOps ES|QL tools and the Meridian FinOps AI Assistant agent."""
+    """Upsert FinOps ES|QL tools and the ELK Co FinOps AI Assistant agent."""
     cfg = load_agent_config()
     nums = budget_numbers()
     tool_ids: list[str] = []
@@ -183,7 +183,7 @@ def ensure_agent(fail_loud: bool = False) -> None:
         if _upsert_tool(spec["id"], create_body, update_body, fail_loud):
             tool_ids.append(spec["id"])
 
-    print("== Meridian FinOps AI Assistant ==")
+    print("== ELK Co FinOps AI Assistant ==")
     agent = cfg["agent"]
     body = _agent_body(cfg, tool_ids, nums)
     _upsert_agent(agent["id"], body, fail_loud)

@@ -23,6 +23,7 @@ class DashboardCaps:
     vertex: bool
     azure_openai: bool
     ess: bool
+    inference: bool
     budgets: bool
     classic_layout: bool
     ai_dashboard: bool
@@ -100,7 +101,83 @@ def caps_from_variant(v: Variant | None = None) -> DashboardCaps:
         vertex=has_prefix("vertex_"),
         azure_openai=has_prefix("azure_openai_"),
         ess=has("ess_billing_credits"),
+        inference=has("inference_token_usage") or v.setup_enabled("inference"),
         budgets=v.setup_enabled("budgets"),
         classic_layout=bool(dash.get("classic")),
         ai_dashboard=bool(dash.get("ai")),
     )
+
+
+_AWS_PANEL_MARKERS = (
+    "metrics-aws_billing",
+    "metrics-aws.billing",
+    "metrics-aws.ec2",
+    "logs-aws.",
+    "aws_bedrock",
+    "aws.billing.group",
+    "aws_billing.cur",
+)
+_GCP_PANEL_MARKERS = (
+    "metrics-gcp.billing",
+    "gcp_vertexai",
+    "gcp.billing",
+)
+
+
+_AZURE_PANEL_MARKERS = (
+    "metrics-azure.billing",
+    "azure.open_ai",
+    "azure_openai",
+    "azure.billing",
+)
+
+
+def assert_variant_dashboard_scope(vid: str) -> None:
+    """Fail if a variant dashboard embeds another cloud's billing/LLM panels."""
+    import json
+    import os
+
+    from src.dashboard_sections import build_baseline_sections
+    from src.variant import canonicalize_variant_id, get_variant, active_variant
+
+    vid = canonicalize_variant_id(vid)
+    prev = os.environ.get("FINOPS_VARIANT")
+    os.environ["FINOPS_VARIANT"] = vid
+    active_variant.cache_clear()
+    try:
+        v = get_variant(vid)
+        caps = caps_from_variant(v)
+        panels = build_baseline_sections(caps, "window", v.title)
+        blob = json.dumps(panels)
+        if vid == "gcp":
+            for marker in _AWS_PANEL_MARKERS:
+                if marker in blob:
+                    raise AssertionError(f"gcp dashboard contains AWS panel marker {marker!r}")
+            for marker in _GCP_PANEL_MARKERS:
+                if marker not in blob:
+                    raise AssertionError(f"gcp dashboard missing Vertex/GCP marker {marker!r}")
+            if not caps.vertex:
+                raise AssertionError("gcp variant must include Vertex AI panels")
+        if vid == "aws":
+            if "gcp_vertexai" in blob or "metrics-gcp.billing" in blob:
+                raise AssertionError("aws dashboard contains GCP panel markers")
+            if "azure_openai" in blob or "metrics-azure.billing" in blob:
+                raise AssertionError("aws dashboard contains Azure panel markers")
+        if vid == "azure":
+            for marker in _AWS_PANEL_MARKERS:
+                if marker in blob:
+                    raise AssertionError(f"azure dashboard contains AWS panel marker {marker!r}")
+            for marker in _GCP_PANEL_MARKERS:
+                if marker in blob:
+                    raise AssertionError(f"azure dashboard contains GCP panel marker {marker!r}")
+            for marker in _AZURE_PANEL_MARKERS:
+                if marker not in blob:
+                    raise AssertionError(f"azure dashboard missing Azure marker {marker!r}")
+            if not caps.azure_openai:
+                raise AssertionError("azure variant must include Azure OpenAI panels")
+    finally:
+        if prev is None:
+            os.environ.pop("FINOPS_VARIANT", None)
+        else:
+            os.environ["FINOPS_VARIANT"] = prev
+        active_variant.cache_clear()

@@ -34,10 +34,10 @@ LINES = (
     ("security", "klg-sec-prod", "proj_sec_prod",
      "security.ingest_gcp-us-central1", "usage", "security",
      "security", None, 0.12),
-    ("deployment", "meridian-ech-prod", "dep_ech_prod",
+    ("deployment", "elk-ech-prod", "dep_ech_prod",
      "gcp.n2.gcp-us-central1_4096_2", "capacity", "elasticsearch",
      "elasticsearch", "gcp.n2.4096_2", 0.14),
-    ("deployment", "meridian-ech-prod", "dep_ech_prod",
+    ("deployment", "elk-ech-prod", "dep_ech_prod",
      "gcp.kibana.gcp-us-central1", "usage", "kibana",
      "kibana", None, 0.08),
     # Ingress / egress panels filter ess.billing.type : data_in / data_out.
@@ -52,7 +52,7 @@ LINES = (
 
 def emit(world, t0, t1, anchor):
     # Rely on Fleet package index template (priority 200). Never reintroduce
-    # meridian-ess-billing — it shadows package keyword mappings and breaks
+    # elk-ess-billing — it shadows package keyword mappings and breaks
     # OOTB Lens ("Could not locate field" on deployment_*).
     from src.ess_billing_health import remove_shadowing_template
     remove_shadowing_template()

@@ -1,6 +1,6 @@
 """Keep ESS Billing OOTB dashboards working against synthetic + Fleet data.
 
-History: a Meridian index template (priority 210) shadowed Fleet's
+History: an ELK Co index template (priority 210) shadowed Fleet's
 `metrics-ess_billing.billing@package` mapping. `deployment_name` /
 `deployment_type` then landed as non-aggregatable text (or were absent),
 so OOTB Lens/controls reported "Could not locate field" / ES|QL
@@ -20,7 +20,9 @@ import requests
 from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_ROOT, KIBANA_URL
 
 DATA_STREAM = "metrics-ess_billing.billing-default"
-SHADOW_TEMPLATE = "meridian-ess-billing"
+# Current + prior company-name shadow templates (delete either if present).
+SHADOW_TEMPLATES = ("elk-ess-billing", "meridian-ess-billing")
+SHADOW_TEMPLATE = SHADOW_TEMPLATES[0]
 REQUIRED_KEYWORD = (
     "ess.billing.deployment_name",
     "ess.billing.deployment_type",
@@ -54,20 +56,23 @@ def _field_types() -> dict[str, list[str]]:
 
 
 def remove_shadowing_template() -> bool:
-    r = requests.get(
-        f"{ELASTIC_URL}/_index_template/{SHADOW_TEMPLATE}",
-        headers=ES_HEADERS,
-        timeout=30,
-    )
-    if r.status_code == 404:
-        return False
-    requests.delete(
-        f"{ELASTIC_URL}/_index_template/{SHADOW_TEMPLATE}",
-        headers=ES_HEADERS,
-        timeout=30,
-    )
-    print(f"  [ok] removed shadowing index template {SHADOW_TEMPLATE}")
-    return True
+    removed_any = False
+    for name in SHADOW_TEMPLATES:
+        r = requests.get(
+            f"{ELASTIC_URL}/_index_template/{name}",
+            headers=ES_HEADERS,
+            timeout=30,
+        )
+        if r.status_code == 404:
+            continue
+        requests.delete(
+            f"{ELASTIC_URL}/_index_template/{name}",
+            headers=ES_HEADERS,
+            timeout=30,
+        )
+        print(f"  [ok] removed shadowing index template {name}")
+        removed_any = True
+    return removed_any
 
 
 def _list_ess_data_views(base: str) -> list[tuple[str, str]]:

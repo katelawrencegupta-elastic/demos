@@ -69,7 +69,7 @@ def _ensure_ce_grain_template():
         },
     }
     r = requests.put(
-        f"{ELASTIC_URL}/_index_template/meridian-aws-billing-ce-grains",
+        f"{ELASTIC_URL}/_index_template/elk-aws-billing-ce-grains",
         headers=ES_HEADERS, json=body, timeout=30)
     if r.status_code >= 300:
         print(f"  [warn] billing CE grain template: {r.status_code} {r.text[:200]}")

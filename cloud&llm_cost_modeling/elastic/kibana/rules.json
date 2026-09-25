@@ -525,11 +525,11 @@
     }
   },
   {
-    "id": "meridian-alert-aws-mtd-budget",
+    "id": "elk-alert-aws-mtd-budget",
     "enabled": true,
-    "name": "[Meridian] AWS trailing-30d spend over monthly budget",
+    "name": "[ELK Co] AWS trailing-30d spend over monthly budget",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -558,7 +558,7 @@
       "timeField": "@timestamp",
       "excludeHitsFromPreviousRun": true
     },
-    "scheduled_task_id": "meridian-alert-aws-mtd-budget",
+    "scheduled_task_id": "elk-alert-aws-mtd-budget",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:29.784Z",
@@ -591,11 +591,11 @@
     "running": false
   },
   {
-    "id": "meridian-alert-staging-daily",
+    "id": "elk-alert-staging-daily",
     "enabled": true,
-    "name": "[Meridian] Staging cost-leak daily burn",
+    "name": "[ELK Co] Staging cost-leak daily burn",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -615,7 +615,7 @@
       "thresholdComparator": ">",
       "size": 10,
       "esqlQuery": {
-        "esql": "FROM metrics-aws_billing.cur-default\n| WHERE aws_billing.cur.line_item.usage_account_name == \"meridian-staging\"\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| WHERE spend > 200"
+        "esql": "FROM metrics-aws_billing.cur-default\n| WHERE aws_billing.cur.line_item.usage_account_name == \"elk-staging\"\n| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)\n| WHERE spend > 200"
       },
       "aggType": "count",
       "groupBy": "all",
@@ -624,7 +624,7 @@
       "timeField": "@timestamp",
       "excludeHitsFromPreviousRun": true
     },
-    "scheduled_task_id": "meridian-alert-staging-daily",
+    "scheduled_task_id": "elk-alert-staging-daily",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:31.815Z",
@@ -657,11 +657,11 @@
     "running": false
   },
   {
-    "id": "meridian-alert-llm-agent-loop",
+    "id": "elk-alert-llm-agent-loop",
     "enabled": true,
-    "name": "[Meridian] checkout-assistant LLM burn",
+    "name": "[ELK Co] checkout-assistant LLM burn",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -690,7 +690,7 @@
       "timeField": "@timestamp",
       "excludeHitsFromPreviousRun": true
     },
-    "scheduled_task_id": "meridian-alert-llm-agent-loop",
+    "scheduled_task_id": "elk-alert-llm-agent-loop",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:33.877Z",
@@ -723,11 +723,11 @@
     "running": false
   },
   {
-    "id": "meridian-alert-gcp-ml-burn",
+    "id": "elk-alert-gcp-ml-burn",
     "enabled": true,
-    "name": "[Meridian] ML platform GCP project burn",
+    "name": "[ELK Co] ML platform GCP project burn",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -747,7 +747,7 @@
       "thresholdComparator": ">",
       "size": 10,
       "esqlQuery": {
-        "esql": "FROM metrics-gcp.billing-default\n| WHERE gcp.billing.project_name == \"meridian-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| WHERE spend > 4000"
+        "esql": "FROM metrics-gcp.billing-default\n| WHERE gcp.billing.project_name == \"elk-ml-prod\"\n| STATS spend = SUM(gcp.billing.total)\n| WHERE spend > 4000"
       },
       "aggType": "count",
       "groupBy": "all",
@@ -756,7 +756,7 @@
       "timeField": "@timestamp",
       "excludeHitsFromPreviousRun": true
     },
-    "scheduled_task_id": "meridian-alert-gcp-ml-burn",
+    "scheduled_task_id": "elk-alert-gcp-ml-burn",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:35.879Z",
@@ -789,11 +789,11 @@
     "running": false
   },
   {
-    "id": "meridian-slo-llm-checkout-spend-burn",
+    "id": "elk-slo-llm-checkout-spend-burn",
     "enabled": true,
-    "name": "[Meridian] checkout-assistant daily LLM cost — burn rate",
+    "name": "[ELK Co] checkout-assistant daily LLM cost — burn rate",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -804,7 +804,7 @@
     },
     "actions": [],
     "params": {
-      "sloId": "meridian-slo-llm-checkout-spend",
+      "sloId": "elk-slo-llm-checkout-spend",
       "windows": [
         {
           "id": "ebc684fc-fa3a-45ac-9694-1c72afbbcea9",
@@ -837,7 +837,7 @@
       ],
       "dependencies": []
     },
-    "scheduled_task_id": "meridian-slo-llm-checkout-spend-burn",
+    "scheduled_task_id": "elk-slo-llm-checkout-spend-burn",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:27.850Z",
@@ -870,11 +870,11 @@
     "running": false
   },
   {
-    "id": "meridian-slo-staging-cost-leak-burn",
+    "id": "elk-slo-staging-cost-leak-burn",
     "enabled": true,
-    "name": "[Meridian] Staging account daily spend healthy — burn rate",
+    "name": "[ELK Co] Staging account daily spend healthy — burn rate",
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
@@ -885,7 +885,7 @@
     },
     "actions": [],
     "params": {
-      "sloId": "meridian-slo-staging-cost-leak",
+      "sloId": "elk-slo-staging-cost-leak",
       "windows": [
         {
           "id": "3f5ab20c-9b70-46d8-b3dc-20116e57f312",
@@ -918,7 +918,7 @@
       ],
       "dependencies": []
     },
-    "scheduled_task_id": "meridian-slo-staging-cost-leak-burn",
+    "scheduled_task_id": "elk-slo-staging-cost-leak-burn",
     "created_by": "719348788",
     "updated_by": "719348788",
     "created_at": "2026-08-27T20:14:23.457Z",

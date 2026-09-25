@@ -63,7 +63,7 @@ class _AnthropicUsage:
             doc = metric_doc(self.DATASET, t0, "usage", 3600 * 1000)
             doc["anthropic"] = {"usage": {
                 "model": model_id,
-                "workspace_id": f"ws_meridian_{app_id.replace('-', '_')}",
+                "workspace_id": f"ws_elk_{app_id.replace('-', '_')}",
                 "api_key_id": f"sk-ant-api-{app_id[:8]}",
                 "service_tier": "standard",
                 "inference_geo": "us",
@@ -122,7 +122,7 @@ class _AnthropicCost:
                         "amount": amount_cents,
                         "currency": "USD",
                         "model": model_id,
-                        "workspace_id": f"ws_meridian_{(b['app'] or 'default').replace('-', '_')}",
+                        "workspace_id": f"ws_elk_{(b['app'] or 'default').replace('-', '_')}",
                         "service_tier": "standard",
                         "cost_type": "tokens",
                         "token_type": token_type,

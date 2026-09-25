@@ -1,7 +1,7 @@
-"""Reusable FinOps / Meridian smoke tests with pass/fail report.
+"""Reusable FinOps / FinOps smoke tests with pass/fail report.
 
 Usage:
-  # Live Verdian FinOps suite (default with --profile live)
+  # Live ELK Co FinOps suite (default with --profile live)
   .venv/bin/python -m src.cli --profile live smoke
   .venv/bin/python -m src.cli --profile live smoke --fix --deep
 

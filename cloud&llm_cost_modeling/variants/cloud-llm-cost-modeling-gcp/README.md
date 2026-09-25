@@ -1,7 +1,7 @@
 # Multi-Cloud Synthetic Data Factory for Elastic
 
 Generates correlated synthetic AWS / GCP / Azure activity, security, and
-billing data for a fictional company (**Meridian Dynamics**) and ships it into
+billing data for a fictional company (**ELK Co**) and ships it into
 **native Elastic integration data streams** on **Elastic Cloud Serverless**,
 so out-of-the-box dashboards, Discover views, and detection content work
 against realistic-looking data.
@@ -30,11 +30,11 @@ correlates across streams:
 
 | Scenario | Where it shows up |
 |---|---|
-| Crypto-mining incident (days -12..-9, `meridian-dev`) | GuardDuty `CryptoCurrency:EC2/BitcoinTool.B` findings, CloudTrail brute-force `ConsoleLogin` + `RunInstances` from attacker IP `185.220.101.34`, CPU pegged 96-99% on the compromised instance, EC2 cost spike in AWS billing, exfil-style S3 GETs |
-| ML training burn (days -20..-16, `meridian-ml-prod`) | GCP billing 3.8x spike on Compute Engine / Vertex AI, GCE instance churn in audit logs |
-| Cost leak (`meridian-staging`) | ~$340/day of EC2 + RDS spend with disproportionately little API activity |
-| S3 public exposure (days -6..-4, `meridian-fintech-prod`) | CloudTrail `PutBucketPolicy`, GuardDuty `Policy:S3/BucketAnonymousAccessGranted`, anonymous curl scrapes of `meridian-fintech-exports`, data-transfer cost spike |
-| GenAI shadow-IT ramp (from day -15, `meridian-genai-poc`) | Vertex AI / Compute spend ramps ~2.8x; audit Predict + CustomJob activity |
+| Crypto-mining incident (days -12..-9, `elk-dev`) | GuardDuty `CryptoCurrency:EC2/BitcoinTool.B` findings, CloudTrail brute-force `ConsoleLogin` + `RunInstances` from attacker IP `185.220.101.34`, CPU pegged 96-99% on the compromised instance, EC2 cost spike in AWS billing, exfil-style S3 GETs |
+| ML training burn (days -20..-16, `elk-ml-prod`) | GCP billing 3.8x spike on Compute Engine / Vertex AI, GCE instance churn in audit logs |
+| Cost leak (`elk-staging`) | ~$340/day of EC2 + RDS spend with disproportionately little API activity |
+| S3 public exposure (days -6..-4, `elk-fintech-prod`) | CloudTrail `PutBucketPolicy`, GuardDuty `Policy:S3/BucketAnonymousAccessGranted`, anonymous curl scrapes of `elk-fintech-exports`, data-transfer cost spike |
+| GenAI shadow-IT ramp (from day -15, `elk-genai-poc`) | Vertex AI / Compute spend ramps ~2.8x; audit Predict + CustomJob activity |
 | Sunday ETL batch (02-08 UTC) | Activity + usage/cost multiplier across clouds |
 | Seasonality + growth | Diurnal / weekday curves on activity, ~0.8%/day organic cost growth |
 
@@ -68,7 +68,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 
 Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), **FinOps dashboard
-→ Budget posture** (gauges + SLO table), and **Agent Builder → chat** (`meridian-finops-ai-assistant`).
+→ Budget posture** (gauges + SLO table), and **Agent Builder → chat** (`elk-finops-ai-assistant`).
 
 ### All commands
 
@@ -82,7 +82,7 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
 .venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
-.venv/bin/python -m src.cli agent                # Meridian FinOps AI Assistant (Agent Builder)
+.venv/bin/python -m src.cli agent                # ELK Co FinOps AI Assistant (Agent Builder)
 .venv/bin/python -m src.cli reindex-elastic-ai   # wipe + re-backfill Agent Builder / inference traces
 .venv/bin/python -m src.cli dashboards --variant all        # baseline + classic + AI
 .venv/bin/python -m src.cli dashboards --variant baseline   # primary FinOps (default)
@@ -91,10 +91,10 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 .venv/bin/python -m src.cli backup     # snapshot Kibana/Fleet/ES objects → ./elastic
 ```
 
-**Dashboard IDs:** `meridian-finops-llm-observability` (baseline — stacked bars/areas),
-`meridian-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
-`meridian-finops-llm-observability-classic` (legacy treemaps/tables),
-`meridian-ai-assistant-inference-usage` (Agent Builder + inference token usage).
+**Dashboard IDs:** `elk-finops-llm-observability` (baseline — stacked bars/areas),
+`elk-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
+`elk-finops-llm-observability-classic` (legacy treemaps/tables),
+`elk-ai-assistant-inference-usage` (Agent Builder + inference token usage).
 
 `--scope` accepts `all` | `cloud` | `llm` | `openai-extra` | `elastic-ai`.
 
@@ -118,27 +118,27 @@ Spot-check in Kibana: **SLOs** (3 violated), **Observability Alerts**, and one
 
 ## Budget SLOs & alerts
 
-Meridian treats cloud + LLM spend as error budgets. `cli budgets` (also run at
+ELK Co treats cloud + LLM spend as error budgets. `cli budgets` (also run at
 the end of `setup`) provisions:
 
 | Kind | Artifacts |
 |---|---|
 | Spend SLOs (timeslice, 30d rolling, 24h slices) | AWS daily CUR under ceiling · staging cost-leak healthy · `checkout-assistant` daily LLM cost |
 | SLO burn-rate rules | staging + checkout |
-| ES\|QL budget alerts | AWS trailing-30d vs monthly budget · staging daily · checkout 7d LLM · GCP `meridian-ml-prod` 7d |
+| ES\|QL budget alerts | AWS trailing-30d vs monthly budget · staging daily · checkout 7d LLM · GCP `elk-ml-prod` 7d |
 
 | SLO ID | Workshop posture |
 |---|---|
-| `meridian-slo-aws-daily-spend` | **VIOLATED** — crypto + growth burn days exceed $5.2k/day ceiling |
-| `meridian-slo-staging-cost-leak` | **VIOLATED** — cost_leak ~$1k/day vs $150/day ceiling |
-| `meridian-slo-llm-checkout-spend` | **VIOLATED** — agent-loop spike days vs $0.50/day ceiling |
+| `elk-slo-aws-daily-spend` | **VIOLATED** — crypto + growth burn days exceed $5.2k/day ceiling |
+| `elk-slo-staging-cost-leak` | **VIOLATED** — cost_leak ~$1k/day vs $150/day ceiling |
+| `elk-slo-llm-checkout-spend` | **VIOLATED** — agent-loop spike days vs $0.50/day ceiling |
 
 Thresholds live in [`config/budgets.yaml`](config/budgets.yaml) and are **intentionally
 tight** so the seeded timeline shows breached SLOs and active budget alerts without
 waiting for a new incident.
 
 FinOps dashboards include a **Budget posture** section: spend gauges (vs monthly
-budget and SLO ceilings), a live **Meridian spend SLO posture** table (from
+budget and SLO ceilings), a live **ELK Co spend SLO posture** table (from
 `.slo-observability.summary-v3.6`), and deep links to Observability SLOs / Alerts /
 Agent Builder.
 
@@ -147,34 +147,34 @@ Agent Builder.
 After a reset, violations return once the 30d rolling window backfills (typically
 1–2 minutes). To refresh thresholds only, run `cli budgets` without reset.
 
-## Meridian FinOps AI Assistant
+## ELK Co FinOps AI Assistant
 
-`cli agent` (also run at the end of `setup`) provisions **Meridian FinOps AI
+`cli agent` (also run at the end of `setup`) provisions **ELK Co FinOps AI
 Assistant** in Elastic Agent Builder: seven custom ES|QL tools plus a public chat
 agent grounded in the seeded billing, SLO, and alert data.
 
 | Tool ID | Use for |
 |---|---|
-| `meridian-finops-aws-spend` | AWS CUR total / avg daily / % of monthly budget |
-| `meridian-finops-aws-top-accounts` | Top linked accounts by spend |
-| `meridian-finops-staging-leak` | meridian-staging vs SLO ceiling (cost leak) |
-| `meridian-finops-llm-spend-by-app` | LLM cost by `service.name` (APM gen_ai) |
-| `meridian-finops-cloud-mix` | AWS + GCP + Azure spend mix |
-| `meridian-finops-gcp-ml-burn` | meridian-ml-prod GCP burn |
-| `meridian-finops-slo-posture` | Error budget remaining / consumed |
+| `elk-finops-aws-spend` | AWS CUR total / avg daily / % of monthly budget |
+| `elk-finops-aws-top-accounts` | Top linked accounts by spend |
+| `elk-finops-staging-leak` | elk-staging vs SLO ceiling (cost leak) |
+| `elk-finops-llm-spend-by-app` | LLM cost by `service.name` (APM gen_ai) |
+| `elk-finops-cloud-mix` | AWS + GCP + Azure spend mix |
+| `elk-finops-gcp-ml-burn` | elk-ml-prod GCP burn |
+| `elk-finops-slo-posture` | Error budget remaining / consumed |
 
 | Command | Purpose |
 |---|---|
 | `python -m src.cli agent` | Upsert tools + agent (re-run after editing `config/finops_agent.yaml`) |
 | `python -m src.cli verify` | Checks tools, agent, budgets, and prints chat URL |
 
-**Chat:** `{KIBANA_URL}/app/agent_builder/chat` — select agent `meridian-finops-ai-assistant`.
+**Chat:** `{KIBANA_URL}/app/agent_builder/chat` — select agent `elk-finops-ai-assistant`.
 
 Definitions live in [`config/finops_agent.yaml`](config/finops_agent.yaml). Tool queries
 use parameterized lookbacks (`?days` integer) with
 `TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))` — do not use `?days * 1 day` (invalid ES\|QL).
 
-Synthetic Agent Builder traces use agent id **`meridian-finops-ai-assistant`**
+Synthetic Agent Builder traces use agent id **`elk-finops-ai-assistant`**
 and FinOps ES|QL tool names. After renaming the agent, run
 `python -m src.cli reindex-elastic-ai` (wipes non-`custom-*` Agent Builder traces
 and `tags:synthetic` inference usage, then re-backfills 120 days). `verify` fails
@@ -184,7 +184,7 @@ if legacy `finops-copilot` traces remain.
 
 1. *How much AWS spend in the last 30 days vs our monthly budget?*
 2. *Which AWS accounts drive the most spend this week?*
-3. *Is meridian-staging still leaking cost?*
+3. *Is elk-staging still leaking cost?*
 4. *Which LLM apps burned the most in the last 7 days?*
 5. *What's our multi-cloud spend mix and are any spend SLOs violated?*
 
@@ -215,7 +215,7 @@ Notes:
 
 - `setup` installs cloud + LLM packages, creates APM gen_ai mappings + **180d**
   trace retention, wires CUR alias / inference data-view Serverless workarounds,
-  provisions FinOps spend SLOs + budget alerts, provisions the Meridian FinOps AI
+  provisions FinOps spend SLOs + budget alerts, provisions the ELK Co FinOps AI
   Assistant, and removes TSDS mode from
   `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
   metric backfill is accepted.
@@ -236,7 +236,7 @@ src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
-src/agent_builder.py       # Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)
+src/agent_builder.py       # ELK Co FinOps AI Assistant (Agent Builder + ES|QL tools)
 src/elastic_ai_reindex.py  # wipe + re-backfill Agent Builder / inference synthetic data
 src/cli.py                 # setup | … | reindex-elastic-ai | agent | dashboards | backup
 src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)

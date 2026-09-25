@@ -250,7 +250,7 @@ def _ensure_kubelet_template():
         },
     }
     r = requests.put(
-        f"{ELASTIC_URL}/_index_template/meridian-kubeletstats",
+        f"{ELASTIC_URL}/_index_template/elk-kubeletstats",
         headers=ES_HEADERS, json=body, timeout=30)
     if r.status_code >= 300:
         print(f"  [warn] kubeletstats template: {r.status_code} {r.text[:200]}")

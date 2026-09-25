@@ -159,8 +159,8 @@ def backup_dashboards(counts: Counter) -> None:
             break
         page += 1
     dest = BACKUP_ROOT / "kibana" / "dashboards"
-    meridian_dest = ROOT / "dashboards"
-    meridian_dest.mkdir(parents=True, exist_ok=True)
+    elk_dest = ROOT / "dashboards"
+    elk_dest.mkdir(parents=True, exist_ok=True)
     n = 0
     for item in items:
         did = item["id"]
@@ -171,8 +171,8 @@ def backup_dashboards(counts: Counter) -> None:
         payload = r.json()
         data = payload.get("data", payload)
         write_json(dest / f"{safe_name(did)}.json", payload)
-        if did.startswith("meridian-"):
-            write_json(meridian_dest / f"{safe_name(did)}.json", data)
+        if did.startswith("elk-"):
+            write_json(elk_dest / f"{safe_name(did)}.json", data)
         n += 1
     counts["kibana.dashboards"] = n
     print(f"  dashboards: {n}")
@@ -271,13 +271,13 @@ def backup_slos(counts: Counter) -> None:
 
 
 def backup_agent_builder(counts: Counter) -> None:
-    """Snapshot Meridian FinOps AI Assistant agent + custom ES|QL tools."""
+    """Snapshot ELK Co FinOps AI Assistant agent + custom ES|QL tools."""
     r = _kbn("GET", "/api/agent_builder/tools")
     if r.status_code >= 300:
         print(f"  [warn] agent_builder tools: {r.status_code} {r.text[:200]}")
         return
     all_tools = r.json().get("results") or []
-    tools = [t for t in all_tools if t.get("id", "").startswith("meridian-finops-")]
+    tools = [t for t in all_tools if t.get("id", "").startswith("elk-finops-")]
     dest = BACKUP_ROOT / "kibana" / "agent_builder" / "tools"
     for tool in tools:
         write_json(dest / f"{safe_name(tool['id'])}.json", tool)
@@ -290,7 +290,7 @@ def backup_agent_builder(counts: Counter) -> None:
         print(f"  [warn] agent_builder agents: {r.status_code} {r.text[:200]}")
         return
     all_agents = r.json().get("results") or []
-    agents = [a for a in all_agents if a.get("id", "").startswith("meridian-")]
+    agents = [a for a in all_agents if a.get("id", "").startswith("elk-")]
     dest = BACKUP_ROOT / "kibana" / "agent_builder" / "agents"
     for agent in agents:
         write_json(dest / f"{safe_name(agent['id'])}.json", agent)

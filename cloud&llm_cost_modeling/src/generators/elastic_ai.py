@@ -6,7 +6,7 @@ Emits:
   * logs-elastic.inference_token_usage-default — Kibana inference plugin
     token-usage documents (feature, connector, model, token counts)
 
-Analysts at Meridian use Observability AI Assistant, Agent Builder
+Analysts at ELK Co use Observability AI Assistant, Agent Builder
 copilots, Security AI Assistant, and EIS (ELSER / e5 / rerank) endpoints.
 """
 from dataclasses import dataclass
@@ -33,7 +33,7 @@ RESOURCE = {
 }
 SCOPE_ATTR = {"name": "inference"}
 
-# Built-in + Meridian custom agents. feature_id values match Kibana's
+# Built-in + ELK Co custom agents. feature_id values match Kibana's
 # inference feature registry (token-usage tracking / Feature Settings).
 AGENTS = [
     {
@@ -44,7 +44,7 @@ AGENTS = [
         "bus": ["ecommerce", "mlplatform", "corpit", "fintech"],
     },
     {
-        "id": "meridian-finops-ai-assistant", "name": "Verdian Dynamics FinOps AI Assistant", "weight": 16,
+        "id": "elk-finops-ai-assistant", "name": "ELK Co FinOps AI Assistant", "weight": 16,
         "feature_id": "agent_builder",
         "parent_feature_id": "agent_builder_parent",
         "feature_name": "Agent Builder",
@@ -138,15 +138,15 @@ TOOLS = [
     ("custom", 0.12),
 ]
 
-# Meridian FinOps AI Assistant custom ES|QL tools (match config/finops_agent.yaml ids).
+# ELK Co FinOps AI Assistant custom ES|QL tools (match config/finops_agent.yaml ids).
 FINOPS_TOOLS = [
-    ("meridian-finops-aws-spend", 0.22),
-    ("meridian-finops-aws-top-accounts", 0.18),
-    ("meridian-finops-staging-leak", 0.16),
-    ("meridian-finops-llm-spend-by-app", 0.16),
-    ("meridian-finops-cloud-mix", 0.12),
-    ("meridian-finops-gcp-ml-burn", 0.10),
-    ("meridian-finops-slo-posture", 0.06),
+    ("elk-finops-aws-spend", 0.22),
+    ("elk-finops-aws-top-accounts", 0.18),
+    ("elk-finops-staging-leak", 0.16),
+    ("elk-finops-llm-spend-by-app", 0.16),
+    ("elk-finops-cloud-mix", 0.12),
+    ("elk-finops-gcp-ml-burn", 0.10),
+    ("elk-finops-slo-posture", 0.06),
 ]
 
 # Semantic search / rerank inference that sits behind platform.core.search
@@ -284,12 +284,12 @@ def iter_rounds(world, t0, t1, anchor):
         n_tools = rng.choices([0, 1, 2, 3, 4, 5], weights=[8, 22, 28, 22, 14, 6])[0]
         tools = []
         search_inf = []
-        tool_pool = FINOPS_TOOLS if agent["id"] == "meridian-finops-ai-assistant" else TOOLS
+        tool_pool = FINOPS_TOOLS if agent["id"] == "elk-finops-ai-assistant" else TOOLS
         for _ in range(n_tools):
             name = rng.choices([t[0] for t in tool_pool], weights=[t[1] for t in tool_pool])[0]
             ok = rng.random() > (0.08 if name == "custom" else 0.025)
             dur = int(max(0.8, rng.gauss(180, 90)) * 1_000_000)  # ~ms → ns
-            if name in ("platform.core.execute_esql",) or name.startswith("meridian-finops-"):
+            if name in ("platform.core.execute_esql",) or name.startswith("elk-finops-"):
                 dur = int(max(5, rng.gauss(420, 200)) * 1_000_000)
             tools.append((name, dur, ok))
             if name == "platform.core.search":
@@ -398,7 +398,7 @@ class AgentBuilderTraces:
                      "elastic.inference.span.kind": "TOOL",
                      "gen_ai.operation.name": "execute_tool",
                      "gen_ai.tool.name": tool,
-                     "gen_ai.tool.type": "builtin" if not tool.startswith(("custom", "meridian-finops-")) else "extension",
+                     "gen_ai.tool.type": "builtin" if not tool.startswith(("custom", "elk-finops-")) else "extension",
                      "kibana.inference.root": False},
                     extra_root=extra,
                 )
@@ -535,7 +535,7 @@ def _ensure_template():
         },
     }
     r = requests.put(
-        f"{ELASTIC_URL}/_index_template/meridian-inference-token-usage",
+        f"{ELASTIC_URL}/_index_template/elk-inference-token-usage",
         headers=ES_HEADERS, json=body, timeout=30)
     if r.status_code >= 300:
         print(f"  [warn] inference token-usage template: {r.status_code} {r.text[:200]}")

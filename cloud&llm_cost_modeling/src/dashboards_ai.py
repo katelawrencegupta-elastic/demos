@@ -1,13 +1,38 @@
-"""Publish Meridian Elastic AI Assistant + inference usage dashboard."""
+"""Publish ELK Co Elastic AI Assistant + inference usage dashboard."""
 from src.dashboards import (
     DASHBOARD_ID_INFERENCE_USAGE, TS, dash_id,
-    gauge, links_panel, markdown, metric, pie, section, table,
+    gauge, hub_tabs_panel, links_panel, markdown, metric, pie, section, table,
     treemap, waffle, xy, _put_dashboard, _ensure_data_view, _q,
 )
 from src.time_window import demo_window, window_label
 
 TRACES = "traces-agent_builder.otel-default"
 USAGE = "logs-elastic.inference_token_usage-default"
+
+
+def _ai_classic_enabled() -> bool:
+    from src.dashboard_caps import caps_from_variant
+    return bool(caps_from_variant().classic_layout)
+
+
+def _ai_family_links() -> list:
+    items = [
+        ("FinOps & LLM Observability (baseline)", dash_id("baseline")),
+    ]
+    if _ai_classic_enabled():
+        items.append(("FinOps & LLM — classic", dash_id("classic")))
+    if active_variant_has_dynamic():
+        items.append(("FinOps & LLM — dynamic alias", dash_id("dynamic")))
+    items.extend([
+        ("This AI Assistant dashboard", dash_id("ai")),
+        ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
+    ])
+    return items
+
+
+def active_variant_has_dynamic() -> bool:
+    from src.variant import active_variant
+    return bool(active_variant().dashboards.get("dynamic"))
 
 
 def build_ai_assistant_dashboard():
@@ -142,16 +167,21 @@ def build_ai_assistant_dashboard():
     )
 
     panels = [
-        section("Elastic AI — Assistant, Agent Builder, and inference", 0, [
+        section("FinOps dashboards", 0, [hub_tabs_panel()]),
+        section("Elastic AI — Assistant, Agent Builder, and inference", 7, [
             markdown(0, 0, 48, 4,
-                     "## Meridian Dynamics — Elastic AI Assistant & inference usage\n\n"
+                     "## ELK Co — Elastic AI Assistant & inference usage\n\n"
                      "Native **Agent Builder** OTel traces (`traces-agent_builder.otel-default`) "
                      "plus **inference token usage** (`logs-elastic.inference_token_usage-default`) "
                      "for Observability / Security AI Assistant, Agent Builder copilots, "
                      "Search Playground, Streams, and EIS endpoints (chat, ELSER, e5, rerank).\n\n"
                      f"Time range: **{label}**. EIS = Elastic Inference Service.\n\n"
-                     f"[FinOps baseline](#/view/{dash_id('baseline')}) · "
-                     f"[FinOps classic](#/view/{dash_id('classic')})."),
+                     f"[FinOps baseline](#/view/{dash_id('baseline')})"
+                     + (
+                         f" · [FinOps classic](#/view/{dash_id('classic')})"
+                         if _ai_classic_enabled() else ""
+                     )
+                     + "."),
             metric(0, 4, 8, 5, "Conversation rounds", rounds, "rounds"),
             metric(8, 4, 8, 5, "LLM requests", llm_reqs, "requests"),
             metric(16, 4, 8, 5, "Input tokens", tokens_in, "tokens"),
@@ -167,7 +197,7 @@ def build_ai_assistant_dashboard():
                rounds_day, "day", ["rounds"], layer="area_stacked",
                breakdown="agent"),
         ]),
-        section("AI Assistant & Agent Builder — agents, models, tools", 26, [
+        section("AI Assistant & Agent Builder — agents, models, tools", 33, [
             markdown(0, 0, 48, 2,
                      "Operational view from Agent Builder traces: `chat *` spans carry tokens and model, "
                      "`invoke_agent *` + `CHAIN`/`AGENT` span kinds are conversation rounds vs executions, "
@@ -203,7 +233,7 @@ def build_ai_assistant_dashboard():
                    "| SORT tokens DESC", "| LIMIT 8"),
                 "tokens", "model"),
         ]),
-        section("Inference token usage — features, EIS, connectors", 80, [
+        section("Inference token usage — features, EIS, connectors", 87, [
             markdown(0, 0, 48, 2,
                      "Kibana inference-plugin shape: `token_usage.*`, `model.*`, `inference.feature_id` / "
                      "`connector_id`. Features include Observability AI Assistant, Agent Builder, "
@@ -229,25 +259,19 @@ def build_ai_assistant_dashboard():
                thinking, "day", ["prompt", "cached", "thinking"],
                layer="area_stacked"),
         ]),
-        section("Related dashboards", 146, [
+        section("Related dashboards", 153, [
             markdown(0, 0, 24, 8,
                      "**Streams**\n\n"
                      "- `traces-agent_builder.otel-default` — Agent Builder OTel spans\n"
                      "- `logs-elastic.inference_token_usage-default` — feature-attributed tokens\n\n"
                      "Enable Kibana **GenAI Settings → Token usage tracking** for the "
                      "managed `[Elastic] Inference Token Usage` dashboard on live traffic."),
-            links_panel(24, 0, 24, 8, "Meridian FinOps family", [
-                ("FinOps & LLM Observability (baseline)", dash_id("baseline")),
-                ("FinOps & LLM — classic", dash_id("classic")),
-                ("FinOps & LLM — dynamic alias", dash_id("dynamic")),
-                ("This AI Assistant dashboard", dash_id("ai")),
-                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-            ]),
+            links_panel(24, 0, 24, 8, "ELK Co FinOps family", _ai_family_links()),
         ]),
     ]
 
     return {
-        "title": "[Meridian] Elastic AI Assistant & inference usage",
+        "title": "[ELK Co] Elastic AI Assistant & inference usage",
         "description": (
             "Observability / Security AI Assistant and Agent Builder operations "
             "(conversations, tokens, latency, tools) plus Elastic inference usage "

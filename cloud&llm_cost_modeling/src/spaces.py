@@ -22,7 +22,7 @@ def ensure_space(fail_loud: bool = False) -> bool:
     body = {
         "id": space,
         "name": "FinOps" if space == "finops" else space,
-        "description": "Verdian Dynamics FinOps",
+        "description": "ELK Co FinOps",
         "color": "#0B6E4F",
         "initials": "FO",
         "disabledFeatures": [],

@@ -11,8 +11,12 @@ PACKAGES = [
     "aws", "gcp", "azure", "azure_billing",
     "openai", "anthropic", "anthropic_metrics",
     "azure_openai", "aws_bedrock", "gcp_vertexai",
-    "aws_billing", "apm",
+    "aws_billing", "apm", "ess_billing",
 ]
+
+# Cloud / LLM packs the workshop may install — used to strip leftovers when a
+# deployment is switched to a single-cloud workshop variant.
+MANAGED_PACKAGES = tuple(PACKAGES)
 
 # TSDS index templates that would reject backfilled timestamps
 TSDS_PATCH = [
@@ -39,26 +43,96 @@ def ensure_packages():
     packages = active_variant().packages
     if not packages:
         print("  [skip] no Fleet packages for this variant")
-        return
-    for pkg in packages:
-        r = requests.get(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
-                         headers=KBN_HEADERS, timeout=60)
-        r.raise_for_status()
-        item = r.json()["item"]
-        if item.get("status") == "installed":
-            print(f"  [ok] package {pkg} {item['version']} already installed")
-            continue
-        print(f"  installing package {pkg} ...")
-        r = requests.post(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
-                          headers=KBN_HEADERS, json={}, timeout=600)
-        if r.status_code >= 300:
-            # APM is often unavailable via Fleet on Serverless (built-in OTel).
-            if pkg == "apm":
-                print(f"  [warn] package {pkg} install failed ({r.status_code}) — "
-                      "continuing (gen_ai traces index on first backfill)")
-                continue
+    else:
+        for pkg in packages:
+            r = requests.get(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+                             headers=KBN_HEADERS, timeout=60)
             r.raise_for_status()
-        print(f"  [ok] package {pkg} installed")
+            item = r.json()["item"]
+            if item.get("status") == "installed":
+                print(f"  [ok] package {pkg} {item['version']} already installed")
+                continue
+            print(f"  installing package {pkg} ...")
+            r = requests.post(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+                              headers=KBN_HEADERS, json={}, timeout=600)
+            if r.status_code >= 300:
+                # APM is often unavailable via Fleet on Serverless (built-in OTel).
+                if pkg == "apm":
+                    print(f"  [warn] package {pkg} install failed ({r.status_code}) — "
+                          "continuing (gen_ai traces index on first backfill)")
+                    continue
+                r.raise_for_status()
+            print(f"  [ok] package {pkg} installed")
+    reconcile_packages()
+
+
+def _package_status(pkg: str) -> tuple[str, str | None]:
+    """Return (status, installed_version) for a Fleet package."""
+    r = requests.get(
+        f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+        headers=KBN_HEADERS, timeout=60,
+    )
+    if r.status_code == 404:
+        return "not_found", None
+    r.raise_for_status()
+    item = r.json().get("item") or {}
+    status = str(item.get("status") or "unknown")
+    ver = (
+        (item.get("installationInfo") or {}).get("version")
+        or item.get("version")
+    )
+    return status, ver
+
+
+def uninstall_package(pkg: str, version: str | None = None) -> bool:
+    """Remove a Fleet package from the deployment. Returns True on success."""
+    status, ver = _package_status(pkg)
+    if status != "installed":
+        return False
+    ver = version or ver
+    if not ver:
+        print(f"  [warn] package {pkg} installed but version unknown — skip uninstall")
+        return False
+    print(f"  uninstalling package {pkg} {ver} ...")
+    r = requests.delete(
+        f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}/{ver}",
+        headers=KBN_HEADERS,
+        params={"force": "true"},
+        timeout=600,
+    )
+    if r.status_code >= 300:
+        print(f"  [warn] uninstall {pkg} failed: {r.status_code} {r.text[:200]}")
+        return False
+    print(f"  [ok] package {pkg} uninstalled")
+    return True
+
+
+def reconcile_packages():
+    """Uninstall workshop-managed Fleet packages not declared by this variant.
+
+    Keeps GCP/Azure/AWS workshop deployments from retaining another cloud's
+    integration (and its OOTB dashboards) after a prior multi-cloud setup.
+    """
+    from src.variant import active_variant
+
+    v = active_variant()
+    if v.is_all:
+        print("  [skip] package reconcile (variant=all keeps full catalog)")
+        return
+    wanted = set(v.packages)
+    removed = []
+    for pkg in MANAGED_PACKAGES:
+        if pkg in wanted:
+            continue
+        status, ver = _package_status(pkg)
+        if status != "installed":
+            continue
+        if uninstall_package(pkg, ver):
+            removed.append(pkg)
+    if not removed:
+        print("  [ok] Fleet packages match variant (no extras)")
+    else:
+        print(f"  [ok] removed foreign packages: {', '.join(removed)}")
 
 
 def patch_tsds_templates():
@@ -387,8 +461,8 @@ def patch_inference_token_usage_dashboard():
 
 
 def run():
-    from src.profile import is_live
-    if is_live():
+    from src.profile import uses_live_aws_hub
+    if uses_live_aws_hub():
         from src.live_setup import run as live_run
         live_run(fail_loud=False)
         return
@@ -451,7 +525,7 @@ def run():
         from src.budgets import ensure_budgets
         ensure_budgets(fail_loud=False)
     if v.setup_enabled("agent"):
-        print("== Verdian Dynamics FinOps AI Assistant ==")
+        print("== ELK Co FinOps AI Assistant ==")
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=False)
     print("setup complete.")

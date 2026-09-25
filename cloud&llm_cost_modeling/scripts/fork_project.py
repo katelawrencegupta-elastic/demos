@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Materialize provider/integration-scoped forks of the Meridian demo project.
+"""Materialize provider/integration-scoped forks of the ELK Co demo project.
 
 Each fork is a self-contained copy with config/active_variant.yaml set so
 setup/backfill/dashboards only touch the relevant integrations.
@@ -22,6 +22,12 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 DEMOS = ROOT.parent
 
+VARIANT_ALIASES = {
+    "vertexai": "gcp",
+    "azure-openai": "azure",
+    "azure_openai": "azure",
+}
+
 SKIP_NAMES = {
     ".venv",
     "__pycache__",
@@ -33,7 +39,7 @@ SKIP_NAMES = {
 
 README_FORK = """# {title}
 
-Provider/integration-scoped fork of the Meridian synthetic data factory.
+Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `{variant}`
 - **Source:** `{source}`
@@ -79,6 +85,10 @@ def _copy_tree(src: Path, dest: Path) -> None:
 
 def fork_variant(variant: str, *, force: bool = False, dest_root: Path | None = None) -> Path:
     variants = _load_variants()
+    canonical = VARIANT_ALIASES.get(variant, variant)
+    if canonical != variant:
+        print(f"{variant} collapsed into {canonical}")
+        variant = canonical
     if variant not in variants:
         known = ", ".join(sorted(variants))
         raise SystemExit(f"Unknown variant {variant!r} (known: {known})")
@@ -113,7 +123,7 @@ def fork_variant(variant: str, *, force: bool = False, dest_root: Path | None = 
 
 def main(argv: list[str] | None = None) -> int:
     variants = _load_variants()
-    p = argparse.ArgumentParser(description="Fork Meridian demo by cloud/integration variant")
+    p = argparse.ArgumentParser(description="Fork ELK Co demo by cloud/integration variant")
     p.add_argument(
         "variants",
         nargs="*",

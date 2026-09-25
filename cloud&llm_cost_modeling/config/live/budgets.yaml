@@ -1,9 +1,9 @@
-# Live Verdian Dynamics FinOps budgets — Cost Explorer (metrics-aws.billing-*),
+# Live ELK Co FinOps budgets — Cost Explorer (metrics-aws.billing-*),
 # not CUR. Calibrated against the finops space on 2026-09-07.
 
 tags:
   - finops
-  - verdian-dynamics
+  - elk-co
 
 budgets:
   aws_mtd_budget_usd: 77000
@@ -28,8 +28,8 @@ budgets:
   gcp_ml_7d_alert_usd: 4000
 
 slos:
-  - id: meridian-slo-aws-daily-spend
-    name: "[Verdian Dynamics] AWS daily unblended under budget"
+  - id: elk-slo-aws-daily-spend
+    name: "[ELK Co] AWS daily unblended under budget"
     description: >
       Daily AWS Cost Explorer unblended cost across linked accounts must stay
       at or below the org ceiling.
@@ -39,8 +39,8 @@ slos:
     ceiling_key: aws_daily_ceiling_usd
     burn_rate_alert: true
 
-  - id: meridian-slo-staging-cost-leak
-    name: "[Verdian Dynamics] Stage account daily spend healthy"
+  - id: elk-slo-staging-cost-leak
+    name: "[ELK Co] Stage account daily spend healthy"
     description: >
       Daily Cost Explorer unblended cost for the stage account must stay at or
       below the stage ceiling.
@@ -52,8 +52,8 @@ slos:
     ceiling_key: staging_daily_ceiling_usd
     burn_rate_alert: true
 
-  - id: gev-finops-slo-monitoring-daily
-    name: "[Verdian Dynamics] Monitoring account daily unblended under budget"
+  - id: elk-finops-slo-monitoring-daily
+    name: "[ELK Co] Monitoring account daily unblended under budget"
     description: >
       Daily Cost Explorer unblended cost for the monitoring account must stay
       at or below the monitoring ceiling.
@@ -65,8 +65,8 @@ slos:
     ceiling_key: monitoring_daily_ceiling_usd
     burn_rate_alert: true
 
-  - id: gev-finops-slo-esf-daily
-    name: "[Verdian Dynamics] ESF accounts daily unblended under budget"
+  - id: elk-finops-slo-esf-daily
+    name: "[ELK Co] ESF accounts daily unblended under budget"
     description: >
       Daily Cost Explorer unblended cost for the ESF account pair combined
       must stay at or below the ESF ceiling.
@@ -79,8 +79,8 @@ slos:
     ceiling_key: esf_daily_ceiling_usd
     burn_rate_alert: true
 
-  - id: meridian-slo-llm-checkout-spend
-    name: "[Verdian Dynamics] Elastic Inference (Agent Builder) daily token budget"
+  - id: elk-slo-llm-checkout-spend
+    name: "[ELK Co] Elastic Inference (Agent Builder) daily token budget"
     description: >
       Daily Elastic Inference token usage for Kibana Agent Builder must stay
       at or below the token ceiling. This meters Elastic's assistant, not
@@ -92,8 +92,8 @@ slos:
     burn_rate_alert: true
 
 alerts:
-  - id: gev-finops-alert-calendar-mtd
-    name: "[Verdian Dynamics] AWS calendar-month unblended over MTD budget"
+  - id: elk-finops-alert-calendar-mtd
+    name: "[ELK Co] AWS calendar-month unblended over MTD budget"
     schedule: 1h
     time_window_size: 31
     time_window_unit: d
@@ -105,8 +105,8 @@ alerts:
       | STATS spend = SUM(aws.billing.UnblendedCost.amount)
       | WHERE spend > {aws_mtd_budget_usd}
 
-  - id: meridian-alert-aws-mtd-budget
-    name: "[Verdian Dynamics] AWS trailing-30d spend over monthly budget"
+  - id: elk-alert-aws-mtd-budget
+    name: "[ELK Co] AWS trailing-30d spend over monthly budget"
     schedule: 1h
     time_window_size: 30
     time_window_unit: d
@@ -117,12 +117,12 @@ alerts:
       | STATS spend = SUM(aws.billing.UnblendedCost.amount)
       | WHERE spend > {aws_trailing_30d_budget_usd}
 
-  - id: gev-finops-alert-dod-spike
-    name: "[Verdian Dynamics] AWS linked-account day-over-day spend spike"
+  - id: elk-finops-alert-dod-spike
+    name: "[ELK Co] AWS linked-account day-over-day spend spike"
     schedule: 1h
     time_window_size: 5
     time_window_unit: d
-    workflow_id: gev-finops-spend-spike-case
+    workflow_id: elk-finops-spend-spike-hitl
     message: "FinOps: latest linked-account day is >{dod_ratio}x the prior-days average"
     esql: |
       FROM metrics-aws.billing-default
@@ -132,12 +132,12 @@ alerts:
       | EVAL baseline = (prev_sum - latest) / (n - 1)
       | WHERE n >= 4 AND latest > baseline * {dod_ratio} AND latest > {dod_latest_floor_usd}
 
-  - id: meridian-alert-staging-daily
-    name: "[Verdian Dynamics] Stage account daily spend over ceiling"
+  - id: elk-alert-staging-daily
+    name: "[ELK Co] Stage account daily spend over ceiling"
     schedule: 1h
     time_window_size: 1
     time_window_unit: d
-    workflow_id: gev-finops-spend-spike-case
+    workflow_id: elk-finops-spend-spike-hitl
     message: "FinOps: {stage_account_name} daily unblended spend exceeded ${staging_daily_alert_usd:,}"
     esql: |
       FROM metrics-aws.billing-default
@@ -146,12 +146,12 @@ alerts:
       | STATS spend = SUM(aws.billing.UnblendedCost.amount)
       | WHERE spend > {staging_daily_alert_usd}
 
-  - id: gev-finops-alert-service-dod-spike
-    name: "[Verdian Dynamics] AWS SERVICE day-over-day spend spike"
+  - id: elk-finops-alert-service-dod-spike
+    name: "[ELK Co] AWS SERVICE day-over-day spend spike"
     schedule: 1h
     time_window_size: 8
     time_window_unit: d
-    workflow_id: gev-finops-spend-spike-case
+    workflow_id: elk-finops-spend-spike-hitl
     message: "FinOps: a SERVICE+account day is >{service_dod_ratio}x its prior-days average and >${service_dod_floor_usd:,}"
     esql: |
       FROM metrics-aws.billing-default
@@ -164,8 +164,8 @@ alerts:
       | SORT latest DESC
       | LIMIT 20
 
-  - id: gev-finops-alert-service-completeness
-    name: "[Verdian Dynamics] Cost Explorer SERVICE grouping incomplete vs linked accounts"
+  - id: elk-finops-alert-service-completeness
+    name: "[ELK Co] Cost Explorer SERVICE grouping incomplete vs linked accounts"
     schedule: 1h
     time_window_size: 2
     time_window_unit: d
@@ -177,8 +177,8 @@ alerts:
       | EVAL ratio = service / linked
       | WHERE linked > {completeness_min_linked_usd} AND ratio < {completeness_ratio}
 
-  - id: meridian-alert-llm-agent-loop
-    name: "[Verdian Dynamics] Elastic Inference (Agent Builder) 7d token burn"
+  - id: elk-alert-llm-agent-loop
+    name: "[ELK Co] Elastic Inference (Agent Builder) 7d token burn"
     schedule: 1h
     time_window_size: 7
     time_window_unit: d

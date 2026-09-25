@@ -24,7 +24,7 @@ def _base(world, ts, sub, day, cost):
         "subscription_id": sub["id"],
         "billing": {
             "currency": "USD",
-            "account_name": "Meridian Dynamics EA",
+            "account_name": "ELK Co EA",
             "department_name": world.bu(sub["business_unit"])["name"],
             "billing_period_id": (f"/subscriptions/{sub['id']}/providers/"
                                   f"Microsoft.Billing/billingPeriods/{day.strftime('%Y%m')}01"),

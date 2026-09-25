@@ -1,6 +1,6 @@
 [
   {
-    "name": "[Meridian] checkout-assistant daily LLM cost",
+    "name": "[ELK Co] checkout-assistant daily LLM cost",
     "description": "Daily gen_ai span cost for checkout-assistant under ceiling. The llm_agent_loop scenario (−8..−6, ×12) burns this budget.",
     "indicator": {
       "type": "sli.metric.timeslice",
@@ -33,11 +33,11 @@
       "timesliceWindow": "24h"
     },
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
-    "id": "meridian-slo-llm-checkout-spend",
+    "id": "elk-slo-llm-checkout-spend",
     "settings": {
       "preventInitialBackfill": false,
       "syncDelay": "1m",
@@ -72,7 +72,7 @@
     "groupings": {}
   },
   {
-    "name": "[Meridian] AWS daily unblended under budget",
+    "name": "[ELK Co] AWS daily unblended under budget",
     "description": "Daily AWS CUR unblended cost must stay at or below the FinOps ceiling. Crypto-mining (−12..−9) and organic growth burn error budget.",
     "indicator": {
       "type": "sli.metric.timeslice",
@@ -104,11 +104,11 @@
       "timesliceWindow": "24h"
     },
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
-    "id": "meridian-slo-aws-daily-spend",
+    "id": "elk-slo-aws-daily-spend",
     "settings": {
       "preventInitialBackfill": false,
       "syncDelay": "1m",
@@ -143,8 +143,8 @@
     "groupings": {}
   },
   {
-    "name": "[Meridian] Staging account daily spend healthy",
-    "description": "meridian-staging daily CUR spend under a healthy baseline. The ongoing cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.",
+    "name": "[ELK Co] Staging account daily spend healthy",
+    "description": "elk-staging daily CUR spend under a healthy baseline. The ongoing cost_leak scenario (~orphaned EC2/RDS) keeps this SLO breached.",
     "indicator": {
       "type": "sli.metric.timeslice",
       "params": {
@@ -162,7 +162,7 @@
           "comparator": "LTE",
           "threshold": 150
         },
-        "filter": "aws_billing.cur.line_item.usage_account_name : \"meridian-staging\""
+        "filter": "aws_billing.cur.line_item.usage_account_name : \"elk-staging\""
       }
     },
     "budgetingMethod": "timeslices",
@@ -176,11 +176,11 @@
       "timesliceWindow": "24h"
     },
     "tags": [
-      "meridian",
+      "elk",
       "finops",
       "workshop"
     ],
-    "id": "meridian-slo-staging-cost-leak",
+    "id": "elk-slo-staging-cost-leak",
     "settings": {
       "preventInitialBackfill": false,
       "syncDelay": "1m",

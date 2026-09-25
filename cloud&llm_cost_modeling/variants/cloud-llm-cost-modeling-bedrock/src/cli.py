@@ -557,11 +557,11 @@ def main():
     )
     sub.add_parser(
         "recover-slos",
-        help="reset all Meridian spend SLOs (recreate transforms + reprocess SLI)",
+        help="reset all ELK Co spend SLOs (recreate transforms + reprocess SLI)",
     )
     sub.add_parser(
         "agent",
-        help="provision Meridian FinOps AI Assistant (Agent Builder + ES|QL tools)",
+        help="provision ELK Co FinOps AI Assistant (Agent Builder + ES|QL tools)",
     )
     ri = sub.add_parser(
         "reindex-elastic-ai",

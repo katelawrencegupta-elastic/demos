@@ -14,6 +14,13 @@ from src.config import ROOT
 VARIANTS_FILE = ROOT / "config" / "variants.yaml"
 ACTIVE_FILE = ROOT / "config" / "active_variant.yaml"
 
+# Retired workshop ids → current catalog entries.
+VARIANT_ALIASES = {
+    "vertexai": "gcp",
+    "azure-openai": "azure",
+    "azure_openai": "azure",
+}
+
 
 @dataclass(frozen=True)
 class Variant:
@@ -46,14 +53,20 @@ def _load_catalog() -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
+def canonicalize_variant_id(vid: str) -> str:
+    """Map retired workshop ids (e.g. vertexai → gcp, azure-openai → azure)."""
+    raw = (vid or "").strip()
+    return VARIANT_ALIASES.get(raw, raw)
+
+
 def _active_id() -> str:
-    env = os.environ.get("MERIDIAN_VARIANT", "").strip()
+    env = os.environ.get("FINOPS_VARIANT", "").strip()
     if env:
-        return env
+        return canonicalize_variant_id(env)
     if ACTIVE_FILE.is_file():
         data = yaml.safe_load(ACTIVE_FILE.read_text(encoding="utf-8")) or {}
         if data.get("variant"):
-            return str(data["variant"])
+            return canonicalize_variant_id(str(data["variant"]))
     return "all"
 
 
@@ -74,13 +87,42 @@ def _resolve_ootb_labels(catalog: dict[str, Any], spec: dict[str, Any]) -> froze
     return frozenset(labels)
 
 
+def _merge_always(spec: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]:
+    """Union catalog `always` (Elastic AI) into a variant spec."""
+    always = catalog.get("always") or {}
+    if not always:
+        return spec
+    merged = dict(spec)
+    extra_gens = [str(g) for g in (always.get("generators") or [])]
+    gens = spec.get("generators")
+    if gens != "all" and gens is not None:
+        merged["generators"] = list(dict.fromkeys([str(g) for g in gens] + extra_gens))
+    setup = dict(spec.get("setup") or {})
+    for key, val in (always.get("setup") or {}).items():
+        if val:
+            setup[str(key)] = True
+    merged["setup"] = setup
+    dashboards = dict(spec.get("dashboards") or {})
+    for key, val in (always.get("dashboards") or {}).items():
+        if val:
+            dashboards[str(key)] = True
+    merged["dashboards"] = dashboards
+    ootb = list(spec.get("ootb_links") or [])
+    for key in always.get("ootb_links") or []:
+        if key not in ootb:
+            ootb.append(key)
+    merged["ootb_links"] = ootb
+    return merged
+
+
 def _build_variant(vid: str, catalog: dict[str, Any] | None = None) -> Variant:
     catalog = catalog or _load_catalog()
     variants = catalog.get("variants") or {}
+    vid = canonicalize_variant_id(vid)
     if vid not in variants:
         known = ", ".join(sorted(variants))
         raise SystemExit(f"Unknown variant {vid!r} (known: {known})")
-    spec = variants[vid]
+    spec = _merge_always(variants[vid], catalog)
     return Variant(
         id=vid,
         title=spec["title"],
@@ -116,8 +158,8 @@ def list_variant_ids() -> list[str]:
     return [vid for vid, _, _ in list_variants()]
 
 
-def filter_o_otb_links(ootb: dict[str, str]) -> dict[str, str]:
-    v = active_variant()
+def filter_o_otb_links(ootb: dict[str, str], variant: Variant | None = None) -> dict[str, str]:
+    v = variant or active_variant()
     if v.is_all:
         return ootb
     return {k: val for k, val in ootb.items() if k in v.ootb_link_labels}
