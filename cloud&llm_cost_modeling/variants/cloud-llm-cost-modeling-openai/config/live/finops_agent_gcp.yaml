@@ -1,0 +1,101 @@
+# Live GCP FinOps AI Assistant — GCP billing hub (no rightsizing / workflows).
+
+agent:
+  id: elk-finops-ai-assistant
+  name: ELK Co FinOps AI Assistant
+  description: >
+    Answers questions about live GCP billing spend, project burn, and spend
+    SLO posture. Ground answers in ES|QL tools. Never changes cloud resources.
+  labels:
+    - elk-co
+    - finops
+    - gcp
+  avatar_color: "#0B6E4F"
+  avatar_symbol: FO
+  access_mode: public
+  enable_elastic_capabilities: true
+
+attach_tools:
+  - platform.core.search
+  - platform.core.execute_esql
+
+instructions: |
+  You are the **ELK Co FinOps AI Assistant** for the live **GCP billing hub**.
+
+  ## Data that is live
+  - Bill: `metrics-gcp.billing-*` (`gcp.billing.total`, project / service dims).
+  - Do **not** query AWS CUR, Cost Explorer, Azure billing, or rightsizing streams.
+
+  ## Budget thresholds
+  {budgets_block}
+
+  Known projects: `{gcp_ml_project}`, `{gcp_genai_project}`.
+
+  ## Detection
+  1. Run `elk-finops-slo-posture` and `elk-finops-gcp-spend` with days=30.
+  2. Run `elk-finops-gcp-top-projects` days=30.
+  3. If ML burn is mentioned, run `elk-finops-gcp-ml-burn` days=7.
+
+  ## Dashboards
+  - FinOps dynamic: {kibana_url}/app/dashboards#/view/elk-finops-llm-observability-dynamic-gcp
+  - SLOs: {kibana_url}/app/observability/slos
+  - Alerts: {kibana_url}/app/observability/alerts
+
+  ## Hard rules
+  - Always call tools before answering spend questions. Never invent USD.
+  - Always state the lookback window.
+
+tools:
+  - id: elk-finops-gcp-spend
+    description: >
+      GCP billing total / avg daily / % of monthly budget over the last N days.
+    esql: |
+      FROM metrics-gcp.billing-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | STATS total_spend = SUM(gcp.billing.total)
+      | EVAL lookback_days = ?days::integer
+      | EVAL avg_daily = total_spend / lookback_days
+      | EVAL monthly_budget_usd = {gcp_monthly_usd}
+      | EVAL pct_of_budget = total_spend / monthly_budget_usd * 100
+    params:
+      days:
+        type: integer
+        description: Lookback window in days
+
+  - id: elk-finops-gcp-top-projects
+    description: Top GCP projects by billing spend over the last N days.
+    esql: |
+      FROM metrics-gcp.billing-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | STATS spend = SUM(gcp.billing.total) BY project = gcp.billing.project_name
+      | SORT spend DESC
+      | LIMIT 12
+    params:
+      days:
+        type: integer
+        description: Lookback window in days
+
+  - id: elk-finops-gcp-ml-burn
+    description: GCP billing for the ML project over the last N days.
+    esql: |
+      FROM metrics-gcp.billing-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+        AND gcp.billing.project_name == "{gcp_ml_project}"
+      | STATS spend = SUM(gcp.billing.total)
+      | EVAL lookback_days = ?days::integer
+      | EVAL alert_floor_usd = {gcp_ml_7d_alert_usd}
+      | EVAL over_alert_floor = spend > alert_floor_usd
+    params:
+      days:
+        type: integer
+        description: Lookback window in days (7 recommended)
+
+  - id: elk-finops-slo-posture
+    description: Current FinOps spend SLO posture (elk-finops-slo-* and elk-slo-*).
+    esql: |
+      FROM .slo-observability.summary-v3.6
+      | WHERE slo.id LIKE "elk-finops-slo-*" OR slo.id LIKE "elk-slo-*"
+      | KEEP slo.id, slo.name, errorBudgetRemaining, errorBudgetConsumed, latestSliTimestamp
+      | EVAL violated = errorBudgetRemaining < 0
+      | SORT slo.name
+    params: {}

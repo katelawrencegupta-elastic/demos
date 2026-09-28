@@ -88,7 +88,7 @@ def _resolve_ootb_labels(catalog: dict[str, Any], spec: dict[str, Any]) -> froze
 
 
 def _merge_always(spec: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]:
-    """Union catalog `always` (Elastic AI) into a variant spec."""
+    """Union catalog `always` (Elastic AI + ESS billing) into a variant spec."""
     always = catalog.get("always") or {}
     if not always:
         return spec
@@ -97,6 +97,11 @@ def _merge_always(spec: dict[str, Any], catalog: dict[str, Any]) -> dict[str, An
     gens = spec.get("generators")
     if gens != "all" and gens is not None:
         merged["generators"] = list(dict.fromkeys([str(g) for g in gens] + extra_gens))
+    packages = list(spec.get("packages") or [])
+    for pkg in always.get("packages") or []:
+        if pkg not in packages:
+            packages.append(str(pkg))
+    merged["packages"] = packages
     setup = dict(spec.get("setup") or {})
     for key, val in (always.get("setup") or {}).items():
         if val:

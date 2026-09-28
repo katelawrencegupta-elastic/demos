@@ -47,24 +47,24 @@ _POLICY_TRACE = {
 def _guardrails(acct_id: str, region: str) -> list[dict]:
     return [
         {
-            "id": "elkpii0block01",
+            "id": "elkcopii0block01",
             "name": "elk-pii-block",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/elkpii0block01"),
+                    "guardrail/elkcopii0block01"),
             "version": "2",
         },
         {
-            "id": "elktoxicontent1",
+            "id": "elktoxicontent01",
             "name": "elk-toxic-content",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/elktoxicontent1"),
+                    "guardrail/elktoxicontent01"),
             "version": "3",
         },
         {
-            "id": "elktopicdeny001",
+            "id": "elktopicdeny0001",
             "name": "elk-topic-deny",
             "arn": (f"arn:aws:bedrock:{region}:{acct_id}:"
-                    "guardrail/elktopicdeny001"),
+                    "guardrail/elktopicdeny0001"),
             "version": "1",
         },
     ]

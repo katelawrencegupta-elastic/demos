@@ -1,5 +1,6 @@
 # Popular LLM model catalog with Aug-2026 list prices ($ / 1M tokens).
-# Used by llm_invocation / llm_usage / llm_cost generators.
+# Used by native LLM generators (OpenAI / Anthropic / Bedrock / Azure OpenAI /
+# Vertex) and APM gen_ai spans (llm_apm) for pricing + workload mix.
 models:
   # --- OpenAI ---
   - id: gpt-5.6-sol

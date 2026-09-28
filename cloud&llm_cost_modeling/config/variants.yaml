@@ -2,22 +2,29 @@
 # setup steps, and dashboard publishing to one cloud or integration pack.
 #
 # Materialize forks:  python scripts/fork_project.py --all
+# Fork destination:   variants/<fork_dir>  (under this project)
 # Active fork:         config/active_variant.yaml  (or FINOPS_VARIANT / DEPLOY_<NAME>_VARIANT)
 # Active Elastic Cloud: FINOPS_DEPLOYMENT=<name> matching DEPLOY_<NAME>_* in .env
 #
 # `always` is unioned into every variant (generators, setup, dashboards, OOTB).
 
-# Elastic AI Assistant + inference usage — installed on every workshop variant.
+# Elastic AI + Elastic Cloud (ESS) billing — installed on every workshop variant.
 always:
   generators:
     - agent_builder_traces
     - inference_token_usage
+    - ess_billing
+    - ess_billing_credits
+  packages:
+    - ess_billing
   setup:
     inference: true
+    ess_billing: true
   dashboards:
     ai: true
   ootb_links:
     - inference
+    - ess_billing
 
 variants:
   all:
@@ -55,7 +62,7 @@ variants:
     dashboards:
       baseline: true
       classic: true
-      dynamic: true
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: true
     ootb_links:
       - ess_billing
@@ -110,7 +117,7 @@ variants:
     dashboards:
       baseline: true
       classic: true
-      dynamic: true
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - ess_billing
@@ -140,7 +147,7 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: true
+      dynamic: false  # single board; -dynamic was a duplicate alias of baseline
       ai: false
     ootb_links:
       - gcp_billing
@@ -170,7 +177,7 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: true
+      dynamic: false  # single board; -dynamic was a duplicate alias of baseline
       ai: false
     ootb_links:
       - azure_billing
@@ -200,7 +207,7 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - openai
@@ -226,7 +233,7 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - anthropic
@@ -247,12 +254,12 @@ variants:
       tsds: true
       bedrock: true
       apm: true
-      budgets: false
-      agent: false
+      budgets: true
+      agent: true
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - bedrock
@@ -270,8 +277,8 @@ variants:
     packages: []
     setup:
       inference: true
-      budgets: false
-      agent: false
+      budgets: true
+      agent: true
     dashboards:
       baseline: false
       classic: false

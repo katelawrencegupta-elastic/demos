@@ -2229,7 +2229,7 @@
           "config": {
             "hide_title": true,
             "title": "",
-            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis ELK Co dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.",
+            "content": "These are the **out-of-the-box Elastic integration dashboards** installed from Fleet packages (`aws_billing`, `openai`, `anthropic_metrics`, `azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\nThis FinOps dashboard is the cross-provider overlay; provider packs remain the source of truth for CUR line items, PTU, Guardrails, etc.",
             "settings": {
               "open_links_in_new_tab": true
             }

@@ -461,8 +461,8 @@ def patch_inference_token_usage_dashboard():
 
 
 def run():
-    from src.profile import uses_live_aws_hub
-    if uses_live_aws_hub():
+    from src.profile import uses_live_hub
+    if uses_live_hub():
         from src.live_setup import run as live_run
         live_run(fail_loud=False)
         return

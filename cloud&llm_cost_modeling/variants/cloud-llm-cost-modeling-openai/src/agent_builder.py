@@ -1,30 +1,58 @@
-"""Provision ELK Co FinOps AI Assistant (Elastic Agent Builder).
+"""Provision FinOps AI Assistant (Elastic Agent Builder).
 
-Creates ES|QL tools and a chat agent that answer billing, SLO, and alert
-questions against the seeded ELK Co demo data.
-
-API refs:
-  POST/PUT /api/agent_builder/tools
-  POST/PUT /api/agent_builder/agents
+Creates ES|QL / workflow tools and a chat agent. Tool definitions come from
+config/finops_agent.yaml (synthetic) or config/live/finops_agent.yaml (live).
 """
 from __future__ import annotations
 
 import requests
 import yaml
 
-from src.budgets import budget_numbers
-from src.config import KBN_HEADERS, KIBANA_URL, ROOT
+from src.budgets import substitutions
+from src.config import KBN_HEADERS, ROOT
+import src.config as _cfg
+from src.profile import LIVE_DIR, live_hub_kind, uses_live_aws_hub
 
-AGENT_CONFIG = ROOT / "config" / "finops_agent.yaml"
-TAGS = ["elk", "finops", "workshop"]
+TAGS = ["elk-co", "finops", "workshop"]
+LIVE_TAGS = ["elk-co", "finops"]
 
-TOOLS_API = f"{KIBANA_URL}/api/agent_builder/tools"
-AGENTS_API = f"{KIBANA_URL}/api/agent_builder/agents"
-AGENT_CHAT_URL = f"{KIBANA_URL}/app/agent_builder/chat"
+def _tools_api() -> str:
+    return f"{_cfg.KIBANA_URL}/api/agent_builder/tools"
+
+
+def _agents_api() -> str:
+    return f"{_cfg.KIBANA_URL}/api/agent_builder/agents"
+
+
+def agent_chat_url() -> str:
+    return f"{_cfg.KIBANA_URL}/app/agent_builder/chat"
+
+
+# Back-compat callables for callers that imported AGENTS_API/TOOLS_API as names.
+# Prefer the helpers; module-level constants would freeze the wrong deployment URL.
+def __getattr__(name: str):
+    if name == "TOOLS_API":
+        return _tools_api()
+    if name == "AGENTS_API":
+        return _agents_api()
+    if name == "AGENT_CHAT_URL":
+        return agent_chat_url()
+    raise AttributeError(name)
+
+
+def agent_config_path():
+    kind = live_hub_kind()
+    if uses_live_aws_hub():
+        return LIVE_DIR / "finops_agent.yaml"
+    if kind == "gcp":
+        return LIVE_DIR / "finops_agent_gcp.yaml"
+    if kind == "azure":
+        return LIVE_DIR / "finops_agent_azure.yaml"
+    return ROOT / "config" / "finops_agent.yaml"
 
 
 def load_agent_config() -> dict:
-    with open(AGENT_CONFIG) as f:
+    with open(agent_config_path()) as f:
         return yaml.safe_load(f)
 
 
@@ -34,48 +62,84 @@ def _kbn(method: str, url: str, **kwargs):
     return requests.request(method, url, **kwargs)
 
 
-def _budgets_block(nums: dict) -> str:
-    lines = [
-        f"- AWS monthly budget: ${nums['aws_monthly_usd']:,.0f}",
-        f"- AWS daily SLO ceiling: ${nums['aws_daily_ceiling_usd']:,.0f}",
-        f"- Staging daily SLO ceiling: ${nums['staging_daily_ceiling_usd']:,.0f}",
-        f"- Staging daily alert floor: ${nums['staging_daily_alert_usd']:,.0f}",
-        f"- checkout-assistant daily SLO ceiling: ${nums['checkout_daily_ceiling_usd']:.2f}",
-        f"- checkout-assistant 7d alert floor: ${nums['checkout_7d_alert_usd']:.2f}",
-        f"- GCP elk-ml-prod 7d alert floor: ${nums['gcp_ml_7d_alert_usd']:,.0f}",
-    ]
-    return "\n".join(lines)
+def _tags(cfg: dict | None = None) -> list:
+    cfg = cfg or load_agent_config()
+    agent = cfg.get("agent") or {}
+    return list(agent.get("labels") or (LIVE_TAGS if live_hub_kind() else TAGS))
 
 
-def _render_esql(template: str, nums: dict) -> str:
-    return template.format(
-        aws_monthly_usd=int(nums["aws_monthly_usd"]),
-        staging_daily_ceiling_usd=int(nums["staging_daily_ceiling_usd"]),
-        staging_daily_alert_usd=int(nums["staging_daily_alert_usd"]),
-        gcp_ml_7d_alert_usd=int(nums["gcp_ml_7d_alert_usd"]),
-    ).strip()
+def _budgets_block(mapping: dict) -> str:
+    kind = live_hub_kind()
+    if uses_live_aws_hub():
+        return "\n".join([
+            f"- Calendar MTD linked unblended alert: ${mapping['aws_mtd_budget_usd']:,.0f}",
+            f"- Trailing-30d budget alert: ${mapping['aws_trailing_30d_budget_usd']:,.0f}",
+            f"- Daily SLO ceilings: org ${mapping['aws_daily_ceiling_usd']:,.0f}, "
+            f"stage `{mapping['stage_account_id']}` ${mapping['staging_daily_ceiling_usd']:,.0f}, "
+            f"monitoring `{mapping['monitoring_account_id']}` "
+            f"${mapping['monitoring_daily_ceiling_usd']:,.0f}, "
+            f"ESF pair ${mapping['esf_daily_ceiling_usd']:,.0f}, "
+            f"Agent Builder {int(mapping['inference_daily_tokens']):,} tokens/day",
+            f"- Stage daily alert floor: ${mapping['staging_daily_alert_usd']:,.0f}",
+            f"- Agent Builder 7d token alert: {int(mapping['inference_7d_tokens']):,} tokens",
+        ])
+    if kind == "gcp":
+        return "\n".join([
+            f"- GCP monthly budget: ${mapping['gcp_monthly_usd']:,.0f}",
+            f"- GCP daily SLO ceiling: ${mapping['gcp_daily_ceiling_usd']:,.0f}",
+            f"- elk-ml-prod daily SLO ceiling: ${mapping['gcp_ml_daily_ceiling_usd']:,.0f}",
+            f"- elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+        ])
+    if kind == "azure":
+        return "\n".join([
+            f"- Azure monthly budget: ${mapping['azure_monthly_usd']:,.0f}",
+            f"- Azure daily SLO ceiling: ${mapping['azure_daily_ceiling_usd']:,.0f}",
+            f"- Azure 7d alert floor: ${mapping['azure_7d_alert_usd']:,.0f}",
+        ])
+    return "\n".join([
+        f"- AWS monthly budget: ${mapping['aws_monthly_usd']:,.0f}",
+        f"- AWS daily SLO ceiling: ${mapping['aws_daily_ceiling_usd']:,.0f}",
+        f"- Staging daily SLO ceiling: ${mapping['staging_daily_ceiling_usd']:,.0f}",
+        f"- Staging daily alert floor: ${mapping['staging_daily_alert_usd']:,.0f}",
+        f"- checkout-assistant daily SLO ceiling: ${mapping['checkout_daily_ceiling_usd']:.2f}",
+        f"- checkout-assistant 7d alert floor: ${mapping['checkout_7d_alert_usd']:.2f}",
+        f"- GCP elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+        f"- Bedrock daily SLO ceiling: ${mapping['bedrock_daily_ceiling_usd']:,.0f}",
+        f"- Bedrock 7d alert floor: ${mapping['bedrock_7d_alert_usd']:,.0f}",
+        f"- Inference daily token ceiling: {int(mapping['inference_daily_tokens']):,}",
+        f"- Inference 7d token alert: {int(mapping['inference_7d_tokens']):,}",
+    ])
 
 
-def _tool_body(spec: dict, nums: dict) -> dict:
-    return {
+def _render(template: str, mapping: dict) -> str:
+    return template.format(**mapping).strip()
+
+
+def _tool_body(spec: dict, mapping: dict, tags: list) -> dict:
+    tool_type = spec.get("type") or "esql"
+    body = {
         "id": spec["id"],
-        "type": "esql",
+        "type": tool_type,
         "description": spec["description"].strip(),
-        "tags": TAGS,
-        "configuration": {
-            "query": _render_esql(spec["esql"], nums),
-            "params": spec.get("params") or {},
-        },
+        "tags": spec.get("tags") or tags,
     }
+    if tool_type == "workflow":
+        body["configuration"] = {"workflow_id": spec["workflow_id"]}
+        return body
+    body["configuration"] = {
+        "query": _render(spec["esql"], mapping),
+        "params": spec.get("params") or {},
+    }
+    return body
 
 
 def _upsert_tool(tool_id: str, create_body: dict, update_body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{TOOLS_API}/{tool_id}")
+    r = _kbn("GET", f"{_tools_api()}/{tool_id}")
     if r.status_code == 200:
-        r = _kbn("PUT", f"{TOOLS_API}/{tool_id}", json=update_body)
+        r = _kbn("PUT", f"{_tools_api()}/{tool_id}", json=update_body)
         action = "updated"
     elif r.status_code == 404:
-        r = _kbn("POST", TOOLS_API, json=create_body)
+        r = _kbn("POST", _tools_api(), json=create_body)
         action = "created"
     else:
         msg = f"  [fail] tool GET {tool_id}: {r.status_code} {r.text[:240]}"
@@ -97,17 +161,17 @@ def _upsert_tool(tool_id: str, create_body: dict, update_body: dict, fail_loud: 
     return True
 
 
-def _agent_body(cfg: dict, tool_ids: list[str], nums: dict) -> dict:
+def _agent_body(cfg: dict, tool_ids: list[str], mapping: dict) -> dict:
     agent = cfg["agent"]
-    instructions = cfg["instructions"].format(
-        budgets_block=_budgets_block(nums),
-        kibana_url=KIBANA_URL,
-    ).strip()
+    fmt = dict(mapping)
+    fmt["budgets_block"] = _budgets_block(mapping)
+    fmt.setdefault("kibana_url", _cfg.KIBANA_URL)
+    instructions = cfg["instructions"].format(**fmt).strip()
     body = {
         "id": agent["id"],
         "name": agent["name"],
         "description": agent["description"].strip(),
-        "labels": agent.get("labels") or TAGS,
+        "labels": agent.get("labels") or _tags(cfg),
         "avatar_color": agent.get("avatar_color"),
         "avatar_symbol": agent.get("avatar_symbol"),
         "access_control": {"access_mode": agent.get("access_mode", "public")},
@@ -118,7 +182,6 @@ def _agent_body(cfg: dict, tool_ids: list[str], nums: dict) -> dict:
                 agent.get("enable_elastic_capabilities", False)),
         },
     }
-    # Omit null avatar fields if absent
     if not body.get("avatar_color"):
         body.pop("avatar_color", None)
     if not body.get("avatar_symbol"):
@@ -127,7 +190,7 @@ def _agent_body(cfg: dict, tool_ids: list[str], nums: dict) -> dict:
 
 
 def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{AGENTS_API}/{agent_id}")
+    r = _kbn("GET", f"{_agents_api()}/{agent_id}")
     if r.status_code == 200:
         update = {
             "name": body["name"],
@@ -141,10 +204,10 @@ def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
             update["avatar_symbol"] = body["avatar_symbol"]
         if "access_control" in body:
             update["access_control"] = body["access_control"]
-        r = _kbn("PUT", f"{AGENTS_API}/{agent_id}", json=update)
+        r = _kbn("PUT", f"{_agents_api()}/{agent_id}", json=update)
         action = "updated"
     elif r.status_code == 404:
-        r = _kbn("POST", AGENTS_API, json=body)
+        r = _kbn("POST", _agents_api(), json=body)
         action = "created"
     else:
         msg = f"  [fail] agent GET {agent_id}: {r.status_code} {r.text[:240]}"
@@ -167,14 +230,15 @@ def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
 
 
 def ensure_agent(fail_loud: bool = False) -> None:
-    """Upsert FinOps ES|QL tools and the ELK Co FinOps AI Assistant agent."""
+    """Upsert FinOps tools and the FinOps AI Assistant agent."""
     cfg = load_agent_config()
-    nums = budget_numbers()
+    mapping = substitutions()
+    tags = _tags(cfg)
     tool_ids: list[str] = []
 
     print("== FinOps AI Assistant tools ==")
     for spec in cfg.get("tools") or []:
-        create_body = _tool_body(spec, nums)
+        create_body = _tool_body(spec, mapping, tags)
         update_body = {
             "description": create_body["description"],
             "tags": create_body["tags"],
@@ -183,36 +247,41 @@ def ensure_agent(fail_loud: bool = False) -> None:
         if _upsert_tool(spec["id"], create_body, update_body, fail_loud):
             tool_ids.append(spec["id"])
 
-    print("== ELK Co FinOps AI Assistant ==")
+    for extra in cfg.get("attach_tools") or []:
+        if extra not in tool_ids:
+            tool_ids.append(extra)
+
+    print("== ELK Co FinOps AI Assistant ==" if live_hub_kind()
+          else "== FinOps AI Assistant ==")
     agent = cfg["agent"]
-    body = _agent_body(cfg, tool_ids, nums)
+    body = _agent_body(cfg, tool_ids, mapping)
     _upsert_agent(agent["id"], body, fail_loud)
 
 
 def verify_agent() -> bool:
     cfg = load_agent_config()
-    agent_id = cfg["agent"]["id"]
+    aid = cfg["agent"]["id"]
     ok = True
     print("== FinOps AI Assistant ==")
     for spec in cfg.get("tools") or []:
-        r = _kbn("GET", f"{TOOLS_API}/{spec['id']}")
+        r = _kbn("GET", f"{_tools_api()}/{spec['id']}")
         if r.status_code == 200:
             print(f"  [ok] tool {spec['id']}")
         else:
             print(f"  [fail] tool {spec['id']}: {r.status_code}")
             ok = False
 
-    r = _kbn("GET", f"{AGENTS_API}/{agent_id}")
+    r = _kbn("GET", f"{_agents_api()}/{aid}")
     if r.status_code == 200:
-        name = r.json().get("name", agent_id)
+        name = r.json().get("name", aid)
         tools = r.json().get("configuration", {}).get("tools", [])
         n_tools = len(tools[0].get("tool_ids", [])) if tools else 0
-        print(f"  [ok] agent {agent_id} ({name}, {n_tools} tools)")
+        print(f"  [ok] agent {aid} ({name}, {n_tools} tools)")
     else:
-        print(f"  [fail] agent {agent_id}: {r.status_code}")
+        print(f"  [fail] agent {aid}: {r.status_code}")
         ok = False
 
-    print(f"  Chat:     {AGENT_CHAT_URL}")
+    print(f"  Chat:     {agent_chat_url()}")
     return ok
 
 

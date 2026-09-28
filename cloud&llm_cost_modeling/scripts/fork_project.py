@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Materialize provider/integration-scoped forks of the ELK Co demo project.
 
-Each fork is a self-contained copy with config/active_variant.yaml set so
-setup/backfill/dashboards only touch the relevant integrations.
+Each fork is a self-contained copy under variants/ with config/active_variant.yaml
+set so setup/backfill/dashboards only touch the relevant integrations.
 
 Examples:
   python scripts/fork_project.py --list
@@ -20,7 +20,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-DEMOS = ROOT.parent
+VARIANTS_ROOT = ROOT / "variants"
 
 VARIANT_ALIASES = {
     "vertexai": "gcp",
@@ -35,6 +35,7 @@ SKIP_NAMES = {
     ".env",
     ".DS_Store",
     "elastic",
+    "variants",  # never nest forks inside forks
 }
 
 README_FORK = """# {title}
@@ -43,6 +44,11 @@ Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
 - **Variant:** `{variant}`
 - **Source:** `{source}`
+- **Path:** `variants/{fork_dir}`
+
+> **Runtime demos use the master tree** (`cloud&llm_cost_modeling/`), not this
+> fork. Forks are workshop handouts regenerated with `fork_project.py --force`.
+> Prefer running CLI / setup / dashboards from master with `FINOPS_VARIANT={variant}`.
 
 ## Quickstart
 
@@ -58,7 +64,7 @@ cp .env.example .env   # set ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
 
 List all workshop variants: `python -m src.cli variants`
 
-Re-fork from the master project:
+Re-fork from the master project (`cloud&llm_cost_modeling/`):
 
 ```bash
 python scripts/fork_project.py --force {variant}
@@ -94,14 +100,14 @@ def fork_variant(variant: str, *, force: bool = False, dest_root: Path | None = 
         raise SystemExit(f"Unknown variant {variant!r} (known: {known})")
 
     spec = variants[variant]
-    dest = (dest_root or DEMOS) / spec["fork_dir"]
+    dest = (dest_root or VARIANTS_ROOT) / spec["fork_dir"]
     if dest.exists():
         if not force:
             print(f"skip {dest.name} (exists — pass --force to replace)")
             return dest
         shutil.rmtree(dest)
 
-    print(f"fork {variant} -> {dest}")
+    print(f"fork {variant} -> {dest.relative_to(ROOT)}")
     _copy_tree(ROOT, dest)
 
     active = dest / "config" / "active_variant.yaml"
@@ -113,6 +119,7 @@ def fork_variant(variant: str, *, force: bool = False, dest_root: Path | None = 
             title=spec["title"],
             variant=variant,
             source=ROOT.name,
+            fork_dir=spec["fork_dir"],
         ),
         encoding="utf-8",
     )
@@ -136,13 +143,13 @@ def main(argv: list[str] | None = None) -> int:
         "--dest",
         type=Path,
         default=None,
-        help=f"parent directory for forks (default: {DEMOS})",
+        help=f"parent directory for forks (default: {VARIANTS_ROOT.relative_to(ROOT)})",
     )
     args = p.parse_args(argv)
 
     if args.list:
         for vid, spec in sorted(variants.items()):
-            print(f"{vid:14}  {spec['fork_dir']}")
+            print(f"{vid:14}  variants/{spec['fork_dir']}")
             print(f"{'':14}  {spec['title']}")
         return 0
 
@@ -150,10 +157,14 @@ def main(argv: list[str] | None = None) -> int:
     if not targets:
         p.error("pass variant ids, or use --all")
 
-    dest_root = args.dest or DEMOS
+    dest_root = args.dest or VARIANTS_ROOT
     for variant in targets:
         fork_variant(variant, force=args.force, dest_root=dest_root)
-    print(f"\nDone. Forks live under {dest_root}")
+    try:
+        shown = dest_root.relative_to(ROOT)
+    except ValueError:
+        shown = dest_root
+    print(f"\nDone. Forks live under {shown}")
     return 0
 
 

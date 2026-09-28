@@ -187,6 +187,8 @@ class _VertexMetrics:
                         "model_invocation_count": ok if ok else b["invocations"],
                         "character_count": (b["input"] + b["output"]) * 4,
                         "consumed_throughput": b["input"] + b["output"],
+                        # Plain numeric for ES|QL PERCENTILE (histogram type is not numeric).
+                        "model_invocation_latency_ms": avg_lat,
                         "model_invocation_latencies": {
                             "values": [avg_lat],
                             "counts": [b["invocations"]],

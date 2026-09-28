@@ -2,7 +2,29 @@
 # setup steps, and dashboard publishing to one cloud or integration pack.
 #
 # Materialize forks:  python scripts/fork_project.py --all
-# Active fork:         config/active_variant.yaml  (or FINOPS_VARIANT env)
+# Fork destination:   variants/<fork_dir>  (under this project)
+# Active fork:         config/active_variant.yaml  (or FINOPS_VARIANT / DEPLOY_<NAME>_VARIANT)
+# Active Elastic Cloud: FINOPS_DEPLOYMENT=<name> matching DEPLOY_<NAME>_* in .env
+#
+# `always` is unioned into every variant (generators, setup, dashboards, OOTB).
+
+# Elastic AI + Elastic Cloud (ESS) billing — installed on every workshop variant.
+always:
+  generators:
+    - agent_builder_traces
+    - inference_token_usage
+    - ess_billing
+    - ess_billing_credits
+  packages:
+    - ess_billing
+  setup:
+    inference: true
+    ess_billing: true
+  dashboards:
+    ai: true
+  ootb_links:
+    - inference
+    - ess_billing
 
 variants:
   all:
@@ -40,7 +62,7 @@ variants:
     dashboards:
       baseline: true
       classic: true
-      dynamic: true
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: true
     ootb_links:
       - ess_billing
@@ -52,7 +74,6 @@ variants:
       - azure_openai
       - bedrock
       - vertexai
-      - apm
 
   aws:
     title: "ELK Co FinOps — AWS"
@@ -65,6 +86,14 @@ variants:
       - aws_ec2_metrics
       - aws_billing
       - aws_billing_cur
+      - aws_rds
+      - aws_s3_daily_storage
+      - aws_lambda
+      - aws_mq_activemq
+      - aws_mq_rabbitmq
+      - aws_cloudwatch_usage
+      - kubeletstats
+      - ess_billing
       - ess_billing_credits
       - bedrock_invocation
       - bedrock_runtime
@@ -74,6 +103,7 @@ variants:
       - aws
       - aws_bedrock
       - aws_billing
+      - ess_billing
       - apm
     setup:
       tsds: true
@@ -87,16 +117,15 @@ variants:
     dashboards:
       baseline: true
       classic: true
-      dynamic: true
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - ess_billing
       - aws_cur
       - bedrock
-      - apm
 
   gcp:
-    title: "ELK Co FinOps — GCP"
+    title: "ELK Co FinOps — GCP + Vertex AI"
     fork_dir: cloud-llm-cost-modeling-gcp
     default_scope: all
     generators:
@@ -118,15 +147,14 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: true
+      dynamic: false  # single board; -dynamic was a duplicate alias of baseline
       ai: false
     ootb_links:
       - gcp_billing
       - vertexai
-      - apm
 
   azure:
-    title: "ELK Co FinOps — Azure"
+    title: "ELK Co FinOps — Azure + Azure OpenAI"
     fork_dir: cloud-llm-cost-modeling-azure
     default_scope: all
     generators:
@@ -149,12 +177,11 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: true
+      dynamic: false  # single board; -dynamic was a duplicate alias of baseline
       ai: false
     ootb_links:
       - azure_billing
       - azure_openai
-      - apm
 
   openai:
     title: "ELK Co LLM Observability — OpenAI"
@@ -180,11 +207,10 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - openai
-      - apm
 
   anthropic:
     title: "ELK Co LLM Observability — Anthropic"
@@ -207,11 +233,10 @@ variants:
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - anthropic
-      - apm
 
   bedrock:
     title: "ELK Co LLM Observability — Amazon Bedrock"
@@ -229,69 +254,18 @@ variants:
       tsds: true
       bedrock: true
       apm: true
-      budgets: false
-      agent: false
+      budgets: true
+      agent: true
     dashboards:
       baseline: true
       classic: false
-      dynamic: false
+      dynamic: false  # publish skips -dynamic when baseline is on
       ai: false
     ootb_links:
       - bedrock
-      - apm
 
-  vertexai:
-    title: "ELK Co LLM Observability — GCP Vertex AI"
-    fork_dir: cloud-llm-cost-modeling-vertexai
-    default_scope: all
-    generators:
-      - vertex_prompt_logs
-      - vertex_metrics
-      - vertex_audit_logs
-      - llm_apm
-    packages:
-      - gcp_vertexai
-      - apm
-    setup:
-      vertexai: true
-      apm: true
-      budgets: false
-      agent: false
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false
-      ai: false
-    ootb_links:
-      - vertexai
-      - apm
-
-  azure-openai:
-    title: "ELK Co LLM Observability — Azure OpenAI"
-    fork_dir: cloud-llm-cost-modeling-azure-openai
-    default_scope: all
-    generators:
-      - azure_openai_logs
-      - azure_openai_metrics
-      - azure_openai_billing
-      - llm_apm
-    packages:
-      - azure_openai
-      - azure_billing
-      - apm
-    setup:
-      azure_openai: true
-      apm: true
-      budgets: false
-      agent: false
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false
-      ai: false
-    ootb_links:
-      - azure_openai
-      - apm
+  # vertexai is an alias of gcp; azure-openai is an alias of azure
+  # (see src/variant.py VARIANT_ALIASES).
 
   elastic-ai:
     title: "ELK Co Elastic AI Assistant & inference usage"
@@ -303,8 +277,8 @@ variants:
     packages: []
     setup:
       inference: true
-      budgets: false
-      agent: false
+      budgets: true
+      agent: true
     dashboards:
       baseline: false
       classic: false
@@ -337,7 +311,5 @@ ootb_groups:
     - "Amazon Bedrock Guardrails"
   vertexai:
     - "GCP Vertex AI Metrics"
-  apm:
-    - "APM Monitoring Overview"
   inference:
     - "[Elastic] Inference Token Usage"

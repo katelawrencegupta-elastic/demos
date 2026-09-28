@@ -176,6 +176,11 @@ def apply_deployment(name: str | None = None) -> str | None:
         live_accounts.cache_clear()
     except Exception:
         pass
+    try:
+        from src.budgets import _server_log_connector_id
+        _server_log_connector_id.cache_clear()
+    except Exception:
+        pass
 
     return ACTIVE_DEPLOYMENT
 

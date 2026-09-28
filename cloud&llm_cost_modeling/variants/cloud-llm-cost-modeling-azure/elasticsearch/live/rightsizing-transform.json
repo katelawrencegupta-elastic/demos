@@ -1,0 +1,28 @@
+{
+  "source": {
+    "index": [
+      "logs-finops.rightsizing-default"
+    ],
+    "query": {
+      "match_all": {}
+    }
+  },
+  "dest": {
+    "index": "finops-rightsizing-latest"
+  },
+  "frequency": "5m",
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  },
+  "latest": {
+    "unique_key": [
+      "finops.rightsizing.id"
+    ],
+    "sort": "@timestamp"
+  },
+  "description": "Current rightsizing recommendation per fingerprint. Dashboards should prefer this index over the raw data stream.",
+  "settings": {}
+}

@@ -1,0 +1,69 @@
+# Live Azure FinOps billing hub — native metrics-azure.billing-* + shared LLM.
+# No Cost Explorer / rightsizing / workflows (AWS-only).
+
+tags:
+  - elk-co
+  - finops
+  - live
+  - azure
+
+budgets:
+  azure_monthly_usd: 60000
+  azure_daily_ceiling_usd: 2500
+  azure_7d_alert_usd: 12000
+  checkout_daily_ceiling_usd: 0.50
+  checkout_7d_alert_usd: 4.0
+  inference_daily_tokens: 200000
+  inference_7d_tokens: 800000
+
+slos:
+  - id: elk-finops-slo-azure-daily
+    name: "[ELK Co] Azure daily billing under ceiling"
+    description: Daily Azure pretax billing must stay at or below the FinOps ceiling.
+    index: metrics-azure.billing-default
+    filter: ""
+    field: azure.billing.pretax_cost
+    ceiling_key: azure_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: elk-slo-llm-checkout-spend
+    name: "[ELK Co] checkout-assistant daily LLM cost"
+    description: >
+      Daily gen_ai span cost for checkout-assistant under ceiling.
+    index: traces-apm-default
+    filter: 'span.subtype : "gen_ai" and service.name : "checkout-assistant"'
+    field: labels.llm_cost_usd
+    ceiling_key: checkout_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: elk-slo-inference-daily-tokens
+    name: "[ELK Co] Elastic Inference daily token budget"
+    description: Daily Elastic Inference tokens for Agent Builder under ceiling.
+    index: logs-elastic.inference_token_usage-default
+    filter: 'inference.feature_id : "agent_builder" or tags : "synthetic"'
+    field: token_usage.total_tokens
+    ceiling_key: inference_daily_tokens
+    burn_rate_alert: false
+
+alerts:
+  - id: elk-finops-alert-azure-mtd
+    name: "[ELK Co] Azure trailing-30d spend over monthly budget"
+    schedule: 1h
+    time_window_size: 30
+    time_window_unit: d
+    message: "FinOps: Azure trailing-30d billing exceeded ${azure_monthly_usd:,}"
+    esql: |
+      FROM metrics-azure.billing-default
+      | STATS spend = SUM(azure.billing.pretax_cost)
+      | WHERE spend > {azure_monthly_usd}
+
+  - id: elk-finops-alert-azure-7d
+    name: "[ELK Co] Azure 7d billing burn"
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    message: "FinOps: Azure 7d billing exceeded ${azure_7d_alert_usd:,}"
+    esql: |
+      FROM metrics-azure.billing-default
+      | STATS spend = SUM(azure.billing.pretax_cost)
+      | WHERE spend > {azure_7d_alert_usd}

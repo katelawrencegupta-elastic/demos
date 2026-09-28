@@ -9,7 +9,7 @@ import requests
 
 from src.agent_builder import AGENT_CHAT_URL, agent_id
 from src.budgets import budget_numbers
-from src.config import KBN_HEADERS, KIBANA_URL
+from src.config import KBN_HEADERS, KIBANA_ROOT, KIBANA_URL
 from src.time_window import demo_window, window_label
 from src.variant import active_variant, filter_o_otb_links
 
@@ -18,6 +18,18 @@ DASHBOARD_ID_CLASSIC = "elk-finops-llm-observability-classic"
 DASHBOARD_ID_DYNAMIC = "elk-finops-llm-observability-dynamic"  # alias of baseline
 DASHBOARD_ID_AI = "elk-ai-assistant-inference-usage"
 DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
+
+# Short labels appended to the ELK Co hub title.
+DASHBOARD_SCOPE_LABELS = {
+    "all": "",
+    "aws": "AWS",
+    "gcp": "GCP + Vertex AI",
+    "azure": "Azure + Azure OpenAI",
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "bedrock": "Amazon Bedrock",
+    "elastic-ai": "Elastic AI",
+}
 
 
 def dash_id(which: str) -> str:
@@ -31,8 +43,68 @@ def dash_id(which: str) -> str:
     return bases[which] + active_variant().dash_suffix()
 
 
+def finops_dashboard_title(*, classic: bool = False) -> str:
+    """`[ELK Co] FinOps & LLM Observability` plus the variant scope."""
+    v = active_variant()
+    base = "[ELK Co] FinOps & LLM Observability"
+    scope = DASHBOARD_SCOPE_LABELS.get(v.id, v.id)
+    title = f"{base} — {scope}" if scope else base
+    if classic:
+        title += " — classic"
+    return title
+
+
+def finops_dashboard_description(*, classic: bool = False) -> str:
+    v = active_variant()
+    layout = "Classic layout" if classic else "Baseline layout"
+    scope = DASHBOARD_SCOPE_LABELS.get(v.id) or v.title
+    if v.is_all:
+        return f"{layout}: multi-cloud FinOps + LLM observability."
+    return (
+        f"{layout} for {scope}: only panels whose data is seeded by the "
+        f"{v.id} workshop variant."
+    )
+
+
+_DASH_EXISTS_CACHE: dict[str, bool] = {}
+
+
+def clear_dashboard_exists_cache() -> None:
+    _DASH_EXISTS_CACHE.clear()
+
+
+def dashboard_exists(did: str) -> bool:
+    """True if the Dashboards API can load this id in the active or default space."""
+    if not did or did.startswith("/"):
+        return True
+    if did in _DASH_EXISTS_CACHE:
+        return _DASH_EXISTS_CACHE[did]
+    for base in (KIBANA_URL, KIBANA_ROOT):
+        try:
+            r = requests.get(
+                f"{base}/api/dashboards/{did}",
+                headers=KBN_HEADERS, timeout=20,
+            )
+        except requests.RequestException:
+            continue
+        if r.status_code == 200:
+            _DASH_EXISTS_CACHE[did] = True
+            return True
+    _DASH_EXISTS_CACHE[did] = False
+    return False
+
+
+def resolve_link_item(label: str, dest: str, *, short: str | None = None):
+    """Normalize an OOTB/hub tab item to ``(display_label, destination)``."""
+    return (short or label, dest)
+
+
 def _ootb_items():
-    return list(filter_o_otb_links(OOTB).items())
+    """Variant-filtered OOTB dashboard links."""
+    return [
+        resolve_link_item(label, dest)
+        for label, dest in filter_o_otb_links(OOTB).items()
+    ]
 
 # Resolved at publish time (see src.time_window); kept as module attrs for imports.
 _WINDOW = demo_window()
@@ -55,7 +127,7 @@ OOTB = {
     "Amazon Bedrock Overview": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
     "Amazon Bedrock Guardrails": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
     "GCP Vertex AI Metrics": "gcp_vertexai-1b42c117-7971-424d-8015-c02f1317824d",
-    "APM Monitoring Overview": "apm-fab02b1d-fdd4-4c42-8ea9-a2be32f8cf61",
+    "[Elastic] Inference Token Usage": DASHBOARD_ID_INFERENCE_USAGE,
 }
 
 
@@ -302,27 +374,118 @@ def table(x, y, w, h, title, query, rows, metrics, ignore_global_filters=False):
     }
 
 
-def links_panel(x, y, w, h, title, items):
+def links_panel(x, y, w, h, title, items, *, layout=None, hide_title=False,
+                open_in_new_tab=True, use_filters=False,
+                open_in_new_tab_labels=None):
+    """Links embeddable. Use layout='horizontal' for AWS-hub-style tab bars.
+
+    Each item is ``(label, destination)`` for a dashboard link, or
+    ``(label, destination, "externalLink")`` for an app/path URL (e.g. ``/app/apm``).
+
+    ``open_in_new_tab_labels`` optionally forces specific labels to open in a new
+    tab even when the panel default is ``open_in_new_tab=False``.
+    """
+    force_new = set(open_in_new_tab_labels or ())
+    links = []
+    for item in items:
+        if len(item) == 3:
+            label, dest, ltype = item
+        else:
+            label, dest = item[0], item[1]
+            ltype = "externalLink" if str(dest).startswith("/") else "dashboardLink"
+        new_tab = True if label in force_new else open_in_new_tab
+        if ltype == "externalLink":
+            links.append({
+                "label": label,
+                "type": "externalLink",
+                "destination": dest,
+                "options": {"open_in_new_tab": new_tab},
+            })
+        else:
+            links.append({
+                "label": label,
+                "type": "dashboardLink",
+                "destination": dest,
+                "options": {
+                    "use_filters": use_filters,
+                    "use_time_range": True,
+                    "open_in_new_tab": new_tab,
+                },
+            })
+    cfg = {
+        "title": title,
+        "hide_title": hide_title,
+        "links": links,
+    }
+    if layout:
+        cfg["layout"] = layout
     return {
         "grid": _grid(x, y, w, h),
         "type": "links",
-        "config": {
-            "title": title,
-            "links": [
-                {
-                    "label": label,
-                    "type": "dashboardLink",
-                    "destination": dest,
-                    "options": {
-                        "use_filters": False,
-                        "use_time_range": True,
-                        "open_in_new_tab": True,
-                    },
-                }
-                for label, dest in items
-            ],
-        },
+        "config": cfg,
     }
+
+
+# Short hub-tab labels (AWS live hub style) for OOTB + family dashboards.
+_HUB_TAB_SHORT = {
+    "GCP Billing Overview": "GCP Billing",
+    "Azure Billing Overview": "Azure Billing",
+    "AWS CUR — current month": "AWS CUR",
+    "AWS CUR — all time": "AWS CUR (all time)",
+    "GCP Vertex AI Metrics": "Vertex AI",
+    "Azure OpenAI Overview": "Azure OpenAI",
+    "Azure OpenAI Billing": "Azure OpenAI Billing",
+    "Amazon Bedrock Overview": "Bedrock",
+    "Amazon Bedrock Guardrails": "Bedrock Guardrails",
+    "OpenAI Usage Overview": "OpenAI",
+    "Anthropic Cost & Billing": "Anthropic",
+    "[Elastic] Inference Token Usage": "Inference tokens",
+    "[Metrics ESS Billing] Billing dashboard": "ESS Billing",
+    "[Metrics ESS Billing] Credits dashboard": "ESS Credits",
+}
+
+# Stable left→right order matching the AWS hub (Overview first, then billing,
+# provider LLM, inference, ESS).
+_HUB_TAB_OOTB_ORDER = (
+    "GCP Billing Overview",
+    "Azure Billing Overview",
+    "AWS CUR — current month",
+    "GCP Vertex AI Metrics",
+    "Azure OpenAI Overview",
+    "Amazon Bedrock Overview",
+    "OpenAI Usage Overview",
+    "Anthropic Cost & Billing",
+    "[Elastic] Inference Token Usage",
+    "[Metrics ESS Billing] Billing dashboard",
+    "[Metrics ESS Billing] Credits dashboard",
+)
+
+
+def hub_tabs_items(caps=None):
+    """Horizontal hub-tab destinations for the active workshop variant."""
+    from src.dashboard_caps import caps_from_variant
+    caps = caps or caps_from_variant()
+    items = [("Overview", dash_id("baseline"))]
+    ootb = filter_o_otb_links(OOTB)
+    for full in _HUB_TAB_OOTB_ORDER:
+        dest = ootb.get(full)
+        if dest:
+            items.append(resolve_link_item(
+                full, dest, short=_HUB_TAB_SHORT.get(full, full)))
+    if caps.ai_dashboard:
+        items.append(("AI Assistant", dash_id("ai")))
+    return items
+
+
+def hub_tabs_panel(caps=None):
+    """Full-width horizontal FinOps tab bar (same UX as the AWS live hub)."""
+    return links_panel(
+        0, 0, 48, 5, "FinOps dashboards", hub_tabs_items(caps),
+        layout="horizontal", hide_title=False,
+        open_in_new_tab=False, use_filters=True,
+        # Dense OOTB ESS boards — open beside the FinOps hub (all variants).
+        open_in_new_tab_labels=("ESS Billing", "ESS Credits"),
+    )
 
 
 def section(title, y, panels, collapsed=False):
@@ -334,94 +497,160 @@ def section(title, y, panels, collapsed=False):
     }
 
 
-def budget_posture_section(y: int):
-    """FinOps spend vs ceilings — mirrors config/budgets.yaml + SLO/alert deep links."""
+def budget_posture_section(y: int, caps=None):
+    """FinOps spend vs ceilings — gauges match the active workshop variant."""
+    from src.dashboard_caps import caps_from_variant
+    caps = caps or caps_from_variant()
     b = budget_numbers()
-    aws_mtd = float(b["aws_monthly_usd"])
-    staging_ceil = float(b["staging_daily_ceiling_usd"])
     checkout_7d = float(b["checkout_7d_alert_usd"])
-    aws_daily = float(b["aws_daily_ceiling_usd"])
     checkout_daily = float(b["checkout_daily_ceiling_usd"])
+    bullets = []
+    gauges = []
 
-    mtd_vs_budget = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)",
-        f"| EVAL budget = {aws_mtd}, min = 0, max = budget * 2, goal = budget",
-    )
-    staging_vs_ceil = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        '| WHERE aws_billing.cur.line_item.usage_account_name == "elk-staging"',
-        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day DESC", "| LIMIT 1",
-        f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
-        "| KEEP spend, budget, min, max, goal",
-    )
-    checkout_vs_alert = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\" AND service.name == \"checkout-assistant\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS spend = SUM(cost)",
-        f"| EVAL budget = {checkout_7d}, min = 0, max = budget * 3, goal = budget",
-    )
-    aws_daily_vs_ceil = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day DESC", "| LIMIT 1",
-        f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
-        "| KEEP spend, budget, min, max, goal",
-    )
+    if caps.aws_cur:
+        aws_mtd = float(b["aws_monthly_usd"])
+        staging_ceil = float(b["staging_daily_ceiling_usd"])
+        aws_daily = float(b["aws_daily_ceiling_usd"])
+        bullets.extend([
+            f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}",
+            f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)",
+        ])
+        gauges.extend([
+            ("AWS window spend vs monthly budget", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                "| STATS spend = SUM(aws_billing.cur.line_item.unblended_cost)",
+                f"| EVAL budget = {aws_mtd}, min = 0, max = budget * 2, goal = budget",
+            ), "USD (goal = budget)"),
+            ("Latest AWS daily vs SLO ceiling", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) "
+                "BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {aws_daily}, min = 0, max = budget * 2, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "USD / day"),
+            ("Staging latest day vs SLO ceiling", _q(
+                "FROM metrics-aws_billing.cur-default", f"| WHERE {TS}",
+                '| WHERE aws_billing.cur.line_item.usage_account_name == "elk-staging"',
+                "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) "
+                "BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {staging_ceil}, min = 0, max = budget * 8, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "elk-staging"),
+        ])
+
+    if caps.gcp_billing:
+        gcp_ml = float(b["gcp_ml_7d_alert_usd"])
+        gcp_daily_goal = gcp_ml / 7.0
+        bullets.append(
+            f"- **GCP elk-ml-prod 7d alert:** ${gcp_ml:,.0f} "
+            f"(~${gcp_daily_goal:,.0f}/day)"
+        )
+        gauges.extend([
+            ("GCP ML project vs 7d alert", _q(
+                "FROM metrics-gcp.billing-default", f"| WHERE {TS}",
+                '| WHERE gcp.billing.project_name == "elk-ml-prod"',
+                "| STATS spend = SUM(gcp.billing.total)",
+                f"| EVAL budget = {gcp_ml}, min = 0, max = budget * 3, goal = budget",
+            ), "elk-ml-prod"),
+            ("Latest GCP daily vs 7d/7 goal", _q(
+                "FROM metrics-gcp.billing-default", f"| WHERE {TS}",
+                "| STATS daily = SUM(gcp.billing.total) BY day = BUCKET(@timestamp, 1d)",
+                "| SORT day DESC", "| LIMIT 1",
+                f"| EVAL spend = daily, budget = {gcp_daily_goal}, min = 0, "
+                "max = budget * 4, goal = budget",
+                "| KEEP spend, budget, min, max, goal",
+            ), "USD / day"),
+        ])
+
+    if caps.azure_billing:
+        azure_daily = float(b.get("azure_daily_ceiling_usd") or 0)
+        if azure_daily > 0:
+            bullets.append(
+                f"- **Azure daily SLO ceiling:** ${azure_daily:,.0f} pretax"
+            )
+            gauges.append((
+                "Latest Azure daily vs SLO ceiling",
+                _q(
+                    "FROM metrics-azure.billing-default", f"| WHERE {TS}",
+                    "| STATS daily = SUM(azure.billing.pretax_cost) "
+                    "BY day = BUCKET(@timestamp, 1d)",
+                    "| SORT day DESC", "| LIMIT 1",
+                    f"| EVAL spend = daily, budget = {azure_daily}, min = 0, "
+                    "max = budget * 3, goal = budget",
+                    "| KEEP spend, budget, min, max, goal",
+                ),
+                "USD / day",
+            ))
+        else:
+            gauges.append((
+                "Azure pretax (window)",
+                _q(
+                    "FROM metrics-azure.billing-default", f"| WHERE {TS}",
+                    "| STATS spend = SUM(azure.billing.pretax_cost)",
+                    "| EVAL budget = spend, min = 0, max = spend * 2, goal = spend",
+                ),
+                "USD pretax",
+            ))
+            bullets.append(
+                "- **Azure pretax:** window total (no dedicated SLO ceiling)."
+            )
+
+    if caps.llm_apm:
+        bullets.append(
+            f"- **checkout-assistant daily SLO ceiling:** ${checkout_daily:.2f} · "
+            f"**7d alert floor:** ${checkout_7d:.2f} (agent-loop)"
+        )
+        gauges.append((
+            "checkout-assistant window vs alert",
+            _q(
+                "FROM traces-apm-default",
+                f'| WHERE {TS} AND span.subtype == "gen_ai" AND service.name == "checkout-assistant"',
+                "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
+                "| STATS spend = SUM(cost)",
+                f"| EVAL budget = {checkout_7d}, min = 0, max = budget * 3, goal = budget",
+            ),
+            "USD LLM (APM)",
+        ))
+
     slo_posture = _q(
-        # Canonical summary alias (ignore_global_filters on panel — no @timestamp).
         "FROM .slo-observability.summary-v3.6",
         '| WHERE slo.id LIKE "elk-*" AND status != "NO_DATA"',
         "| EVAL eb_remaining_pct = ROUND(errorBudgetRemaining * 100, 1)",
         "| KEEP slo.name, status, eb_remaining_pct, errorBudgetConsumed, sliValue",
         "| SORT status DESC, slo.name",
     )
-
-    return section("Budget posture — spend SLOs & alerts", y, [
-        markdown(
-            0, 0, 48, 4,
-            "## Budget posture\n\n"
-            "ELK Co treats cloud + LLM spend as error budgets. Thresholds come from "
-            "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
-            f"- **AWS monthly budget:** ${aws_mtd:,.0f} · **AWS daily SLO ceiling:** ${aws_daily:,.0f}\n"
-            f"- **Staging daily SLO ceiling:** ${staging_ceil:,.0f} (cost_leak)\n"
-            f"- **checkout-assistant daily SLO ceiling:** ${checkout_daily:.2f} · "
-            f"**7d alert floor:** ${checkout_7d:.2f} (agent-loop)\n\n"
-            "**Workshop posture:** AWS daily + staging cost-leak SLOs should show **VIOLATED**; "
-            "checkout-assistant breaches during the agent-loop window (−8..−6).\n\n"
-            f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
-            f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
-            f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
-            f"**ELK Co FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
-            f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`.",
-        ),
-        gauge(0, 4, 12, 12, "AWS window spend vs monthly budget",
-              mtd_vs_budget, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD (goal = budget)"),
-        gauge(12, 4, 12, 12, "Latest AWS daily vs SLO ceiling",
-              aws_daily_vs_ceil, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD / day"),
-        gauge(24, 4, 12, 12, "Staging latest day vs SLO ceiling",
-              staging_vs_ceil, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="elk-staging"),
-        gauge(36, 4, 12, 12, "checkout-assistant window vs alert",
-              checkout_vs_alert, "spend", shape="arc",
-              min_col="min", max_col="max", goal_col="goal",
-              subtitle="USD LLM (APM)"),
-        table(0, 16, 48, 10, "ELK Co spend SLO posture (error budget)",
-              slo_posture,
-              rows=["slo.name", "status"],
-              metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
-              ignore_global_filters=True),
-    ])
+    intro = (
+        "## Budget posture\n\n"
+        "ELK Co treats cloud + LLM spend as error budgets. Thresholds come from "
+        "`config/budgets.yaml` (intentionally tight so the seeded timeline shows breaches).\n\n"
+        + ("\n".join(bullets) + "\n\n" if bullets else "")
+        + f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
+        f"[Observability Alerts]({KIBANA_URL}/app/observability/alerts) · "
+        f"[Alerting rules]({KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules)\n\n"
+        f"**ELK Co FinOps AI Assistant:** [Open in Agent Builder]({AGENT_CHAT_URL}) "
+        f"(agent `{agent_id()}`). Provision: `python -m src.cli agent` · `python -m src.cli budgets`."
+    )
+    panels = [markdown(0, 0, 48, 4, intro)]
+    if gauges:
+        w = max(48 // len(gauges), 8)
+        for i, (title, query, subtitle) in enumerate(gauges):
+            panels.append(gauge(
+                i * w, 4, w, 12, title, query, "spend", shape="arc",
+                min_col="min", max_col="max", goal_col="goal", subtitle=subtitle,
+            ))
+        table_y = 16
+    else:
+        table_y = 4
+    panels.append(table(
+        0, table_y, 48, 10, "ELK Co spend SLO posture (error budget)",
+        slo_posture,
+        rows=["slo.name", "status"],
+        metrics=["eb_remaining_pct", "errorBudgetConsumed", "sliValue"],
+        ignore_global_filters=True,
+    ))
+    return section("Budget posture — spend SLOs & alerts", y, panels)
 
 
 def _ensure_data_view(view_id, title, time_field="@timestamp"):
@@ -447,462 +676,15 @@ def _ensure_data_view(view_id, title, time_field="@timestamp"):
 
 
 def build_classic_dashboard():
+    from src.dashboard_sections import build_classic_sections
     win = demo_window()
     label = window_label()
-    aws_cost = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost)",
-    )
-    gcp_cost = _q(
-        "FROM metrics-gcp.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(gcp.billing.total)",
-    )
-    azure_cost = _q(
-        "FROM metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(azure.billing.pretax_cost)",
-    )
-    llm_cost = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS cost = SUM(cost)",
-    )
-    cloud_mix = _q(
-        "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)",
-        "| EVAL provider = data_stream.dataset",
-        "| STATS cost = SUM(cost) BY provider",
-        "| SORT cost DESC",
-    )
-    daily_cloud = _q(
-        "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)",
-        "| EVAL provider = data_stream.dataset",
-        "| STATS cost = SUM(cost) BY day = BUCKET(@timestamp, 1d), provider",
-        "| SORT day",
-    )
-
-    panels = [
-        section("FinOps integration — native cloud provider dashboards", 0, [
-            markdown(0, 0, 20, 10,
-                     "These are the **out-of-the-box Elastic integration dashboards** installed from "
-                     "Fleet packages (`ess_billing`, `aws_billing`, `gcp`, `azure_billing`, `openai`, `anthropic_metrics`, "
-                     "`azure_openai`, `aws_bedrock`, `gcp_vertexai`, `apm`). Open them with the same time range.\n\n"
-                     "This ELK Co dashboard is the cross-provider overlay; provider packs remain "
-                     "the source of truth for CUR line items, PTU, Guardrails, etc.\n\n"
-                     "Elastic AI Assistant / Agent Builder usage and the managed inference token "
-                     "dashboard are linked at right."),
-            links_panel(20, 0, 12, 10, "Elastic AI", [
-                ("AI Assistant & inference usage", dash_id("ai")),
-                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-            ]),
-            links_panel(32, 0, 16, 10, "Provider FinOps & LLM packs", [
-                *_ootb_items(),
-                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-                ("AI Assistant & inference usage", dash_id("ai")),
-            ]),
-        ]),
-        section("Overview — multi-cloud + LLM spend", 12, [
-            markdown(0, 0, 48, 3,
-                     "## ELK Co — FinOps & LLM Observability\n\n"
-                     "Cost allocation across AWS accounts, GCP projects, and Azure subscriptions, "
-                     "correlated with infrastructure usage, plus end-to-end LLM traces (tokens, cost, "
-                     "latency, quality) for every application flow.\n\n"
-                     f"Time range is stored with the dashboard (**{label}**). "
-                     "Republish after backfill to refresh.\n\n"
-                     f"**Baseline (stacked bars/areas):** "
-                     f"[FinOps & LLM Observability](#/view/{dash_id('baseline')}).\n\n"
-                     "**Scenario callouts:** cost leak on `elk-staging` · crypto mining (−12..−9, "
-                     "`elk-dev`) · S3 exposure (−6..−4) · ML burn (−20..−16, GCP) · GenAI ramp "
-                     "(from −15) · LLM agent-loop (`checkout-assistant`) · model migration "
-                     "(`support-copilot` openai→anthropic) · cache-miss (`rag-research`).\n\n"
-                     "**Budget posture:** spend SLOs + ES|QL alerts — see the Budget posture section "
-                     f"or [Observability SLOs]({KIBANA_URL}/app/observability/slos)."),
-            metric(0, 3, 12, 5, "AWS unblended cost (CUR)", aws_cost, "cost", "USD"),
-            metric(12, 3, 12, 5, "GCP billing total", gcp_cost, "cost", "USD"),
-            metric(24, 3, 12, 5, "Azure pretax cost", azure_cost, "cost", "USD"),
-            metric(36, 3, 12, 5, "LLM cost (APM traces)", llm_cost, "cost", "USD"),
-            pie(0, 8, 18, 12, "Spend mix by billing dataset", cloud_mix, "cost", "provider"),
-            xy(18, 8, 30, 12, "Daily cost by cloud provider", daily_cloud,
-               "day", ["cost"], layer="area", breakdown="provider"),
-        ]),
-        section("Security → cost — crypto mining & S3 exposure", 36, [
-            markdown(0, 0, 48, 3,
-                     "## Security incidents that move spend\n\n"
-                     "**Crypto-mining** (days −12..−9, `elk-dev`): GuardDuty "
-                     "`CryptoCurrency:EC2/BitcoinTool.B`, CloudTrail brute-force from "
-                     "`185.220.101.34`, CPU pegged, EC2 cost spike.\n\n"
-                     "**S3 public exposure** (days −6..−4, fintech): "
-                     "`Policy:S3/BucketAnonymousAccessGranted`, `PutBucketPolicy`, anonymous scrapes "
-                     "of `elk-fintech-exports`, data-transfer cost.\n\n"
-                     "Open OOTB GuardDuty / CloudTrail Discover with the same time range for drill-down."),
-            metric(0, 3, 12, 5, "GuardDuty findings",
-                   _q("FROM logs-aws.guardduty-default",
-                      f"| WHERE {TS}",
-                      "| STATS findings = COUNT(*)"),
-                   "findings"),
-            metric(12, 3, 12, 5, "Crypto findings",
-                   _q("FROM logs-aws.guardduty-default",
-                      f"| WHERE {TS} AND rule.name LIKE \"CryptoCurrency*\"",
-                      "| STATS crypto = COUNT(*)"),
-                   "crypto"),
-            metric(24, 3, 12, 5, "S3 policy findings",
-                   _q("FROM logs-aws.guardduty-default",
-                      f"| WHERE {TS} AND rule.name LIKE \"Policy:S3*\"",
-                      "| STATS s3_findings = COUNT(*)"),
-                   "s3_findings"),
-            metric(36, 3, 12, 5, "CloudTrail from attacker IP",
-                   _q("FROM logs-aws.cloudtrail-default",
-                      f"| WHERE {TS} AND source.ip == \"185.220.101.34\"",
-                      "| STATS events = COUNT(*)"),
-                   "events"),
-            xy(0, 8, 24, 12, "GuardDuty findings by type",
-               _q("FROM logs-aws.guardduty-default",
-                  f"| WHERE {TS}",
-                  "| STATS findings = COUNT(*) BY finding = rule.name",
-                  "| SORT findings DESC", "| LIMIT 12"),
-               "finding", ["findings"], layer="bar"),
-            xy(24, 8, 24, 12, "S3 / bucket CloudTrail actions",
-               _q("FROM logs-aws.cloudtrail-default",
-                  f"| WHERE {TS} AND (event.action LIKE \"*Bucket*\" OR event.action LIKE \"*Object*\")",
-                  "| STATS calls = COUNT(*) BY action = event.action",
-                  "| SORT calls DESC", "| LIMIT 12"),
-               "action", ["calls"], layer="bar"),
-            table(0, 20, 48, 10, "Recent high-severity GuardDuty findings",
-                  _q("FROM logs-aws.guardduty-default",
-                     f"| WHERE {TS}",
-                     "| SORT @timestamp DESC",
-                     "| KEEP @timestamp, rule.name, aws.guardduty.severity.value, cloud.account.id",
-                     "| LIMIT 40"),
-                  ["@timestamp", "rule.name", "cloud.account.id"],
-                  ["aws.guardduty.severity.value"]),
-        ]),
-        section("Cost allocation — account, subscription, service, team, tag, region", 64, [
-            markdown(0, 0, 48, 2,
-                     "Allocation dimensions from native billing integrations: AWS CUR "
-                     "(`usage_account_name`, `product`, `resource_tags`, region), GCP project/service/"
-                     "region, Azure subscription/department/product/region, and Cost Explorer "
-                     "`cost_center` tags (untagged bucket = `cost_center$`)."),
-            xy(0, 2, 24, 12, "AWS cost by linked account",
-               _q("FROM metrics-aws_billing.cur-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY account = aws_billing.cur.line_item.usage_account_name",
-                  "| SORT cost DESC", "| LIMIT 12"),
-               "account", ["cost"], layer="bar"),
-            xy(24, 2, 24, 12, "AWS cost by service",
-               _q("FROM metrics-aws_billing.cur-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY service = aws_billing.cur.product.product",
-                  "| SORT cost DESC", "| LIMIT 12"),
-               "service", ["cost"], layer="bar"),
-            pie(0, 14, 16, 12, "AWS Cost Explorer by cost_center tag",
-                _q("FROM metrics-aws.billing-default",
-                   f"| WHERE {TS} AND aws.billing.group_definition.key == \"COST_CENTER\"",
-                   "| STATS cost = SUM(aws.billing.UnblendedCost.amount) BY tag = aws.billing.group_by.COST_CENTER",
-                   "| SORT cost DESC"),
-                "cost", "tag"),
-            xy(16, 14, 16, 12, "GCP cost by project",
-               _q("FROM metrics-gcp.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(gcp.billing.total) BY project = gcp.billing.project_name",
-                  "| SORT cost DESC"),
-               "project", ["cost"], layer="bar"),
-            xy(32, 14, 16, 12, "Azure cost by subscription",
-               _q("FROM metrics-azure.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(azure.billing.pretax_cost) BY subscription = azure.subscription_id",
-                  "| SORT cost DESC"),
-               "subscription", ["cost"], layer="bar"),
-            table(0, 26, 24, 12, "AWS CUR allocation — account × service × tags",
-                  _q("FROM metrics-aws_billing.cur-default",
-                     f"| WHERE {TS}",
-                     "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost), usage = SUM(aws_billing.cur.line_item.usage_amount) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product, tag = aws_billing.cur.resource_tags",
-                     "| SORT cost DESC", "| LIMIT 50"),
-                  ["account", "service", "tag"], ["cost", "usage"]),
-            table(24, 26, 24, 12, "Azure allocation — department × product × region",
-                  _q("FROM metrics-azure.billing-default",
-                     f"| WHERE {TS}",
-                     "| STATS cost = SUM(azure.billing.pretax_cost) BY team = azure.billing.department_name, product = azure.billing.product, region = cloud.region, rg = azure.resource.group",
-                     "| SORT cost DESC", "| LIMIT 50"),
-                  ["team", "product", "region", "rg"], ["cost"]),
-            xy(0, 38, 24, 11, "GCP cost by service",
-               _q("FROM metrics-gcp.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(gcp.billing.total) BY service = gcp.billing.service_description",
-                  "| SORT cost DESC"),
-               "service", ["cost"], layer="bar"),
-            xy(24, 38, 24, 11, "GCP cost by region",
-               _q("FROM metrics-gcp.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(gcp.billing.total) BY region = gcp.billing.location.region",
-                  "| SORT cost DESC"),
-               "region", ["cost"], layer="bar"),
-        ]),
-        section("Engineering & Ops — usage correlated with cost", 118, [
-            markdown(0, 0, 48, 2,
-                     "Infrastructure usage (EC2 network throughput, CloudTrail API volume) plotted "
-                     "alongside CUR EC2 spend so ops can see whether cost moves with work. "
-                     "Watch `elk-staging` for the cost-leak pattern (spend without matching activity)."),
-            xy(0, 2, 24, 11, "AWS EC2 daily unblended cost",
-               _q("FROM metrics-aws_billing.cur-default",
-                  f"| WHERE {TS} AND aws_billing.cur.product.product == \"AmazonEC2\"",
-                  "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["cost"], layer="line"),
-            xy(24, 2, 24, 11, "EC2 NetworkIn rate (usage proxy)",
-               _q("FROM metrics-aws.ec2_metrics-default",
-                  f"| WHERE {TS}",
-                  "| STATS network_in = SUM(aws.ec2.metrics.NetworkIn.rate) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["network_in"], layer="line"),
-            xy(0, 13, 24, 11, "CloudTrail API calls per day",
-               _q("FROM logs-aws.cloudtrail-default",
-                  f"| WHERE {TS}",
-                  "| STATS api_calls = COUNT() BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["api_calls"], layer="line"),
-            xy(24, 13, 24, 11, "EC2 network usage by account",
-               _q("FROM metrics-aws.ec2_metrics-default",
-                  f"| WHERE {TS}",
-                  "| STATS network_in = SUM(aws.ec2.metrics.NetworkIn.rate) BY account = cloud.account.name",
-                  "| SORT network_in DESC"),
-               "account", ["network_in"], layer="bar"),
-            table(0, 24, 48, 11, "AWS cost vs usage quantity by account and product",
-                  _q("FROM metrics-aws_billing.cur-default",
-                     f"| WHERE {TS}",
-                     "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost), usage = SUM(aws_billing.cur.line_item.usage_amount) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product",
-                     "| EVAL unit_cost = cost / usage",
-                     "| SORT cost DESC", "| LIMIT 40"),
-                  ["account", "service"], ["cost", "usage", "unit_cost"]),
-        ]),
-        section("Historical cost & 7-day run-rate forecast", 156, [
-            markdown(0, 0, 48, 2,
-                     "Daily CUR history plus a trailing 7-day average run-rate. "
-                     "`projected_30d` = last-7-day daily average × 30 (not a statistical model — a FinOps run-rate)."),
-            xy(0, 2, 32, 12, "AWS CUR daily unblended cost (history)",
-               _q("FROM metrics-aws_billing.cur-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["cost"], layer="line"),
-            metric(32, 2, 16, 6, "AWS 7-day avg daily cost",
-                   _q("FROM metrics-aws_billing.cur-default",
-                      f"| WHERE {TS}",
-                      "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-                      "| SORT day DESC", "| LIMIT 7",
-                      "| STATS avg_7d = AVG(daily)"),
-                   "avg_7d", "USD / day"),
-            metric(32, 8, 16, 6, "Projected 30-day AWS run-rate",
-                   _q("FROM metrics-aws_billing.cur-default",
-                      f"| WHERE {TS}",
-                      "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-                      "| SORT day DESC", "| LIMIT 7",
-                      "| STATS avg_7d = AVG(daily)",
-                      "| EVAL projected_30d = avg_7d * 30",
-                      "| KEEP projected_30d"),
-                   "projected_30d", "USD"),
-            xy(0, 14, 24, 11, "GCP daily cost",
-               _q("FROM metrics-gcp.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(gcp.billing.total) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["cost"], layer="line"),
-            xy(24, 14, 24, 11, "Azure daily pretax cost",
-               _q("FROM metrics-azure.billing-default",
-                  f"| WHERE {TS}",
-                  "| STATS cost = SUM(azure.billing.pretax_cost) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["cost"], layer="line"),
-        ]),
-        budget_posture_section(184),
-        section("LLM traces — end-to-end call, tokens, and cost", 208, [
-            markdown(0, 0, 48, 2,
-                     "APM `gen_ai` spans (`traces-apm-default`) carry prompt/completion/total tokens, "
-                     "model, system, latency, outcome, and `labels.llm_cost_usd`. `trace.id` is the "
-                     "request id — open APM to inspect the parent FastAPI transaction.\n\n"
-                     "**LLM scenarios:** agent-loop burn on `checkout-assistant` (−8..−6) · "
-                     "model migration on `support-copilot` (openai→anthropic at −14) · "
-                     "cache-miss storm on `rag-research` (−5..−3) · skunkworks GenAI ramp."),
-            metric(0, 2, 12, 5, "LLM calls (sampled spans)",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS calls = COUNT(*)"),
-                   "calls"),
-            metric(12, 2, 12, 5, "Total tokens",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS tokens = SUM(gen_ai.usage.total_tokens)"),
-                   "tokens"),
-            metric(24, 2, 12, 5, "Prompt tokens",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS prompt = SUM(gen_ai.usage.input_tokens)"),
-                   "prompt"),
-            metric(36, 2, 12, 5, "Completion tokens",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS completion = SUM(gen_ai.usage.output_tokens)"),
-                   "completion"),
-            table(0, 7, 48, 14, "Recent LLM calls — trace, model, tokens, cost, latency",
-                  _q("FROM traces-apm-default",
-                     f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                     "| EVAL cost_usd = TO_DOUBLE(labels.llm_cost_usd), latency_ms = span.duration.us / 1000.0",
-                     "| SORT @timestamp DESC",
-                     "| KEEP @timestamp, trace.id, service.name, gen_ai.request.model, gen_ai.system, gen_ai.usage.input_tokens, gen_ai.usage.output_tokens, gen_ai.usage.total_tokens, cost_usd, latency_ms, event.outcome, labels.team, labels.env",
-                     "| LIMIT 100"),
-                  ["@timestamp", "trace.id", "service.name", "gen_ai.request.model",
-                   "gen_ai.system", "event.outcome", "labels.team", "labels.env"],
-                  ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens",
-                   "gen_ai.usage.total_tokens", "cost_usd", "latency_ms"]),
-        ]),
-        section("Token usage per request — prompt, completion, total", 232, [
-            xy(0, 0, 32, 12, "Daily prompt vs completion tokens (APM spans)",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| STATS prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), total = SUM(gen_ai.usage.total_tokens) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["prompt", "completion", "total"], layer="area"),
-            pie(32, 0, 16, 12, "Prompt vs completion share",
-                _q("FROM traces-apm-default",
-                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                   "| FORK",
-                   "    (STATS tokens = SUM(gen_ai.usage.input_tokens) | EVAL kind = \"prompt\")",
-                   "    (STATS tokens = SUM(gen_ai.usage.output_tokens) | EVAL kind = \"completion\")",
-                   "| KEEP kind, tokens"),
-                "tokens", "kind"),
-            xy(0, 12, 24, 11, "OpenAI completions — input vs output tokens",
-               _q("FROM logs-openai.completions-default",
-                  f"| WHERE {TS}",
-                  "| STATS prompt = SUM(openai.completions.input_tokens), completion = SUM(openai.completions.output_tokens) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["prompt", "completion"], layer="area"),
-            xy(24, 12, 24, 11, "Vertex AI — prompt vs candidate tokens",
-               _q("FROM logs-gcp_vertexai.prompt_response_logs-default",
-                  f"| WHERE {TS}",
-                  "| STATS prompt = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.prompt_token_count), completion = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.candidates_token_count) BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["prompt", "completion"], layer="area"),
-        ]),
-        section("LLM cost — model, user, feature, team", 258, [
-            xy(0, 0, 24, 12, "LLM cost by model",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                  "| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens), calls = COUNT(*) BY model = gen_ai.request.model",
-                  "| SORT cost_usd DESC", "| LIMIT 15"),
-               "model", ["cost_usd"], layer="bar"),
-            xy(24, 0, 24, 12, "LLM cost by team",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                  "| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens) BY team = COALESCE(labels.team, \"untagged\")",
-                  "| SORT cost_usd DESC"),
-               "team", ["cost_usd"], layer="bar"),
-            xy(0, 12, 24, 12, "LLM cost by feature / application",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                  "| STATS cost_usd = SUM(cost), tokens = SUM(gen_ai.usage.total_tokens), calls = COUNT(*) BY feature = service.name",
-                  "| SORT cost_usd DESC"),
-               "feature", ["cost_usd"], layer="bar"),
-            xy(24, 12, 24, 12, "OpenAI tokens by user",
-               _q("FROM logs-openai.completions-default",
-                  f"| WHERE {TS}",
-                  "| STATS tokens = SUM(openai.base.usage_tokens), requests = SUM(openai.base.num_model_requests) BY user = openai.base.user_id",
-                  "| SORT tokens DESC", "| LIMIT 15"),
-               "user", ["tokens"], layer="bar"),
-            table(0, 24, 24, 12, "Cost × tokens by model and provider",
-                  _q("FROM traces-apm-default",
-                     f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                     "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                     "| STATS cost_usd = SUM(cost), prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), calls = COUNT(*) BY model = gen_ai.request.model, provider = gen_ai.system",
-                     "| SORT cost_usd DESC"),
-                  ["provider", "model"], ["calls", "prompt", "completion", "cost_usd"]),
-            table(24, 24, 24, 12, "Vertex AI tokens by user and app",
-                  _q("FROM logs-gcp_vertexai.prompt_response_logs-default",
-                     f"| WHERE {TS}",
-                     "| STATS tokens = SUM(gcp.vertexai.prompt_response_logs.full_response.usage_metadata.total_token_count), calls = COUNT(*) BY user = user.name, feature = service.name, team = labels.team",
-                     "| SORT tokens DESC", "| LIMIT 30"),
-                  ["user", "feature", "team"], ["calls", "tokens"]),
-        ]),
-        section("LLM quality & latency", 298, [
-            metric(0, 0, 12, 5, "p95 latency (ms)",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000"),
-                   "p95_ms"),
-            metric(12, 0, 12, 5, "p50 latency (ms)",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS p50_ms = PERCENTILE(span.duration.us, 50) / 1000"),
-                   "p50_ms"),
-            metric(24, 0, 12, 5, "Error rate",
-                   _q("FROM traces-apm-default",
-                      f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                      "| STATS errors = COUNT(*) WHERE event.outcome == \"failure\", calls = COUNT(*)",
-                      "| EVAL error_rate = errors * 1.0 / calls",
-                      "| KEEP error_rate"),
-                   "error_rate"),
-            pie(36, 0, 12, 12, "Call outcome",
-                _q("FROM traces-apm-default",
-                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                   "| STATS calls = COUNT(*) BY outcome = event.outcome"),
-                "calls", "outcome"),
-            xy(0, 5, 36, 12, "Latency p95 by model (ms)",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000, p50_ms = PERCENTILE(span.duration.us, 50) / 1000 BY model = gen_ai.request.model",
-                  "| SORT p95_ms DESC", "| LIMIT 15"),
-               "model", ["p50_ms", "p95_ms"], layer="bar"),
-            xy(0, 17, 48, 11, "Daily p95 latency (ms)",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY day = BUCKET(@timestamp, 1d)",
-                  "| SORT day"),
-               "day", ["p95_ms"], layer="line"),
-        ]),
-        section("Funnel — which user flows consume the most tokens", 330, [
-            markdown(0, 0, 48, 3,
-                     "Each `service.name` is an ELK Co user flow (`checkout-assistant`, `support-copilot`, "
-                     "`rag-research`, `skunk-agent-lab`, …). Ranked by total tokens, then cost and calls. "
-                     "Shadow-IT (`skunk-agent-lab`, `prompt-playground`) and the agent-loop scenario show up here."),
-            xy(0, 3, 28, 14, "Tokens consumed by user flow",
-               _q("FROM traces-apm-default",
-                  f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                  "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                  "| STATS tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost), calls = COUNT(*) BY flow = service.name",
-                  "| SORT tokens DESC"),
-               "flow", ["tokens"], layer="bar"),
-            pie(28, 3, 20, 14, "Token share by flow",
-                _q("FROM traces-apm-default",
-                   f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                   "| STATS tokens = SUM(gen_ai.usage.total_tokens) BY flow = service.name",
-                   "| SORT tokens DESC"),
-                "tokens", "flow"),
-            table(0, 17, 48, 12, "Flow funnel — tokens, prompt/completion split, cost, latency",
-                  _q("FROM traces-apm-default",
-                     f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-                     "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-                     "| STATS calls = COUNT(*), prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost), p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY flow = service.name, team = COALESCE(labels.team, \"untagged\"), env = COALESCE(labels.env, service.environment)",
-                     "| EVAL tokens_per_call = tokens / calls",
-                     "| SORT tokens DESC"),
-                  ["flow", "team", "env"],
-                  ["calls", "prompt", "completion", "tokens", "tokens_per_call", "cost_usd", "p95_ms"]),
-        ]),
-    ]
+    vtitle = active_variant().title
+    panels = build_classic_sections(None, label, vtitle)
 
     return {
-        "title": "[ELK Co] FinOps & LLM Observability — classic",
-        "description": (
-            "Classic layout: cross-cloud cost allocation tables and bars, security→cost "
-            "(crypto / S3), usage-to-cost correlation, and LLM observability tables. "
-            "The baseline dashboard is elk-finops-llm-observability."
-        ),
+        "title": finops_dashboard_title(classic=True),
+        "description": finops_dashboard_description(classic=True),
         "time_range": win,
         "options": {
             "use_margins": True,
@@ -917,290 +699,16 @@ def build_classic_dashboard():
 
 
 def build_dashboard():
-    """Baseline ELK Co FinOps + LLM dashboard (stacked bars/areas, gauges, waffles)."""
+    """Baseline ELK Co FinOps + LLM dashboard (variant-scoped panels)."""
+    from src.dashboard_sections import build_baseline_sections
     win = demo_window()
     label = window_label()
     vtitle = active_variant().title
-    aws_trend = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    gcp_trend = _q(
-        "FROM metrics-gcp.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(gcp.billing.total) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    azure_trend = _q(
-        "FROM metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(azure.billing.pretax_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    llm_trend = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS cost = SUM(cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    cloud_mix = _q(
-        "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)",
-        "| EVAL provider = data_stream.dataset",
-        "| STATS cost = SUM(cost) BY provider",
-        "| SORT cost DESC",
-    )
-    daily_cloud = _q(
-        "FROM metrics-aws_billing.cur-default, metrics-gcp.billing-default, metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| EVAL cost = COALESCE(aws_billing.cur.line_item.unblended_cost, gcp.billing.total, azure.billing.pretax_cost)",
-        "| EVAL provider = data_stream.dataset",
-        "| STATS cost = SUM(cost) BY day = BUCKET(@timestamp, 1d), provider",
-        "| SORT day",
-    )
-    acct_svc = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY account = aws_billing.cur.line_item.usage_account_name, service = aws_billing.cur.product.product",
-        "| SORT cost DESC", "| LIMIT 40",
-    )
-    cost_by_acct_day = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d), account = aws_billing.cur.line_item.usage_account_name",
-        "| SORT day",
-    )
-    cc_tag = _q(
-        "FROM metrics-aws.billing-default",
-        f"| WHERE {TS} AND aws.billing.group_definition.key == \"COST_CENTER\"",
-        "| STATS cost = SUM(aws.billing.UnblendedCost.amount) BY tag = aws.billing.group_by.COST_CENTER",
-        "| SORT cost DESC",
-    )
-    gcp_proj_svc = _q(
-        "FROM metrics-gcp.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(gcp.billing.total) BY project = gcp.billing.project_name, service = gcp.billing.service_description",
-        "| SORT cost DESC",
-    )
-    azure_dept = _q(
-        "FROM metrics-azure.billing-default",
-        f"| WHERE {TS}",
-        "| STATS cost = SUM(azure.billing.pretax_cost) BY team = azure.billing.department_name, product = azure.billing.product",
-        "| SORT cost DESC", "| LIMIT 30",
-    )
-    ec2_cost_day = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS} AND aws_billing.cur.product.product == \"AmazonEC2\"",
-        "| STATS cost = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    net_day = _q(
-        "FROM metrics-aws.ec2_metrics-default",
-        f"| WHERE {TS}",
-        "| STATS network_in = SUM(aws.ec2.metrics.NetworkIn.rate) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    forecast = _q(
-        "FROM metrics-aws_billing.cur-default",
-        f"| WHERE {TS}",
-        "| STATS daily = SUM(aws_billing.cur.line_item.unblended_cost) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day DESC", "| LIMIT 7",
-        "| STATS avg_7d = AVG(daily)",
-        "| EVAL projected_30d = avg_7d * 30, min = 0, max = avg_7d * 45, goal = avg_7d * 28",
-    )
-    flow_model = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost) BY flow = service.name, model = gen_ai.request.model",
-        "| SORT tokens DESC", "| LIMIT 40",
-    )
-    tokens_by_flow_day = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS tokens = SUM(gen_ai.usage.total_tokens) BY day = BUCKET(@timestamp, 1d), flow = service.name",
-        "| SORT day",
-    )
-    latency_by_model_day = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000 BY day = BUCKET(@timestamp, 1d), model = gen_ai.request.model",
-        "| SORT day",
-    )
-    tokens_day = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens) BY day = BUCKET(@timestamp, 1d)",
-        "| SORT day",
-    )
-    flow_tokens = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS prompt = SUM(gen_ai.usage.input_tokens), completion = SUM(gen_ai.usage.output_tokens), tokens = SUM(gen_ai.usage.total_tokens), cost_usd = SUM(cost) BY flow = service.name",
-        "| SORT tokens DESC",
-    )
-    team_cost = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| EVAL cost = TO_DOUBLE(labels.llm_cost_usd)",
-        "| STATS cost_usd = SUM(cost) BY team = COALESCE(labels.team, \"untagged\")",
-        "| SORT cost_usd DESC",
-    )
-    model_tokens = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS tokens = SUM(gen_ai.usage.total_tokens) BY model = gen_ai.request.model",
-        "| SORT tokens DESC", "| LIMIT 16",
-    )
-    error_gauge = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS errors = COUNT(*) WHERE event.outcome == \"failure\", calls = COUNT(*)",
-        "| EVAL error_rate = errors * 1.0 / calls, min = 0, max = 0.08, goal = 0.01",
-    )
-    p95_gauge = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS p95_ms = PERCENTILE(span.duration.us, 95) / 1000",
-        "| EVAL min = 0, max = 8000, goal = 1500",
-    )
-    outcome = _q(
-        "FROM traces-apm-default",
-        f"| WHERE {TS} AND span.subtype == \"gen_ai\"",
-        "| STATS calls = COUNT(*) BY outcome = event.outcome",
-    )
-    users = _q(
-        "FROM logs-openai.completions-default",
-        f"| WHERE {TS}",
-        "| STATS tokens = SUM(openai.base.usage_tokens) BY user = openai.base.user_id",
-        "| SORT tokens DESC", "| LIMIT 12",
-    )
-
-    panels = [
-        section("Scoreboard — sparkline KPIs", 0, [
-            markdown(0, 0, 48, 4,
-                     f"## {vtitle}\n\n"
-                     "Baseline ELK Co FinOps + LLM view: stacked bars/areas, gauges, "
-                     "waffles, tag clouds, and dual-axis usage vs cost.\n\n"
-                     f"Time range: **{label}**. "
-                     f"Security→cost (crypto / S3) lives on the "
-                     f"[classic](#/view/{dash_id('classic')}).\n\n"
-                     f"[Open classic](#/view/{dash_id('classic')}) · "
-                     f"Scenarios: cost leak · ML burn · GenAI ramp · agent-loop · migration · cache-miss.\n\n"
-                     f"**Budgets:** [ELK Co FinOps AI Assistant]({AGENT_CHAT_URL}) · "
-                     f"[Observability SLOs]({KIBANA_URL}/app/observability/slos) · "
-                     f"`python -m src.cli agent`.\n\n"
-                     f"**ESS billing:** "
-                     f"[Billing dashboard](#/view/ess_billing-billingdashboard) · "
-                     f"[Credits dashboard](#/view/ess_billing-creditsdashboard)."),
-            metric(0, 4, 12, 6, "AWS CUR", aws_trend, "cost", "USD · sparkline", trend=True),
-            metric(12, 4, 12, 6, "GCP billing", gcp_trend, "cost", "USD · sparkline", trend=True),
-            metric(24, 4, 12, 6, "Azure pretax", azure_trend, "cost", "USD · sparkline", trend=True),
-            metric(36, 4, 12, 6, "LLM cost (APM)", llm_trend, "cost", "USD · sparkline", trend=True),
-            waffle(0, 10, 16, 14, "Cloud spend mix", cloud_mix, "cost", "provider"),
-            xy(16, 10, 32, 14, "Daily cost by cloud (stacked area)",
-               daily_cloud, "day", ["cost"], layer="area_stacked", breakdown="provider"),
-        ]),
-        section("Allocation — stacked bars, area, waffle", 26, [
-            xy(0, 0, 28, 16, "AWS cost by service — stacked by account",
-               acct_svc, "service", ["cost"], layer="bar_stacked", breakdown="account"),
-            waffle(28, 0, 20, 16, "AWS cost_center tags", cc_tag, "cost", "tag"),
-            xy(0, 16, 48, 14, "AWS cost by account over day (stacked area)",
-               cost_by_acct_day, "day", ["cost"], layer="area_stacked", breakdown="account"),
-            xy(0, 30, 24, 14, "GCP cost by service — stacked by project",
-               gcp_proj_svc, "service", ["cost"], layer="bar_stacked", breakdown="project"),
-            xy(24, 30, 24, 14, "Azure cost by product — stacked by department",
-               azure_dept, "product", ["cost"], layer="bar_stacked", breakdown="team"),
-        ]),
-        section("Usage vs cost — dual axis", 76, [
-            xy_dual(
-                0, 0, 48, 14, "EC2 unblended cost vs NetworkIn (dual axis)",
-                {
-                    "type": "area",
-                    "data_source": _esql(ec2_cost_day),
-                    "x": {"column": "day"},
-                    "y": [{"column": "cost", "axis": "y"}],
-                },
-                {
-                    "type": "line",
-                    "data_source": _esql(net_day),
-                    "x": {"column": "day"},
-                    "y": [{"column": "network_in", "axis": "y2"}],
-                },
-            ),
-            xy(0, 14, 24, 12, "AWS daily cost (smooth)",
-               aws_trend, "day", ["cost"], layer="area"),
-            gauge(24, 14, 24, 12, "AWS 30-day run-rate vs 7-day average",
-                  forecast, "projected_30d", shape="arc",
-                  min_col="min", max_col="max", goal_col="goal",
-                  subtitle="USD projected"),
-        ]),
-        budget_posture_section(106),
-        section("LLM landscape — models, teams, flows", 130, [
-            tag_cloud(0, 0, 24, 14, "Models sized by tokens",
-                      model_tokens, "tokens", "model"),
-            waffle(24, 0, 24, 14, "LLM cost by team",
-                   team_cost, "cost_usd", "team"),
-            treemap(0, 14, 28, 16, "Token treemap — flow × model",
-                    flow_model, "tokens", ["flow", "model"]),
-            xy(28, 14, 20, 16, "Tokens by user flow",
-               flow_tokens, "flow", ["tokens"], layer="bar_horizontal"),
-        ]),
-        section("LLM tokens & latency over time", 164, [
-            xy(0, 0, 48, 14, "Tokens by flow over day (stacked area)",
-               tokens_by_flow_day, "day", ["tokens"], layer="area_stacked", breakdown="flow"),
-            xy(0, 14, 48, 14, "p95 latency by model over day (ms)",
-               latency_by_model_day, "day", ["p95_ms"], layer="line", breakdown="model"),
-            xy(0, 28, 32, 12, "Prompt vs completion (stacked area)",
-               tokens_day, "day", ["prompt", "completion"], layer="area_stacked"),
-            xy(32, 28, 16, 12, "OpenAI tokens by user",
-               users, "user", ["tokens"], layer="bar_horizontal"),
-        ]),
-        section("Quality gauges & funnel", 194, [
-            gauge(0, 0, 16, 12, "LLM error rate",
-                  error_gauge, "error_rate", shape="arc",
-                  min_col="min", max_col="max", goal_col="goal",
-                  subtitle="failures / calls"),
-            gauge(16, 0, 16, 12, "p95 latency",
-                  p95_gauge, "p95_ms", shape="semi_circle",
-                  min_col="min", max_col="max", goal_col="goal",
-                  subtitle="ms"),
-            pie(32, 0, 16, 12, "Call outcome",
-                outcome, "calls", "outcome"),
-            xy(0, 12, 24, 14, "Prompt vs completion by flow",
-               flow_tokens, "flow", ["prompt", "completion"],
-               layer="bar_horizontal_stacked"),
-            xy(24, 12, 24, 14, "Cost by flow — stacked by model",
-               flow_model, "flow", ["cost_usd"],
-               layer="bar_horizontal_stacked", breakdown="model"),
-        ]),
-        section("Provider packs", 224, [
-            links_panel(0, 0, 24, 10, "This family", [
-                ("This baseline dashboard", dash_id("baseline")),
-                ("Classic layout", dash_id("classic")),
-                ("Dynamic alias (same as baseline)", dash_id("dynamic")),
-                ("AI Assistant & inference usage", dash_id("ai")),
-                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-            ]),
-            links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", [
-                *_ootb_items(),
-                ("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE),
-                ("AI Assistant & inference usage", dash_id("ai")),
-            ]),
-        ]),
-    ]
+    panels = build_baseline_sections(None, label, vtitle)
 
     return {
-        "title": "[ELK Co] FinOps & LLM Observability",
-        "description": (
-            "Baseline ELK Co FinOps + LLM dashboard: stacked bars and areas, "
-            "gauges, waffles, tag clouds, and dual-axis usage vs cost."
-        ),
+        "title": finops_dashboard_title(),
+        "description": finops_dashboard_description(),
         "time_range": win,
         "options": {
             "use_margins": True,
@@ -1220,8 +728,6 @@ def build_dashboard():
         ],
         "panels": panels,
     }
-
-
 def _put_dashboard(dash_id, body):
     r = requests.put(
         f"{KIBANA_URL}/api/dashboards/{dash_id}",
@@ -1271,13 +777,22 @@ def _put_dashboard(dash_id, body):
 
 def publish(include_baseline=True, include_classic=False, include_dynamic_alias=True,
             include_ai=True):
-    """Publish ELK Co dashboards.
+    """Publish FinOps dashboards.
 
     Baseline is the current stacked-bar/area layout (former \"dynamic\").
     Classic is the older table/bar layout with the security→cost section.
-    The -dynamic Kibana id is kept as an alias of baseline for existing links.
+    The -dynamic Kibana id is only written when baseline is off (legacy links).
+    When both flags are set, baseline alone is published to avoid duplicate titles.
     """
+    from src.profile import uses_live_aws_hub
+
+    if uses_live_aws_hub():
+        from src.live_dashboards import publish as live_publish
+        return live_publish()
+    # Live GCP/Azure billing hubs fall through to variant-scoped FinOps boards.
+    clear_dashboard_exists_cache()
     v = active_variant()
+    print(f"== {finops_dashboard_title()} (variant={v.id}) ==")
     if not v.is_all:
         include_baseline = v.dashboards.get("baseline", False)
         include_classic = v.dashboards.get("classic", False)
@@ -1295,9 +810,16 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
     if include_baseline:
         print(f"== PUT dashboard {baseline_id} (baseline) ==")
         urls.append(_put_dashboard(baseline_id, baseline))
-    if include_dynamic_alias:
-        print(f"== PUT dashboard {dynamic_id} (alias of baseline) ==")
+    if include_dynamic_alias and not include_baseline:
+        # Only publish the -dynamic id when it is the sole FinOps layout.
+        # When baseline is also enabled, -dynamic was an identical title/body
+        # duplicate (see azure reconcile).
+        print(f"== PUT dashboard {dynamic_id} (baseline layout) ==")
         urls.append(_put_dashboard(dynamic_id, baseline))
+    elif include_dynamic_alias and include_baseline:
+        print(f"== skip {dynamic_id} (alias of {baseline_id}; single dashboard) ==")
+    if not include_dynamic_alias and dynamic_id != baseline_id:
+        _delete_dashboard_if_exists(dynamic_id)
     if include_classic:
         print(f"== PUT dashboard {classic_id} ==")
         urls.append(_put_dashboard(classic_id, build_classic_dashboard()))
@@ -1305,4 +827,26 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
         from src.dashboards_ai import publish_ai
         urls.append(publish_ai())
     return urls
+
+
+def _delete_dashboard_if_exists(dash_id: str) -> None:
+    """Remove a stale dashboard id (e.g. retired -dynamic alias)."""
+    r = requests.get(
+        f"{KIBANA_URL}/api/dashboards/{dash_id}",
+        headers=KBN_HEADERS, timeout=30,
+    )
+    if r.status_code == 404:
+        return
+    if r.status_code != 200:
+        print(f"  [warn] GET {dash_id} before delete: {r.status_code}")
+        return
+    r = requests.delete(
+        f"{KIBANA_URL}/api/dashboards/{dash_id}",
+        headers=KBN_HEADERS, timeout=60,
+    )
+    if r.status_code >= 300 and r.status_code != 404:
+        print(f"  [warn] DELETE {dash_id}: {r.status_code} {r.text[:200]}")
+    else:
+        print(f"  [ok] removed stale dashboard {dash_id}")
+        _DASH_EXISTS_CACHE.pop(dash_id, None)
 

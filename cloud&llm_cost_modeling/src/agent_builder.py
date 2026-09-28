@@ -9,19 +9,46 @@ import requests
 import yaml
 
 from src.budgets import substitutions
-from src.config import KBN_HEADERS, KIBANA_URL, ROOT
-from src.profile import LIVE_DIR, uses_live_aws_hub
+from src.config import KBN_HEADERS, ROOT
+import src.config as _cfg
+from src.profile import LIVE_DIR, live_hub_kind, uses_live_aws_hub
 
 TAGS = ["elk-co", "finops", "workshop"]
 LIVE_TAGS = ["elk-co", "finops"]
 
-TOOLS_API = f"{KIBANA_URL}/api/agent_builder/tools"
-AGENTS_API = f"{KIBANA_URL}/api/agent_builder/agents"
-AGENT_CHAT_URL = f"{KIBANA_URL}/app/agent_builder/chat"
+def _tools_api() -> str:
+    return f"{_cfg.KIBANA_URL}/api/agent_builder/tools"
+
+
+def _agents_api() -> str:
+    return f"{_cfg.KIBANA_URL}/api/agent_builder/agents"
+
+
+def agent_chat_url() -> str:
+    return f"{_cfg.KIBANA_URL}/app/agent_builder/chat"
+
+
+# Back-compat callables for callers that imported AGENTS_API/TOOLS_API as names.
+# Prefer the helpers; module-level constants would freeze the wrong deployment URL.
+def __getattr__(name: str):
+    if name == "TOOLS_API":
+        return _tools_api()
+    if name == "AGENTS_API":
+        return _agents_api()
+    if name == "AGENT_CHAT_URL":
+        return agent_chat_url()
+    raise AttributeError(name)
 
 
 def agent_config_path():
-    return LIVE_DIR / "finops_agent.yaml" if uses_live_aws_hub() else ROOT / "config" / "finops_agent.yaml"
+    kind = live_hub_kind()
+    if uses_live_aws_hub():
+        return LIVE_DIR / "finops_agent.yaml"
+    if kind == "gcp":
+        return LIVE_DIR / "finops_agent_gcp.yaml"
+    if kind == "azure":
+        return LIVE_DIR / "finops_agent_azure.yaml"
+    return ROOT / "config" / "finops_agent.yaml"
 
 
 def load_agent_config() -> dict:
@@ -38,10 +65,11 @@ def _kbn(method: str, url: str, **kwargs):
 def _tags(cfg: dict | None = None) -> list:
     cfg = cfg or load_agent_config()
     agent = cfg.get("agent") or {}
-    return list(agent.get("labels") or (LIVE_TAGS if uses_live_aws_hub() else TAGS))
+    return list(agent.get("labels") or (LIVE_TAGS if live_hub_kind() else TAGS))
 
 
 def _budgets_block(mapping: dict) -> str:
+    kind = live_hub_kind()
     if uses_live_aws_hub():
         return "\n".join([
             f"- Calendar MTD linked unblended alert: ${mapping['aws_mtd_budget_usd']:,.0f}",
@@ -55,6 +83,19 @@ def _budgets_block(mapping: dict) -> str:
             f"- Stage daily alert floor: ${mapping['staging_daily_alert_usd']:,.0f}",
             f"- Agent Builder 7d token alert: {int(mapping['inference_7d_tokens']):,} tokens",
         ])
+    if kind == "gcp":
+        return "\n".join([
+            f"- GCP monthly budget: ${mapping['gcp_monthly_usd']:,.0f}",
+            f"- GCP daily SLO ceiling: ${mapping['gcp_daily_ceiling_usd']:,.0f}",
+            f"- elk-ml-prod daily SLO ceiling: ${mapping['gcp_ml_daily_ceiling_usd']:,.0f}",
+            f"- elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+        ])
+    if kind == "azure":
+        return "\n".join([
+            f"- Azure monthly budget: ${mapping['azure_monthly_usd']:,.0f}",
+            f"- Azure daily SLO ceiling: ${mapping['azure_daily_ceiling_usd']:,.0f}",
+            f"- Azure 7d alert floor: ${mapping['azure_7d_alert_usd']:,.0f}",
+        ])
     return "\n".join([
         f"- AWS monthly budget: ${mapping['aws_monthly_usd']:,.0f}",
         f"- AWS daily SLO ceiling: ${mapping['aws_daily_ceiling_usd']:,.0f}",
@@ -63,6 +104,10 @@ def _budgets_block(mapping: dict) -> str:
         f"- checkout-assistant daily SLO ceiling: ${mapping['checkout_daily_ceiling_usd']:.2f}",
         f"- checkout-assistant 7d alert floor: ${mapping['checkout_7d_alert_usd']:.2f}",
         f"- GCP elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+        f"- Bedrock daily SLO ceiling: ${mapping['bedrock_daily_ceiling_usd']:,.0f}",
+        f"- Bedrock 7d alert floor: ${mapping['bedrock_7d_alert_usd']:,.0f}",
+        f"- Inference daily token ceiling: {int(mapping['inference_daily_tokens']):,}",
+        f"- Inference 7d token alert: {int(mapping['inference_7d_tokens']):,}",
     ])
 
 
@@ -89,12 +134,12 @@ def _tool_body(spec: dict, mapping: dict, tags: list) -> dict:
 
 
 def _upsert_tool(tool_id: str, create_body: dict, update_body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{TOOLS_API}/{tool_id}")
+    r = _kbn("GET", f"{_tools_api()}/{tool_id}")
     if r.status_code == 200:
-        r = _kbn("PUT", f"{TOOLS_API}/{tool_id}", json=update_body)
+        r = _kbn("PUT", f"{_tools_api()}/{tool_id}", json=update_body)
         action = "updated"
     elif r.status_code == 404:
-        r = _kbn("POST", TOOLS_API, json=create_body)
+        r = _kbn("POST", _tools_api(), json=create_body)
         action = "created"
     else:
         msg = f"  [fail] tool GET {tool_id}: {r.status_code} {r.text[:240]}"
@@ -120,7 +165,7 @@ def _agent_body(cfg: dict, tool_ids: list[str], mapping: dict) -> dict:
     agent = cfg["agent"]
     fmt = dict(mapping)
     fmt["budgets_block"] = _budgets_block(mapping)
-    fmt.setdefault("kibana_url", KIBANA_URL)
+    fmt.setdefault("kibana_url", _cfg.KIBANA_URL)
     instructions = cfg["instructions"].format(**fmt).strip()
     body = {
         "id": agent["id"],
@@ -145,7 +190,7 @@ def _agent_body(cfg: dict, tool_ids: list[str], mapping: dict) -> dict:
 
 
 def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{AGENTS_API}/{agent_id}")
+    r = _kbn("GET", f"{_agents_api()}/{agent_id}")
     if r.status_code == 200:
         update = {
             "name": body["name"],
@@ -159,10 +204,10 @@ def _upsert_agent(agent_id: str, body: dict, fail_loud: bool) -> bool:
             update["avatar_symbol"] = body["avatar_symbol"]
         if "access_control" in body:
             update["access_control"] = body["access_control"]
-        r = _kbn("PUT", f"{AGENTS_API}/{agent_id}", json=update)
+        r = _kbn("PUT", f"{_agents_api()}/{agent_id}", json=update)
         action = "updated"
     elif r.status_code == 404:
-        r = _kbn("POST", AGENTS_API, json=body)
+        r = _kbn("POST", _agents_api(), json=body)
         action = "created"
     else:
         msg = f"  [fail] agent GET {agent_id}: {r.status_code} {r.text[:240]}"
@@ -206,7 +251,7 @@ def ensure_agent(fail_loud: bool = False) -> None:
         if extra not in tool_ids:
             tool_ids.append(extra)
 
-    print("== ELK Co FinOps AI Assistant ==" if uses_live_aws_hub()
+    print("== ELK Co FinOps AI Assistant ==" if live_hub_kind()
           else "== FinOps AI Assistant ==")
     agent = cfg["agent"]
     body = _agent_body(cfg, tool_ids, mapping)
@@ -219,14 +264,14 @@ def verify_agent() -> bool:
     ok = True
     print("== FinOps AI Assistant ==")
     for spec in cfg.get("tools") or []:
-        r = _kbn("GET", f"{TOOLS_API}/{spec['id']}")
+        r = _kbn("GET", f"{_tools_api()}/{spec['id']}")
         if r.status_code == 200:
             print(f"  [ok] tool {spec['id']}")
         else:
             print(f"  [fail] tool {spec['id']}: {r.status_code}")
             ok = False
 
-    r = _kbn("GET", f"{AGENTS_API}/{aid}")
+    r = _kbn("GET", f"{_agents_api()}/{aid}")
     if r.status_code == 200:
         name = r.json().get("name", aid)
         tools = r.json().get("configuration", {}).get("tools", [])
@@ -236,7 +281,7 @@ def verify_agent() -> bool:
         print(f"  [fail] agent {aid}: {r.status_code}")
         ok = False
 
-    print(f"  Chat:     {AGENT_CHAT_URL}")
+    print(f"  Chat:     {agent_chat_url()}")
     return ok
 
 

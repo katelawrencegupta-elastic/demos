@@ -1,5 +1,5 @@
-# ELK Co FinOps spend budgets — intentionally tight so workshop demos show
-# breached SLOs / Active alerts against the seeded timeline.
+# ELK Co FinOps spend budgets — thresholds from the AWS FinOps workshop
+# calibration (intentionally tight so spend SLOs / alerts can fire).
 # Calibrated 2026-08-27 against Serverless backfill (~120d):
 #   AWS CUR 30d total ~$220k, daily avg ~$7.4k
 #   elk-staging daily ~$1.0k (cost_leak)
@@ -7,7 +7,7 @@
 #   elk-ml-prod GCP 7d ~$7.2k
 
 tags:
-  - elk
+  - elk-co
   - finops
   - workshop
 
@@ -20,6 +20,10 @@ budgets:
   checkout_daily_ceiling_usd: 0.50 # agent-loop days $2–3.5; normal ~$0.45–0.58 → chronic breach
   checkout_7d_alert_usd: 4.0       # 7d sum ~$5.5
   gcp_ml_7d_alert_usd: 4000        # elk-ml-prod 7d ~$7.2k
+  bedrock_daily_ceiling_usd: 25    # APM gen_ai aws.bedrock daily cost (tight for demos)
+  bedrock_7d_alert_usd: 80
+  inference_daily_tokens: 200000   # Agent Builder inference tokens/day
+  inference_7d_tokens: 800000
 
 slos:
   - id: elk-slo-aws-daily-spend
@@ -55,6 +59,27 @@ slos:
     ceiling_key: checkout_daily_ceiling_usd
     burn_rate_alert: true
 
+  - id: elk-slo-bedrock-daily-spend
+    name: "[ELK Co] Bedrock daily LLM cost"
+    description: >
+      Daily APM gen_ai cost for aws.bedrock under ceiling. Useful for the
+      bedrock workshop variant (and all when Bedrock traffic is seeded).
+    index: traces-apm-default
+    filter: 'span.subtype : "gen_ai" and gen_ai.system : "aws.bedrock"'
+    field: labels.llm_cost_usd
+    ceiling_key: bedrock_daily_ceiling_usd
+    burn_rate_alert: true
+
+  - id: elk-slo-inference-daily-tokens
+    name: "[ELK Co] Elastic Inference daily token budget"
+    description: >
+      Daily Elastic Inference tokens for Agent Builder under ceiling.
+    index: logs-elastic.inference_token_usage-default
+    filter: 'inference.feature_id : "agent_builder" or tags : "synthetic"'
+    field: token_usage.total_tokens
+    ceiling_key: inference_daily_tokens
+    burn_rate_alert: false
+
 alerts:
   - id: elk-alert-aws-mtd-budget
     name: "[ELK Co] AWS trailing-30d spend over monthly budget"
@@ -87,3 +112,19 @@ alerts:
     time_window_size: 7
     time_window_unit: d
     kind: gcp_ml_7d
+
+  - id: elk-alert-bedrock-7d
+    name: "[ELK Co] Bedrock 7d LLM burn"
+    description: 7-day APM gen_ai cost for aws.bedrock above floor.
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    kind: bedrock_7d
+
+  - id: elk-alert-inference-7d
+    name: "[ELK Co] Elastic Inference 7d token burn"
+    description: 7-day Agent Builder inference tokens above floor.
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    kind: inference_7d

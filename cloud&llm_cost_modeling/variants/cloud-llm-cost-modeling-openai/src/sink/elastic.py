@@ -34,9 +34,18 @@ class BulkSink:
         body = ("\n".join(lines) + "\n").encode()
 
         resp = None
-        for attempt in range(6):
-            r = requests.post(f"{ELASTIC_URL}/_bulk", headers=NDJSON_HEADERS,
-                              data=body, timeout=120)
+        r = None
+        for attempt in range(8):
+            try:
+                r = requests.post(f"{ELASTIC_URL}/_bulk", headers=NDJSON_HEADERS,
+                                  data=body, timeout=120)
+            except (requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as exc:
+                wait = min(2 ** attempt, 30)
+                print(f"  [warn] bulk transport error (attempt {attempt + 1}/8): "
+                      f"{exc}; retry in {wait}s", flush=True)
+                time.sleep(wait)
+                continue
             if r.status_code in RETRYABLE:
                 time.sleep(min(2 ** attempt, 20))
                 continue
@@ -44,7 +53,9 @@ class BulkSink:
             resp = r.json()
             break
         if resp is None:
-            raise RuntimeError(f"bulk kept failing with {r.status_code}: {r.text[:300]}")
+            status = getattr(r, "status_code", "?")
+            text = (getattr(r, "text", "") or "")[:300]
+            raise RuntimeError(f"bulk kept failing with {status}: {text}")
 
         for (idx, _), item in zip(self.buf, resp["items"]):
             res = item.get("create") or item.get("index") or {}

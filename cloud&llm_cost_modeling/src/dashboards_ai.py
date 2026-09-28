@@ -31,8 +31,14 @@ def _ai_family_links() -> list:
 
 
 def active_variant_has_dynamic() -> bool:
+    """True only when the -dynamic Kibana id is actually published.
+
+    Publish skips -dynamic when baseline is also on (identical body/title);
+    linking to a missing alias 404s hub tabs.
+    """
     from src.variant import active_variant
-    return bool(active_variant().dashboards.get("dynamic"))
+    d = active_variant().dashboards or {}
+    return bool(d.get("dynamic")) and not bool(d.get("baseline"))
 
 
 def build_ai_assistant_dashboard():

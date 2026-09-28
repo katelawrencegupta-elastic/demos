@@ -187,3 +187,38 @@ tools:
       | EVAL violated = errorBudgetRemaining < 0
       | SORT slo.name
     params: {}
+
+  - id: elk-finops-bedrock-spend
+    description: >
+      APM gen_ai cost for aws.bedrock over the last N days. Use for Bedrock
+      FinOps / Bedrock workshop questions.
+    esql: |
+      FROM traces-apm-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+        AND span.subtype == "gen_ai" AND gen_ai.system == "aws.bedrock"
+      | EVAL cost = TO_DOUBLE(labels.llm_cost_usd)
+      | STATS spend_usd = SUM(cost), calls = COUNT(*)
+        BY model = gen_ai.request.model
+      | SORT spend_usd DESC
+      | LIMIT 12
+    params:
+      days:
+        type: integer
+        description: Lookback window in days
+
+  - id: elk-finops-inference-usage
+    description: >
+      Elastic Inference token usage by feature/model over the last N days.
+      Use for Agent Builder / inference FinOps (elastic-ai workshop).
+    esql: |
+      FROM logs-elastic.inference_token_usage-default
+      | WHERE @timestamp >= NOW() - TO_DATEPERIOD(CONCAT(TO_STRING(?days), " days"))
+      | STATS tokens = SUM(token_usage.total_tokens),
+              cost_usd = SUM(TO_DOUBLE(labels.cost_usd))
+        BY feature = inference.feature_name, model = model.model_id
+      | SORT tokens DESC
+      | LIMIT 15
+    params:
+      days:
+        type: integer
+        description: Lookback window in days

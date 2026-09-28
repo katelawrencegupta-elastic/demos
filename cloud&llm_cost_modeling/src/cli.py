@@ -62,7 +62,23 @@ PARSE_CHECKS = {
         "gcp.vertexai.audit.resource_name",
         "client.user.email",
     ],
+    "gcp_vertexai.prompt_response_logs": [
+        "cloud.project.id",
+        "gcp.vertexai_logs.model",
+        "service.name",
+    ],
+    "elastic.inference_token_usage": [
+        "token_usage.total_tokens",
+        "model.model_id",
+        "inference.feature_name",
+    ],
 }
+
+# Log datasets that intentionally skip ingest-simulate PARSE_CHECKS
+# (pre-parsed docs, no Fleet pipeline, or package versions rename fields).
+PARSE_CHECKS_SKIP = frozenset({
+    # none today — keep explicit so variant_smoke can assert coverage
+})
 
 
 def _scope_default():
@@ -613,9 +629,19 @@ def main():
         "agent",
         help="provision ELK Co FinOps AI Assistant (Agent Builder + ES|QL tools)",
     )
-    sub.add_parser(
+    wf = sub.add_parser(
         "workflow",
         help="provision live FinOps Kibana workflows (spend spike + rightsizing)",
+    )
+    wf.add_argument(
+        "--smoke",
+        action="store_true",
+        help="after upsert, verify workflows are findable/enabled",
+    )
+    wf.add_argument(
+        "--deep",
+        action="store_true",
+        help="with --smoke: also run spend-spike auto-approve and wait",
     )
     ri = sub.add_parser(
         "reindex-elastic-ai",
@@ -698,8 +724,8 @@ def main():
         cmd_stream(args.tick, _resolve_scope(args))
     elif args.cmd == "verify":
         _print_variant()
-        from src.profile import uses_live_aws_hub
-        if uses_live_aws_hub():
+        from src.profile import uses_live_hub
+        if uses_live_hub():
             from src.live_setup import verify as live_verify
             if not live_verify():
                 raise SystemExit(1)
@@ -725,8 +751,17 @@ def main():
         from src.agent_builder import ensure_agent
         ensure_agent(fail_loud=True)
     elif args.cmd == "workflow":
-        from src.workflows import ensure_workflows
+        from src.workflows import ensure_workflows, verify_workflows
         ensure_workflows(fail_loud=True)
+        if args.smoke or args.deep:
+            if not verify_workflows():
+                raise SystemExit(1)
+            if args.deep:
+                from src.live_smoke import check_workflow_run_auto
+                ok, msg = check_workflow_run_auto(deep=True)
+                print(f"  [{'ok' if ok else 'fail'}] deep run: {msg}")
+                if not ok:
+                    raise SystemExit(1)
     elif args.cmd == "reindex-elastic-ai":
         from src.elastic_ai_reindex import reindex_elastic_ai
         reindex_elastic_ai(args.days, all_docs=args.all)
@@ -794,7 +829,7 @@ def main():
         from src.variant import VARIANT_ALIASES
         for vid, title, fork_dir in list_variants():
             mark = " (active)" if vid == active_variant().id else ""
-            print(f"  {vid:14}  {fork_dir}{mark}")
+            print(f"  {vid:14}  variants/{fork_dir}{mark}")
             print(f"                 {title}")
         for old, new in sorted(VARIANT_ALIASES.items()):
             print(f"  {old:14}  alias of {new}")

@@ -9,7 +9,7 @@
 # - Scenarios: crypto mining, ML burn, cost leak, S3 public exposure,
 #   GenAI shadow-IT ramp, Sunday ETL batch window
 company: ELK Co
-domain: elkdynamics.io
+domain: elkco.example
 seed: 42
 
 business_units:
@@ -30,7 +30,7 @@ business_units:
     cost_center: null   # shadow IT -- no cost center assigned on purpose
 
 aws:
-  organization_id: o-mrdn7k2x9
+  organization_id: o-elkco7k2x9
   regions: [us-east-1, us-west-2, eu-west-1]
   accounts:
     - id: "111111111111"
@@ -68,7 +68,7 @@ aws:
       env: dev
       business_unit: skunkworks
       ec2_count: 12
-      s3_buckets: [mrdn-skunk-data, mrdn-skunk-models, mrdn-skunk-llm-corpus]
+      s3_buckets: [elk-skunk-data, elk-skunk-models, elk-skunk-llm-corpus]
     - id: "777777777777"
       name: elk-mlops
       env: prod

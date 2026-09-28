@@ -26,20 +26,80 @@ Calibration probes (run against live cluster before tightening YAML)::
 from __future__ import annotations
 
 import uuid
+from functools import lru_cache
+
 import requests
 import yaml
 
-from src.config import KBN_HEADERS, KIBANA_URL, ROOT
+from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, ROOT
+import src.config as _cfg
 
 BUDGETS_CONFIG = ROOT / "config" / "budgets.yaml"
-TAGS = ["elk", "finops", "workshop"]
+TAGS = ["elk-co", "finops", "workshop"]
+WORKFLOWS_CONNECTOR = "system-connector-.workflows"
 
-SLO_API = f"{KIBANA_URL}/api/observability/slos"
-RULE_API = f"{KIBANA_URL}/api/alerting/rule"
+LLM_BUDGET_VARIANTS = frozenset({"openai", "anthropic", "elastic-ai"})
+
+
+def _slo_api() -> str:
+    """Kibana SLO API base for the currently selected deployment."""
+    return f"{_cfg.KIBANA_URL}/api/observability/slos"
+
+
+def _rule_api() -> str:
+    """Kibana alerting rule API base for the currently selected deployment."""
+    return f"{_cfg.KIBANA_URL}/api/alerting/rule"
+
+
+def budgets_config_path(
+    *,
+    variant_id: str | None = None,
+    profile: str | None = None,
+) -> Path:
+    """Resolve which budgets YAML a variant/profile combination loads.
+
+    Mirrors ``load_budgets()`` without mutating process env.
+    """
+    from src.profile import LIVE_DIR
+
+    vid = (variant_id or "").strip() or "all"
+    prof = (profile or "synthetic").strip().lower()
+    live = prof in ("live", "gev", "gev-live")
+    if live and vid == "aws":
+        return LIVE_DIR / "budgets.yaml"
+    if live and vid == "gcp":
+        return LIVE_DIR / "budgets_gcp.yaml"
+    if live and vid == "azure":
+        return LIVE_DIR / "budgets_azure.yaml"
+    if vid == "azure":
+        return ROOT / "config" / "budgets_azure.yaml"
+    if vid == "gcp":
+        return ROOT / "config" / "budgets_gcp.yaml"
+    if vid == "bedrock":
+        return ROOT / "config" / "budgets_bedrock.yaml"
+    if vid in LLM_BUDGET_VARIANTS:
+        return ROOT / "config" / "budgets_llm.yaml"
+    if live:
+        # live non-cloud hubs fall back to workshop budgets
+        return BUDGETS_CONFIG
+    return BUDGETS_CONFIG
 
 
 def load_budgets() -> dict:
-    with open(BUDGETS_CONFIG) as f:
+    """Load budget/SLO YAML for the active FinOps profile + variant.
+
+    Live hubs use ``config/live/budgets*.yaml``. Synthetic single-cloud
+    variants (azure / gcp) use cloud-scoped workshop budgets so we do not
+    install AWS CUR SLOs against missing indices (empty posture table).
+    """
+    from src.profile import finops_profile
+    from src.variant import active_variant
+
+    path = budgets_config_path(
+        variant_id=active_variant().id,
+        profile=finops_profile(),
+    )
+    with open(path) as f:
         return yaml.safe_load(f)
 
 
@@ -47,6 +107,22 @@ def budget_numbers(cfg: dict | None = None) -> dict:
     """Flat dict of named USD thresholds for dashboards / callers."""
     cfg = cfg or load_budgets()
     return dict(cfg["budgets"])
+
+
+def substitutions(cfg: dict | None = None) -> dict:
+    """Numbers + live account ids + kibana_url for YAML `.format()`."""
+    from src.profile import live_accounts, live_hub_kind, uses_live_aws_hub
+    cfg = cfg or load_budgets()
+    mapping = dict(cfg["budgets"])
+    if live_hub_kind():
+        mapping.update(live_accounts())
+    mapping["kibana_url"] = _cfg.KIBANA_URL
+    return mapping
+
+
+def _rule_tags(cfg: dict | None = None) -> list:
+    cfg = cfg or load_budgets()
+    return list(cfg.get("tags") or TAGS)
 
 
 def _kbn(method: str, url: str, **kwargs):
@@ -74,7 +150,7 @@ def _timeslice_slo_body(spec: dict, ceiling: float) -> dict:
     }
     filt = (spec.get("filter") or "").strip()
     if filt:
-        params["filter"] = filt
+        params["filter"] = filt.format(**substitutions())
     return {
         "name": spec["name"],
         "description": (spec.get("description") or "").strip(),
@@ -89,18 +165,18 @@ def _timeslice_slo_body(spec: dict, ceiling: float) -> dict:
             "timesliceTarget": 0.95,
             "timesliceWindow": "24h",
         },
-        "tags": TAGS,
+        "tags": _rule_tags(),
     }
 
 
 def _upsert_slo(slo_id: str, body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{SLO_API}/{slo_id}")
+    r = _kbn("GET", f"{_slo_api()}/{slo_id}")
     if r.status_code == 200:
-        r = _kbn("PUT", f"{SLO_API}/{slo_id}", json=body)
+        r = _kbn("PUT", f"{_slo_api()}/{slo_id}", json=body)
         action = "updated"
     elif r.status_code == 404:
         payload = {**body, "id": slo_id}
-        r = _kbn("POST", SLO_API, json=payload)
+        r = _kbn("POST", _slo_api(), json=payload)
         action = "created"
     else:
         msg = f"  [fail] SLO GET {slo_id}: {r.status_code} {r.text[:240]}"
@@ -123,7 +199,11 @@ def _upsert_slo(slo_id: str, body: dict, fail_loud: bool) -> bool:
     return True
 
 
-def _esql_for_alert(kind: str, nums: dict) -> str:
+def _esql_for_alert(spec: dict, mapping: dict) -> str:
+    if spec.get("esql"):
+        return spec["esql"].format(**mapping).strip()
+    kind = spec["kind"]
+    nums = mapping
     if kind == "aws_mtd":
         return (
             "FROM metrics-aws_billing.cur-default\n"
@@ -151,18 +231,110 @@ def _esql_for_alert(kind: str, nums: dict) -> str:
             "| STATS spend = SUM(gcp.billing.total)\n"
             f"| WHERE spend > {nums['gcp_ml_7d_alert_usd']}"
         )
+    if kind == "bedrock_7d":
+        return (
+            "FROM traces-apm-default\n"
+            '| WHERE span.subtype == "gen_ai" AND gen_ai.system == "aws.bedrock"\n'
+            "| STATS spend = SUM(TO_DOUBLE(labels.llm_cost_usd))\n"
+            f"| WHERE spend > {nums['bedrock_7d_alert_usd']}"
+        )
+    if kind == "inference_7d":
+        return (
+            "FROM logs-elastic.inference_token_usage-default\n"
+            "| STATS tokens = SUM(token_usage.total_tokens)\n"
+            f"| WHERE tokens > {nums['inference_7d_tokens']}"
+        )
     raise ValueError(f"unknown alert kind: {kind}")
 
 
-def _esql_rule_body(spec: dict, nums: dict) -> dict:
+@lru_cache(maxsize=1)
+def _server_log_connector_id() -> str | None:
+    try:
+        r = _kbn("GET", f"{_cfg.KIBANA_URL}/api/actions/connectors")
+    except requests.RequestException:
+        return None
+    if r.status_code != 200:
+        return None
+    body = r.json()
+    items = body if isinstance(body, list) else body.get("data") or body.get("connectors") or []
+    named = None
+    generic = None
+    for c in items:
+        if c.get("connector_type_id") != ".server-log" and c.get("actionTypeId") != ".server-log":
+            continue
+        cid = c.get("id")
+        if not cid:
+            continue
+        if (c.get("name") or "") == "FinOps demo server log":
+            named = cid
+        elif generic is None:
+            generic = cid
+    return named or generic
+
+
+def _with_action_uuids(actions: list, existing: list | None) -> list:
+    """Kibana rejects multi-action PUTs that cannot correlate rows; keep ids stable."""
+    by_id: dict[str, str] = {}
+    for a in existing or []:
+        cid, uid = a.get("id"), a.get("uuid")
+        if cid and uid and cid not in by_id:
+            by_id[cid] = uid
+    out = []
+    for a in actions:
+        item = dict(a)
+        item["uuid"] = item.get("uuid") or by_id.get(item.get("id")) or str(uuid.uuid4())
+        out.append(item)
+    return out
+
+
+def _alert_actions(spec: dict, mapping: dict) -> list:
+    actions = []
+    log_id = _server_log_connector_id()
+    if log_id:
+        raw = spec.get("message") or spec["name"]
+        try:
+            msg = raw.format(**mapping)
+        except (KeyError, ValueError):
+            msg = raw
+        actions.append({
+            "group": "query matched",
+            "id": log_id,
+            "params": {"message": msg, "level": "info"},
+            "frequency": {
+                "summary": False,
+                "notify_when": "onActionGroupChange",
+                "throttle": None,
+            },
+        })
+    if spec.get("workflow_id"):
+        # PUT rejects connector_type_id (GET returns it). System connector has no group.
+        actions.append({
+            "id": WORKFLOWS_CONNECTOR,
+            "params": {
+                "subAction": "run",
+                "subActionParams": {
+                    "workflowId": spec["workflow_id"],
+                    "summaryMode": False,
+                    "alertStates": {
+                        "new": True,
+                        "ongoing": False,
+                        "recovered": True,
+                    },
+                },
+            },
+        })
+    return actions
+
+
+def _esql_rule_body(spec: dict, mapping: dict) -> dict:
     return {
         "name": spec["name"],
-        "tags": TAGS,
+        "tags": _rule_tags(),
         "rule_type_id": ".es-query",
         "consumer": "stackAlerts",
         "enabled": True,
         "schedule": {"interval": spec.get("schedule", "1h")},
-        "actions": [],
+        "actions": _alert_actions(spec, mapping),
         "params": {
             "searchType": "esqlQuery",
             "timeWindowSize": spec["time_window_size"],
@@ -170,7 +342,7 @@ def _esql_rule_body(spec: dict, nums: dict) -> dict:
             "threshold": [0],
             "thresholdComparator": ">",
             "size": 10,
-            "esqlQuery": {"esql": _esql_for_alert(spec["kind"], nums)},
+            "esqlQuery": {"esql": _esql_for_alert(spec, mapping)},
             "aggType": "count",
             "groupBy": "all",
             "termSize": 5,
@@ -182,6 +354,7 @@ def _esql_rule_body(spec: dict, nums: dict) -> dict:
 
 
 def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
+    from src.profile import uses_live_aws_hub
     windows = [
         {
             "id": str(uuid.uuid4()),
@@ -200,9 +373,18 @@ def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
             "actionGroup": "slo.burnRate.medium",
         },
     ]
+    if uses_live_aws_hub():
+        windows.append({
+            "id": str(uuid.uuid4()),
+            "burnRateThreshold": 10.0,
+            "maxBurnRateThreshold": 30,
+            "longWindow": {"value": 1, "unit": "h"},
+            "shortWindow": {"value": 5, "unit": "m"},
+            "actionGroup": "slo.burnRate.high",
+        })
     return {
         "name": name,
-        "tags": TAGS,
+        "tags": _rule_tags(),
         "rule_type_id": "slo.rules.burnRate",
         "consumer": "slo",
         "enabled": True,
@@ -217,7 +399,10 @@ def _burn_rate_rule_body(slo_id: str, name: str) -> dict:
 
 
 def _upsert_rule(rule_id: str, body: dict, fail_loud: bool) -> bool:
-    r = _kbn("GET", f"{RULE_API}/{rule_id}")
+    r = _kbn("GET", f"{_rule_api()}/{rule_id}")
+    existing_actions = (r.json().get("actions") or []) if r.status_code == 200 else []
+    if "actions" in body:
+        body = {**body, "actions": _with_action_uuids(body["actions"], existing_actions)}
     if r.status_code == 200:
         # Update payload omits rule_type_id / consumer; some rule types reject `enabled` on PUT.
         update = {
@@ -225,10 +410,10 @@ def _upsert_rule(rule_id: str, body: dict, fail_loud: bool) -> bool:
             for k in ("name", "tags", "schedule", "params", "actions")
             if k in body
         }
-        r = _kbn("PUT", f"{RULE_API}/{rule_id}", json=update)
+        r = _kbn("PUT", f"{_rule_api()}/{rule_id}", json=update)
         action = "updated"
     elif r.status_code == 404:
-        r = _kbn("POST", f"{RULE_API}/{rule_id}", json=body)
+        r = _kbn("POST", f"{_rule_api()}/{rule_id}", json=body)
         action = "created"
     else:
         msg = f"  [fail] rule GET {rule_id}: {r.status_code} {r.text[:240]}"
@@ -238,11 +423,31 @@ def _upsert_rule(rule_id: str, body: dict, fail_loud: bool) -> bool:
         return False
 
     if r.status_code >= 300:
-        msg = f"  [fail] rule {action} {rule_id}: {r.status_code} {r.text[:400]}"
-        if fail_loud:
-            raise SystemExit(msg)
-        print(msg.replace("[fail]", "[warn]"))
-        return False
+        err = r.text[:400]
+        if body.get("actions") and any(
+            a.get("id") == WORKFLOWS_CONNECTOR for a in body["actions"]
+        ):
+            print(f"  [warn] {rule_id} with workflow action: {r.status_code} {err}")
+            stripped = {
+                **body,
+                "actions": [a for a in body["actions"] if a.get("id") != WORKFLOWS_CONNECTOR],
+            }
+            print(f"  [warn] retrying {rule_id} without workflow action")
+            if action == "updated":
+                update = {
+                    k: stripped[k]
+                    for k in ("name", "tags", "schedule", "params", "actions")
+                    if k in stripped
+                }
+                r = _kbn("PUT", f"{_rule_api()}/{rule_id}", json=update)
+            else:
+                r = _kbn("POST", f"{_rule_api()}/{rule_id}", json=stripped)
+        if r.status_code >= 300:
+            msg = f"  [fail] rule {action} {rule_id}: {r.status_code} {r.text[:400]}"
+            if fail_loud:
+                raise SystemExit(msg)
+            print(msg.replace("[fail]", "[warn]"))
+            return False
     print(f"  [ok] rule {action}: {rule_id}")
     return True
 
@@ -250,10 +455,11 @@ def _upsert_rule(rule_id: str, body: dict, fail_loud: bool) -> bool:
 def ensure_budgets(fail_loud: bool = False) -> None:
     """Upsert spend SLOs + burn-rate rules + ES|QL budget alerts."""
     cfg = load_budgets()
-    nums = budget_numbers(cfg)
+    mapping = substitutions(cfg)
+    wanted = {s["id"] for s in cfg.get("slos") or []}
     print("== FinOps spend SLOs ==")
     for spec in cfg.get("slos") or []:
-        ceiling = float(nums[spec["ceiling_key"]])
+        ceiling = float(mapping[spec["ceiling_key"]])
         ok = _upsert_slo(spec["id"], _timeslice_slo_body(spec, ceiling), fail_loud)
         if ok and spec.get("burn_rate_alert"):
             burn_id = f"{spec['id']}-burn"
@@ -263,9 +469,100 @@ def ensure_budgets(fail_loud: bool = False) -> None:
                 fail_loud,
             )
 
+    # Drop SLOs from other clouds left behind by a prior full budgets.yaml install
+    # (e.g. AWS CUR SLOs on an Azure deployment → permanent NO_DATA posture rows).
+    r = _kbn("GET", _slo_api(), params={"perPage": 100})
+    if r.status_code == 200:
+        orphans = []
+        for s in r.json().get("results") or []:
+            sid = s.get("id") or ""
+            if not (sid.startswith("elk-") or sid.startswith("elk-finops-")):
+                continue
+            if sid not in wanted:
+                orphans.append(sid)
+        if orphans:
+            print(f"== Remove {len(orphans)} out-of-scope SLO(s) ==")
+            for sid in sorted(orphans):
+                rr = _kbn("DELETE", f"{_slo_api()}/{sid}")
+                if rr.status_code >= 300 and rr.status_code != 404:
+                    print(f"  [warn] DELETE SLO {sid}: {rr.status_code} {rr.text[:200]}")
+                else:
+                    print(f"  [ok] deleted SLO {sid}")
+
     print("== FinOps budget ES|QL alerts ==")
     for spec in cfg.get("alerts") or []:
-        _upsert_rule(spec["id"], _esql_rule_body(spec, nums), fail_loud)
+        _upsert_rule(spec["id"], _esql_rule_body(spec, mapping), fail_loud)
+
+    # SLOs created before backfill (or with empty transforms) stay NO_DATA / N/A
+    # until reset. Auto-recover any that still have no SLI summary.
+    stale = []
+    r = _kbn("GET", _slo_api(), params={"perPage": 100})
+    if r.status_code == 200:
+        known = {s["id"] for s in cfg.get("slos") or []}
+        for s in r.json().get("results") or []:
+            sid = s.get("id")
+            if sid not in known:
+                continue
+            status = (s.get("summary") or {}).get("status")
+            if status in (None, "NO_DATA"):
+                stale.append(sid)
+    if stale:
+        print(f"== Recover {len(stale)} SLO(s) with NO_DATA ==")
+        recover_slos(fail_loud=fail_loud, slo_ids=stale)
+    _kick_slo_summary_transforms(wanted)
+
+
+def _kick_slo_summary_transforms(slo_ids: set[str]) -> None:
+    """Nudge SLI + summary transforms so the posture ES|QL table fills quickly.
+
+    After create/reset, Kibana may report HEALTHY while
+    ``.slo-observability.summary-v3.6`` still lags until the summary transform
+    indexes — the dashboard panel reads that index.
+    """
+    if not slo_ids:
+        return
+    try:
+        r = requests.get(
+            f"{ELASTIC_URL}/_cat/transforms?h=id&format=json",
+            headers=ES_HEADERS,
+            timeout=60,
+        )
+    except requests.RequestException as e:
+        print(f"  [warn] list transforms: {e}")
+        return
+    if r.status_code != 200:
+        print(f"  [warn] list transforms: {r.status_code}")
+        return
+    ids = []
+    for row in r.json() or []:
+        tid = row.get("id") or ""
+        if any(sid in tid for sid in slo_ids):
+            ids.append(tid)
+    if not ids:
+        return
+    print(f"== Kick {len(ids)} SLO transform(s) ==")
+    for tid in sorted(ids):
+        rr = requests.post(
+            f"{ELASTIC_URL}/_transform/{tid}/_schedule_now",
+            headers=ES_HEADERS,
+            timeout=60,
+        )
+        if rr.status_code >= 300:
+            print(f"  [warn] schedule {tid}: {rr.status_code}")
+        else:
+            print(f"  [ok] scheduled {tid}")
+    # Summary transforms often need a second nudge after SLI docs land.
+    import time
+    time.sleep(5)
+    summaries = [tid for tid in ids if tid.startswith("slo-summary-")]
+    for tid in sorted(summaries):
+        rr = requests.post(
+            f"{ELASTIC_URL}/_transform/{tid}/_schedule_now",
+            headers=ES_HEADERS,
+            timeout=60,
+        )
+        if rr.status_code < 300:
+            print(f"  [ok] re-scheduled {tid}")
 
 
 def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> None:
@@ -278,7 +575,7 @@ def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> N
     ids = set(slo_ids or [])
     if not ids:
         ids = {s["id"] for s in cfg.get("slos") or []}
-        r = _kbn("GET", f"{SLO_API}/_definitions", params={"includeOutdatedOnly": 1})
+        r = _kbn("GET", f"{_slo_api()}/_definitions", params={"includeOutdatedOnly": 1})
         if r.status_code == 200:
             for spec in r.json().get("results") or []:
                 if spec.get("id"):
@@ -286,7 +583,7 @@ def recover_slos(fail_loud: bool = False, slo_ids: list[str] | None = None) -> N
 
     print("== Recover ELK Co SLOs (reset) ==")
     for slo_id in sorted(ids):
-        r = _kbn("POST", f"{SLO_API}/{slo_id}/_reset")
+        r = _kbn("POST", f"{_slo_api()}/{slo_id}/_reset")
         if r.status_code >= 300:
             msg = f"  [fail] SLO reset {slo_id}: {r.status_code} {r.text[:400]}"
             if fail_loud:
@@ -305,7 +602,7 @@ def verify_budgets() -> bool:
     ok = True
     print("== FinOps budgets / SLOs ==")
     for spec in cfg.get("slos") or []:
-        r = _kbn("GET", f"{SLO_API}/{spec['id']}")
+        r = _kbn("GET", f"{_slo_api()}/{spec['id']}")
         if r.status_code == 200:
             print(f"  [ok] SLO {spec['id']}")
         else:
@@ -313,7 +610,7 @@ def verify_budgets() -> bool:
             ok = False
         if spec.get("burn_rate_alert"):
             burn_id = f"{spec['id']}-burn"
-            r = _kbn("GET", f"{RULE_API}/{burn_id}")
+            r = _kbn("GET", f"{_rule_api()}/{burn_id}")
             if r.status_code == 200 and r.json().get("enabled"):
                 print(f"  [ok] burn-rate rule {burn_id}")
             else:
@@ -321,16 +618,29 @@ def verify_budgets() -> bool:
                 ok = False
 
     for spec in cfg.get("alerts") or []:
-        r = _kbn("GET", f"{RULE_API}/{spec['id']}")
-        if r.status_code == 200 and r.json().get("enabled"):
-            print(f"  [ok] alert {spec['id']} (enabled)")
-        else:
+        r = _kbn("GET", f"{_rule_api()}/{spec['id']}")
+        if r.status_code != 200 or not r.json().get("enabled"):
             print(f"  [fail] alert {spec['id']}: {r.status_code}")
             ok = False
+            continue
+        wf = spec.get("workflow_id")
+        if wf:
+            found = any(
+                ((a.get("params") or {}).get("subActionParams") or {}).get("workflowId") == wf
+                or a.get("id") == WORKFLOWS_CONNECTOR
+                for a in (r.json().get("actions") or [])
+            )
+            if found:
+                print(f"  [ok] alert {spec['id']} (enabled, workflow={wf})")
+            else:
+                print(f"  [fail] alert {spec['id']} missing workflow action {wf}")
+                ok = False
+        else:
+            print(f"  [ok] alert {spec['id']} (enabled)")
 
-    print(f"  SLOs:     {KIBANA_URL}/app/observability/slos")
-    print(f"  Alerts:   {KIBANA_URL}/app/observability/alerts")
-    print(f"  Rules:    {KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules")
+    print(f"  SLOs:     {_cfg.KIBANA_URL}/app/observability/slos")
+    print(f"  Alerts:   {_cfg.KIBANA_URL}/app/observability/alerts")
+    print(f"  Rules:    {_cfg.KIBANA_URL}/app/management/insightsAndAlerting/triggersActions/rules")
     return ok
 
 

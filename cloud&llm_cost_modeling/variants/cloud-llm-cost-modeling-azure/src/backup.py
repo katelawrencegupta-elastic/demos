@@ -159,8 +159,8 @@ def backup_dashboards(counts: Counter) -> None:
             break
         page += 1
     dest = BACKUP_ROOT / "kibana" / "dashboards"
-    elk_dest = ROOT / "dashboards"
-    elk_dest.mkdir(parents=True, exist_ok=True)
+    dash_dest = ROOT / "dashboards"
+    dash_dest.mkdir(parents=True, exist_ok=True)
     n = 0
     for item in items:
         did = item["id"]
@@ -172,7 +172,7 @@ def backup_dashboards(counts: Counter) -> None:
         data = payload.get("data", payload)
         write_json(dest / f"{safe_name(did)}.json", payload)
         if did.startswith("elk-"):
-            write_json(elk_dest / f"{safe_name(did)}.json", data)
+            write_json(dash_dest / f"{safe_name(did)}.json", data)
         n += 1
     counts["kibana.dashboards"] = n
     print(f"  dashboards: {n}")

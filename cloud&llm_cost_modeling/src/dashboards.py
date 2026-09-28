@@ -375,12 +375,17 @@ def table(x, y, w, h, title, query, rows, metrics, ignore_global_filters=False):
 
 
 def links_panel(x, y, w, h, title, items, *, layout=None, hide_title=False,
-                open_in_new_tab=True, use_filters=False):
+                open_in_new_tab=True, use_filters=False,
+                open_in_new_tab_labels=None):
     """Links embeddable. Use layout='horizontal' for AWS-hub-style tab bars.
 
     Each item is ``(label, destination)`` for a dashboard link, or
     ``(label, destination, "externalLink")`` for an app/path URL (e.g. ``/app/apm``).
+
+    ``open_in_new_tab_labels`` optionally forces specific labels to open in a new
+    tab even when the panel default is ``open_in_new_tab=False``.
     """
+    force_new = set(open_in_new_tab_labels or ())
     links = []
     for item in items:
         if len(item) == 3:
@@ -388,12 +393,13 @@ def links_panel(x, y, w, h, title, items, *, layout=None, hide_title=False,
         else:
             label, dest = item[0], item[1]
             ltype = "externalLink" if str(dest).startswith("/") else "dashboardLink"
+        new_tab = True if label in force_new else open_in_new_tab
         if ltype == "externalLink":
             links.append({
                 "label": label,
                 "type": "externalLink",
                 "destination": dest,
-                "options": {"open_in_new_tab": open_in_new_tab},
+                "options": {"open_in_new_tab": new_tab},
             })
         else:
             links.append({
@@ -403,7 +409,7 @@ def links_panel(x, y, w, h, title, items, *, layout=None, hide_title=False,
                 "options": {
                     "use_filters": use_filters,
                     "use_time_range": True,
-                    "open_in_new_tab": open_in_new_tab,
+                    "open_in_new_tab": new_tab,
                 },
             })
     cfg = {
@@ -477,6 +483,8 @@ def hub_tabs_panel(caps=None):
         0, 0, 48, 5, "FinOps dashboards", hub_tabs_items(caps),
         layout="horizontal", hide_title=False,
         open_in_new_tab=False, use_filters=True,
+        # Dense OOTB ESS boards — open beside the FinOps hub (all variants).
+        open_in_new_tab_labels=("ESS Billing", "ESS Credits"),
     )
 
 
@@ -557,16 +565,37 @@ def budget_posture_section(y: int, caps=None):
         ])
 
     if caps.azure_billing:
-        gauges.append((
-            "Azure pretax (window)",
-            _q(
-                "FROM metrics-azure.billing-default", f"| WHERE {TS}",
-                "| STATS spend = SUM(azure.billing.pretax_cost)",
-                "| EVAL budget = spend, min = 0, max = spend * 2, goal = spend",
-            ),
-            "USD pretax",
-        ))
-        bullets.append("- **Azure pretax:** window total (no dedicated SLO ceiling in budgets.yaml).")
+        azure_daily = float(b.get("azure_daily_ceiling_usd") or 0)
+        if azure_daily > 0:
+            bullets.append(
+                f"- **Azure daily SLO ceiling:** ${azure_daily:,.0f} pretax"
+            )
+            gauges.append((
+                "Latest Azure daily vs SLO ceiling",
+                _q(
+                    "FROM metrics-azure.billing-default", f"| WHERE {TS}",
+                    "| STATS daily = SUM(azure.billing.pretax_cost) "
+                    "BY day = BUCKET(@timestamp, 1d)",
+                    "| SORT day DESC", "| LIMIT 1",
+                    f"| EVAL spend = daily, budget = {azure_daily}, min = 0, "
+                    "max = budget * 3, goal = budget",
+                    "| KEEP spend, budget, min, max, goal",
+                ),
+                "USD / day",
+            ))
+        else:
+            gauges.append((
+                "Azure pretax (window)",
+                _q(
+                    "FROM metrics-azure.billing-default", f"| WHERE {TS}",
+                    "| STATS spend = SUM(azure.billing.pretax_cost)",
+                    "| EVAL budget = spend, min = 0, max = spend * 2, goal = spend",
+                ),
+                "USD pretax",
+            ))
+            bullets.append(
+                "- **Azure pretax:** window total (no dedicated SLO ceiling)."
+            )
 
     if caps.llm_apm:
         bullets.append(
@@ -752,13 +781,15 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
 
     Baseline is the current stacked-bar/area layout (former \"dynamic\").
     Classic is the older table/bar layout with the security→cost section.
-    The -dynamic Kibana id is kept as an alias of baseline for existing links.
+    The -dynamic Kibana id is only written when baseline is off (legacy links).
+    When both flags are set, baseline alone is published to avoid duplicate titles.
     """
     from src.profile import uses_live_aws_hub
 
     if uses_live_aws_hub():
         from src.live_dashboards import publish as live_publish
         return live_publish()
+    # Live GCP/Azure billing hubs fall through to variant-scoped FinOps boards.
     clear_dashboard_exists_cache()
     v = active_variant()
     print(f"== {finops_dashboard_title()} (variant={v.id}) ==")
@@ -779,9 +810,16 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
     if include_baseline:
         print(f"== PUT dashboard {baseline_id} (baseline) ==")
         urls.append(_put_dashboard(baseline_id, baseline))
-    if include_dynamic_alias:
-        print(f"== PUT dashboard {dynamic_id} (alias of baseline) ==")
+    if include_dynamic_alias and not include_baseline:
+        # Only publish the -dynamic id when it is the sole FinOps layout.
+        # When baseline is also enabled, -dynamic was an identical title/body
+        # duplicate (see azure reconcile).
+        print(f"== PUT dashboard {dynamic_id} (baseline layout) ==")
         urls.append(_put_dashboard(dynamic_id, baseline))
+    elif include_dynamic_alias and include_baseline:
+        print(f"== skip {dynamic_id} (alias of {baseline_id}; single dashboard) ==")
+    if not include_dynamic_alias and dynamic_id != baseline_id:
+        _delete_dashboard_if_exists(dynamic_id)
     if include_classic:
         print(f"== PUT dashboard {classic_id} ==")
         urls.append(_put_dashboard(classic_id, build_classic_dashboard()))
@@ -789,4 +827,26 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
         from src.dashboards_ai import publish_ai
         urls.append(publish_ai())
     return urls
+
+
+def _delete_dashboard_if_exists(dash_id: str) -> None:
+    """Remove a stale dashboard id (e.g. retired -dynamic alias)."""
+    r = requests.get(
+        f"{KIBANA_URL}/api/dashboards/{dash_id}",
+        headers=KBN_HEADERS, timeout=30,
+    )
+    if r.status_code == 404:
+        return
+    if r.status_code != 200:
+        print(f"  [warn] GET {dash_id} before delete: {r.status_code}")
+        return
+    r = requests.delete(
+        f"{KIBANA_URL}/api/dashboards/{dash_id}",
+        headers=KBN_HEADERS, timeout=60,
+    )
+    if r.status_code >= 300 and r.status_code != 404:
+        print(f"  [warn] DELETE {dash_id}: {r.status_code} {r.text[:200]}")
+    else:
+        print(f"  [ok] removed stale dashboard {dash_id}")
+        _DASH_EXISTS_CACHE.pop(dash_id, None)
 

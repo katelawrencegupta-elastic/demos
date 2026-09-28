@@ -4,21 +4,33 @@ import json
 
 import requests
 
-from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_URL
+from src.config import ELASTIC_URL, ES_HEADERS, KBN_HEADERS, KIBANA_ROOT, KIBANA_URL
 from src.time_window import demo_window
 
 PACKAGES = [
     "aws", "gcp", "azure", "azure_billing",
     "openai", "anthropic", "anthropic_metrics",
     "azure_openai", "aws_bedrock", "gcp_vertexai",
-    "aws_billing", "apm",
+    "aws_billing", "apm", "ess_billing",
 ]
+
+# Cloud / LLM packs the workshop may install — used to strip leftovers when a
+# deployment is switched to a single-cloud workshop variant.
+MANAGED_PACKAGES = tuple(PACKAGES)
 
 # TSDS index templates that would reject backfilled timestamps
 TSDS_PATCH = [
     "metrics-aws.ec2_metrics",
     "metrics-aws_bedrock.runtime",
     "metrics-aws_bedrock.guardrails",
+    "metrics-aws.rds",
+    "metrics-aws.lambda",
+    "metrics-aws.s3_daily_storage",
+    "metrics-aws.cloudwatch_metrics",
+    "metrics-aws.usage",
+    "metrics-aws_mq.activemq_metrics",
+    "metrics-aws_mq.rabbitmq_metrics",
+    "metrics-ess_billing.billing",
 ]
 
 TEMPLATE_KEYS = ("index_patterns", "template", "composed_of", "priority",
@@ -31,20 +43,96 @@ def ensure_packages():
     packages = active_variant().packages
     if not packages:
         print("  [skip] no Fleet packages for this variant")
+    else:
+        for pkg in packages:
+            r = requests.get(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+                             headers=KBN_HEADERS, timeout=60)
+            r.raise_for_status()
+            item = r.json()["item"]
+            if item.get("status") == "installed":
+                print(f"  [ok] package {pkg} {item['version']} already installed")
+                continue
+            print(f"  installing package {pkg} ...")
+            r = requests.post(f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+                              headers=KBN_HEADERS, json={}, timeout=600)
+            if r.status_code >= 300:
+                # APM is often unavailable via Fleet on Serverless (built-in OTel).
+                if pkg == "apm":
+                    print(f"  [warn] package {pkg} install failed ({r.status_code}) — "
+                          "continuing (gen_ai traces index on first backfill)")
+                    continue
+                r.raise_for_status()
+            print(f"  [ok] package {pkg} installed")
+    reconcile_packages()
+
+
+def _package_status(pkg: str) -> tuple[str, str | None]:
+    """Return (status, installed_version) for a Fleet package."""
+    r = requests.get(
+        f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}",
+        headers=KBN_HEADERS, timeout=60,
+    )
+    if r.status_code == 404:
+        return "not_found", None
+    r.raise_for_status()
+    item = r.json().get("item") or {}
+    status = str(item.get("status") or "unknown")
+    ver = (
+        (item.get("installationInfo") or {}).get("version")
+        or item.get("version")
+    )
+    return status, ver
+
+
+def uninstall_package(pkg: str, version: str | None = None) -> bool:
+    """Remove a Fleet package from the deployment. Returns True on success."""
+    status, ver = _package_status(pkg)
+    if status != "installed":
+        return False
+    ver = version or ver
+    if not ver:
+        print(f"  [warn] package {pkg} installed but version unknown — skip uninstall")
+        return False
+    print(f"  uninstalling package {pkg} {ver} ...")
+    r = requests.delete(
+        f"{KIBANA_ROOT}/api/fleet/epm/packages/{pkg}/{ver}",
+        headers=KBN_HEADERS,
+        params={"force": "true"},
+        timeout=600,
+    )
+    if r.status_code >= 300:
+        print(f"  [warn] uninstall {pkg} failed: {r.status_code} {r.text[:200]}")
+        return False
+    print(f"  [ok] package {pkg} uninstalled")
+    return True
+
+
+def reconcile_packages():
+    """Uninstall workshop-managed Fleet packages not declared by this variant.
+
+    Keeps GCP/Azure/AWS workshop deployments from retaining another cloud's
+    integration (and its OOTB dashboards) after a prior multi-cloud setup.
+    """
+    from src.variant import active_variant
+
+    v = active_variant()
+    if v.is_all:
+        print("  [skip] package reconcile (variant=all keeps full catalog)")
         return
-    for pkg in packages:
-        r = requests.get(f"{KIBANA_URL}/api/fleet/epm/packages/{pkg}",
-                         headers=KBN_HEADERS, timeout=60)
-        r.raise_for_status()
-        item = r.json()["item"]
-        if item.get("status") == "installed":
-            print(f"  [ok] package {pkg} {item['version']} already installed")
+    wanted = set(v.packages)
+    removed = []
+    for pkg in MANAGED_PACKAGES:
+        if pkg in wanted:
             continue
-        print(f"  installing package {pkg} ...")
-        r = requests.post(f"{KIBANA_URL}/api/fleet/epm/packages/{pkg}",
-                          headers=KBN_HEADERS, json={}, timeout=600)
-        r.raise_for_status()
-        print(f"  [ok] package {pkg} installed")
+        status, ver = _package_status(pkg)
+        if status != "installed":
+            continue
+        if uninstall_package(pkg, ver):
+            removed.append(pkg)
+    if not removed:
+        print("  [ok] Fleet packages match variant (no extras)")
+    else:
+        print(f"  [ok] removed foreign packages: {', '.join(removed)}")
 
 
 def patch_tsds_templates():
@@ -55,6 +143,9 @@ def patch_tsds_templates():
     for name in TSDS_PATCH:
         r = requests.get(f"{ELASTIC_URL}/_index_template/{name}",
                          headers=ES_HEADERS, timeout=60)
+        if r.status_code == 404:
+            print(f"  [skip] {name} template not installed")
+            continue
         r.raise_for_status()
         tpl = r.json()["index_templates"][0]["index_template"]
         idx = tpl.get("template", {}).get("settings", {}).get("index", {})
@@ -294,8 +385,8 @@ ESS_BILLING_DASHBOARDS = (
 
 def pin_ess_billing_dashboards():
     """Pin OOTB ESS Billing + Credits dashboards to the demo backfill window."""
-    for did in ESS_BILLING_DASHBOARDS:
-        _pin_dashboard_time_range(did)
+    from src.ess_billing_health import pin_ess_billing_dashboards_all_spaces
+    pin_ess_billing_dashboards_all_spaces()
 
 
 INFERENCE_TOKEN_USAGE_DATA_VIEW_ID = "kibana-inference-token-usage"
@@ -315,6 +406,28 @@ def patch_inference_token_usage_dashboard():
     r = requests.get(
         f"{KIBANA_URL}/api/data_views/data_view/{INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}",
         headers=KBN_HEADERS, timeout=30)
+    if r.status_code == 404:
+        r = requests.post(
+            f"{KIBANA_URL}/api/data_views/data_view",
+            headers=KBN_HEADERS, timeout=30, json={
+                "override": True,
+                "data_view": {
+                    "id": INFERENCE_TOKEN_USAGE_DATA_VIEW_ID,
+                    "title": INFERENCE_TOKEN_USAGE_INDEX,
+                    "name": "Inference Token Usage",
+                    "timeFieldName": "@timestamp",
+                    "allowNoIndex": True,
+                },
+            })
+        if r.status_code >= 300:
+            print(f"  [warn] could not create data view: {r.status_code} {r.text[:400]}")
+            return
+        updated = r.json().get("data_view") or r.json()
+        n_fields = len(updated.get("fields") or {})
+        print(f"  [ok] created data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID} -> "
+              f"{INFERENCE_TOKEN_USAGE_INDEX} ({n_fields} fields)")
+        _pin_dashboard_time_range(INFERENCE_TOKEN_USAGE_DASHBOARD_ID)
+        return
     if r.status_code != 200:
         print(f"  [warn] data view {INFERENCE_TOKEN_USAGE_DATA_VIEW_ID}: {r.status_code}")
         return
@@ -348,6 +461,11 @@ def patch_inference_token_usage_dashboard():
 
 
 def run():
+    from src.profile import uses_live_hub
+    if uses_live_hub():
+        from src.live_setup import run as live_run
+        live_run(fail_loud=False)
+        return
     from src.variant import active_variant
     v = active_variant()
     print(f"== variant: {v.id} — {v.title} ==")
@@ -393,6 +511,9 @@ def run():
         from src.generators.llm_apm import ensure_apm_genai_mappings
         ensure_apm_genai_mappings(fail_loud=True)
     if v.setup_enabled("inference"):
+        print("== GenAI Settings: token usage tracking ==")
+        from src.genai_settings import ensure_genai_token_usage_tracking
+        ensure_genai_token_usage_tracking(fail_loud=False)
         print("== inference token-usage template ==")
         from src.generators.elastic_ai import _ensure_template
         _ensure_template()

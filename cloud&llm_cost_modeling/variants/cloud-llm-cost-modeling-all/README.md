@@ -52,6 +52,58 @@ correlates across streams:
 | `logs-azure.activitylogs-default` | Azure activity log records |
 | `metrics-azure.billing-default` | Per-VM + per-resource-group daily usage costs |
 
+## Workshop forks (per cloud / integration)
+
+The master project (`cloud&llm_cost_modeling`) supports **variant profiles** that scope
+generators, Fleet packages, setup steps, and dashboards to one cloud or LLM integration pack.
+
+Materialize self-contained copies under `variants/`:
+
+```bash
+python scripts/fork_project.py --list          # variant ids + destination dirs
+python scripts/fork_project.py --all           # fork every variant
+python scripts/fork_project.py aws gcp azure   # fork selected variants
+python scripts/fork_project.py --force openai  # replace an existing fork
+```
+
+| Variant | Directory | Focus |
+|---|---|---|
+| `all` | `variants/cloud-llm-cost-modeling-all` | Full multi-cloud + all LLM + Elastic AI |
+| `aws` | `variants/cloud-llm-cost-modeling-aws` | CloudTrail, GuardDuty, S3, EC2, CUR, Bedrock, ESS credits |
+| `gcp` | `variants/cloud-llm-cost-modeling-gcp` | GCP audit/billing + Vertex AI (prompt logs, metrics, audit) |
+| `azure` | `variants/cloud-llm-cost-modeling-azure` | Azure activity/billing + Azure OpenAI logs/metrics/billing |
+| `openai` | `variants/cloud-llm-cost-modeling-openai` | OpenAI streams + baseline FinOps + budgets/agent |
+| `anthropic` | `variants/cloud-llm-cost-modeling-anthropic` | Anthropic metrics + baseline FinOps + budgets/agent |
+| `bedrock` | `variants/cloud-llm-cost-modeling-bedrock` | Bedrock + APM + baseline FinOps + budgets/agent |
+| `elastic-ai` | `variants/cloud-llm-cost-modeling-elastic-ai` | Agent Builder + inference + AI dashboard + budgets/agent |
+
+**Packaging policy:** every variant that has measurable spend enables **budgets** and
+**agent**. LLM packs (`openai`, `anthropic`, `bedrock`) and cloud packs (`aws` /
+`gcp` / `azure`) publish a **single baseline** FinOps board (`dynamic: false` when
+`baseline` is on — the old `-dynamic` id is not dual-published). Classic/security→cost
+stays on `aws` / `all` only. Elastic AI keeps the AI Assistant dashboard as primary
+(`baseline` off).
+
+**Runtime demos use the master tree** (`cloud&llm_cost_modeling/`). Forks under
+`variants/` are workshop handouts — regenerate with
+`python scripts/fork_project.py --all --force` after master changes, then
+`python scripts/check_fork_drift.py` to confirm.
+
+Each fork ships with `config/active_variant.yaml` and a `FORK.md` quickstart.
+`FINOPS_VARIANT=vertexai` is an alias of `gcp` (Vertex AI lives in the default GCP build).
+`FINOPS_VARIANT=azure-openai` is an alias of `azure` (Azure OpenAI lives in the default Azure build).
+Every variant also installs Elastic AI + Elastic Cloud billing
+(`config/variants.yaml` `always`): Agent Builder traces, inference token usage,
+GenAI token-usage tracking, the AI Assistant dashboard, and the Fleet
+`ess_billing` package (Billing + Credits OOTB dashboards).
+
+Active variant in any tree: `python -m src.cli variants` (or set `FINOPS_VARIANT`).
+
+Each variant publishes its own `[ELK Co] FinOps & LLM Observability — …`
+dashboard (`elk-finops-llm-observability-<variant>`). GCP panels are GCP billing
++ Vertex AI only; Azure panels are Azure billing + Azure OpenAI only; AWS Cost Explorer
+/ CUR panels are not included on either.
+
 ## Usage
 
 ### Workshop quickstart
@@ -59,16 +111,60 @@ correlates across streams:
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
-# Copy .env.example → .env and set ELASTIC_URL, ELASTIC_API_KEY, KIBANA_URL
+# Copy .env.example → .env and fill DEPLOY_<NAME>_* blocks (or flat ELASTIC_* keys).
+# Select a target: FINOPS_DEPLOYMENT=gcp   (or pass --deployment gcp on each command)
 
-.venv/bin/python -m src.cli setup                           # Fleet, APM, budgets, agent
-.venv/bin/python -m src.cli backfill --scope all            # default 120 days
-.venv/bin/python -m src.cli verify --scope all
-.venv/bin/python -m src.cli dashboards --variant all
+.venv/bin/python -m src.cli deployments                     # list named targets
+.venv/bin/python -m src.cli --deployment gcp setup          # Fleet, APM, budgets, agent
+.venv/bin/python -m src.cli --deployment gcp backfill --scope all
+.venv/bin/python -m src.cli --deployment gcp verify --scope all
+.venv/bin/python -m src.cli --deployment gcp dashboards --variant all
 ```
+
+Each `DEPLOY_<NAME>_*` block can set its own `VARIANT` (workshop profile),
+`FINOPS_PROFILE` (`synthetic` | `live`), and `KIBANA_SPACE` so AWS / GCP / Azure
+Elastic Cloud projects stay side-by-side in one `.env`.
 
 Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), **FinOps dashboard
 → Budget posture** (gauges + SLO table), and **Agent Builder → chat** (`elk-finops-ai-assistant`).
+
+### Live ELK Co FinOps (Cost Explorer / billing hubs)
+
+The synthetic factory is the default. To provision the **live** ELK Co FinOps space
+without generating data:
+
+```bash
+# AWS — Cost Explorer + rightsizing + workflows
+FINOPS_PROFILE=live
+FINOPS_VARIANT=aws   # or DEPLOY_AWS_VARIANT=aws
+.venv/bin/python -m src.cli --deployment aws --profile live setup
+.venv/bin/python -m src.cli --deployment aws --profile live verify
+
+# GCP / Azure — billing hub (SLOs + agent + variant FinOps dashboards;
+# no Cost Explorer / rightsizing / workflows)
+.venv/bin/python -m src.cli --deployment gcp --profile live setup
+.venv/bin/python -m src.cli --deployment azure --profile live setup
+```
+
+Live AWS setup also **enables GenAI token usage tracking**, installs **ess_billing**,
+and pins OOTB Billing / Credits / Inference Token Usage dashboards into the FinOps space.
+
+`setup` / `dashboards` / `agent` / `budgets` / `verify` honor `FINOPS_PROFILE=live`
+for variants **`aws`**, **`gcp`**, and **`azure`**. Other variants stay on synthetic
+dashboards and ignore the AWS Cost Explorer hub.
+
+Sources: `config/live/`, `kibana/live/`, `elasticsearch/live/`.
+
+Rightsizing queue (`finops-rightsizing-overview`) uses **Vega-Lite** panels plus an expanded
+recommendation catalog (downsize, upsize, stop_idle, delete_volume, migrate_generation,
+gp2_to_gp3, purchase_ri_sp, schedule_offhours, rightsize_lambda). Rebuild assets with:
+
+```bash
+.venv/bin/python scripts/generate_rightsizing_seed.py
+.venv/bin/python scripts/build_rightsizing_dashboard.py
+```
+
+Then re-run `--profile live setup` (force-reseeds when the stream is thin / always upserts on live setup).
 
 ### All commands
 
@@ -81,6 +177,7 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 .venv/bin/python -m src.cli stream --tick 60 --scope all
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli budgets              # FinOps spend SLOs + ES|QL budget alerts
+.venv/bin/python -m src.cli workflow             # live FinOps Kibana workflows (spend spike + rightsizing)
 .venv/bin/python -m src.cli recover-slos         # reset SLO transforms + reprocess SLI data
 .venv/bin/python -m src.cli agent                # ELK Co FinOps AI Assistant (Agent Builder)
 .venv/bin/python -m src.cli reindex-elastic-ai   # wipe + re-backfill Agent Builder / inference traces
@@ -92,9 +189,10 @@ Then open Kibana: **Observability → SLOs** (expect **VIOLATED** spend SLOs), *
 ```
 
 **Dashboard IDs:** `elk-finops-llm-observability` (baseline — stacked bars/areas),
-`elk-finops-llm-observability-dynamic` (same layout, kept for bookmarks),
 `elk-finops-llm-observability-classic` (legacy treemaps/tables),
 `elk-ai-assistant-inference-usage` (Agent Builder + inference token usage).
+The `-dynamic` id is only published when baseline is off (legacy sole-layout packs);
+when both flags were historically true, publish skips the alias.
 
 `--scope` accepts `all` | `cloud` | `llm` | `openai-extra` | `elastic-ai`.
 
@@ -108,9 +206,31 @@ After a fresh backfill, re-run `dashboards` so stored windows match.
 ### Pre-session checklist (~10 min)
 
 ```bash
+# Gate: config consistency + fork drift (+ optional panel smoke)
+.venv/bin/python scripts/pre_demo_gate.py --deployment azure --deployment gcp
+# or step-by-step:
+.venv/bin/python scripts/variant_consistency.py
+.venv/bin/python scripts/check_fork_drift.py
+.venv/bin/python scripts/panel_smoke.py --deployment azure
+
 .venv/bin/python -m src.cli reindex-elastic-ai   # align Agent Builder trace agent IDs
 .venv/bin/python -m src.cli verify --scope all
 .venv/bin/python -m src.cli dashboards --variant all   # refresh 120d time window if needed
+```
+
+**Never reset live AWS mid-workshop.** `scripts/reset_environment.py` requires
+`--yes` and deletes the Kibana space **only** with `--delete-space` (never implied
+by live profile). Live Cost Explorer / native billing is **not** restored by
+generators — recovery is re-setup + real integration lag (often hours for AWS CE).
+
+**After a live AWS wipe / space delete**, re-provision and smoke workflows:
+
+```bash
+.venv/bin/python -m src.cli --deployment aws --profile live setup
+.venv/bin/python -m src.cli --deployment aws workflow --smoke
+# optional: also execute auto-approve spend-spike
+.venv/bin/python -m src.cli --deployment aws workflow --smoke --deep
+# or: .venv/bin/python scripts/verify_live_workflows.py --deployment aws --ensure --deep
 ```
 
 Spot-check in Kibana: **SLOs** (3 violated), **Observability Alerts**, and one
@@ -133,7 +253,11 @@ the end of `setup`) provisions:
 | `elk-slo-staging-cost-leak` | **VIOLATED** — cost_leak ~$1k/day vs $150/day ceiling |
 | `elk-slo-llm-checkout-spend` | **VIOLATED** — agent-loop spike days vs $0.50/day ceiling |
 
-Thresholds live in [`config/budgets.yaml`](config/budgets.yaml) and are **intentionally
+Thresholds live in scoped YAML packs — [`config/budgets.yaml`](config/budgets.yaml)
+(`aws`/`all`), [`budgets_azure.yaml`](config/budgets_azure.yaml),
+[`budgets_gcp.yaml`](config/budgets_gcp.yaml),
+[`budgets_llm.yaml`](config/budgets_llm.yaml) (openai/anthropic/elastic-ai),
+[`budgets_bedrock.yaml`](config/budgets_bedrock.yaml) — and are **intentionally
 tight** so the seeded timeline shows breached SLOs and active budget alerts without
 waiting for a new incident.
 
@@ -214,7 +338,9 @@ as the real integrations), so OOTB dashboards work:
 Notes:
 
 - `setup` installs cloud + LLM packages, creates APM gen_ai mappings + **180d**
-  trace retention, wires CUR alias / inference data-view Serverless workarounds,
+  trace retention, enables **GenAI Settings → Token usage tracking** (and the
+  managed inference dashboard when the API allows), wires CUR alias /
+  inference data-view Serverless workarounds,
   provisions FinOps spend SLOs + budget alerts, provisions the ELK Co FinOps AI
   Assistant, and removes TSDS mode from
   `metrics-aws.ec2_metrics` and `metrics-aws_bedrock.runtime` so multi-month
@@ -222,8 +348,7 @@ Notes:
 - Generation is seeded and windows are pure functions of time, so backfill
   and `stream` produce one continuous, reproducible timeline.
 - Default backfill is **120 days** (~4.5M cloud docs + ~500k LLM/APM/CUR/Agent Builder docs).
-- Orphan modules `llm_invocation` / `llm_usage` / `llm_cost` are **not** in
-  `backfill --scope llm` (native provider streams + APM are used instead).
+- LLM spend comes from **native provider streams + APM gen_ai spans** (`llm_apm`).
 
 ## Layout
 
@@ -234,11 +359,14 @@ src/world/                 # inventory + scenarios + cloud costs + LLM catalog
 src/generators/            # cloud + LLM + Elastic AI Assistant / inference
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
+src/genai_settings.py      # GenAI token usage tracking + OOTB dashboard install
 src/time_window.py         # shared demo time range (aligns with backfill)
 src/budgets.py             # FinOps spend SLOs, budget alerts, recover-slos
 src/agent_builder.py       # ELK Co FinOps AI Assistant (Agent Builder + ES|QL tools)
 src/elastic_ai_reindex.py  # wipe + re-backfill Agent Builder / inference synthetic data
-src/cli.py                 # setup | … | reindex-elastic-ai | agent | dashboards | backup
+src/cli.py                 # setup | … | variants | dashboards | backup
+src/variant.py             # workshop fork profiles (config/variants.yaml)
+scripts/fork_project.py    # materialize per-cloud/integration forks
 src/dashboards.py          # Kibana FinOps + LLM dashboards (baseline + classic)
 src/dashboards_ai.py       # Kibana AI Assistant + inference usage dashboard
 src/backup.py              # snapshot Kibana/Fleet/ES objects into ./elastic
