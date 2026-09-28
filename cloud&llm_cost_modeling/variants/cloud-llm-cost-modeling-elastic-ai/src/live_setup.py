@@ -61,6 +61,9 @@ def _run_aws_hub(*, fail_loud: bool) -> None:
     from src.ess_billing_health import ensure_ess_billing_field_health
     ensure_ess_billing_field_health(fail_loud=fail_loud)
     pin_ess_billing_dashboards()
+    from src.setup_cmd import pin_bedrock_dashboards
+    print("== Amazon Bedrock dashboards (time range) ==")
+    pin_bedrock_dashboards()
     from src.generators.aws_ec2_metrics import ensure_cpu_restore_pipeline
     ensure_cpu_restore_pipeline()
 

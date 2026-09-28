@@ -26,6 +26,8 @@ VARIANT_ALIASES = {
     "vertexai": "gcp",
     "azure-openai": "azure",
     "azure_openai": "azure",
+    "bedrock": "aws",
+    "anthropic": "gcp",
 }
 
 SKIP_NAMES = {

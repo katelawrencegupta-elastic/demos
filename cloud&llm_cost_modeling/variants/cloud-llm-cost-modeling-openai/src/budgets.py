@@ -38,7 +38,7 @@ BUDGETS_CONFIG = ROOT / "config" / "budgets.yaml"
 TAGS = ["elk-co", "finops", "workshop"]
 WORKFLOWS_CONNECTOR = "system-connector-.workflows"
 
-LLM_BUDGET_VARIANTS = frozenset({"openai", "anthropic", "elastic-ai"})
+LLM_BUDGET_VARIANTS = frozenset({"openai", "elastic-ai"})
 
 
 def _slo_api() -> str:
@@ -75,8 +75,11 @@ def budgets_config_path(
         return ROOT / "config" / "budgets_azure.yaml"
     if vid == "gcp":
         return ROOT / "config" / "budgets_gcp.yaml"
+    # Retired aliases — keep paths for any direct calls that bypass canonicalize.
     if vid == "bedrock":
-        return ROOT / "config" / "budgets_bedrock.yaml"
+        return ROOT / "config" / "budgets.yaml"
+    if vid == "anthropic":
+        return ROOT / "config" / "budgets_gcp.yaml"
     if vid in LLM_BUDGET_VARIANTS:
         return ROOT / "config" / "budgets_llm.yaml"
     if live:

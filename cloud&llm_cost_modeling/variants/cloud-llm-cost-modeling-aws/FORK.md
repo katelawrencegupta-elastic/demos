@@ -1,4 +1,4 @@
-# ELK Co FinOps — AWS
+# ELK Co FinOps — AWS + Amazon Bedrock
 
 Provider/integration-scoped fork of the ELK Co synthetic data factory.
 

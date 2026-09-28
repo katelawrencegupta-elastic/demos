@@ -187,6 +187,12 @@ def live_hub_tabs_items() -> list:
         ("Spend vs savings", spend),
         ("Rightsizing", rightsizing),
     ]
+    bedrock_overview = "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4"
+    bedrock_guardrails = "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde"
+    if bedrock_overview in mapping:
+        items.append(("Bedrock", mapping[bedrock_overview]))
+    if bedrock_guardrails in mapping:
+        items.append(("Bedrock Guardrails", mapping[bedrock_guardrails]))
     if "kibana-inference-token-usage" in mapping:
         items.append(("Inference tokens", mapping["kibana-inference-token-usage"]))
     if "ess_billing-billingdashboard" in mapping:

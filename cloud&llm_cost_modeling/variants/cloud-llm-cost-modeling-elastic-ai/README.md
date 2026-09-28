@@ -70,16 +70,14 @@ python scripts/fork_project.py --force openai  # replace an existing fork
 |---|---|---|
 | `all` | `variants/cloud-llm-cost-modeling-all` | Full multi-cloud + all LLM + Elastic AI |
 | `aws` | `variants/cloud-llm-cost-modeling-aws` | CloudTrail, GuardDuty, S3, EC2, CUR, Bedrock, ESS credits |
-| `gcp` | `variants/cloud-llm-cost-modeling-gcp` | GCP audit/billing + Vertex AI (prompt logs, metrics, audit) |
+| `gcp` | `variants/cloud-llm-cost-modeling-gcp` | GCP audit/billing + Vertex AI + Anthropic metrics |
 | `azure` | `variants/cloud-llm-cost-modeling-azure` | Azure activity/billing + Azure OpenAI logs/metrics/billing |
 | `openai` | `variants/cloud-llm-cost-modeling-openai` | OpenAI streams + baseline FinOps + budgets/agent |
-| `anthropic` | `variants/cloud-llm-cost-modeling-anthropic` | Anthropic metrics + baseline FinOps + budgets/agent |
-| `bedrock` | `variants/cloud-llm-cost-modeling-bedrock` | Bedrock + APM + baseline FinOps + budgets/agent |
 | `elastic-ai` | `variants/cloud-llm-cost-modeling-elastic-ai` | Agent Builder + inference + AI dashboard + budgets/agent |
 
 **Packaging policy:** every variant that has measurable spend enables **budgets** and
-**agent**. LLM packs (`openai`, `anthropic`, `bedrock`) and cloud packs (`aws` /
-`gcp` / `azure`) publish a **single baseline** FinOps board (`dynamic: false` when
+**agent**. LLM pack `openai` and cloud packs (`aws` / `gcp` / `azure`) publish a
+**single baseline** FinOps board (`dynamic: false` when
 `baseline` is on — the old `-dynamic` id is not dual-published). Classic/security→cost
 stays on `aws` / `all` only. Elastic AI keeps the AI Assistant dashboard as primary
 (`baseline` off).
@@ -92,6 +90,8 @@ stays on `aws` / `all` only. Elastic AI keeps the AI Assistant dashboard as prim
 Each fork ships with `config/active_variant.yaml` and a `FORK.md` quickstart.
 `FINOPS_VARIANT=vertexai` is an alias of `gcp` (Vertex AI lives in the default GCP build).
 `FINOPS_VARIANT=azure-openai` is an alias of `azure` (Azure OpenAI lives in the default Azure build).
+`FINOPS_VARIANT=bedrock` is an alias of `aws` (Bedrock lives in the default AWS build).
+`FINOPS_VARIANT=anthropic` is an alias of `gcp` (Anthropic metrics live in the default GCP build).
 Every variant also installs Elastic AI + Elastic Cloud billing
 (`config/variants.yaml` `always`): Agent Builder traces, inference token usage,
 GenAI token-usage tracking, the AI Assistant dashboard, and the Fleet
@@ -101,8 +101,8 @@ Active variant in any tree: `python -m src.cli variants` (or set `FINOPS_VARIANT
 
 Each variant publishes its own `[ELK Co] FinOps & LLM Observability — …`
 dashboard (`elk-finops-llm-observability-<variant>`). GCP panels are GCP billing
-+ Vertex AI only; Azure panels are Azure billing + Azure OpenAI only; AWS Cost Explorer
-/ CUR panels are not included on either.
++ Vertex AI + Anthropic; Azure panels are Azure billing + Azure OpenAI only; AWS Cost Explorer
+/ CUR + Bedrock panels are not included on either.
 
 ## Usage
 

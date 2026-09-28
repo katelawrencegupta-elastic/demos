@@ -19,6 +19,10 @@ VARIANT_ALIASES = {
     "vertexai": "gcp",
     "azure-openai": "azure",
     "azure_openai": "azure",
+    # Bedrock is part of the AWS FinOps pack going forward.
+    "bedrock": "aws",
+    # Anthropic metrics ship with the GCP FinOps pack going forward.
+    "anthropic": "gcp",
 }
 
 

@@ -158,11 +158,15 @@ def assert_variant_dashboard_scope(vid: str) -> None:
                     raise AssertionError(f"gcp dashboard missing Vertex/GCP marker {marker!r}")
             if not caps.vertex:
                 raise AssertionError("gcp variant must include Vertex AI panels")
+            if not caps.anthropic:
+                raise AssertionError("gcp variant must include Anthropic panels")
         if vid == "aws":
             if "gcp_vertexai" in blob or "metrics-gcp.billing" in blob:
                 raise AssertionError("aws dashboard contains GCP panel markers")
             if "azure_openai" in blob or "metrics-azure.billing" in blob:
                 raise AssertionError("aws dashboard contains Azure panel markers")
+            if not caps.bedrock:
+                raise AssertionError("aws variant must include Bedrock panels")
         if vid == "azure":
             for marker in _AWS_PANEL_MARKERS:
                 if marker in blob:

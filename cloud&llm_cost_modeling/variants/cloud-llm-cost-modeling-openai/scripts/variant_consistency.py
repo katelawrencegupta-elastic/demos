@@ -62,19 +62,18 @@ _CLOUD_MARKERS = {
 }
 
 # Single-cloud variants must not reference other clouds' SLO indices.
-# LLM packs (openai/anthropic/elastic-ai/bedrock) use scoped LLM budgets — no CUR.
+# LLM packs (openai/elastic-ai) use scoped LLM budgets — no CUR.
+# bedrock → aws and anthropic → gcp (see VARIANT_ALIASES).
 _VARIANT_CLOUD = {
     "aws": "aws",
-    "bedrock": None,
     "gcp": "gcp",
     "azure": "azure",
     "openai": None,
-    "anthropic": None,
     "elastic-ai": None,
     "all": None,
 }
 
-_LLM_BUDGET_VARIANTS = frozenset({"openai", "anthropic", "elastic-ai", "bedrock"})
+_LLM_BUDGET_VARIANTS = frozenset({"openai", "elastic-ai"})
 _CUR_INDEX_MARKERS = (
     "metrics-aws_billing",
     "aws_billing.cur",
@@ -256,15 +255,18 @@ def check_static_variant(report: Report, vid: str) -> None:
                     f"budgets.llm_slo[{profile}]",
                     f"{need} {'present' if need in ids else 'MISSING'}",
                 )
-            if vid == "bedrock":
-                report.add(
-                    "elk-slo-bedrock-daily-spend" in ids,
-                    scope,
-                    f"budgets.bedrock_slo[{profile}]",
-                    "elk-slo-bedrock-daily-spend present"
-                    if "elk-slo-bedrock-daily-spend" in ids
-                    else "MISSING elk-slo-bedrock-daily-spend",
-                )
+
+        if vid == "aws":
+            # Bedrock is part of the AWS pack — budgets must carry the Bedrock SLO.
+            slo_ids = {s["id"] for s in slos if s.get("id")}
+            report.add(
+                "elk-slo-bedrock-daily-spend" in slo_ids,
+                scope,
+                f"budgets.bedrock_slo[{profile}]",
+                "elk-slo-bedrock-daily-spend present"
+                if "elk-slo-bedrock-daily-spend" in slo_ids
+                else "MISSING elk-slo-bedrock-daily-spend",
+            )
 
         # alerts need kind or esql
         bad_alerts = [
@@ -282,6 +284,29 @@ def check_static_variant(report: Report, vid: str) -> None:
             scope,
             f"budgets.alerts[{profile}]",
             f"{len(alerts)} alerts" if not missing_kind else f"alerts missing kind/esql: {missing_kind}",
+        )
+
+    if vid == "aws":
+        for need in ("bedrock_invocation", "bedrock_runtime", "bedrock_guardrails"):
+            report.add(
+                v.has_generator(need),
+                scope,
+                "generators.bedrock",
+                f"{need} {'present' if v.has_generator(need) else 'MISSING'}",
+            )
+        report.add(
+            v.setup_enabled("bedrock"),
+            scope,
+            "setup.bedrock",
+            "on" if v.setup_enabled("bedrock") else "OFF",
+        )
+        report.add(
+            any("Bedrock" in L for L in v.ootb_link_labels),
+            scope,
+            "ootb.bedrock",
+            "bedrock ootb group present"
+            if any("Bedrock" in L for L in v.ootb_link_labels)
+            else "MISSING bedrock ootb labels",
         )
 
     # dashboard alias rule — synthetic variants must not enable both

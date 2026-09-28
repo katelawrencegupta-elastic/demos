@@ -76,7 +76,7 @@ variants:
       - vertexai
 
   aws:
-    title: "ELK Co FinOps — AWS"
+    title: "ELK Co FinOps — AWS + Amazon Bedrock"
     fork_dir: cloud-llm-cost-modeling-aws
     default_scope: all
     generators:
@@ -125,7 +125,7 @@ variants:
       - bedrock
 
   gcp:
-    title: "ELK Co FinOps — GCP + Vertex AI"
+    title: "ELK Co FinOps — GCP + Vertex AI + Anthropic"
     fork_dir: cloud-llm-cost-modeling-gcp
     default_scope: all
     generators:
@@ -134,13 +134,19 @@ variants:
       - vertex_prompt_logs
       - vertex_metrics
       - vertex_audit_logs
+      - anthropic_usage
+      - anthropic_cost
+      - anthropic_rate_limit
       - llm_apm
     packages:
       - gcp
       - gcp_vertexai
+      - anthropic
+      - anthropic_metrics
       - apm
     setup:
       vertexai: true
+      anthropic: true
       apm: true
       budgets: true
       agent: true
@@ -152,6 +158,7 @@ variants:
     ootb_links:
       - gcp_billing
       - vertexai
+      - anthropic
 
   azure:
     title: "ELK Co FinOps — Azure + Azure OpenAI"
@@ -212,60 +219,9 @@ variants:
     ootb_links:
       - openai
 
-  anthropic:
-    title: "ELK Co LLM Observability — Anthropic"
-    fork_dir: cloud-llm-cost-modeling-anthropic
-    default_scope: all
-    generators:
-      - anthropic_usage
-      - anthropic_cost
-      - anthropic_rate_limit
-      - llm_apm
-    packages:
-      - anthropic
-      - anthropic_metrics
-      - apm
-    setup:
-      anthropic: true
-      apm: true
-      budgets: true
-      agent: true
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false  # publish skips -dynamic when baseline is on
-      ai: false
-    ootb_links:
-      - anthropic
-
-  bedrock:
-    title: "ELK Co LLM Observability — Amazon Bedrock"
-    fork_dir: cloud-llm-cost-modeling-bedrock
-    default_scope: all
-    generators:
-      - bedrock_invocation
-      - bedrock_runtime
-      - bedrock_guardrails
-      - llm_apm
-    packages:
-      - aws_bedrock
-      - apm
-    setup:
-      tsds: true
-      bedrock: true
-      apm: true
-      budgets: true
-      agent: true
-    dashboards:
-      baseline: true
-      classic: false
-      dynamic: false  # publish skips -dynamic when baseline is on
-      ai: false
-    ootb_links:
-      - bedrock
-
-  # vertexai is an alias of gcp; azure-openai is an alias of azure
-  # (see src/variant.py VARIANT_ALIASES).
+  # vertexai → gcp; azure-openai → azure; bedrock → aws; anthropic → gcp
+  # (see src/variant.py VARIANT_ALIASES). Bedrock generators + OOTB links
+  # live on the aws variant; Anthropic generators + OOTB links live on gcp.
 
   elastic-ai:
     title: "ELK Co Elastic AI Assistant & inference usage"

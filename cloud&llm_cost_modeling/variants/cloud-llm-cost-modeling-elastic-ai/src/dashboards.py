@@ -22,12 +22,10 @@ DASHBOARD_ID_INFERENCE_USAGE = "kibana-inference-token-usage"
 # Short labels appended to the ELK Co hub title.
 DASHBOARD_SCOPE_LABELS = {
     "all": "",
-    "aws": "AWS",
-    "gcp": "GCP + Vertex AI",
+    "aws": "AWS + Amazon Bedrock",
+    "gcp": "GCP + Vertex AI + Anthropic",
     "azure": "Azure + Azure OpenAI",
     "openai": "OpenAI",
-    "anthropic": "Anthropic",
-    "bedrock": "Amazon Bedrock",
     "elastic-ai": "Elastic AI",
 }
 

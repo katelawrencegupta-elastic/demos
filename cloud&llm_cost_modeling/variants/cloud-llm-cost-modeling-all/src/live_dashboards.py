@@ -23,6 +23,9 @@ OOTB_HUB_TITLES = {
     "kibana-inference-token-usage": "[Elastic] Inference Token Usage",
     "ess_billing-billingdashboard": "[Metrics ESS Billing] Billing dashboard",
     "ess_billing-creditsdashboard": "[Metrics ESS Billing] Credits dashboard",
+    # Fleet titles (bracketed) — share into the FinOps space for hub tabs.
+    "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4": "[Amazon Bedrock] Overview",
+    "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde": "[Amazon Bedrock] Guardrails",
 }
 HUB_BACKUP_IDS = {
     "ffd600e5-2862-4bf4-8556-2ef8872c5ba5": "kibana-inference-token-usage",
@@ -46,6 +49,8 @@ HUB_LINK_LABELS = {
     "ESS Credits": "ess_billing-creditsdashboard",
     "Billing": "ess_billing-billingdashboard",
     "Credits": "ess_billing-creditsdashboard",
+    "Bedrock": "aws_bedrock-2a19b571-251b-487b-84b2-abd887efb8a4",
+    "Bedrock Guardrails": "aws_bedrock-14fd745a-d3c1-4ebe-bd25-00b465336cde",
 }
 _KIBANA_HOST_RE = re.compile(r"https://[^/\s)]+\.kb\.[^/\s)]+elastic\.cloud")
 

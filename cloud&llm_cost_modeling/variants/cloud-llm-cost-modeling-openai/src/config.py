@@ -71,10 +71,13 @@ _DEPLOY_VARIANT_ALIASES = {
     "vertexai": "gcp",
     "azure-openai": "azure",
     "azure_openai": "azure",
+    "bedrock": "aws",
+    "anthropic": "gcp",
 }
 _KNOWN_VARIANTS = frozenset({
-    "all", "aws", "gcp", "azure", "openai", "anthropic",
-    "bedrock", "elastic-ai",
+    "all", "aws", "gcp", "azure", "openai", "elastic-ai",
+    # Retired ids still accepted via _DEPLOY_VARIANT_ALIASES above.
+    "anthropic", "bedrock",
 })
 
 

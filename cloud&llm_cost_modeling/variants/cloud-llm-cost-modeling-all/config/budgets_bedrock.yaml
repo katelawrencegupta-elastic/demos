@@ -1,5 +1,7 @@
-# Bedrock workshop variant — Bedrock + shared LLM / inference SLOs.
-# No AWS CUR SLOs (CUR is not required for the Bedrock pack).
+# Legacy Bedrock-only workshop budgets.
+# Bedrock is folded into the aws variant going forward — prefer
+# config/budgets.yaml (synthetic) or config/live/budgets.yaml (live AWS).
+# Kept so check_fork_drift / older handouts still resolve the path.
 
 tags:
   - elk-co

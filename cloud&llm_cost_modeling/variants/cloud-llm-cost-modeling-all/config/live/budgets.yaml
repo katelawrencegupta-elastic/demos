@@ -26,6 +26,9 @@ budgets:
   checkout_daily_ceiling_usd: 0.50
   checkout_7d_alert_usd: 4.0
   gcp_ml_7d_alert_usd: 4000
+  # Bedrock is part of the AWS pack — APM gen_ai aws.bedrock ceilings
+  bedrock_daily_ceiling_usd: 25
+  bedrock_7d_alert_usd: 80
 
 slos:
   - id: elk-slo-aws-daily-spend
@@ -89,6 +92,17 @@ slos:
     filter: 'inference.feature_id : "agent_builder"'
     field: token_usage.total_tokens
     ceiling_key: inference_daily_tokens
+    burn_rate_alert: true
+
+  - id: elk-slo-bedrock-daily-spend
+    name: "[ELK Co] Bedrock daily LLM cost"
+    description: >
+      Daily APM gen_ai cost for aws.bedrock under ceiling (Bedrock is part of
+      the AWS FinOps pack).
+    index: traces-apm-default
+    filter: 'span.subtype : "gen_ai" and gen_ai.system : "aws.bedrock"'
+    field: labels.llm_cost_usd
+    ceiling_key: bedrock_daily_ceiling_usd
     burn_rate_alert: true
 
 alerts:
@@ -188,3 +202,11 @@ alerts:
       | WHERE inference.feature_id == "agent_builder"
       | STATS tokens = SUM(token_usage.total_tokens)
       | WHERE tokens > {inference_7d_tokens}
+
+  - id: elk-alert-bedrock-7d
+    name: "[ELK Co] Bedrock 7d LLM burn"
+    description: 7-day APM gen_ai cost for aws.bedrock above floor.
+    schedule: 1h
+    time_window_size: 7
+    time_window_unit: d
+    kind: bedrock_7d

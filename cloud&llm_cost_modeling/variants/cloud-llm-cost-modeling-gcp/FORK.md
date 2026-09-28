@@ -1,4 +1,4 @@
-# ELK Co FinOps — GCP + Vertex AI
+# ELK Co FinOps — GCP + Vertex AI + Anthropic
 
 Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
