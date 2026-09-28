@@ -826,7 +826,7 @@ def main():
             if not report.ok:
                 raise SystemExit(1)
     elif args.cmd == "variants":
-        from src.variant import VARIANT_ALIASES
+        from src.variant import VARIANT_ALIASES, active_variant
         for vid, title, fork_dir in list_variants():
             mark = " (active)" if vid == active_variant().id else ""
             print(f"  {vid:14}  variants/{fork_dir}{mark}")

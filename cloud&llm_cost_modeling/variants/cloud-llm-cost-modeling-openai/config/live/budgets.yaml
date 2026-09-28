@@ -136,7 +136,7 @@ alerts:
     schedule: 1h
     time_window_size: 5
     time_window_unit: d
-    workflow_id: elk-finops-spend-spike-hitl
+    workflow_id: elk-finops-spend-spike-hitl-2
     message: "FinOps: latest linked-account day is >{dod_ratio}x the prior-days average"
     esql: |
       FROM metrics-aws.billing-default
@@ -151,7 +151,7 @@ alerts:
     schedule: 1h
     time_window_size: 1
     time_window_unit: d
-    workflow_id: elk-finops-spend-spike-hitl
+    workflow_id: elk-finops-spend-spike-hitl-2
     message: "FinOps: {stage_account_name} daily unblended spend exceeded ${staging_daily_alert_usd:,}"
     esql: |
       FROM metrics-aws.billing-default
@@ -165,7 +165,7 @@ alerts:
     schedule: 1h
     time_window_size: 8
     time_window_unit: d
-    workflow_id: elk-finops-spend-spike-hitl
+    workflow_id: elk-finops-spend-spike-hitl-2
     message: "FinOps: a SERVICE+account day is >{service_dod_ratio}x its prior-days average and >${service_dod_floor_usd:,}"
     esql: |
       FROM metrics-aws.billing-default

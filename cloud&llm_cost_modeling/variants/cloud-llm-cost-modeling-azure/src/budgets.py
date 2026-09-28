@@ -119,6 +119,9 @@ def substitutions(cfg: dict | None = None) -> dict:
     mapping = dict(cfg["budgets"])
     if live_hub_kind():
         mapping.update(live_accounts())
+    # Defaults so cloud-scoped agent YAML works on synthetic hubs too.
+    mapping.setdefault("gcp_ml_project", "elk-ml-prod")
+    mapping.setdefault("gcp_genai_project", "elk-genai-poc")
     mapping["kibana_url"] = _cfg.KIBANA_URL
     return mapping
 

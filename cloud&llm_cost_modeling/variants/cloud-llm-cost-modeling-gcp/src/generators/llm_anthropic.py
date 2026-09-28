@@ -139,8 +139,10 @@ class _AnthropicCost:
 class _AnthropicRateLimit:
     """Organization rate-limit ceilings -> metrics-anthropic_metrics.rate_limit.
 
-    Emits Admin API JSON in `message` so the Fleet pipeline populates
-    anthropic.rate_limit.group_type / models / flattened limit fields.
+    Writes anthropic.rate_limit.* fields directly (same shape the Fleet pipeline
+    would extract from Admin API JSON). Avoid relying on ``message`` + ingest
+    pipeline alone — that path rewrites @timestamp to ingest time and collapses
+    the whole backfill onto the demo day.
     """
     DATA_STREAM = "metrics-anthropic_metrics.rate_limit-default"
     DATASET = "anthropic_metrics.rate_limit"
@@ -152,23 +154,34 @@ class _AnthropicRateLimit:
         rng = rng_for("anthrl", t0.date().isoformat())
         for group in _RATE_LIMIT_GROUPS:
             jitter = 1 + rng.uniform(-0.02, 0.02)
+            rpm = int(group["rpm"] * jitter)
+            itpm = int(group["itpm"] * jitter)
+            itpm_cache = int(group["itpm_cache"] * jitter)
+            otpm = int(group["otpm"] * jitter)
             payload = {
                 "type": "rate_limit",
                 "group_type": "model_group",
                 "models": list(group["models"]),
                 "limits": [
-                    {"type": "requests_per_minute",
-                     "value": int(group["rpm"] * jitter)},
-                    {"type": "input_tokens_per_minute",
-                     "value": int(group["itpm"] * jitter)},
+                    {"type": "requests_per_minute", "value": rpm},
+                    {"type": "input_tokens_per_minute", "value": itpm},
                     {"type": "input_tokens_per_minute_cache_aware",
-                     "value": int(group["itpm_cache"] * jitter)},
-                    {"type": "output_tokens_per_minute",
-                     "value": int(group["otpm"] * jitter)},
+                     "value": itpm_cache},
+                    {"type": "output_tokens_per_minute", "value": otpm},
                 ],
             }
             doc = metric_doc(self.DATASET, t0, "rate_limit", 6 * 3600 * 1000)
-            doc["message"] = json.dumps(payload)
+            # Do not put Admin API JSON in `message` — the Fleet pipeline then
+            # rewrites @timestamp to ingest time. ECS fields are enough for ES|QL.
+            doc["event"] = {**(doc.get("event") or {}), "original": json.dumps(payload)}
+            doc["anthropic"] = {"rate_limit": {
+                "group_type": "model_group",
+                "models": list(group["models"]),
+                "requests_per_minute": rpm,
+                "input_tokens_per_minute": itpm,
+                "input_tokens_per_minute_cache_aware": itpm_cache,
+                "output_tokens_per_minute": otpm,
+            }}
             doc["tags"] = ["synthetic", "anthropic"]
             yield doc
 

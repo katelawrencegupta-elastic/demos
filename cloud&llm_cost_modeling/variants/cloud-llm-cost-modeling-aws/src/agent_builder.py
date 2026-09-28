@@ -41,7 +41,7 @@ def __getattr__(name: str):
 
 
 def agent_config_path():
-    kind = live_hub_kind()
+    kind = live_hub_kind() or _synthetic_cloud_kind()
     if uses_live_aws_hub():
         return LIVE_DIR / "finops_agent.yaml"
     if kind == "gcp":
@@ -49,6 +49,16 @@ def agent_config_path():
     if kind == "azure":
         return LIVE_DIR / "finops_agent_azure.yaml"
     return ROOT / "config" / "finops_agent.yaml"
+
+
+def _synthetic_cloud_kind() -> str | None:
+    """Return aws|gcp|azure for synthetic single-cloud variants."""
+    from src.variant import active_variant
+
+    vid = active_variant().id
+    if vid in ("aws", "gcp", "azure"):
+        return vid
+    return None
 
 
 def load_agent_config() -> dict:
@@ -69,7 +79,7 @@ def _tags(cfg: dict | None = None) -> list:
 
 
 def _budgets_block(mapping: dict) -> str:
-    kind = live_hub_kind()
+    kind = live_hub_kind() or _synthetic_cloud_kind()
     if uses_live_aws_hub():
         return "\n".join([
             f"- Calendar MTD linked unblended alert: ${mapping['aws_mtd_budget_usd']:,.0f}",
@@ -89,6 +99,8 @@ def _budgets_block(mapping: dict) -> str:
             f"- GCP daily SLO ceiling: ${mapping['gcp_daily_ceiling_usd']:,.0f}",
             f"- elk-ml-prod daily SLO ceiling: ${mapping['gcp_ml_daily_ceiling_usd']:,.0f}",
             f"- elk-ml-prod 7d alert floor: ${mapping['gcp_ml_7d_alert_usd']:,.0f}",
+            f"- checkout-assistant daily SLO ceiling: ${mapping.get('checkout_daily_ceiling_usd', 0.50):.2f}",
+            f"- Inference daily token ceiling: {int(mapping.get('inference_daily_tokens', 200000)):,}",
         ])
     if kind == "azure":
         return "\n".join([

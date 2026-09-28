@@ -27,11 +27,13 @@ def _workflow_app_url() -> str:
     return f"{KIBANA_URL}/app/workflows"
 
 
+# Bare elk-finops-* ids are tombstoned on the AWS serverless project
+# (POST 409 while GET/list return missing). Deploy under these free ids.
 WORKFLOW_IDS = (
-    "elk-finops-spend-spike-hitl",
-    "elk-finops-spend-spike-auto-approve",
-    "elk-finops-rightsize-case",
-    "elk-finops-rightsize-auto-approve",
+    "elk-finops-spend-spike-hitl-2",
+    "elk-finops-spend-spike-auto-approve-1",
+    "elk-finops-rightsize-case-1",
+    "elk-finops-rightsize-auto-approve-1",
 )
 
 # Observability Cases custom fields required by the FinOps workflow YAML.

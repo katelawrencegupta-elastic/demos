@@ -450,7 +450,9 @@ _HUB_TAB_OOTB_ORDER = (
     "AWS CUR — current month",
     "GCP Vertex AI Metrics",
     "Azure OpenAI Overview",
+    "Azure OpenAI Billing",
     "Amazon Bedrock Overview",
+    "Amazon Bedrock Guardrails",
     "OpenAI Usage Overview",
     "Anthropic Cost & Billing",
     "[Elastic] Inference Token Usage",
@@ -459,26 +461,35 @@ _HUB_TAB_OOTB_ORDER = (
 )
 
 
-def hub_tabs_items(caps=None):
-    """Horizontal hub-tab destinations for the active workshop variant."""
+def hub_tabs_items(caps=None, *, variant=None):
+    """Horizontal hub-tab destinations for a workshop variant.
+
+    Pass ``variant`` when building boards offline for a non-active variant so
+    OOTB filtering and Overview / AI Assistant ids do not follow
+    ``active_variant()`` by accident.
+    """
     from src.dashboard_caps import caps_from_variant
-    caps = caps or caps_from_variant()
-    items = [("Overview", dash_id("baseline"))]
-    ootb = filter_o_otb_links(OOTB)
+
+    v = variant or active_variant()
+    caps = caps or caps_from_variant(v)
+    overview = DASHBOARD_ID + v.dash_suffix()
+    items = [("Overview", overview)]
+    ootb = filter_o_otb_links(OOTB, v)
     for full in _HUB_TAB_OOTB_ORDER:
         dest = ootb.get(full)
         if dest:
             items.append(resolve_link_item(
                 full, dest, short=_HUB_TAB_SHORT.get(full, full)))
     if caps.ai_dashboard:
-        items.append(("AI Assistant", dash_id("ai")))
+        items.append(("AI Assistant", DASHBOARD_ID_AI + v.dash_suffix()))
     return items
 
 
-def hub_tabs_panel(caps=None):
+def hub_tabs_panel(caps=None, *, variant=None):
     """Full-width horizontal FinOps tab bar (same UX as the AWS live hub)."""
     return links_panel(
-        0, 0, 48, 5, "FinOps dashboards", hub_tabs_items(caps),
+        0, 0, 48, 5, "FinOps dashboards",
+        hub_tabs_items(caps, variant=variant),
         layout="horizontal", hide_title=False,
         open_in_new_tab=False, use_filters=True,
     )

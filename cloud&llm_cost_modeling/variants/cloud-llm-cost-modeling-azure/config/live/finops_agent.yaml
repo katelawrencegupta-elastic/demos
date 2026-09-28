@@ -219,30 +219,32 @@ tools:
       | SORT dbload_avg ASC
       | LIMIT 15
 
+  # Workflow ids use -1/-2 suffixes: bare elk-finops-* ids are tombstoned on the
+  # AWS serverless project (POST 409 / GET 404) and cannot be reused.
   - id: elk-finops-spike-run
     type: workflow
-    workflow_id: elk-finops-spend-spike-hitl
+    workflow_id: elk-finops-spend-spike-hitl-2
     description: >
       Spend-spike RCA: case + Cost Explorer/util evidence + classify + HITL.
       Optional inputs: account, service, lookback. Never stops instances.
 
   - id: elk-finops-spike-run-auto-approve
     type: workflow
-    workflow_id: elk-finops-spend-spike-auto-approve
+    workflow_id: elk-finops-spend-spike-auto-approve-1
     description: >
       Auto-approve spend-spike RCA: case + evidence + classify, then auto
       page_owner/park/false_positive from RCA. Never stops instances.
 
   - id: elk-finops-rightsize-run
     type: workflow
-    workflow_id: elk-finops-rightsize-case
+    workflow_id: elk-finops-rightsize-case-1
     description: >
       Rightsizing investigation: case + rec + 14d CPU/RDS evidence + RCA + HITL.
       Optional input: arn. Never ModifyInstanceAttribute / StopInstances.
 
   - id: elk-finops-rightsize-run-auto-approve
     type: workflow
-    workflow_id: elk-finops-rightsize-auto-approve
+    workflow_id: elk-finops-rightsize-auto-approve-1
     description: >
       Auto-approve rightsizing investigation: case + rec + evidence + RCA, then
       auto approve_ticket/park_infeasible/reject_false_positive. Never changes AWS.

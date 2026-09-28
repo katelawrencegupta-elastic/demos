@@ -9,6 +9,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -17,6 +18,14 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = ROOT / ".venv" / "bin" / "python"
 if not PY.is_file():
     PY = Path(sys.executable)
+
+# Load .env so DEPLOY_<NAME>_FINOPS_PROFILE is visible for --live detection.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env")
+except Exception:
+    pass
 
 
 def _run(label: str, argv: list[str]) -> int:
@@ -60,10 +69,15 @@ def main(argv: list[str] | None = None) -> int:
         if not deps:
             print("\n== panel_smoke skipped (pass --deployment NAME) ==")
         for dep in deps:
-            rc |= _run(
-                f"panel_smoke[{dep}]",
-                [str(PY), "scripts/panel_smoke.py", "--deployment", dep],
-            )
+            smoke_argv = [str(PY), "scripts/panel_smoke.py", "--deployment", dep]
+            # Live AWS hub uses Cost Explorer NDJSON ids — synthetic panel targets 404.
+            profile = (
+                os.environ.get(f"DEPLOY_{dep.upper()}_FINOPS_PROFILE", "")
+                or ""
+            ).strip().lower()
+            if profile in ("live", "gev", "gev-live"):
+                smoke_argv.append("--live")
+            rc |= _run(f"panel_smoke[{dep}]", smoke_argv)
     if rc:
         print("\nPRE-DEMO GATE: FAIL")
         return 1

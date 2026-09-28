@@ -244,12 +244,11 @@ def _baseline_anthropic_native(caps: DashboardCaps, q: dict) -> list:
         return []
     return [
         xy(0, 0, 24, 14, "Anthropic usage tokens by model",
-           q["anthropic_usage_model"], "model", ["tokens"], layer="bar_stacked",
-           breakdown="kind"),
+           q["anthropic_usage_model"], "model", ["tokens"], layer="bar"),
         xy(24, 0, 24, 14, "Anthropic daily cost (USD)",
            q["anthropic_cost_day"], "day", ["cost_usd"], layer="area"),
-        xy(0, 14, 48, 12, "Rate-limit headroom by model",
-           q["anthropic_rate_limits"], "model", ["remaining_pct"], layer="bar"),
+        xy(0, 14, 48, 12, "Anthropic rate-limit ceilings by model (itpm)",
+           q["anthropic_rate_limits"], "model", ["itpm"], layer="bar"),
     ]
 
 
@@ -443,22 +442,32 @@ def baseline_queries() -> dict:
             "| SORT interventions DESC"),
         "anthropic_tokens": _q(
             "FROM metrics-anthropic_metrics.usage-default", f"| WHERE {TS}",
-            "| STATS tokens = SUM(anthropic.usage.input_tokens) + SUM(anthropic.usage.output_tokens)"),
+            "| STATS tokens = SUM(anthropic.usage.uncached_input_tokens) "
+            "+ SUM(anthropic.usage.cached_input_tokens) "
+            "+ SUM(anthropic.usage.output_tokens)"),
         "anthropic_usage_model": _q(
             "FROM metrics-anthropic_metrics.usage-default", f"| WHERE {TS}",
-            "| STATS input = SUM(anthropic.usage.input_tokens), "
+            "| STATS uncached = SUM(anthropic.usage.uncached_input_tokens), "
+            "cached = SUM(anthropic.usage.cached_input_tokens), "
             "output = SUM(anthropic.usage.output_tokens) "
-            "BY model = anthropic.usage.model, kind = anthropic.usage.type",
-            "| EVAL tokens = input + output", "| SORT tokens DESC", "| LIMIT 20"),
+            "BY model = anthropic.usage.model",
+            "| EVAL tokens = uncached + cached + output",
+            "| SORT tokens DESC", "| LIMIT 20"),
         "anthropic_cost_day": _q(
             "FROM metrics-anthropic_metrics.cost-default", f"| WHERE {TS}",
             "| STATS cost_usd = SUM(anthropic.cost.amount) / 100 "
             "BY day = BUCKET(@timestamp, 1d)", "| SORT day"),
+        # OOTB rate_limit docs expose ceilings (rpm/itpm/otpm) + models[], not
+        # remaining/limit scalars. MV_EXPAND models so Lens can facet by model.
         "anthropic_rate_limits": _q(
             "FROM metrics-anthropic_metrics.rate_limit-default", f"| WHERE {TS}",
-            "| STATS remaining = AVG(anthropic.rate_limit.remaining), "
-            "limit = AVG(anthropic.rate_limit.limit) BY model = anthropic.rate_limit.model",
-            "| EVAL remaining_pct = remaining * 100.0 / limit", "| SORT remaining_pct"),
+            "| WHERE anthropic.rate_limit.group_type == \"model_group\"",
+            "| MV_EXPAND anthropic.rate_limit.models",
+            "| STATS rpm = MAX(anthropic.rate_limit.requests_per_minute), "
+            "itpm = MAX(anthropic.rate_limit.input_tokens_per_minute_cache_aware), "
+            "otpm = MAX(anthropic.rate_limit.output_tokens_per_minute) "
+            "BY model = anthropic.rate_limit.models",
+            "| SORT itpm DESC"),
         "openai_tokens_model": _q(
             "FROM logs-openai.completions-default", f"| WHERE {TS}",
             "| STATS prompt = SUM(openai.completions.input_tokens), "
@@ -511,8 +520,17 @@ def baseline_queries() -> dict:
     }
 
 
-def build_baseline_sections(caps: DashboardCaps | None, label: str, vtitle: str) -> list:
+def build_baseline_sections(
+    caps: DashboardCaps | None,
+    label: str,
+    vtitle: str,
+    *,
+    variant=None,
+) -> list:
+    from src.variant import active_variant
+
     caps = caps or caps_from_variant()
+    variant = variant or active_variant()
     q = baseline_queries()
     if caps.cloud_mix_query(_q):
         q["cloud_mix"] = caps.cloud_mix_query(_q)
@@ -529,7 +547,7 @@ def build_baseline_sections(caps: DashboardCaps | None, label: str, vtitle: str)
         y += _section_height(panels) + 2
 
     # AWS-hub-style horizontal tabs across Overview + variant OOTB packs.
-    push("FinOps dashboards", [hub_tabs_panel(caps)])
+    push("FinOps dashboards", [hub_tabs_panel(caps, variant=variant)])
     push("Scoreboard — sparkline KPIs", _baseline_scoreboard(caps, label, vtitle, q))
     push("Allocation — stacked bars, area, waffle", _baseline_allocation(caps, q))
     push("Usage vs cost — dual axis", _baseline_usage_cost(caps, q))
