@@ -483,8 +483,6 @@ def hub_tabs_panel(caps=None):
         0, 0, 48, 5, "FinOps dashboards", hub_tabs_items(caps),
         layout="horizontal", hide_title=False,
         open_in_new_tab=False, use_filters=True,
-        # Dense OOTB ESS boards — open beside the FinOps hub (all variants).
-        open_in_new_tab_labels=("ESS Billing", "ESS Credits"),
     )
 
 
@@ -826,6 +824,10 @@ def publish(include_baseline=True, include_classic=False, include_dynamic_alias=
     if include_ai:
         from src.dashboards_ai import publish_ai
         urls.append(publish_ai())
+    # Bidirectional hub: inject the same tab bar onto every destination
+    # (OOTB billing / LLM packs / ESS / Inference / sibling FinOps boards).
+    from src.hub_nav import ensure_hub_tabs_on_destinations
+    ensure_hub_tabs_on_destinations()
     return urls
 
 

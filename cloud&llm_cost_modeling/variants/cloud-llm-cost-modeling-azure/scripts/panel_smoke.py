@@ -79,6 +79,45 @@ def data_view_ok(dvid: str):
     return True, attrs.get("title") or dvid, attrs
 
 
+def _lens_data_view_ids(cfg: dict) -> list[str]:
+    """Collect data-view refs from top-level or Lens ``layers`` data_source."""
+    ids: list[str] = []
+    ds = cfg.get("data_source") or {}
+    if ds.get("type") == "data_view_reference":
+        ref = ds.get("ref_id") or ds.get("id") or ds.get("data_view_id")
+        if ref:
+            ids.append(ref)
+    for layer in cfg.get("layers") or []:
+        if not isinstance(layer, dict):
+            continue
+        lds = layer.get("data_source") or {}
+        if lds.get("type") == "data_view_reference":
+            ref = lds.get("ref_id") or lds.get("id") or lds.get("data_view_id")
+            if ref and ref not in ids:
+                ids.append(ref)
+    return ids
+
+
+def _index_has_docs(index: str, *, kql: str | None = None) -> tuple[bool, int, str]:
+    """Return (ok, hit_count, detail) for docs in the last 120d."""
+    filt: list = [{"range": {"@timestamp": {"gte": "now-120d"}}}]
+    if kql:
+        filt.append({"query_string": {"query": kql}})
+    sr = requests.post(
+        f"{ELASTIC_URL}/{index}/_search",
+        headers=ES_HEADERS,
+        json={"size": 0, "track_total_hits": True, "query": {"bool": {"filter": filt}}},
+        timeout=60,
+    )
+    if sr.status_code != 200:
+        return False, -1, f"search {sr.status_code}"
+    tot = (sr.json().get("hits") or {}).get("total")
+    if isinstance(tot, dict):
+        tot = tot.get("value", 0)
+    n = int(tot or 0)
+    return n > 0, n, f"hits={n}"
+
+
 def target_dashboards(*, live: bool) -> list[str]:
     if live:
         mapping = _resolve_hub_ids()
@@ -94,6 +133,11 @@ def target_dashboards(*, live: bool) -> list[str]:
     for which, on in publishable.items():
         if on and which in _FINOPS_DASH_BASES:
             ids.append(_dash_id(which, v))
+    # Include every hub destination (OOTB billing / ESS / Inference / AI).
+    from src.hub_nav import hub_destination_ids
+    for hid in hub_destination_ids():
+        if hid not in ids:
+            ids.append(hid)
     return ids
 
 
@@ -129,7 +173,7 @@ def smoke_deployment(*, live: bool = False) -> dict:
             cfgp = p.get("config") or {}
             pname = cfgp.get("title") or pid
 
-            if t in ("section", "markdown", "slo_overview", "time_slider_control"):
+            if t in ("section", "markdown", "slo_overview", "time_slider_control", "discover_session"):
                 passes.append({"dash": did, "panel": pid, "detail": t})
                 continue
 
@@ -220,23 +264,100 @@ def smoke_deployment(*, live: bool = False) -> dict:
                     print(f"  FAIL VIS {pname}: {str(err)[:220]}")
                 else:
                     rows = len(rr.json().get("values") or [])
-                    passes.append({"dash": did, "panel": pid, "detail": f"esql rows={rows}"})
-                    print(f"  PASS VIS {pname}: rows={rows}")
+                    if rows == 0:
+                        failures.append({
+                            "dash": did, "panel": pid, "title": pname,
+                            "detail": "ES|QL rows=0 (no data)",
+                        })
+                        print(f"  FAIL VIS {pname}: rows=0")
+                    else:
+                        passes.append({"dash": did, "panel": pid, "detail": f"esql rows={rows}"})
+                        print(f"  PASS VIS {pname}: rows={rows}")
+                continue
+
+            # Lens / embeddable: data_view on panel or nested layers.
+            dvids = _lens_data_view_ids(cfgp)
+            if dvids:
+                kql = None
+                qobj = cfgp.get("query")
+                if isinstance(qobj, dict):
+                    kql = qobj.get("query") or qobj.get("expression")
+                if isinstance(kql, str) and not kql.strip():
+                    kql = None
+                ok_any = False
+                details = []
+                for dvid in dvids:
+                    ok, dv_title, attrs = data_view_ok(dvid)
+                    if not ok:
+                        details.append(f"dv missing {dvid}")
+                        continue
+                    index = (attrs or {}).get("title") or dv_title
+                    has, n, det = _index_has_docs(index, kql=kql)
+                    details.append(f"{dv_title} {det}")
+                    if has:
+                        ok_any = True
+                if ok_any:
+                    passes.append({"dash": did, "panel": pid, "detail": "; ".join(details)})
+                    print(f"  PASS VIS {pname}: {details[0]}")
+                else:
+                    failures.append({
+                        "dash": did, "panel": pid, "title": pname,
+                        "detail": "lens empty: " + "; ".join(details),
+                    })
+                    print(f"  FAIL VIS {pname}: {'; '.join(details)[:220]}")
                 continue
 
             if ds.get("type") == "data_view_reference":
                 dvid = ds.get("ref_id") or ds.get("id") or ds.get("data_view_id")
-                ok, dv_title, _ = data_view_ok(dvid)
+                ok, dv_title, attrs = data_view_ok(dvid)
                 if not ok:
                     failures.append({"dash": did, "panel": pid, "detail": f"dv missing {dvid}"})
                     print(f"  FAIL VIS {pname}: dv {dvid}")
                 else:
-                    passes.append({"dash": did, "panel": pid, "detail": f"dv {dv_title}"})
-                    print(f"  PASS VIS {pname}: dv {dv_title}")
+                    index = (attrs or {}).get("title") or dv_title
+                    has, n, det = _index_has_docs(index)
+                    if not has:
+                        failures.append({
+                            "dash": did, "panel": pid, "title": pname,
+                            "detail": f"dv {dv_title} {det}",
+                        })
+                        print(f"  FAIL VIS {pname}: dv {dv_title} {det}")
+                    else:
+                        passes.append({"dash": did, "panel": pid, "detail": f"dv {dv_title} {det}"})
+                        print(f"  PASS VIS {pname}: dv {dv_title} {det}")
                 continue
 
             warnings.append({"dash": did, "panel": pid, "detail": f"no executable query type={ds.get('type')}"})
             print(f"  SKIP VIS {pname}: no executable query")
+
+    # Hub nav: every destination must carry Overview back-link, same-tab.
+    from src.dashboards import dash_id as finops_dash_id
+    from src.hub_nav import (
+        hub_destination_ids,
+        live_hub_tabs_items,
+        verify_hub_tabs,
+    )
+
+    if live:
+        hub_items = live_hub_tabs_items()
+        overview_id = hub_items[0][1] if hub_items else DASHBOARD_IDS[0]
+    else:
+        hub_items = None
+        overview_id = finops_dash_id("baseline")
+    print("\n## hub tab navigation")
+    for hid in hub_destination_ids(hub_items):
+        ok_hub, detail = verify_hub_tabs(hid, overview_id=overview_id)
+        if ok_hub:
+            passes.append({"dash": hid, "panel": "hub_tabs", "detail": detail})
+            print(f"  PASS HUB {hid}: {detail}")
+        else:
+            # Destination may be absent on this variant — skip soft misses.
+            if detail == "dashboard missing":
+                warnings.append({"dash": hid, "panel": "hub_tabs", "detail": detail})
+                print(f"  SKIP HUB {hid}: {detail}")
+            else:
+                failures.append({"dash": hid, "panel": "hub_tabs", "detail": detail})
+                print(f"  FAIL HUB {hid}: {detail}")
 
     report = {
         "ok": not failures,

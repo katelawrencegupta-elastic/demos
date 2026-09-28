@@ -27,6 +27,8 @@ CRITICAL_PATHS = (
     "src/budgets.py",
     "src/dashboards.py",
     "src/dashboards_ai.py",
+    "src/dashboard_sections.py",
+    "src/hub_nav.py",
     "src/agent_builder.py",
     "src/config.py",
     "config/budgets.yaml",

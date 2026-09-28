@@ -1,0 +1,126 @@
+LOG=/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/redeploy_20260901_155057.log
+========== WIPE 2026-09-01T19:50:57Z ==========
+== Wipe 32 workshop data streams (async delete_by_query) ==
+  logs-aws.cloudtrail-default ...
+  [ok] logs-aws.cloudtrail-default: ok_0
+  logs-aws.guardduty-default ...
+  [ok] logs-aws.guardduty-default: ok_0
+  logs-aws.s3access-default ...
+  [ok] logs-aws.s3access-default: ok_0
+  logs-aws_bedrock.invocation-default ...
+  [ok] logs-aws_bedrock.invocation-default: ok_0
+  logs-azure.activitylogs-default ...
+  [skip] logs-azure.activitylogs-default: skip_not_found
+  logs-azure_openai.logs-default ...
+  [skip] logs-azure_openai.logs-default: skip_not_found
+  logs-elastic.inference_token_usage-default ...
+  [ok] logs-elastic.inference_token_usage-default: ok_0
+  logs-gcp.audit-default ...
+  [skip] logs-gcp.audit-default: skip_not_found
+  logs-gcp_vertexai.auditlogs-default ...
+  [skip] logs-gcp_vertexai.auditlogs-default: skip_not_found
+  logs-gcp_vertexai.prompt_response_logs-default ...
+  [skip] logs-gcp_vertexai.prompt_response_logs-default: skip_not_found
+  logs-openai.audio_speeches-default ...
+  [skip] logs-openai.audio_speeches-default: skip_not_found
+  logs-openai.audio_transcriptions-default ...
+  [skip] logs-openai.audio_transcriptions-default: skip_not_found
+  logs-openai.completions-default ...
+  [skip] logs-openai.completions-default: skip_not_found
+  logs-openai.embeddings-default ...
+  [skip] logs-openai.embeddings-default: skip_not_found
+  logs-openai.images-default ...
+  [skip] logs-openai.images-default: skip_not_found
+  logs-openai.moderations-default ...
+  [skip] logs-openai.moderations-default: skip_not_found
+  logs-openai.rate_limits-default ...
+  [skip] logs-openai.rate_limits-default: skip_not_found
+  metrics-anthropic_metrics.cost-default ...
+  [ok] metrics-anthropic_metrics.cost-default: ok_0
+  metrics-anthropic_metrics.rate_limit-default ...
+  [ok] metrics-anthropic_metrics.rate_limit-default: ok_0
+  metrics-anthropic_metrics.usage-default ...
+  [ok] metrics-anthropic_metrics.usage-default: ok_0
+  metrics-aws.billing-default ...
+  [ok] metrics-aws.billing-default: ok_0
+  metrics-aws.ec2_metrics-default ...
+  [ok] metrics-aws.ec2_metrics-default: ok_0
+  metrics-aws_bedrock.guardrails-default ...
+    ... metrics-aws_bedrock.guardrails-default: 23,000 deleted so far
+  [ok] metrics-aws_bedrock.guardrails-default: ok_33207
+  metrics-aws_bedrock.runtime-default ...
+  [fail] metrics-aws_bedrock.runtime-default: metrics-aws_bedrock.runtime-default: 5,894 docs remain after delete (err=None)
+  metrics-aws_billing.cur-default ...
+  [ok] metrics-aws_billing.cur-default: ok_4560
+  metrics-azure.billing-default ...
+  [skip] metrics-azure.billing-default: skip_not_found
+  metrics-azure.open_ai-default ...
+  [skip] metrics-azure.open_ai-default: skip_not_found
+  metrics-ess_billing.credits-default ...
+  [ok] metrics-ess_billing.credits-default: ok_120
+  metrics-gcp.billing-default ...
+  [skip] metrics-gcp.billing-default: skip_not_found
+  metrics-gcp_vertexai.metrics-default ...
+  [skip] metrics-gcp_vertexai.metrics-default: skip_not_found
+  traces-agent_builder.otel-default ...
+    ... traces-agent_builder.otel-default: 23,000 deleted so far
+    ... traces-agent_builder.otel-default: 46,000 deleted so far
+    ... traces-agent_builder.otel-default: 68,000 deleted so far
+  [ok] traces-agent_builder.otel-default: ok_69085
+  traces-apm-default ...
+    ... traces-apm-default: 22,000 deleted so far
+    ... traces-apm-default: 45,000 deleted so far
+    ... traces-apm-default: 68,000 deleted so far
+    ... traces-apm-default: 91,000 deleted so far
+    ... traces-apm-default: 114,000 deleted so far
+    ... traces-apm-default: 137,000 deleted so far
+    ... traces-apm-default: 159,000 deleted so far
+    ... traces-apm-default: 182,000 deleted so far
+    ... traces-apm-default: 205,000 deleted so far
+    ... traces-apm-default: 228,000 deleted so far
+    ... traces-apm-default: 251,000 deleted so far
+    ... traces-apm-default: 274,000 deleted so far
+    ... traces-apm-default: 296,000 deleted so far
+    ... traces-apm-default: 319,000 deleted so far
+    ... traces-apm-default: 342,000 deleted so far
+    ... traces-apm-default: 370,000 deleted so far
+    ... traces-apm-default: 392,000 deleted so far
+    ... traces-apm-default: 415,000 deleted so far
+    ... traces-apm-default: 438,000 deleted so far
+  [fail] traces-apm-default: traces-apm-default: 13,024 docs remain after delete (err=None)
+
+== wipe summary ==
+  logs-aws.cloudtrail-default: ok_0
+  logs-aws.guardduty-default: ok_0
+  logs-aws.s3access-default: ok_0
+  logs-aws_bedrock.invocation-default: ok_0
+  logs-azure.activitylogs-default: skip_not_found
+  logs-azure_openai.logs-default: skip_not_found
+  logs-elastic.inference_token_usage-default: ok_0
+  logs-gcp.audit-default: skip_not_found
+  logs-gcp_vertexai.auditlogs-default: skip_not_found
+  logs-gcp_vertexai.prompt_response_logs-default: skip_not_found
+  logs-openai.audio_speeches-default: skip_not_found
+  logs-openai.audio_transcriptions-default: skip_not_found
+  logs-openai.completions-default: skip_not_found
+  logs-openai.embeddings-default: skip_not_found
+  logs-openai.images-default: skip_not_found
+  logs-openai.moderations-default: skip_not_found
+  logs-openai.rate_limits-default: skip_not_found
+  metrics-anthropic_metrics.cost-default: ok_0
+  metrics-anthropic_metrics.rate_limit-default: ok_0
+  metrics-anthropic_metrics.usage-default: ok_0
+  metrics-aws.billing-default: ok_0
+  metrics-aws.ec2_metrics-default: ok_0
+  metrics-aws_bedrock.guardrails-default: ok_33207
+  metrics-aws_bedrock.runtime-default: fail:metrics-aws_bedrock.runtime-default: 5,894 docs remain after delete (err=None)
+  metrics-aws_billing.cur-default: ok_4560
+  metrics-azure.billing-default: skip_not_found
+  metrics-azure.open_ai-default: skip_not_found
+  metrics-ess_billing.credits-default: ok_120
+  metrics-gcp.billing-default: skip_not_found
+  metrics-gcp_vertexai.metrics-default: skip_not_found
+  traces-agent_builder.otel-default: ok_69085
+  traces-apm-default: fail:traces-apm-default: 13,024 docs remain after delete (err=None)
+
+2 error(s)

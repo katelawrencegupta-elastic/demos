@@ -1,0 +1,6 @@
+========== WIPE 2026-09-01T19:50:03Z ==========
+Traceback (most recent call last):
+  File "/Users/klg/Documents/GItHub/demos/cloud&llm_cost_modeling/scripts/wipe_workshop_streams.py", line 9, in <module>
+    from src.config import ELASTIC_URL, ES_HEADERS
+ModuleNotFoundError: No module named 'src'
+wipe exit: 1

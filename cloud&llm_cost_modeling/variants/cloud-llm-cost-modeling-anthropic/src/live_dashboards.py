@@ -781,6 +781,9 @@ def ensure_hub_ootb() -> None:
     patch_tsds_templates()
     _share_hub_dashboards()
     _retarget_hub_links()
+    # Bidirectional bar on FinOps + space-local ESS / Inference copies.
+    from src.hub_nav import ensure_hub_tabs_on_destinations, live_hub_tabs_items
+    ensure_hub_tabs_on_destinations(live_hub_tabs_items())
     _pin_hub_ootb_time_ranges()
     from src.setup_cmd import patch_inference_token_usage_dashboard
     patch_inference_token_usage_dashboard()
@@ -1012,10 +1015,10 @@ def _retarget_hub_obj(obj, mapping=None):
                 out["destination"] = mapping[fleet_id]
             elif isinstance(out.get("destination"), str) and out["destination"] in mapping:
                 out["destination"] = mapping[out["destination"]]
-            # ESS Billing/Credits are dense OOTB boards — open beside the FinOps hub.
-            if label in ("ESS Billing", "ESS Credits", "Billing", "Credits"):
-                opts = dict(out.get("options") or {})
-                opts["open_in_new_tab"] = True
+            # Keep hub navigation same-tab (including ESS Billing / Credits).
+            opts = dict(out.get("options") or {})
+            if opts.get("open_in_new_tab"):
+                opts["open_in_new_tab"] = False
                 out["options"] = opts
             return out
         out = {}

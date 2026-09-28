@@ -4,15 +4,12 @@ from __future__ import annotations
 from src.dashboard_caps import DashboardCaps, TS, caps_from_variant
 from src.dashboards import (
     AGENT_CHAT_URL,
-    DASHBOARD_ID_INFERENCE_USAGE,
     KIBANA_URL,
-    _ootb_items,
     _q,
     budget_posture_section,
     dash_id,
     gauge,
     hub_tabs_panel,
-    links_panel,
     markdown,
     metric,
     pie,
@@ -297,25 +294,15 @@ def _baseline_azure_openai_native(caps: DashboardCaps, q: dict) -> list:
 
 
 def _baseline_provider_packs(caps: DashboardCaps) -> list:
-    family = [("This baseline dashboard", dash_id("baseline"))]
-    if caps.classic_layout:
-        family.extend([
-            ("Classic layout", dash_id("classic")),
-            ("Dynamic alias (same as baseline)", dash_id("dynamic")),
-        ])
-    if caps.ai_dashboard:
-        family.append(("AI Assistant & inference usage", dash_id("ai")))
-    if caps.inference:
-        family.append(("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE))
-    ootb = list(_ootb_items())
-    ootb_extra = []
-    if caps.inference:
-        ootb_extra.append(("[Elastic] Inference Token Usage", DASHBOARD_ID_INFERENCE_USAGE))
-    if caps.ai_dashboard:
-        ootb_extra.append(("AI Assistant & inference usage", dash_id("ai")))
+    """Hub tabs at the top are the single nav — no duplicate link panels."""
     return [
-        links_panel(0, 0, 24, 10, "This family", family),
-        links_panel(24, 0, 24, 10, "Provider FinOps & LLM packs", ootb + ootb_extra),
+        markdown(
+            0, 0, 48, 3,
+            "## Provider packs\n\n"
+            "Use the **FinOps dashboards** tabs at the top of this board to open "
+            "native billing / LLM OOTB dashboards. Every destination links back "
+            "to **Overview** in the same tab.",
+        ),
     ]
 
 
