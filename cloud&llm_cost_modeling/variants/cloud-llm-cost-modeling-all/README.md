@@ -356,8 +356,8 @@ Notes:
 config/world.yaml          # org model: BUs, accounts, resources, tags, scenarios
 config/llm_models.yaml     # LLM providers, models, pricing, app workloads
 src/world/                 # inventory + scenarios + cloud costs + LLM catalog
-src/generators/            # shims → data_factories.finops.generators
-src/world/                 # shims → data_factories.finops.world
+src/generators/            # shims → data_factories (registry: presets.cost_modeling)
+src/world/                 # shims → data_factories.world
 src/sink/elastic.py        # bulk indexer with batching + retry
 src/setup_cmd.py           # Fleet package install, TSDS patch, access checks
 src/genai_settings.py      # GenAI token usage tracking + OOTB dashboard install

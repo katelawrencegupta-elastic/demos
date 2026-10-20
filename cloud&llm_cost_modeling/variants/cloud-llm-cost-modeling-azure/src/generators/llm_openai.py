@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.llm_openai."""
-from data_factories.finops.generators.llm_openai import *  # noqa: F403
+"""Shim: data_factories.llm.openai."""
+from data_factories.llm.openai import *  # noqa: F403

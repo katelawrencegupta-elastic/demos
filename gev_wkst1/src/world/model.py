@@ -1,2 +1,2 @@
-"""Shim: data_factories.gev.world.model."""
-from data_factories.gev.world.model import *  # noqa: F403
+"""Shim: data_factories.world.microservices."""
+from data_factories.world.microservices import *  # noqa: F403

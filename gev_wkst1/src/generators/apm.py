@@ -1,2 +1,2 @@
-"""Shim: data_factories.gev.generators.apm."""
-from data_factories.gev.generators.apm import *  # noqa: F403
+"""Shim: data_factories.apm.service_traces."""
+from data_factories.apm.service_traces import *  # noqa: F403

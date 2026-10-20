@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.llm_bedrock."""
-from data_factories.finops.generators.llm_bedrock import *  # noqa: F403
+"""Shim: data_factories.llm.bedrock."""
+from data_factories.llm.bedrock import *  # noqa: F403

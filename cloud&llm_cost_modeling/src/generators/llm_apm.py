@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.llm_apm."""
-from data_factories.finops.generators.llm_apm import *  # noqa: F403
+"""Shim: data_factories.apm.llm_traces."""
+from data_factories.apm.llm_traces import *  # noqa: F403

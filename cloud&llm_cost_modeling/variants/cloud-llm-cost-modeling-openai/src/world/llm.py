@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.world.llm."""
-from data_factories.finops.world.llm import *  # noqa: F403
+"""Shim: data_factories.world.llm_catalog."""
+from data_factories.world.llm_catalog import *  # noqa: F403

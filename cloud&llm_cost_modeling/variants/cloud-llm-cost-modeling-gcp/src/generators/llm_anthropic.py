@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.llm_anthropic."""
-from data_factories.finops.generators.llm_anthropic import *  # noqa: F403
+"""Shim: data_factories.llm.anthropic."""
+from data_factories.llm.anthropic import *  # noqa: F403

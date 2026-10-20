@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.aws_cloudtrail."""
-from data_factories.finops.generators.aws_cloudtrail import *  # noqa: F403
+"""Shim: data_factories.cloud_audit.aws_cloudtrail."""
+from data_factories.cloud_audit.aws_cloudtrail import *  # noqa: F403

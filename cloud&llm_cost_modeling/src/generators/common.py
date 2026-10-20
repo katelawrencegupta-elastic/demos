@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.common."""
-from data_factories.finops.generators.common import *  # noqa: F403
+"""Shim: data_factories.common."""
+from data_factories.common import *  # noqa: F403

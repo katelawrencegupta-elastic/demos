@@ -1,2 +1,2 @@
-"""Shim: data_factories.gev.generators.infra."""
-from data_factories.gev.generators.infra import *  # noqa: F403
+"""Shim: data_factories.kubernetes.hosts_nodes."""
+from data_factories.kubernetes.hosts_nodes import *  # noqa: F403

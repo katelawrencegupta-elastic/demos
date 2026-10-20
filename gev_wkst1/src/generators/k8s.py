@@ -1,2 +1,2 @@
-"""Shim: data_factories.gev.generators.k8s."""
-from data_factories.gev.generators.k8s import *  # noqa: F403
+"""Shim: data_factories.kubernetes.pods_events."""
+from data_factories.kubernetes.pods_events import *  # noqa: F403

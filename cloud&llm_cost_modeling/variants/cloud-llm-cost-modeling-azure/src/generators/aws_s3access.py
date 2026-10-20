@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.aws_s3access."""
-from data_factories.finops.generators.aws_s3access import *  # noqa: F403
+"""Shim: data_factories.cloud_audit.aws_s3access."""
+from data_factories.cloud_audit.aws_s3access import *  # noqa: F403

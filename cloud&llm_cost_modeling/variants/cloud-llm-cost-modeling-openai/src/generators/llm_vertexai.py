@@ -1,2 +1,2 @@
-"""Shim: data_factories.finops.generators.llm_vertexai."""
-from data_factories.finops.generators.llm_vertexai import *  # noqa: F403
+"""Shim: data_factories.llm.vertexai."""
+from data_factories.llm.vertexai import *  # noqa: F403
