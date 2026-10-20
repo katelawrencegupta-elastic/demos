@@ -370,6 +370,13 @@ filtered to enabled rules, Agent Builder answers grounded in tools.
 
 ---
 
+## Data factories
+
+Generators + world model live in the shared package
+[`data_factories`](../../data_factories) (`data_factories.finops.*`).
+This tree keeps thin `src/generators` / `src/world` shims; `requirements.txt`
+installs the package editable (`-e ../../data_factories`).
+
 ## Layout
 
 ```
@@ -387,7 +394,8 @@ src/
   dashboard_sections.py  # capability-scoped panels
   live_dashboards.py     # AWS live NDJSON import + OOTB share
   budgets.py / agent_builder.py / workflows.py / rightsizing.py
-  generators/            # cloud + LLM + Elastic AI + ESS
+  generators/            # shims → data_factories.finops.generators
+  world/                 # shims → data_factories.finops.world
 scripts/
   pre_demo_gate.py       # consistency + drift + panel smoke
   panel_smoke.py         # deep ES|QL / hub / OOTB panel checks

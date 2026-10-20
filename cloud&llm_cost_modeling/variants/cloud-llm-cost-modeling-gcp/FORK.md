@@ -2,6 +2,8 @@
 
 Provider/integration-scoped fork of the ELK Co synthetic data factory.
 
+
+Generators/world are shared via editable `data_factories` (`-e ../../../../data_factories` in requirements); `src/generators` and `src/world` are shims.
 - **Variant:** `gcp`
 - **Source:** `cloud&llm_cost_modeling`
 - **Path:** `variants/cloud-llm-cost-modeling-gcp`

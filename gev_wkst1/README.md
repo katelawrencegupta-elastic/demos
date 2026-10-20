@@ -28,6 +28,13 @@ ELASTIC_API_KEY=…
 KIBANA_URL=https://….kb.…elastic.cloud
 ```
 
+## Data factories
+
+Generators + world model live in the shared package
+[`data_factories`](../../data_factories) (`data_factories.gev.*`).
+This tree keeps thin `src/generators` / `src/world` shims; `requirements.txt`
+installs the package editable (`-e ../../data_factories`).
+
 ## Quick start
 
 ```bash
