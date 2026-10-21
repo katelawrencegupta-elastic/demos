@@ -1,5 +1,0 @@
-.env
-.elastic-credentials
-.venv/
-__pycache__/
-*.pyc

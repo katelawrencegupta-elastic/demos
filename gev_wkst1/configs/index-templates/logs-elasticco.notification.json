@@ -1,7 +1,0 @@
-{
-  "index_patterns": ["logs-elasticco.notification-*"],
-  "data_stream": {},
-  "priority": 500,
-  "composed_of": ["logs-elasticco.notification"],
-  "_meta": { "demo": "elastic-co" }
-}
