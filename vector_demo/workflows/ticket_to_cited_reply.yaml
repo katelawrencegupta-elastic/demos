@@ -1,0 +1,60 @@
+name: Ticket to cited reply
+description: Takes a support ticket, retrieves the best docs with the stored hybrid search template, and drafts a short reply that cites only those docs.
+enabled: true
+tags:
+  - demo
+  - vector-search
+triggers:
+  - type: manual
+inputs:
+  - name: ticket_id
+    type: string
+    default: T-1042
+  - name: ticket_text
+    type: string
+    default: "Customer ticket: our vector index uses too much RAM at 3072 dimensions"
+steps:
+  - name: search_docs
+    type: elasticsearch.request
+    with:
+      method: POST
+      path: /docs-jina/_search/template
+      body:
+        id: demo_hybrid_docs
+        params:
+          query: "{{ inputs.ticket_text }}"
+          size: 3
+  - name: draft_reply
+    type: ai.prompt
+    with:
+      systemPrompt: >-
+        You draft support replies. Every sentence of the reply must be supported by the documentation excerpts provided.
+        Do not add general knowledge, industry norms or performance claims that the excerpts do not state. If the excerpts
+        only partly answer the question, answer that part and say what they do not cover. Never state a setting, number or
+        version that is not in the excerpts. Cite only the docs whose content you actually used.
+      prompt: >-
+        Ticket {{ inputs.ticket_id }}: {{ inputs.ticket_text }}
+
+        Documentation excerpts (JSON, best match first):
+        {{ steps.search_docs.output.hits.hits | json }}
+
+        Write a reply of at most 120 words. Then list the docs you used.
+      schema:
+        type: object
+        properties:
+          reply:
+            type: string
+          cited_docs:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                section:
+                  type: string
+                version:
+                  type: string
+        required:
+          - reply
+          - cited_docs

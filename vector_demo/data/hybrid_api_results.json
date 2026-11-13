@@ -1,0 +1,249 @@
+{
+ "captured": "2026-11-13T18:06:13Z",
+ "app_query": "ergonomic chair for long work days",
+ "templates": {
+  "demo_hybrid_products": "{\n  \"size\":{{size}}{{^size}}5{{/size}},\n  \"_source\":[\n    \"sku\",\n    \"name\",\n    \"category\",\n    \"price\",\n    \"rating\"\n  ],\n  \"retriever\":{\n    \"rrf\":{\n      \"rank_window_size\":20,\n      \"retrievers\":[\n        {\n          \"standard\":{\n            \"query\":{\n              \"bool\":{\n                \"must\":{\n                  \"match\":{\n                    \"description\":\"{{query}}\"}},\n                    \"filter\":[\n                      {\n                        \"range\":{\n                          \"price\":{\n                            \"lte\":{{max_price}}{{^max_price}}100000{{/max_price}}}}\n                          }\n                        ]}}}},\n                        {\n                          \"standard\":{\n                            \"query\":{\n                              \"semantic\":{\n                                \"field\":\"description_semantic\",\n                                \"query\":\"{{query}}\"}},\n                                \"filter\":[\n                                  {\n                                    \"range\":{\n                                      \"price\":{\n                                        \"lte\":{{max_price}}{{^max_price}}100000{{/max_price}}}}\n                                      }\n                                    ]}}\n                                  ]}}\n                                }",
+  "demo_hybrid_docs": "{\n  \"size\":{{size}}{{^size}}3{{/size}},\n  \"_source\":[\n    \"title\",\n    \"section\",\n    \"version\"\n  ],\n  \"retriever\":{\n    \"rrf\":{\n      \"rank_window_size\":20,\n      \"retrievers\":[\n        {\n          \"standard\":{\n            \"query\":{\n              \"match\":{\n                \"body\":\"{{query}}\"}}}},\n                {\n                  \"standard\":{\n                    \"query\":{\n                      \"semantic\":{\n                        \"field\":\"body_semantic\",\n                        \"query\":\"{{query}}\"}}}}\n                      ]}}\n                    }"
+ },
+ "app": {
+  "keyword_500": {
+   "took": 2,
+   "hits": [
+    {
+     "name": "Fulcrum Under-Desk Keyboard Tray",
+     "category": "home office & ergonomic furniture",
+     "price": 89.99,
+     "rating": 4.3,
+     "score": 10.466
+    },
+    {
+     "name": "Stratus Pro Mesh Task Chair",
+     "category": "home office & ergonomic furniture",
+     "price": 389.0,
+     "rating": 4.7,
+     "score": 9.422
+    },
+    {
+     "name": "Sovereign Kneeling Ergonomic Chair",
+     "category": "home office & ergonomic furniture",
+     "price": 205.0,
+     "rating": 4.2,
+     "score": 8.201
+    }
+   ]
+  },
+  "hybrid_500": {
+   "took": 46,
+   "hits": [
+    {
+     "name": "Stratus Pro Mesh Task Chair",
+     "category": "home office & ergonomic furniture",
+     "price": 389.0,
+     "rating": 4.7,
+     "score": 0.033
+    },
+    {
+     "name": "Sovereign Kneeling Ergonomic Chair",
+     "category": "home office & ergonomic furniture",
+     "price": 205.0,
+     "rating": 4.2,
+     "score": 0.032
+    },
+    {
+     "name": "Corvane Stride Mesh Task",
+     "category": "home office & ergonomic furniture",
+     "price": 219.99,
+     "rating": 4.4,
+     "score": 0.031
+    }
+   ]
+  },
+  "hybrid_250": {
+   "took": 29,
+   "hits": [
+    {
+     "name": "Sovereign Kneeling Ergonomic Chair",
+     "category": "home office & ergonomic furniture",
+     "price": 205.0,
+     "rating": 4.2,
+     "score": 0.033
+    },
+    {
+     "name": "Fulcrum Under-Desk Keyboard Tray",
+     "category": "home office & ergonomic furniture",
+     "price": 89.99,
+     "rating": 4.3,
+     "score": 0.032
+    },
+    {
+     "name": "Corvane Stride Mesh Task",
+     "category": "home office & ergonomic furniture",
+     "price": 219.99,
+     "rating": 4.4,
+     "score": 0.031
+    }
+   ]
+  }
+ },
+ "workflow": [
+  {
+   "ticket_id": "T-1042",
+   "text": "Customer ticket: our vector index uses too much RAM at 3072 dimensions",
+   "took": 22,
+   "hits": [
+    {
+     "title": "HNSW Index Parameters and Trade-offs",
+     "section": "2. Index Configuration",
+     "version": "2.4.0",
+     "score": 0.033
+    },
+    {
+     "title": "VectorForge Configuration Guide: Getting Started",
+     "section": "1. Getting Started",
+     "version": "2.4.0",
+     "score": 0.032
+    },
+    {
+     "title": "Quantization for Storage Optimization",
+     "section": "5. Storage Optimization",
+     "version": "2.2.0",
+     "score": 0.031
+    }
+   ],
+   "handoff": {
+    "ticket_id": "T-1042",
+    "query": "Customer ticket: our vector index uses too much RAM at 3072 dimensions",
+    "suggested_docs": [
+     {
+      "title": "HNSW Index Parameters and Trade-offs",
+      "section": "2. Index Configuration",
+      "version": "2.4.0"
+     },
+     {
+      "title": "VectorForge Configuration Guide: Getting Started",
+      "section": "1. Getting Started",
+      "version": "2.4.0"
+     },
+     {
+      "title": "Quantization for Storage Optimization",
+      "section": "5. Storage Optimization",
+      "version": "2.2.0"
+     }
+    ]
+   }
+  },
+  {
+   "ticket_id": "T-1043",
+   "text": "Customer ticket: search got slower after we turned on quantization, is accuracy affected?",
+   "took": 23,
+   "hits": [
+    {
+     "title": "Quantization for Storage Optimization",
+     "section": "5. Storage Optimization",
+     "version": "2.2.0",
+     "score": 0.033
+    },
+    {
+     "title": "VectorForge Configuration Guide: Getting Started",
+     "section": "1. Getting Started",
+     "version": "2.4.0",
+     "score": 0.032
+    },
+    {
+     "title": "Slow Query Diagnosis with EXPLAIN Plans",
+     "section": "5.2",
+     "version": "4.1.3",
+     "score": 0.031
+    }
+   ],
+   "handoff": {
+    "ticket_id": "T-1043",
+    "query": "Customer ticket: search got slower after we turned on quantization, is accuracy affected?",
+    "suggested_docs": [
+     {
+      "title": "Quantization for Storage Optimization",
+      "section": "5. Storage Optimization",
+      "version": "2.2.0"
+     },
+     {
+      "title": "VectorForge Configuration Guide: Getting Started",
+      "section": "1. Getting Started",
+      "version": "2.4.0"
+     },
+     {
+      "title": "Slow Query Diagnosis with EXPLAIN Plans",
+      "section": "5.2",
+      "version": "4.1.3"
+     }
+    ]
+   }
+  }
+ ],
+ "evolve": {
+  "params": {
+   "query": "Customer ticket: search got slower after we turned on quantization, is accuracy affected?",
+   "size": 5
+  },
+  "before": {
+   "took": 22,
+   "hits": [
+    {
+     "title": "Quantization for Storage Optimization",
+     "section": "5. Storage Optimization",
+     "score": 0.033
+    },
+    {
+     "title": "VectorForge Configuration Guide: Getting Started",
+     "section": "1. Getting Started",
+     "score": 0.032
+    },
+    {
+     "title": "Slow Query Diagnosis with EXPLAIN Plans",
+     "section": "5.2",
+     "score": 0.031
+    },
+    {
+     "title": "Distance Metrics and Similarity Scoring",
+     "section": "4. Similarity Metrics",
+     "score": 0.031
+    },
+    {
+     "title": "Index Fragmentation and Rebuild Scheduling",
+     "section": "6.4",
+     "score": 0.031
+    }
+   ]
+  },
+  "after": {
+   "took": 711,
+   "hits": [
+    {
+     "title": "Quantization for Storage Optimization",
+     "section": "5. Storage Optimization",
+     "score": 1.317
+    },
+    {
+     "title": "HNSW Index Parameters and Trade-offs",
+     "section": "2. Index Configuration",
+     "score": 1.133
+    },
+    {
+     "title": "Distance Metrics and Similarity Scoring",
+     "section": "4. Similarity Metrics",
+     "score": 1.082
+    },
+    {
+     "title": "VectorForge Configuration Guide: Getting Started",
+     "section": "1. Getting Started",
+     "score": 0.967
+    },
+    {
+     "title": "Slow Query Diagnosis with EXPLAIN Plans",
+     "section": "5.2",
+     "score": 0.966
+    }
+   ]
+  },
+  "v2_template": "{\n  \"size\":{{size}}{{^size}}3{{/size}},\n  \"_source\":[\n    \"title\",\n    \"section\",\n    \"version\"\n  ],\n  \"retriever\":{\n    \"text_similarity_reranker\":{\n      \"retriever\":{\n        \"rrf\":{\n          \"rank_window_size\":20,\n          \"retrievers\":[\n            {\n              \"standard\":{\n                \"query\":{\n                  \"match\":{\n                    \"body\":\"{{query}}\"}}}},\n                    {\n                      \"standard\":{\n                        \"query\":{\n                          \"semantic\":{\n                            \"field\":\"body_semantic\",\n                            \"query\":\"{{query}}\"}}}}\n                          ]}},\n                          \"field\":\"body\",\n                          \"inference_id\":\".jina-reranker-v3\",\n                          \"inference_text\":\"{{query}}\",\n                          \"rank_window_size\":20}}\n                        }"
+ }
+}

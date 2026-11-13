@@ -1,0 +1,36 @@
+# ===== SEGMENT 2: EIS + large embeddings (Kibana Dev Tools) =====
+# 2a. EIS: managed models, no ML nodes. Show the catalog.
+GET _inference
+# 2b. Same question, three embedding setups
+GET products-elser/_search
+{ "size": 3, "_source": ["name","brand","price"],
+  "query": { "semantic": { "field": "description_semantic", "query": "know when someone is at my front door while I'm away" } } }
+GET products-jina/_search
+{ "size": 3, "_source": ["name","brand","price"],
+  "query": { "semantic": { "field": "description_semantic", "query": "know when someone is at my front door while I'm away" } } }
+GET products-large-bbq/_search
+{ "size": 3, "_source": ["name","brand","price"],
+  "query": { "semantic": { "field": "description_semantic", "query": "know when someone is at my front door while I'm away" } } }
+# 2c. Large (3072-dim) embeddings: float vs int8 vs BBQ mappings
+# NOTE: GET {index}/_mapping/field/{field} is not available on Serverless; use filter_path instead.
+GET products-large-float/_mapping?filter_path=*.mappings.properties.description_semantic
+GET products-large-int8/_mapping?filter_path=*.mappings.properties.description_semantic
+GET products-large-bbq/_mapping?filter_path=*.mappings.properties.description_semantic
+# 2d. Long descriptions are auto-chunked (sentence strategy, 250 words, 1 sentence overlap); show chunk counts
+GET products-jina/_search
+{ "size": 1, "_source": false, "fields": ["name"],
+  "query": { "match": { "name": "tent" } },
+  "highlight": { "fields": { "description_semantic": { "number_of_fragments": 3 } } } }
+# 2e. Chunks: products vs chunk documents. (Do NOT read store.size on Serverless: it is node-local and unreliable; _stats, _cat/shards and _disk_usage are unavailable.)
+# Quantized formats keep the original vectors for rescoring, so disk rises slightly and RAM drops sharply. Size it from the chunk count (see the walkthrough, step 5).
+GET products-jina/_count
+GET _cat/indices/products-*?v&h=index,docs.count&s=index
+# 2f. Hybrid (BM25 + semantic via RRF) + rerank
+GET products-jina/_search
+{ "size": 5, "_source": ["name","price"],
+  "retriever": { "text_similarity_reranker": {
+    "retriever": { "rrf": { "rank_window_size": 20, "retrievers": [
+      { "standard": { "query": { "match": { "description": "gift for someone who just started running" } } } },
+      { "standard": { "query": { "semantic": { "field": "description_semantic", "query": "gift for someone who just started running" } } } } ] } },
+    "field": "description", "inference_id": ".jina-reranker-v3",
+    "inference_text": "gift for someone who just started running", "rank_window_size": 20 } } }

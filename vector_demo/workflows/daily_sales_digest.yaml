@@ -1,0 +1,83 @@
+name: Sales digest
+description: Runs ES|QL over the orders index for a window, has a model write a short digest from the numbers, and stores it in the sales-digests index.
+enabled: true
+tags:
+  - demo
+  - vector-search
+triggers:
+  - type: manual
+  - type: scheduled
+    with:
+      every: 1d
+inputs:
+  - name: start
+    type: string
+    default: "2026-11-07T00:00:00Z"
+  - name: end
+    type: string
+    default: "2026-11-14T00:00:00Z"
+steps:
+  - name: totals
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: >-
+        FROM orders
+        | WHERE @timestamp >= "{{ inputs.start }}" AND @timestamp < "{{ inputs.end }}"
+        | EVAL net = CASE(status == "cancelled" OR status == "returned", 0.0, line_total),
+               is_returned = CASE(status == "returned", 1, 0),
+               is_cancelled = CASE(status == "cancelled", 1, 0)
+        | STATS lines = COUNT(*), orders = COUNT_DISTINCT(order_id), revenue = ROUND(SUM(net)),
+                returned_lines = SUM(is_returned), cancelled_lines = SUM(is_cancelled)
+  - name: top_categories
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: >-
+        FROM orders
+        | WHERE @timestamp >= "{{ inputs.start }}" AND @timestamp < "{{ inputs.end }}" AND status != "cancelled" AND status != "returned"
+        | STATS revenue = ROUND(SUM(line_total)) BY category
+        | SORT revenue DESC
+        | LIMIT 3
+  - name: top_products
+    type: elasticsearch.esql.query
+    with:
+      format: json
+      query: >-
+        FROM orders
+        | WHERE @timestamp >= "{{ inputs.start }}" AND @timestamp < "{{ inputs.end }}" AND status != "cancelled" AND status != "returned"
+        | STATS revenue = ROUND(SUM(line_total)), units = SUM(quantity) BY product = product_name.keyword
+        | SORT revenue DESC
+        | LIMIT 3
+  - name: write_digest
+    type: ai.prompt
+    with:
+      systemPrompt: >-
+        You write a three-line sales digest for a retail team. Use only the figures provided and quote them exactly.
+        Revenue excludes cancelled and returned lines. Never invent a figure or a comparison to another period.
+      prompt: >-
+        Window: {{ inputs.start }} to {{ inputs.end }}.
+        Totals (columns and values): {{ steps.totals.output | json }}
+        Top categories by revenue: {{ steps.top_categories.output | json }}
+        Top products by revenue: {{ steps.top_products.output | json }}
+        Write exactly three lines: overall result, the leading categories, the leading products.
+      schema:
+        type: object
+        properties:
+          digest:
+            type: string
+        required:
+          - digest
+  - name: store_digest
+    type: elasticsearch.index
+    with:
+      index: sales-digests
+      document:
+        "@timestamp": "{{ execution.startedAt | date: '%Y-%m-%dT%H:%M:%SZ' }}"
+        window_start: "{{ inputs.start }}"
+        window_end: "{{ inputs.end }}"
+        digest: "{{ steps.write_digest.output.content.digest }}"
+        revenue: "{{ steps.totals.output.values[0][2] }}"
+        orders: "{{ steps.totals.output.values[0][1] }}"
+        cancelled_lines: "{{ steps.totals.output.values[0][4] }}"
+        returned_lines: "{{ steps.totals.output.values[0][3] }}"

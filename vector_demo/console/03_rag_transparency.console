@@ -1,0 +1,17 @@
+# ===== SEGMENT 3: RAG + LLM transparency =====
+# 3a. Retrieve grounding context (docs index)
+GET docs-jina/_search
+{ "size": 3, "_source": ["title","section","version"],
+  "query": { "semantic": { "field": "body_semantic", "query": "how do I reduce memory use for high-dimensional vectors?" } } }
+# 3b. Same prompt, swap ONLY the inference_id -> model-agnostic. Compare Claude / Gemini / GPT / open weights.
+POST _inference/completion/.anthropic-claude-5.5-haiku-completion
+{ "input": "In 2 sentences: why use quantization for 3072-dim embeddings?" }
+POST _inference/completion/.google-gemini-3.5-flash-lite-completion
+{ "input": "In 2 sentences: why use quantization for 3072-dim embeddings?" }
+POST _inference/completion/.openai-gpt-oss-120b-completion
+{ "input": "In 2 sentences: why use quantization for 3072-dim embeddings?" }
+# 3c. Inventory of every model available (transparency): ids, provider (service: elastic = EIS), task type
+GET _inference/_all
+# 3d. Agent Builder converse: response includes model, connector, token usage, tool-call steps, trace_id
+POST kbn:/api/agent_builder/converse
+{ "input": "Which docs explain BBQ quantization and what are the tradeoffs?", "agent_id": "elastic-ai-agent" }

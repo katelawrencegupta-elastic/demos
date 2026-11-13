@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hybrid Search API Walkthrough</title>
+<style>
+:root{--bg:#f3f5fa;--card:#ffffff;--ink:#0a1230;--mut:#3b4663;--line:#c9d1e3;--acc:#004f8f;--acc-ink:#ffffff;--teal:#00695f;--tealbg:#d2f2ec;--warn:#6b3200;--warnbg:#ffe9c2;--code:#0a1230;--codeink:#f7f9ff;--codeacc:#8fd0ff;--sel:#dbe9f8}
+:root[data-theme=dark]{--bg:#0a1230;--card:#111c44;--ink:#ffffff;--mut:#d3dbef;--line:#3d4d84;--acc:#8cc8ff;--acc-ink:#06102b;--teal:#8ff0df;--tealbg:#14504f;--warn:#ffd45c;--warnbg:#4a3a0a;--code:#050b20;--codeink:#ffffff;--codeacc:#8fd0ff;--sel:#1f3070}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+nav{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 16px;border-right:1px solid var(--line);background:var(--card)}
+nav h1{font-size:17px;margin:0 0 2px}nav .sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+.prog{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}.prog i{display:block;height:100%;background:var(--teal);width:0;transition:width .25s}
+.stepbtn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:9px 10px;border-radius:10px;cursor:pointer;font:inherit;font-size:14px}
+.stepbtn:hover{background:var(--sel)}.stepbtn.on{background:var(--sel);outline:2px solid var(--acc);font-weight:600}
+.num{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--sel);color:var(--ink);border:1px solid var(--mut);font-size:13px;font-weight:700}.stepbtn.on .num,.stepbtn.done .num{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.stepbtn small{display:block;color:var(--mut);font-size:13px}
+.tools{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+main{padding:28px clamp(16px,4vw,48px) 90px;max-width:1180px;width:100%}
+.kick{color:var(--teal);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+h2{font-size:clamp(24px,3.2vw,34px);line-height:1.2;margin:4px 0 6px}
+.goal{color:var(--mut);font-size:17px;margin:0 0 18px;max-width:75ch}
+.panel{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 2px rgba(10,18,48,.06);border-radius:14px;padding:16px 18px;margin:0 0 16px}
+.panel>h3{margin:0 0 10px;font-size:13.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+.say{border-left:4px solid var(--teal)}.say p{margin:.3em 0;font-size:17px}
+.watch{background:var(--warnbg);border-color:transparent}.watch>h3{color:var(--warn)}.watch ul{margin:0;padding-left:20px}
+pre{margin:0;background:var(--code);color:var(--codeink);border-radius:10px;padding:14px 16px;overflow:auto;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word}
+.reqwrap{position:relative;margin-bottom:10px}.copy{position:absolute;top:8px;right:8px}
+button.sm,.pill{font:inherit;font-size:14px;border:1px solid var(--mut);background:var(--card);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+button.sm:hover{border-color:var(--acc)}.pill.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.col{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
+.col h4{margin:0 0 2px;font-size:15px}.col .meta{color:var(--mut);font-size:13.5px;margin-bottom:8px}
+.hit{display:grid;grid-template-columns:24px 1fr auto;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:15.5px}
+.hit:first-of-type{border-top:0}.rank{color:var(--mut);font-weight:600}.hit .n{font-weight:600}.hit .c{color:var(--mut);font-size:13.5px}
+.badge{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:999px;background:var(--tealbg);color:var(--teal);font-weight:700;margin-left:6px;white-space:nowrap}
+.badge.w{background:var(--warnbg);color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}.chip{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);min-width:210px;flex:1}
+.chip b{display:block;font-size:14px}.chip code,code{font:13.5px ui-monospace,Menlo,monospace;color:var(--acc);font-weight:600}pre code{color:inherit}.chip span{color:var(--mut);font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:15.5px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}td.r,th.r{text-align:right}
+tr.hl td{background:var(--tealbg);font-weight:600}
+.stat{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 12px}.stat div{flex:1;min-width:140px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}.stat b{display:block;font-size:26px;line-height:1.1}.stat span{color:var(--mut);font-size:14px}
+.frag{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:15px;white-space:pre-wrap}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 2px}.flow .node{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg);font-size:13.5px}.flow .arr{color:var(--mut)}
+.nav2{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+button.big{font:inherit;font-weight:600;border:0;background:var(--acc);color:var(--acc-ink);padding:10px 20px;border-radius:10px;cursor:pointer}button.big.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}button.big:disabled{opacity:.4;cursor:default}
+input[type=number]{font:inherit;width:170px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--mut)}
+.foot{color:var(--mut);font-size:14px;margin-top:26px}
+@media (max-width:860px){.app{grid-template-columns:1fr}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.steps{display:flex;gap:6px;overflow:auto}.stepbtn{min-width:170px}.stepbtn small{display:none}}
+</style></head>
+<body>
+<div class="app">
+<nav aria-label="Walkthrough steps">
+  <h1>Hybrid search API</h1>
+  <div class="sub">One endpoint for an application and a workflow</div>
+  <div class="prog"><i id="prog"></i></div>
+  <div class="steps" id="steps"></div>
+  <div class="tools"><button class="sm" id="theme">Theme</button><span class="kbd">&larr;</span><span class="kbd">&rarr;</span></div>
+</nav>
+<main id="main" tabindex="-1"></main>
+</div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent);
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const state={step:0,seen:new Set(),ticket:0};
+function req(method,path,body){return method+' '+path+(body?'\n'+JSON.stringify(body,null,2):'');}
+function reqBlock(text){return `<div class="reqwrap"><pre>${esc(text)}</pre><button class="sm copy" data-copy="${esc(text)}">Copy</button></div>`;}
+function panel(t,inner,cls=''){return `<div class="panel ${cls}"><h3>${t}</h3>${inner}</div>`;}
+const bd=(t,w)=>`<span class="badge ${w?'w':''}">${t}</span>`;
+const flow=a=>`<div class="flow">${a.map(x=>`<span class="node">${x}</span>`).join('<span class="arr">→</span>')}</div>`;
+const h3=t=>`<h3 style="font-size:13.5px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px">${t}</h3>`;
+function outcome(title,key,fn){const d=D[key];
+  if(!d)return panel(title,`<p style="margin:0;color:var(--mut)">Not captured yet. Run <code>python3 12_capture_hybrid_api.py</code> then <code>python3 build_hybrid_api_walkthrough.py</code>.</p>`,'watch');
+  if(d.error)return panel(title,`<p style="margin:0">This call failed during capture: <code>${esc(d.error)}</code></p>`,'watch');
+  return panel(title,fn(d));}
+const prodTable=(r,mark={})=>`<table><tr><th>#</th><th>Product</th><th class="r">Price</th></tr>${r.hits.map((h,i)=>`<tr class="${mark[h.name]?'hl':''}"><td>${i+1}</td><td>${esc(h.name)}${mark[h.name]||''}</td><td class="r">$${h.price}</td></tr>`).join('')}</table>`;
+const docTable=r=>`<table><tr><th>#</th><th>Doc</th><th>Section</th><th>Version</th></tr>${r.hits.map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.title)}</td><td>${esc(h.section)}</td><td>${esc(h.version||'')}</td></tr>`).join('')}</table>`;
+const APPQ=D.app_query||'ergonomic chair for long work days';
+
+const steps=[
+{t:'The idea',s:'Why one endpoint',
+ goal:'Put the hybrid retrieval logic on the cluster once. Applications and workflows then send only a query and a few parameters.',
+ say:['“Without this, every app and every automation carries its own copy of the query. They drift apart, and a ranking change means redeploying all of them.”','“With a stored search template, the callers stay thin and Elastic owns the retrieval.”'],
+ body:()=>panel('Shape of the solution',flow(['Caller: app or workflow','POST …/_search/template { id, params }','Stored template: BM25 + semantic, merged with RRF','JSON hits']))
+  +panel('Two callers, one pattern',`<table><tr><th>Use case</th><th>Caller</th><th>Index</th><th>Template</th><th>Parameters</th></tr>
+   <tr><td>1 Application</td><td>Storefront search box</td><td><code>products-jina</code></td><td><code>demo_hybrid_products</code></td><td><code>query</code>, <code>max_price</code>, <code>size</code></td></tr>
+   <tr><td>2 Workflow</td><td>Support ticket automation</td><td><code>docs-jina</code></td><td><code>demo_hybrid_docs</code></td><td><code>query</code>, <code>size</code></td></tr></table>`),
+ watch:['This page runs against templates created by 11_register_hybrid_endpoints.py. Run it first on a new cluster.']},
+
+{t:'Define the endpoint',s:'Register a stored template',
+ goal:'The template is the endpoint. It holds both retrievers and the RRF merge, with placeholders for the caller\'s parameters.',
+ say:['“Two retrievers, keyword and semantic, merged by reciprocal rank fusion. The double braces are the only parts a caller can change.”','Point at the optional price filter: if the app sends no max_price the template falls back to a very high ceiling.'],
+ body:()=>panel('Call to run',reqBlock('PUT _scripts/demo_hybrid_products\n{ "script": { "lang": "mustache", "source": "<template JSON as a string>" } }')+`<p style="margin:0;color:var(--mut);font-size:14px">Run <code>python3 11_register_hybrid_endpoints.py</code> to register both templates.</p>`)
+  +outcome('Outcome: template as stored on the cluster (products)','templates',d=>`<pre>${esc(d.demo_hybrid_products)}</pre>`)
+  +outcome('Outcome: template as stored on the cluster (docs)','templates',d=>`<pre>${esc(d.demo_hybrid_docs)}</pre>`),
+ watch:['The stored source is a string, so the page re-indents it for reading. The cluster returns it on one line.']},
+
+{t:'Use case 1: application',s:'Storefront search with a price filter',
+ goal:'A shopper types a goal in plain words. The app sends the text and the price ceiling from its UI filter.',
+ say:['“The app never builds a query. It sends what the user typed and the filter value.”','Compare the keyword-only column with the hybrid one, then tighten the price ceiling.'],
+ body:()=>panel('Call to run',reqBlock(req('POST','products-jina/_search/template',{id:'demo_hybrid_products',params:{query:APPQ,max_price:500,size:3}})))
+  +outcome('Outcome: keyword only vs hybrid, same text and price ceiling','app',d=>{const kwn=new Set(d.hybrid_500.hits.map(h=>h.name));const mk={};d.keyword_500.hits.forEach(h=>{if(!kwn.has(h.name))mk[h.name]=bd('keyword only',1)});
+   return `<p style="margin:0 0 8px;color:var(--mut)">Query: “${esc(APPQ)}” · max_price 500</p><div class="cols"><div class="col"><h4>Keyword only</h4><div class="meta">match on description · took ${d.keyword_500.took} ms</div>${prodTable(d.keyword_500,mk)}</div><div class="col"><h4>Hybrid endpoint</h4><div class="meta">BM25 + semantic, RRF · took ${d.hybrid_500.took} ms</div>${prodTable(d.hybrid_500)}</div></div>`;})
+  +outcome('Outcome: same endpoint, price ceiling lowered to $250','app',d=>`<p style="margin:0 0 8px;color:var(--mut)">Only the <code>max_price</code> parameter changed · took ${d.hybrid_250.took} ms</p>${prodTable(d.hybrid_250)}`),
+ watch:['Check the lower-price results before presenting. With few strong matches under the ceiling, weaker items can fill the list, so explain that RRF ranks what is available.','Show your own result, not the screenshot: the wording of a query changes the ranking.']},
+
+{t:'Use case 2: workflow',s:'Ticket enrichment step',
+ goal:'An automation receives a support ticket and calls the same kind of endpoint over the docs. The next step uses the returned docs.',
+ say:['“The workflow engine treats Elastic as one HTTP step: send the ticket text, get ranked docs back.”','“What the next step does with them, attach, summarise or draft a reply, is up to the workflow.”'],
+ body:()=>{const t=D.workflow&&!D.workflow.error?D.workflow[state.ticket]||D.workflow[0]:null;
+  return (D.workflow&&!D.workflow.error?`<div class="tabs">${D.workflow.map((x,i)=>`<button class="pill ${i===state.ticket?'on':''}" data-ticket="${i}">${esc(x.ticket_id)}</button>`).join('')}</div>`:'')
+  +panel('Call to run (HTTP step in the workflow)',reqBlock(req('POST','docs-jina/_search/template',{id:'demo_hybrid_docs',params:{query:t?t.text:'Customer ticket: our vector index uses too much RAM at 3072 dimensions',size:3}})))
+  +outcome('Outcome: top docs for the ticket','workflow',()=>`<p style="margin:0 0 8px;color:var(--mut)">${esc(t.text)} · took ${t.took} ms</p>${docTable(t)}`)
+  +outcome('Outcome: payload handed to the next workflow step','workflow',()=>`<pre>${esc(JSON.stringify(t.handoff,null,2))}</pre>`);},
+ watch:['The handoff payload is what this demo builds from the response. It stands in for whatever your automation tool passes on.']},
+
+{t:'Change it once',s:'Add reranking without touching callers',
+ goal:'Update the stored template and every caller gets better ranking. The request they send does not change.',
+ say:['“Same call, same parameters. I only replace the template on the cluster.”','Show the order before and after, then be candid about what moved.'],
+ body:()=>outcome('Call used for both runs','evolve',d=>reqBlock(req('POST','docs-jina/_search/template',{id:'demo_hybrid_scratch',params:d.params})))
+  +panel('The change',`<p style="margin:0 0 8px">A scratch template, <code>demo_hybrid_scratch</code>, starts as the docs template (RRF only). The update wraps the RRF retriever in a <code>text_similarity_reranker</code> using <code>.jina-reranker-v3</code>. The capture script puts it back to the RRF version when it finishes.</p>`)
+  +outcome('Outcome: v1 RRF only vs v2 with reranker','evolve',d=>{const b=d.before.hits.map(h=>h.title);const mk={};d.after.hits.forEach((h,i)=>{const p=b.indexOf(h.title);mk[h.title]=p<0?bd('new',1):p===i?'':bd((p>i?'▲ ':'▼ ')+Math.abs(p-i),p<i)});
+   const list=(r,m={})=>r.hits.map((h,i)=>`<div class="hit"><span class="rank">${i+1}</span><div><span class="n">${esc(h.title)}</span>${m[h.title]||''}<div class="c">${esc(h.section)}</div></div></div>`).join('');
+   return `<p style="margin:0 0 8px;color:var(--mut)">${esc(d.params.query)}</p><div class="cols"><div class="col"><h4>Before</h4><div class="meta">RRF · took ${d.before.took} ms</div>${list(d.before)}</div><div class="col"><h4>After</h4><div class="meta">RRF + reranker · took ${d.after.took} ms</div>${list(d.after,mk)}</div></div>`;})
+  +outcome('Updated template source','evolve',d=>`<pre>${esc(d.v2_template)}</pre>`),
+ watch:['Reranking adds a model call, so latency goes up. The took values above show this run only.','On a corpus this small the reorder is modest. Say that it is a precision step, not a magic fix.']},
+
+{t:'Lock it down',s:'Least-privilege key per caller',
+ goal:'Callers need only read access to the index they search. Give each one its own API key.',
+ say:['“The application and the workflow each get a key that can read one index and nothing else.”','“Rotate or revoke a caller\'s key without touching the other.”'],
+ body:()=>panel('Example key for the application (shown, not run during capture)',reqBlock(req('POST','_security/api_key',{name:'storefront-search',expiration:'30d',role_descriptors:{search_only:{indices:[{names:['products-jina'],privileges:['read']}]}}})))
+  +panel('Same pattern for the workflow',reqBlock(req('POST','_security/api_key',{name:'ticket-enrichment',expiration:'30d',role_descriptors:{search_only:{indices:[{names:['docs-jina'],privileges:['read']}]}}})))
+  +panel('Recap',`<table><tr><th>Step</th><th>API</th></tr><tr><td>Define</td><td><code>PUT _scripts/{id}</code></td></tr><tr><td>Application call</td><td><code>POST products-jina/_search/template</code></td></tr><tr><td>Workflow call</td><td><code>POST docs-jina/_search/template</code></td></tr><tr><td>Update ranking</td><td><code>PUT _scripts/{id}</code> again</td></tr><tr><td>Access</td><td><code>POST _security/api_key</code></td></tr></table>`),
+ watch:['Confirm in your own environment that a read-only key can run search templates before promising it to a customer. This page did not test the restricted keys.','Never paste a real key into a slide or this page.']}
+];
+
+function render(){
+  const s=steps[state.step];state.seen.add(state.step);
+  $('#prog').style.width=((state.step+1)/steps.length*100)+'%';
+  $('#steps').innerHTML=steps.map((x,i)=>`<button class="stepbtn ${i===state.step?'on':''} ${state.seen.has(i)&&i!==state.step?'done':''}" data-go="${i}" ${i===state.step?'aria-current="step"':''}><span class="num">${i+1}</span><span>${esc(x.t)}<small>${esc(x.s)}</small></span></button>`).join('');
+  $('#main').innerHTML=`<div class="kick">Step ${state.step+1} of ${steps.length}</div><h2>${esc(s.t)}</h2><p class="goal">${esc(s.goal)}</p>`
+   +panel('Say',s.say.map(x=>`<p>${esc(x)}</p>`).join(''),'say')
+   +s.body()
+   +(s.watch&&s.watch.length?panel('Watch-outs',`<ul>${s.watch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`,'watch'):'')
+   +`<div class="nav2"><button class="big ghost" data-dir="-1" ${state.step===0?'disabled':''}>&larr; Back</button><button class="big" data-dir="1" ${state.step===steps.length-1?'disabled':''}>Next &rarr;</button></div>
+   <div class="foot">${D.captured?`Results captured live from the cluster on ${esc(D.captured)}. API key and hostnames are not included.`:'No captured results yet, so only the calls are shown.'}</div>`;
+}
+function go(i){state.step=Math.max(0,Math.min(steps.length-1,i));history.replaceState(null,'','#'+(state.step+1));render();$('#main').focus({preventScroll:true});window.scrollTo({top:0});}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.go!==undefined)go(+t.dataset.go);
+  else if(t.dataset.dir)go(state.step+ +t.dataset.dir);
+  else if(t.dataset.ticket!==undefined){state.ticket=+t.dataset.ticket;render();}
+  else if(t.dataset.copy!==undefined){navigator.clipboard&&navigator.clipboard.writeText(t.dataset.copy).then(()=>{t.textContent='Copied';setTimeout(()=>t.textContent='Copy',1200)}).catch(()=>{});}
+  else if(t.id==='theme'){const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';}
+});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(state.step+1);if(e.key==='ArrowLeft')go(state.step-1);});
+const h0=parseInt((location.hash||'').slice(1),10);if(h0>=1&&h0<=steps.length)state.step=h0-1;
+addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1),10);if(n>=1&&n<=steps.length){state.step=n-1;render();}});
+render();
+</script>
+</body>
+</html>

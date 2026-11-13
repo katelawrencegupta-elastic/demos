@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 2 Walkthrough</title>
+<style>
+:root{--bg:#f3f5fa;--card:#ffffff;--ink:#0a1230;--mut:#3b4663;--line:#c9d1e3;--acc:#004f8f;--acc-ink:#ffffff;--teal:#00695f;--tealbg:#d2f2ec;--warn:#6b3200;--warnbg:#ffe9c2;--code:#0a1230;--codeink:#f7f9ff;--codeacc:#8fd0ff;--sel:#dbe9f8}
+:root[data-theme=dark]{--bg:#0a1230;--card:#111c44;--ink:#ffffff;--mut:#d3dbef;--line:#3d4d84;--acc:#8cc8ff;--acc-ink:#06102b;--teal:#8ff0df;--tealbg:#14504f;--warn:#ffd45c;--warnbg:#4a3a0a;--code:#050b20;--codeink:#ffffff;--codeacc:#8fd0ff;--sel:#1f3070}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+nav{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 16px;border-right:1px solid var(--line);background:var(--card)}
+nav h1{font-size:17px;margin:0 0 2px}nav .sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+.prog{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}.prog i{display:block;height:100%;background:var(--teal);width:0;transition:width .25s}
+.stepbtn{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:9px 10px;border-radius:10px;cursor:pointer;font:inherit;font-size:14px}
+.stepbtn:hover{background:var(--sel)}.stepbtn.on{background:var(--sel);outline:2px solid var(--acc);font-weight:600}
+.num{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--sel);color:var(--ink);border:1px solid var(--mut);font-size:13px;font-weight:700}.stepbtn.on .num,.stepbtn.done .num{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.stepbtn small{display:block;color:var(--mut);font-size:13px}
+.tools{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+main{padding:28px clamp(16px,4vw,48px) 90px;max-width:1180px;width:100%}
+.kick{color:var(--teal);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+h2{font-size:clamp(24px,3.2vw,34px);line-height:1.2;margin:4px 0 6px}
+.goal{color:var(--mut);font-size:17px;margin:0 0 18px;max-width:75ch}
+.panel{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 2px rgba(10,18,48,.06);border-radius:14px;padding:16px 18px;margin:0 0 16px}
+.panel>h3{margin:0 0 10px;font-size:13.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+.say{border-left:4px solid var(--teal)}.say p{margin:.3em 0;font-size:17px}
+.watch{background:var(--warnbg);border-color:transparent}.watch>h3{color:var(--warn)}.watch ul{margin:0;padding-left:20px}
+pre{margin:0;background:var(--code);color:var(--codeink);border-radius:10px;padding:14px 16px;overflow:auto;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word}
+.reqwrap{position:relative;margin-bottom:10px}.copy{position:absolute;top:8px;right:8px}
+button.sm,.pill{font:inherit;font-size:14px;border:1px solid var(--mut);background:var(--card);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+button.sm:hover{border-color:var(--acc)}.pill.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.col{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
+.col h4{margin:0 0 2px;font-size:15px}.col .meta{color:var(--mut);font-size:13.5px;margin-bottom:8px}
+.hit{display:grid;grid-template-columns:24px 1fr auto;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:15.5px}
+.hit:first-of-type{border-top:0}.rank{color:var(--mut);font-weight:600}.hit .n{font-weight:600}.hit .c{color:var(--mut);font-size:13.5px}
+.badge{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:999px;background:var(--tealbg);color:var(--teal);font-weight:700;margin-left:6px;white-space:nowrap}
+.badge.w{background:var(--warnbg);color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}.chip{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);min-width:210px;flex:1}
+.chip b{display:block;font-size:14px}.chip code,code{font:13.5px ui-monospace,Menlo,monospace;color:var(--acc);font-weight:600}pre code{color:inherit}.chip span{color:var(--mut);font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:15.5px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}td.r,th.r{text-align:right}
+tr.hl td{background:var(--tealbg);font-weight:600}
+.stat{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 12px}.stat div{flex:1;min-width:140px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}.stat b{display:block;font-size:26px;line-height:1.1}.stat span{color:var(--mut);font-size:14px}
+.frag{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:15px;white-space:pre-wrap}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 2px}.flow .node{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--bg);font-size:13.5px}.flow .arr{color:var(--mut)}
+.nav2{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+button.big{font:inherit;font-weight:600;border:0;background:var(--acc);color:var(--acc-ink);padding:10px 20px;border-radius:10px;cursor:pointer}button.big.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}button.big:disabled{opacity:.4;cursor:default}
+input[type=number]{font:inherit;width:170px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--mut)}
+.foot{color:var(--mut);font-size:14px;margin-top:26px}
+@media (max-width:860px){.app{grid-template-columns:1fr}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.steps{display:flex;gap:6px;overflow:auto}.stepbtn{min-width:170px}.stepbtn small{display:none}}
+</style></head>
+<body>
+<div class="app">
+<nav aria-label="Walkthrough steps">
+  <h1>Demo 2 walkthrough</h1>
+  <div class="sub">RAG, LLM transparency, MCP and A2A (slides 9-13 plus hybrid API)</div>
+  <div class="prog"><i id="prog"></i></div>
+  <div class="steps" id="steps"></div>
+  <div class="tools"><button class="sm" id="theme">Theme</button><span class="kbd">&larr;</span><span class="kbd">&rarr;</span></div>
+</nav>
+<main id="main" tabindex="-1"></main>
+</div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent);
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const state={step:0,seen:new Set(),sq:0,wt:0};
+function req(method,path,body){return method+' '+path+(body?'\n'+JSON.stringify(body,null,2):'');}
+function reqBlock(text){return `<div class="reqwrap"><pre>${esc(text)}</pre><button class="sm copy" data-copy="${esc(text)}">Copy</button></div>`;}
+function panel(t,inner,cls=''){return `<div class="panel ${cls}"><h3>${t}</h3>${inner}</div>`;}
+const h3=t=>`<h3 style="font-size:13.5px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px">${t}</h3>`;
+const bd=(t,w)=>`<span class="badge ${w?'w':''}">${t}</span>`;
+const code=o=>`<pre>${esc(JSON.stringify(o,null,2))}</pre>`;
+const flow=a=>`<div class="flow">${a.map(x=>`<span class="node">${x}</span>`).join('<span class="arr">→</span>')}</div>`;
+// Outcome panels need captured data. Without it, say so plainly instead of inventing numbers.
+function outcome(title,key,fn){const d=D[key];
+  if(!d)return panel(title,`<p style="margin:0;color:var(--mut)">Not captured yet. Run <code>python3 10_capture_demo2.py</code> then <code>python3 build_walkthrough2.py</code>.</p>`,'watch');
+  if(d.error)return panel(title,`<p style="margin:0">This call failed during capture: <code>${esc(d.error)}</code></p>`,'watch');
+  return panel(title,fn(d));}
+const MQ='POST kbn:/api/agent_builder/converse';
+
+const steps=[
+{t:'Set the stage',s:'Slide 9: RAG and LLM transparency',
+ goal:'Demo 2 answers three questions in six minutes: how does retrieval feed an LLM, how easy is it to change the LLM, and how do you see what ran.',
+ say:['“Three things in this demo: retrieve grounding context, swap the model with one parameter, and then look at exactly what ran.”','Open console/03_rag_transparency.console in Kibana Dev Tools. Each step below maps to one block (3a to 3d).'],
+ body:()=>panel('Run of show (about 6 min)',`<table><tr><th>Step</th><th>Console block</th><th>Point to make</th></tr>
+  <tr><td>2 Retrieve</td><td>3a</td><td>Docs come back ranked from <code>docs-jina</code></td></tr>
+  <tr><td>3 Switch LLMs</td><td>3b</td><td>Same prompt, three providers, only the inference ID changes</td></tr>
+  <tr><td>4 Inventory</td><td>3c</td><td><code>GET _inference/_all</code> shows everything available</td></tr>
+  <tr><td>5 Trace</td><td>3d</td><td><code>model_usage</code>, <code>steps</code> and <code>trace_id</code></td></tr>
+  <tr><td>6 Demo agent</td><td>extra</td><td>Sales questions answered by <code>vector-demo-agent</code>, verified with ES|QL</td></tr>
+  <tr><td>7 Workflows</td><td>extra</td><td>Ticket to cited reply, and a sales digest, both as Kibana workflows</td></tr>
+  <tr><td>8 MCP and A2A</td><td>slide 13</td><td>The same tools served to other clients; hands over to Demo 3</td></tr></table>`),
+ watch:['Pre-run each block once so the first call is warm, and screenshot the results as a fallback.']},
+
+{t:'Retrieve context',s:'Slide 10: ask, retrieve, rerank, answer',
+ goal:'RAG on Elastic is four stages, and the model at the end is just an inference ID. Start with the retrieval stage against the docs index.',
+ say:['“Ask, retrieve, rerank, answer. The LLM only sees the chunks that retrieval returns.”','“Here is stage two on its own: a semantic query against our documentation index.”'],
+ body:()=>panel('RAG flow',flow(['1 Ask','2 Retrieve: BM25 + semantic_text, fused with RRF','3 Rerank: jina-reranker-v3','4 Answer: chat completion endpoint']))
+  +panel('Call to run (3a)',reqBlock(req('GET','docs-jina/_search',{size:3,_source:['title','section','version'],query:{semantic:{field:'body_semantic',query:D.docs_query||'how do I reduce memory use for high-dimensional vectors?'}}})))
+  +outcome('Outcome: top 3 docs chunks','retrieve',d=>`<p style="margin:0 0 8px;color:var(--mut)">Query: “${esc(D.docs_query)}” · took ${d.took} ms</p><table><tr><th>#</th><th>Title</th><th>Section</th><th>Version</th><th class="r">Score</th></tr>${d.hits.map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.title)}</td><td>${esc(h.section)}</td><td>${esc(h.version)}</td><td class="r">${h.score}</td></tr>`).join('')}</table>`),
+ watch:['This call retrieves only. The slide shows the full pipeline, including BM25 fusion and reranking, which Demo 1 covered in its hybrid step.']},
+
+{t:'Switch LLMs',s:'Slide 11: change one inference ID',
+ goal:'Send the same prompt to three providers. Only the inference ID in the path changes.',
+ say:['“Same API for every provider. I change the ID in the URL and nothing else.”','Say that each ID has -completion and -chat_completion variants and that the list changes over time, so GET _inference/_all is the source of truth.'],
+ body:()=>{const ids=(D.llms||[]).map(x=>x.id);const use=ids.length?ids:['.anthropic-claude-5.5-haiku-completion','.google-gemini-3.5-flash-lite-completion','.openai-gpt-oss-120b-completion'];
+  return panel('Calls to run (3b)',use.map(i=>reqBlock(req('POST','_inference/completion/'+i,{input:D.llm_prompt||'In 2 sentences: why use quantization for 3072-dim embeddings?'}))).join(''))
+  +outcome('Outcome: same prompt, three models','llms',a=>`<div class="cols">${a.map(x=>`<div class="col"><h4>${esc(x.id.replace(/^\./,'').replace(/-completion$/,''))}</h4>${x.error?`<div class="meta">failed: ${esc(x.error)}</div>`:`<div class="meta">${x.ms} ms end to end</div><div style="font-size:15px">${esc(x.text)}</div>`}</div>`).join('')}</div>`)
+  +panel('Providers on slide 11',`<table><tr><th>Provider</th><th>Example endpoint IDs</th></tr><tr><td>Anthropic</td><td><code>anthropic-claude-5.5-sonnet</code>, <code>anthropic-claude-5.5-haiku</code></td></tr><tr><td>Google</td><td><code>google-gemini-3.5-flash</code>, <code>google-gemini-3.1-pro</code></td></tr><tr><td>OpenAI</td><td><code>openai-gpt-5.5</code>, <code>openai-gpt-oss-120b</code></td></tr><tr><td>Others</td><td><code>nvidia-nemotron-3-ultra</code>, <code>moonshot-kimi-k3</code>, <code>zai-glm-5.3</code>, <code>qwen-3.8-2.4t-a95b</code></td></tr></table>`);},
+ watch:['Times are wall-clock for one call and vary run to run. Do not present them as a benchmark.','If an endpoint is slow, swap to another from the inventory in the next step.']},
+
+{t:'Model inventory',s:'Slide 12: what is available',
+ goal:'Transparency starts with knowing which models exist. One call lists every endpoint, provider and task type.',
+ say:['“This is the inventory. Every model, who provides it, and what task it does.”'],
+ body:()=>panel('Call to run (3c)',reqBlock(req('GET','_inference/_all')))
+  +outcome('Outcome: endpoints on this project','inventory',d=>`<div class="stat"><div><b>${d.total}</b><span>endpoints in total</span></div>${Object.entries(d.by_task).map(([k,v])=>`<div><b>${v}</b><span>${esc(k.replace(/_/g,' '))}</span></div>`).join('')}</div>
+   <table><tr><th>Provider prefix</th><th>Task types (count)</th></tr>${Object.entries(d.by_provider).sort().map(([p,t])=>`<tr><td><code>${esc(p)}</code></td><td>${Object.entries(t).map(([k,v])=>esc(k)+' ('+v+')').join(', ')}</td></tr>`).join('')}</table>
+   <p style="color:var(--mut);font-size:14px;margin:10px 0 0">Provider is taken from the first part of the endpoint ID. Re-run before presenting: the catalog changes.</p>`),
+ watch:['The slide lists LLM chat endpoints as a separate group from the 15 embedding and rerank models on slide 8.']},
+
+{t:'Trace one answer',s:'Slide 12: usage and tool steps',
+ goal:'Ask the default agent a question and read what the response reports about itself: model, tokens, tool steps and a trace ID.',
+ say:['“Every response tells me which model ran, how many LLM calls it made, and the tokens used.”','Point at model_usage, then steps, then trace_id. Replace the slide figure with the live numbers from this run.'],
+ body:()=>panel('Call to run (3d)',reqBlock(req('POST','kbn:/api/agent_builder/converse',{input:D.converse_query||'Which docs explain BBQ quantization and what are the tradeoffs?',agent_id:'elastic-ai-agent'})))
+  +outcome('Outcome: what the response reports','converse',d=>`<div class="stat">${d.model_usage?Object.entries(d.model_usage).filter(([k,v])=>typeof v!=='object').map(([k,v])=>`<div><b style="font-size:20px">${esc(v)}</b><span>${esc(k)}</span></div>`).join(''):''}<div><b>${d.n_steps}</b><span>tool-call steps</span></div></div>
+   ${d.trace_id?`<p style="margin:0 0 8px">trace_id: <code>${esc(d.trace_id)}</code></p>`:''}
+   <h3 style="font-size:13.5px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px">model_usage</h3>${code(d.model_usage)}
+   <h3 style="font-size:13.5px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px">steps (trimmed)</h3>${code(d.steps)}
+   <h3 style="font-size:13.5px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px">answer (trimmed)</h3><div class="frag">${esc(d.message)}</div>`),
+ watch:['Slide 12 quotes claude-5.5-opus, 4 LLM calls and 677 output tokens from a test question. Your live numbers will differ, so quote the ones on screen.','The model depends on the agent configuration; the default agent model can change.']},
+
+{t:'Ask the demo agent',s:'Sales questions, checked against ES|QL',
+ goal:'The demo agent has three tools: products, orders and docs. Ask it sales questions, then check its numbers against ES|QL on the same index.',
+ say:['“Same agent, new data. It decides which tool to use, then answers with figures I can verify.”','Open the ES|QL check for each answer. The numbers should match to the dollar.'],
+ body:()=>{const S=Array.isArray(D.sales)?D.sales:null;const i=Math.min(state.sq||0,(S||[1]).length-1);const x=S?S[i]:null;
+  return (S?`<div class="tabs">${S.map((y,k)=>`<button class="pill ${k===i?'on':''}" data-sq="${k}">${esc(y.q.length>46?y.q.slice(0,44)+'…':y.q)}</button>`).join('')}</div>`:'')
+  +panel('Call to run',reqBlock(req('POST','kbn:/api/agent_builder/converse',{input:x?x.q:'What were our top 3 product categories by revenue this past month?',agent_id:'vector-demo-agent'})))
+  +outcome('Outcome: what the agent did','sales',()=>{if(x.error)return `<p style="margin:0">This call failed during capture: <code>${esc(x.error)}</code></p>`;const u=x.usage||{};
+   return `<div class="stat"><div><b style="font-size:20px">${esc(u.model)}</b><span>model</span></div><div><b>${u.llm_calls}</b><span>LLM calls</span></div><div><b>${u.output_tokens}</b><span>output tokens</span></div><div><b>${x.seconds} s</b><span>wall clock</span></div></div>
+   <p style="margin:0 0 8px">Tools called: ${x.tools.map(n=>`<code>${esc(n)}</code>`).join(' → ')}</p>${x.trace_id?`<p style="margin:0 0 8px">trace_id: <code>${esc(x.trace_id)}</code></p>`:''}
+   ${h3('Agent answer (trimmed)')}<div class="frag">${esc(x.message)}</div>`;})
+  +(x&&!x.error?panel('ES|QL check: '+esc(x.truth_label),(Array.isArray(x.truth_esql)?x.truth_esql:[x.truth_esql]).map((qq,k)=>reqBlock('POST _query\n'+JSON.stringify({query:qq},null,2))+`<table><tr>${x.truth[k].columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr>${x.truth[k].rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</table>`).join('')):'');},
+ watch:['The agent counts order lines, not whole orders, because each line carries its own status. It says so in its answer.','Each question takes several LLM calls on the default model. Run them once before presenting, or ask for “the last 30 days” to save a retry.']},
+
+{t:'Workflow: ticket to reply',s:'Hybrid search, then a cited draft',
+ goal:'A Kibana workflow takes a support ticket, calls the stored hybrid search template, and has a model draft a reply that cites only the docs it was given.',
+ say:['“Three steps, no code: a manual trigger, one HTTP-style call to the same endpoint the app uses, and one model step.”','“The model only sees the retrieved excerpts, and the prompt says every sentence must be supported by them.”'],
+ body:()=>{const W=D.workflows;const T=W&&Array.isArray(W.tickets)?W.tickets:null;const i=Math.min(state.wt||0,(T||[1]).length-1);const t=T?T[i]:null;
+  const ok=T&&t&&!t.error;const doc=ok?t.steps[1].output.content:null;
+  return (T?`<div class="tabs">${T.map((y,k)=>`<button class="pill ${k===i?'on':''}" data-wt="${k}">${esc(y.ticket_id)}</button>`).join('')}</div>`:'')
+  +panel('Workflow',flow(['Manual trigger: ticket_id, ticket_text','search_docs: POST docs-jina/_search/template','draft_reply: ai.prompt with a JSON schema']))
+  +panel('Run it (Kibana: Workflows, Ticket to cited reply, Run)',reqBlock(req('POST','kbn:/api/workflows/workflow/ticket-to-cited-reply/run',{inputs:{ticket_id:t?t.ticket_id:'T-1042',ticket_text:t?t.text:'Customer ticket: our vector index uses too much RAM at 3072 dimensions'}})))
+  +(W&&W.yaml?panel('Definition (YAML)',`<pre>${esc(W.yaml['ticket-to-cited-reply'])}</pre>`):'')
+  +outcome('Outcome: the run','workflows',()=>{if(!t)return '<p style="margin:0">No ticket runs captured.</p>';if(t.error||t.status!=='completed')return `<p style="margin:0">Run status: <code>${esc(t.status)}</code> ${esc(JSON.stringify(t.error||''))}</p>`;
+   return `<div class="stat"><div><b style="font-size:20px">${esc(t.status)}</b><span>status</span></div><div><b>${(t.duration_ms/1000).toFixed(1)} s</b><span>total</span></div><div><b>${t.tokens.in}</b><span>input tokens</span></div><div><b>${t.tokens.out}</b><span>output tokens</span></div></div>
+   <table><tr><th>Step</th><th>Type</th><th>Status</th><th class="r">ms</th></tr>${t.steps.map(s=>`<tr><td><code>${esc(s.id)}</code></td><td><code>${esc(s.type)}</code></td><td>${esc(s.status)}</td><td class="r">${s.ms}</td></tr>`).join('')}</table>
+   <p style="margin:10px 0 0;color:var(--mut);font-size:14px">Model: <code>${esc(t.model)}</code></p>
+   ${h3('Docs retrieved by search_docs')}<table><tr><th>#</th><th>Title</th><th>Section</th><th>Version</th></tr>${t.steps[0].output.hits.map((h,k)=>`<tr><td>${k+1}</td><td>${esc(h.title)}</td><td>${esc(h.section)}</td><td>${esc(h.version)}</td></tr>`).join('')}</table>
+   ${h3('Drafted reply')}<div class="frag">${esc(doc.reply)}</div>
+   ${h3('Docs the model cited')}<table><tr><th>Title</th><th>Section</th><th>Version</th></tr>${doc.cited_docs.map(c=>`<tr><td>${esc(c.title)}</td><td>${esc(c.section)}</td><td>${esc(c.version)}</td></tr>`).join('')}</table>`;});},
+ watch:['Read the reply against the retrieved docs before presenting. A first version of this prompt let the model add a general claim about speed that the docs did not make, so the prompt now forbids outside claims and asks it to say what the docs do not cover.','Nothing is sent anywhere. The draft is workflow output only. Add a Slack, email or ticketing step when you connect one.','When run through the API, pass the inputs explicitly: the defaults in the YAML are not applied.']},
+
+{t:'Workflow: sales digest',s:'ES|QL, model summary, stored result',
+ goal:'A second workflow runs ES|QL over the orders index, has a model write a three-line digest from only those numbers, and stores it in a new index.',
+ say:['“The numbers come from ES|QL. The model only words them. I can check every figure against a query.”','“Run it on demand here, or on a daily schedule.”'],
+ body:()=>{const W=D.workflows;const g=W&&W.digest;
+  return panel('Workflow',flow(['Manual or scheduled (daily)','totals, top_categories, top_products: ES|QL','write_digest: ai.prompt','store_digest: index into sales-digests']))
+  +panel('Run it (Kibana: Workflows, Sales digest, Run)',reqBlock(req('POST','kbn:/api/workflows/workflow/sales-digest/run',{inputs:{start:'2026-11-07T00:00:00Z',end:'2026-11-14T00:00:00Z'}})))
+  +(W&&W.yaml?panel('Definition (YAML)',`<pre>${esc(W.yaml['sales-digest'])}</pre>`):'')
+  +outcome('Outcome: the run','workflows',()=>{if(!g||g.status!=='completed')return `<p style="margin:0">Run status: <code>${esc(g&&g.status)}</code> ${esc(JSON.stringify((g&&g.error)||''))}</p>`;
+   const dd=W.digest_doc;return `<div class="stat"><div><b style="font-size:20px">${esc(g.status)}</b><span>status</span></div><div><b>${(g.duration_ms/1000).toFixed(1)} s</b><span>total</span></div><div><b>${g.tokens.in}</b><span>input tokens</span></div><div><b>${g.tokens.out}</b><span>output tokens</span></div></div>
+   <table><tr><th>Step</th><th>Type</th><th>Status</th><th class="r">ms</th></tr>${g.steps.map(s=>`<tr><td><code>${esc(s.id)}</code></td><td><code>${esc(s.type)}</code></td><td>${esc(s.status)}</td><td class="r">${s.ms}</td></tr>`).join('')}</table>
+   ${dd?`${h3('Stored digest (document in sales-digests)')}<div class="frag">${esc(dd.digest)}</div><p style="margin:6px 0 0;color:var(--mut);font-size:14px">Window ${esc(dd.window_start)} to ${esc(dd.window_end)} · revenue ${esc(dd.revenue)} · orders ${esc(dd.orders)} · cancelled lines ${esc(dd.cancelled_lines)} · returned lines ${esc(dd.returned_lines)}</p>`:''}`;})
+  +outcome('ES|QL check of the digest figures','workflows',()=>{const c=W.digest_check;return reqBlock('POST _query\n'+JSON.stringify({query:c.esql_total},null,2))+`<p style="margin:0 0 8px">Total revenue: <b>${esc(c.total.rows[0][0])}</b></p>`+reqBlock('POST _query\n'+JSON.stringify({query:c.esql},null,2))+`<table><tr>${c.categories.columns.map(x=>`<th>${esc(x)}</th>`).join('')}</tr>${c.categories.rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</table>`;});},
+ watch:['The orders index is a one-time backfill that ends on Nov 13, so the inputs pin a window. A daily schedule would produce an empty window once the data ages out.','This window has 0 returned lines because the synthetic returns only appear for orders older than about 10 days. Do not read it as a real return rate.','Email is the only connector set up on this project, and no email step is included, so nothing is sent.']},
+
+{t:'MCP and A2A',s:'Slide 13: same tools, two protocols',
+ goal:'Agent Builder serves the tools you registered to MCP clients and A2A agents. This sets up Demo 3.',
+ say:['“I registered two tools over my indices. Agent Builder exposes them over MCP for clients like Claude, and over A2A for other agents.”','Auth is an API key header. Rotate the key after the session.'],
+ body:()=>panel('Architecture',flow(['MCP clients: Claude Code, Claude Desktop','A2A agents: other frameworks'])+flow(['Agent Builder tools (Kibana)','demo.search_products, demo.search_docs'])+flow(['Indices: products-*, docs-jina']))
+  +panel('Calls to run',reqBlock('POST $KB_URL/api/agent_builder/mcp\nAccept: application/json, text/event-stream\n\n{"jsonrpc":"2.0","id":1,"method":"tools/list"}')+reqBlock('GET $KB_URL/api/agent_builder/a2a/elastic-ai-agent.json')+`<p style="margin:0;color:var(--mut);font-size:14px">A2A <code>message/send</code> goes to <code>/api/agent_builder/a2a/elastic-ai-agent</code>. The tools were registered by <code>04_agent_tools.py</code>; <code>05_mcp_a2a_demo.sh</code> runs all of this in Demo 3.</p>`)
+  +outcome('Outcome: MCP tools/list','mcp',d=>`<div class="stat"><div><b>${d.count}</b><span>tools exposed over MCP</span></div><div><b>${d.demo_tools.length}</b><span>of them from this demo</span></div></div><p style="margin:0;font-size:14px">${d.names.map(n=>`<code>${esc(n)}</code>`).join(' · ')}</p>`)
+  +outcome('Outcome: A2A agent card','a2a',d=>`<p style="margin:0 0 6px"><b>${esc(d.name)}</b>${d.protocolVersion?' · protocol '+esc(d.protocolVersion):''}</p><p style="margin:0 0 6px;color:var(--mut);font-size:14px">${esc(d.description)}</p>${d.n_skills?`<p style="margin:0;font-size:14px">${d.n_skills} skills: ${d.skills.map(s=>`<code>${esc(s)}</code>`).join(' · ')}</p>`:''}`)
+  +outcome('Outcome: A2A message/send (trimmed)','a2a_send',d=>code(d)),
+ watch:['Next is Demo 3 (slide 14): run 05_mcp_a2a_demo.sh, then add the MCP server to Claude Code with the claude mcp add command it prints.','Never paste the API key into the page or the slides.']}
+,{t:'Hybrid search API',s:'Two reusable endpoint use cases',
+ goal:'Save the hybrid query (BM25 + semantic, fused with RRF) once on the cluster as a stored search template. Any caller then sends only parameters.',
+ say:['“The retrieval logic lives in Elastic. The application or workflow just calls one endpoint with a query and a few parameters.”','“Change the ranking later and every caller gets it, with no redeploy.”'],
+ body:()=>panel('One endpoint, two callers',flow(['Application or workflow','POST _search/template { id, params }','Stored template: BM25 + semantic, RRF','Ranked hits as JSON']))
+  +panel('Use case 1: application, storefront search',`<p style="margin:0 0 8px">A shopper types a goal, not a product name. The app passes the text and a price ceiling from the UI filter.</p>`+reqBlock(req('POST','products-jina/_search/template',{id:'demo_hybrid_products',params:(D.uc_app||{}).params||{query:'ergonomic chair for long work days',max_price:500,size:3}})))
+  +outcome('Outcome: use case 1','uc_app',d=>`<p style="margin:0 0 8px;color:var(--mut)">took ${d.took} ms</p><table><tr><th>#</th><th>Product</th><th>Category</th><th class="r">Price</th><th class="r">Rating</th></tr>${d.hits.map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.name)}</td><td>${esc(h.category)}</td><td class="r">$${h.price}</td><td class="r">${h.rating??''}</td></tr>`).join('')}</table>`)
+  +panel('Use case 2: workflow, support ticket enrichment',`<p style="margin:0 0 8px">A ticket arrives and an automation step calls the same kind of endpoint over the docs index. The next step attaches the top docs to the ticket or drafts a reply from them.</p>`+reqBlock(req('POST','docs-jina/_search/template',{id:'demo_hybrid_docs',params:(D.uc_workflow||{}).params||{query:'Customer ticket: our vector index uses too much RAM at 3072 dimensions',size:3}})))
+  +outcome('Outcome: use case 2','uc_workflow',d=>`<p style="margin:0 0 8px;color:var(--mut)">took ${d.took} ms</p><table><tr><th>#</th><th>Title</th><th>Section</th><th>Version</th><th class="r">Score</th></tr>${d.hits.map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.title)}</td><td>${esc(h.section)}</td><td>${esc(h.version)}</td><td class="r">${h.score}</td></tr>`).join('')}</table>`)
+  +panel('Setup',`<p style="margin:0;font-size:14px">Run <code>python3 11_register_hybrid_endpoints.py</code> once. It registers <code>demo_hybrid_products</code> and <code>demo_hybrid_docs</code> with <code>PUT _scripts/{id}</code>.</p>`),
+ watch:['Both templates are plain mustache search templates, so the app and the workflow need only an API key with read access to the index.','The workflow example shows the retrieval call only. The attach-to-ticket step belongs to whatever automation tool you use.']}
+
+];
+
+function render(){
+  const s=steps[state.step];state.seen.add(state.step);
+  $('#prog').style.width=((state.step+1)/steps.length*100)+'%';
+  $('#steps').innerHTML=steps.map((x,i)=>`<button class="stepbtn ${i===state.step?'on':''} ${state.seen.has(i)&&i!==state.step?'done':''}" data-go="${i}" ${i===state.step?'aria-current="step"':''}><span class="num">${i+1}</span><span>${esc(x.t)}<small>${esc(x.s)}</small></span></button>`).join('');
+  $('#main').innerHTML=`<div class="kick">Step ${state.step+1} of ${steps.length}</div><h2>${esc(s.t)}</h2><p class="goal">${esc(s.goal)}</p>`
+   +panel('Say',s.say.map(x=>`<p>${esc(x)}</p>`).join(''),'say')
+   +s.body()
+   +(s.watch&&s.watch.length?panel('Watch-outs',`<ul>${s.watch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`,'watch'):'')
+   +`<div class="nav2"><button class="big ghost" data-dir="-1" ${state.step===0?'disabled':''}>&larr; Back</button><button class="big" data-dir="1" ${state.step===steps.length-1?'disabled':''}>Next &rarr;</button></div>
+   <div class="foot">${D.captured?`Results captured live from the cluster on ${esc(D.captured)}. API key and hostnames are not included.`:'No captured results yet, so only the calls are shown.'}</div>`;
+}
+function go(i){state.step=Math.max(0,Math.min(steps.length-1,i));history.replaceState(null,'','#'+(state.step+1));render();$('#main').focus({preventScroll:true});window.scrollTo({top:0});}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.go!==undefined)go(+t.dataset.go);
+  else if(t.dataset.dir)go(state.step+ +t.dataset.dir);
+  else if(t.dataset.wt!==undefined){state.wt=+t.dataset.wt;render();}
+  else if(t.dataset.sq!==undefined){state.sq=+t.dataset.sq;render();}
+  else if(t.dataset.copy!==undefined){navigator.clipboard&&navigator.clipboard.writeText(t.dataset.copy).then(()=>{t.textContent='Copied';setTimeout(()=>t.textContent='Copy',1200)}).catch(()=>{});}
+  else if(t.id==='theme'){const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';}
+});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(state.step+1);if(e.key==='ArrowLeft')go(state.step-1);});
+const h0=parseInt((location.hash||'').slice(1),10);if(h0>=1&&h0<=steps.length)state.step=h0-1;
+addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1),10);if(n>=1&&n<=steps.length){state.step=n-1;render();}});
+render();
+</script>
+</body>
+</html>

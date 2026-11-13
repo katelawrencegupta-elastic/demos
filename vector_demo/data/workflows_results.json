@@ -1,0 +1,350 @@
+{
+ "captured": "2026-11-13T18:49:30Z",
+ "yaml": {
+  "ticket-to-cited-reply": "name: Ticket to cited reply\ndescription: Takes a support ticket, retrieves the best docs with the stored hybrid search template, and drafts a short reply that cites only those docs.\nenabled: true\ntags:\n  - demo\n  - vector-search\ntriggers:\n  - type: manual\ninputs:\n  - name: ticket_id\n    type: string\n    default: T-1042\n  - name: ticket_text\n    type: string\n    default: \"Customer ticket: our vector index uses too much RAM at 3072 dimensions\"\nsteps:\n  - name: search_docs\n    type: elasticsearch.request\n    with:\n      method: POST\n      path: /docs-jina/_search/template\n      body:\n        id: demo_hybrid_docs\n        params:\n          query: \"{{ inputs.ticket_text }}\"\n          size: 3\n  - name: draft_reply\n    type: ai.prompt\n    with:\n      systemPrompt: >-\n        You draft support replies. Every sentence of the reply must be supported by the documentation excerpts provided.\n        Do not add general knowledge, industry norms or performance claims that the excerpts do not state. If the excerpts\n        only partly answer the question, answer that part and say what they do not cover. Never state a setting, number or\n        version that is not in the excerpts. Cite only the docs whose content you actually used.\n      prompt: >-\n        Ticket {{ inputs.ticket_id }}: {{ inputs.ticket_text }}\n\n        Documentation excerpts (JSON, best match first):\n        {{ steps.search_docs.output.hits.hits | json }}\n\n        Write a reply of at most 120 words. Then list the docs you used.\n      schema:\n        type: object\n        properties:\n          reply:\n            type: string\n          cited_docs:\n            type: array\n            items:\n              type: object\n              properties:\n                title:\n                  type: string\n                section:\n                  type: string\n                version:\n                  type: string\n        required:\n          - reply\n          - cited_docs\n",
+  "sales-digest": "name: Sales digest\ndescription: Runs ES|QL over the orders index for a window, has a model write a short digest from the numbers, and stores it in the sales-digests index.\nenabled: true\ntags:\n  - demo\n  - vector-search\ntriggers:\n  - type: manual\n  - type: scheduled\n    with:\n      every: 1d\ninputs:\n  - name: start\n    type: string\n    default: \"2026-11-07T00:00:00Z\"\n  - name: end\n    type: string\n    default: \"2026-11-14T00:00:00Z\"\nsteps:\n  - name: totals\n    type: elasticsearch.esql.query\n    with:\n      format: json\n      query: >-\n        FROM orders\n        | WHERE @timestamp >= \"{{ inputs.start }}\" AND @timestamp < \"{{ inputs.end }}\"\n        | EVAL net = CASE(status == \"cancelled\" OR status == \"returned\", 0.0, line_total),\n               is_returned = CASE(status == \"returned\", 1, 0),\n               is_cancelled = CASE(status == \"cancelled\", 1, 0)\n        | STATS lines = COUNT(*), orders = COUNT_DISTINCT(order_id), revenue = ROUND(SUM(net)),\n                returned_lines = SUM(is_returned), cancelled_lines = SUM(is_cancelled)\n  - name: top_categories\n    type: elasticsearch.esql.query\n    with:\n      format: json\n      query: >-\n        FROM orders\n        | WHERE @timestamp >= \"{{ inputs.start }}\" AND @timestamp < \"{{ inputs.end }}\" AND status != \"cancelled\" AND status != \"returned\"\n        | STATS revenue = ROUND(SUM(line_total)) BY category\n        | SORT revenue DESC\n        | LIMIT 3\n  - name: top_products\n    type: elasticsearch.esql.query\n    with:\n      format: json\n      query: >-\n        FROM orders\n        | WHERE @timestamp >= \"{{ inputs.start }}\" AND @timestamp < \"{{ inputs.end }}\" AND status != \"cancelled\" AND status != \"returned\"\n        | STATS revenue = ROUND(SUM(line_total)), units = SUM(quantity) BY product = product_name.keyword\n        | SORT revenue DESC\n        | LIMIT 3\n  - name: write_digest\n    type: ai.prompt\n    with:\n      systemPrompt: >-\n        You write a three-line sales digest for a retail team. Use only the figures provided and quote them exactly.\n        Revenue excludes cancelled and returned lines. Never invent a figure or a comparison to another period.\n      prompt: >-\n        Window: {{ inputs.start }} to {{ inputs.end }}.\n        Totals (columns and values): {{ steps.totals.output | json }}\n        Top categories by revenue: {{ steps.top_categories.output | json }}\n        Top products by revenue: {{ steps.top_products.output | json }}\n        Write exactly three lines: overall result, the leading categories, the leading products.\n      schema:\n        type: object\n        properties:\n          digest:\n            type: string\n        required:\n          - digest\n  - name: store_digest\n    type: elasticsearch.index\n    with:\n      index: sales-digests\n      document:\n        \"@timestamp\": \"{{ execution.startedAt | date: '%Y-%m-%dT%H:%M:%SZ' }}\"\n        window_start: \"{{ inputs.start }}\"\n        window_end: \"{{ inputs.end }}\"\n        digest: \"{{ steps.write_digest.output.content.digest }}\"\n        revenue: \"{{ steps.totals.output.values[0][2] }}\"\n        orders: \"{{ steps.totals.output.values[0][1] }}\"\n        cancelled_lines: \"{{ steps.totals.output.values[0][4] }}\"\n        returned_lines: \"{{ steps.totals.output.values[0][3] }}\"\n"
+ },
+ "tickets": [
+  {
+   "ticket_id": "T-1042",
+   "text": "Customer ticket: our vector index uses too much RAM at 3072 dimensions",
+   "inputs": {
+    "ticket_id": "T-1042",
+    "ticket_text": "Customer ticket: our vector index uses too much RAM at 3072 dimensions"
+   },
+   "status": "completed",
+   "duration_ms": 3864,
+   "error": null,
+   "model": ".anthropic-claude-5-sonnet-chat_completion",
+   "tokens": {
+    "in": 4187,
+    "out": 401
+   },
+   "steps": [
+    {
+     "id": "search_docs",
+     "type": "elasticsearch.request",
+     "status": "completed",
+     "ms": 41,
+     "output": {
+      "took": 36,
+      "hits": [
+       {
+        "title": "HNSW Index Parameters and Trade-offs",
+        "section": "2. Index Configuration",
+        "version": "2.4.0",
+        "score": 0.033
+       },
+       {
+        "title": "VectorForge Configuration Guide: Getting Started",
+        "section": "1. Getting Started",
+        "version": "2.4.0",
+        "score": 0.032
+       },
+       {
+        "title": "Quantization for Storage Optimization",
+        "section": "5. Storage Optimization",
+        "version": "2.2.0",
+        "score": 0.031
+       }
+      ]
+     }
+    },
+    {
+     "id": "draft_reply",
+     "type": "ai.prompt",
+     "status": "completed",
+     "ms": 3542,
+     "output": {
+      "metadata": {
+       "tokenUsage": {
+        "promptTokens": 4187,
+        "totalTokens": 4588,
+        "completionTokens": 401
+       },
+       "usage": {
+        "connectorId": ".anthropic-claude-5-sonnet-chat_completion",
+        "inputTokens": 4187,
+        "outputTokens": 401
+       }
+      },
+      "content": {
+       "cited_docs": [
+        {
+         "section": "2. Index Configuration",
+         "title": "HNSW Index Parameters and Trade-offs",
+         "version": "2.4.0"
+        },
+        {
+         "section": "5. Storage Optimization",
+         "title": "Quantization for Storage Optimization",
+         "version": "2.2.0"
+        }
+       ],
+       "reply": "Thanks for reaching out. High RAM usage at 3072 dimensions is expected since full-precision (float32) vectors use 4 bytes per dimension, and HNSW index memory scales with both dimensions and the `m` parameter (roughly `nodes * (dimensions * 4 + m * 2 * 8)` bytes). To reduce memory, consider enabling quantization: scalar quantization (`sq8`) uses 1 byte per dimension with typically under 1% recall loss, or `sq4` at 0.5 bytes per dimension with 1-3% recall loss. For the largest reduction, product quantization (`pq`) is configurable but needs careful tuning. Always measure recall before and after enabling quantization using the `vforge bench recall` command, and keep rescoring enabled if you use `pq`."
+      }
+     }
+    }
+   ]
+  },
+  {
+   "ticket_id": "T-1043",
+   "text": "Customer ticket: search got slower after we turned on quantization, is accuracy affected?",
+   "inputs": {
+    "ticket_id": "T-1043",
+    "ticket_text": "Customer ticket: search got slower after we turned on quantization, is accuracy affected?"
+   },
+   "status": "completed",
+   "duration_ms": 4511,
+   "error": null,
+   "model": ".anthropic-claude-5-sonnet-chat_completion",
+   "tokens": {
+    "in": 4164,
+    "out": 370
+   },
+   "steps": [
+    {
+     "id": "search_docs",
+     "type": "elasticsearch.request",
+     "status": "completed",
+     "ms": 30,
+     "output": {
+      "took": 24,
+      "hits": [
+       {
+        "title": "Quantization for Storage Optimization",
+        "section": "5. Storage Optimization",
+        "version": "2.2.0",
+        "score": 0.033
+       },
+       {
+        "title": "VectorForge Configuration Guide: Getting Started",
+        "section": "1. Getting Started",
+        "version": "2.4.0",
+        "score": 0.032
+       },
+       {
+        "title": "Slow Query Diagnosis with EXPLAIN Plans",
+        "section": "5.2",
+        "version": "4.1.3",
+        "score": 0.031
+       }
+      ]
+     }
+    },
+    {
+     "id": "draft_reply",
+     "type": "ai.prompt",
+     "status": "completed",
+     "ms": 4203,
+     "output": {
+      "metadata": {
+       "tokenUsage": {
+        "promptTokens": 4164,
+        "totalTokens": 4534,
+        "completionTokens": 370
+       },
+       "usage": {
+        "connectorId": ".anthropic-claude-5-sonnet-chat_completion",
+        "inputTokens": 4164,
+        "outputTokens": 370
+       }
+      },
+      "content": {
+       "cited_docs": [
+        {
+         "section": "5. Storage Optimization",
+         "title": "Quantization for Storage Optimization",
+         "version": "2.2.0"
+        }
+       ],
+       "reply": "Thanks for reaching out. Quantization does involve a trade-off between storage/bandwidth savings and search accuracy, but it should generally not make search *slower* — if latency increased after enabling it, that's unexpected and worth investigating separately (e.g., check whether rescoring is enabled, since rescoring fetches extra candidates and recomputes exact scores, which adds work). On accuracy: each scheme has a typical recall loss (e.g., sq8 under 1%, sq4 1-3%, pq 2-8%, binary 5-15% without rescoring), but actual loss depends on your data. We recommend running the built-in recall benchmark (`vforge bench recall`) comparing your baseline to the quantized setting to measure the real impact, and keeping rescoring enabled for best accuracy. Could you confirm which quantization scheme and settings you're using?"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "digest": {
+  "inputs": {
+   "start": "2026-11-07T00:00:00Z",
+   "end": "2026-11-14T00:00:00Z"
+  },
+  "status": "completed",
+  "duration_ms": 2833,
+  "error": null,
+  "model": ".anthropic-claude-5-sonnet-chat_completion",
+  "tokens": {
+   "in": 1501,
+   "out": 247
+  },
+  "steps": [
+   {
+    "id": "totals",
+    "type": "elasticsearch.esql.query",
+    "status": "completed",
+    "ms": 18,
+    "output": {
+     "columns": [
+      "lines",
+      "orders",
+      "revenue",
+      "returned_lines",
+      "cancelled_lines"
+     ],
+     "values": [
+      [
+       2908,
+       2028,
+       274669,
+       0,
+       97
+      ]
+     ]
+    }
+   },
+   {
+    "id": "top_categories",
+    "type": "elasticsearch.esql.query",
+    "status": "completed",
+    "ms": 11,
+    "output": {
+     "columns": [
+      "revenue",
+      "category"
+     ],
+     "values": [
+      [
+       42679,
+       "bike components & accessories"
+      ],
+      [
+       38033,
+       "baby & kids"
+      ],
+      [
+       32155,
+       "running & fitness wearables"
+      ]
+     ]
+    }
+   },
+   {
+    "id": "top_products",
+    "type": "elasticsearch.esql.query",
+    "status": "completed",
+    "ms": 13,
+    "output": {
+     "columns": [
+      "revenue",
+      "units",
+      "product"
+     ],
+     "values": [
+      [
+       13889,
+       115,
+       "MG-Twist 40"
+      ],
+      [
+       6605,
+       196,
+       "City Grid Reversible Play Mat SF-6"
+      ],
+      [
+       5497,
+       39,
+       "Seatpost Elite 27.2 mm Dropper"
+      ]
+     ]
+    }
+   },
+   {
+    "id": "write_digest",
+    "type": "ai.prompt",
+    "status": "completed",
+    "ms": 2249,
+    "output": {
+     "metadata": {
+      "tokenUsage": {
+       "promptTokens": 1501,
+       "totalTokens": 1748,
+       "completionTokens": 247
+      },
+      "usage": {
+       "connectorId": ".anthropic-claude-5-sonnet-chat_completion",
+       "inputTokens": 1501,
+       "outputTokens": 247
+      }
+     },
+     "content": {
+      "digest": "For the week of 2026-11-07 to 2026-11-14, total revenue was $274,669 across 2,028 orders and 2,908 lines (0 returned lines, 97 cancelled lines excluded).\nTop categories by revenue: bike components & accessories ($42,679), baby & kids ($38,033), and running & fitness wearables ($32,155).\nTop products by revenue: MG-Twist 40 ($13,889, 115 units), City Grid Reversible Play Mat SF-6 ($6,605, 196 units), and Seatpost Elite 27.2 mm Dropper ($5,497, 39 units)."
+     }
+    }
+   },
+   {
+    "id": "store_digest",
+    "type": "elasticsearch.index",
+    "status": "completed",
+    "ms": 267,
+    "output": {
+     "result": "created",
+     "_shards": {
+      "total": 1,
+      "failed": 0,
+      "successful": 1
+     },
+     "_seq_no": 3,
+     "_index": "sales-digests",
+     "_id": "tVQ-1qEBoHnWLmb5vadk",
+     "_version": 1,
+     "_primary_term": 1
+    }
+   }
+  ]
+ },
+ "digest_check": {
+  "esql": "FROM orders | WHERE @timestamp >= \"2026-11-07T00:00:00Z\" AND @timestamp < \"2026-11-14T00:00:00Z\" AND status != \"cancelled\" AND status != \"returned\" | STATS revenue = ROUND(SUM(line_total)) BY category | SORT revenue DESC | LIMIT 3",
+  "esql_total": "FROM orders | WHERE @timestamp >= \"2026-11-07T00:00:00Z\" AND @timestamp < \"2026-11-14T00:00:00Z\" AND status != \"cancelled\" AND status != \"returned\" | STATS revenue = ROUND(SUM(line_total))",
+  "categories": {
+   "columns": [
+    "revenue",
+    "category"
+   ],
+   "rows": [
+    [
+     42679.0,
+     "bike components & accessories"
+    ],
+    [
+     38033.0,
+     "baby & kids"
+    ],
+    [
+     32155.0,
+     "running & fitness wearables"
+    ]
+   ]
+  },
+  "total": {
+   "columns": [
+    "revenue"
+   ],
+   "rows": [
+    [
+     274669.0
+    ]
+   ]
+  }
+ },
+ "digest_doc": {
+  "@timestamp": "2026-11-13T18:49:55Z",
+  "window_start": "2026-11-07T00:00:00Z",
+  "window_end": "2026-11-14T00:00:00Z",
+  "digest": "For the week of 2026-11-07 to 2026-11-14, total revenue was $274,669 across 2,028 orders and 2,908 lines (0 returned lines, 97 cancelled lines excluded).\nTop categories by revenue: bike components & accessories ($42,679), baby & kids ($38,033), and running & fitness wearables ($32,155).\nTop products by revenue: MG-Twist 40 ($13,889, 115 units), City Grid Reversible Play Mat SF-6 ($6,605, 196 units), and Seatpost Elite 27.2 mm Dropper ($5,497, 39 units).",
+  "revenue": "274669",
+  "orders": "2028",
+  "cancelled_lines": "97",
+  "returned_lines": "0"
+ }
+}
